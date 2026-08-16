@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import {
   CarFront,
-  Camera,
   Check,
   ChevronDown,
   ClipboardCheck,
@@ -29,7 +28,7 @@ import {
   translateTransmission,
 } from "@/server/normalization/display";
 import { CarMediaShowcase } from "./CarMediaShowcase";
-import { RemoteImage } from "@/components/site/RemoteImage";
+import { InspectionPhotoGallery } from "./InspectionPhotoGallery";
 import type { ThermalEntry, ThermalReference } from "./thermalTypes";
 import { PriceCalculationCard } from "./PriceCalculationCard";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -206,7 +205,7 @@ export default async function CarDetailPage({
             />
 
             {inspectionImages.length > 0 && (
-              <EncarInspectionEvidence media={inspectionImages} title={title} />
+              <InspectionPhotoGallery media={inspectionImages} title={title} />
             )}
 
             {inspectionGroups.length > 0 && (
@@ -601,51 +600,6 @@ function ConditionOverview({
             </p>
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-function EncarInspectionEvidence({
-  media,
-  title,
-}: {
-  media: Array<{
-    url: string;
-    thumbnail_url: string | null;
-    sort_order: number;
-  }>;
-  title: string;
-}) {
-  const ordered = [...media].sort((left, right) => left.sort_order - right.sort_order);
-  return (
-    <div className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
-      <div className="flex items-center gap-2">
-        <Camera className="text-[#a98239]" size={20} />
-        <div>
-          <h2 className="text-lg font-semibold sm:text-xl">Фото живого осмотра</h2>
-          <p className="mt-1 text-xs text-[#647084] sm:text-sm">Материалы проверки, полученные из Encar</p>
-        </div>
-      </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {ordered.map((image, index) => (
-          <figure className="overflow-hidden rounded bg-[#f7f9fb] ring-1 ring-[#e8ecf2]" key={`${image.url}-${index}`}>
-            <div className="relative aspect-[4/3]">
-              <RemoteImage
-                alt={`${title} — фото живого осмотра Encar`}
-                className="object-cover"
-                fill
-                loading="lazy"
-                sizes="(min-width: 640px) 50vw, 100vw"
-                src={image.thumbnail_url ?? image.url}
-                fallback="Фото осмотра недоступно"
-              />
-            </div>
-            <figcaption className="px-3 py-2 text-xs text-[#647084]">
-              {index === 0 ? "Основной кадр осмотра" : `Кадр осмотра ${index + 1}`}
-            </figcaption>
-          </figure>
-        ))}
       </div>
     </div>
   );
