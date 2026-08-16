@@ -412,7 +412,12 @@ export function getShowcasePhoto(car: CatalogCar) {
     .filter((media) => media.media_type === "image")
     .map((media) => ({ media, score: showcasePhotoScore(media) }))
     .filter((item) => item.score > 0)
-    .sort((left, right) => right.score - left.score || left.media.sort_order - right.media.sort_order);
+    .sort(
+      (left, right) =>
+        Number(right.media.is_primary) - Number(left.media.is_primary) ||
+        right.score - left.score ||
+        left.media.sort_order - right.media.sort_order,
+    );
 
   return candidates[0]?.media.url ?? null;
 }
@@ -443,7 +448,7 @@ function showcasePhotoScore(media: NonNullable<CatalogCar["car_media"]>[number])
   }
 
   const fileCode = Number(media.url.match(/_(\d{3})(?:\.[a-z]+)(?:\?|$)/i)?.[1] ?? NaN);
-  const primaryBonus = media.is_primary ? 2 : 0;
+  const primaryBonus = media.is_primary ? 1000 : 0;
   if (["outside", "outside_image", "exterior", "outer"].includes(category)) {
     const exteriorAngleBonus =
       fileCode === 2 ? 55 :
