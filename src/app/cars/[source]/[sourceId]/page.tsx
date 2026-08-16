@@ -225,8 +225,6 @@ export default async function CarDetailPage({
         <div className="order-2 min-w-0 lg:sticky lg:top-4 lg:col-start-2 lg:row-start-1 lg:self-start">
           <PriceCalculationCard
             calc={calc}
-            color={car.color}
-            driveType={car.drive_type}
             engineCc={car.engine_cc}
             fuel={translateFuel(car.fuel_type)}
             mileageKm={car.mileage_km}
@@ -236,7 +234,6 @@ export default async function CarDetailPage({
             sourceId={sourceId}
             sourceUrl={officialSourceUrl(car.source_url, car.primary_source)}
             title={title}
-            transmission={translateTransmission(car.transmission)}
             year={car.year}
             registrationMonth={car.registration_month}
           />

@@ -83,8 +83,6 @@ function resultNumber(result: unknown, key: string) {
 
 export function PriceCalculationCard({
   calc,
-  color,
-  driveType,
   engineCc,
   fuel,
   mileageKm,
@@ -94,13 +92,10 @@ export function PriceCalculationCard({
   sourceId,
   sourceUrl,
   title,
-  transmission,
   year,
   registrationMonth,
 }: {
   calc: CalculationSnapshot | undefined;
-  color: string | null;
-  driveType: string | null;
   engineCc: number | null;
   fuel: string;
   mileageKm: number | null;
@@ -110,7 +105,6 @@ export function PriceCalculationCard({
   sourceId: string;
   sourceUrl: string | null;
   title: string;
-  transmission: string;
   year: number | null;
   registrationMonth: number | null;
 }) {
@@ -312,11 +306,6 @@ export function PriceCalculationCard({
             label="Цена в Корее"
             value={priceKrw ? won(priceKrw) : "-"}
           />
-          <Spec label="Мощность" value={powerHp ? `${powerHp} л.с.` : "-"} />
-          <Spec label="Топливо" value={fuel} />
-          <Spec label="КПП" value={transmission} />
-          <Spec label="Привод" value={driveType ?? "-"} />
-          <Spec label="Цвет" value={color ?? "-"} />
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:grid-cols-1 sm:gap-3">
