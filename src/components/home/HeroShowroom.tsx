@@ -1,11 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRef, type MouseEvent } from "react";
 import {
   ArrowRight,
-  BadgeCheck,
   Calculator,
   CarFront,
   ChevronRight,
@@ -96,20 +94,6 @@ export function HeroShowroom({
 
         <div className="hero-showroom__content">
           <div className="hero-showroom__copy">
-            <div className="hero-showroom__brand" aria-label="TL Auto Export">
-              <Image
-                alt="TL Auto Export"
-                height={724}
-                loading="eager"
-                sizes="(min-width: 640px) 224px, 180px"
-                src="/branding/tl-auto-wordmark.png"
-                width={2172}
-              />
-            </div>
-            <p className="hero-showroom__eyebrow">
-              <BadgeCheck size={16} aria-hidden="true" />
-              Корея · расчёт для РФ · Владивосток
-            </p>
             <h1 id="hero-title">
               Автомобили из Кореи{" "}
               <span>с расчётом под ключ</span>

@@ -116,36 +116,9 @@ a {
   animation: hero-reveal 720ms 120ms both cubic-bezier(0.2, 0.72, 0.2, 1);
 }
 
-.hero-showroom__brand {
-  display: inline-flex;
-  width: fit-content;
-  margin-bottom: 20px;
-  border: 1px solid rgba(216, 189, 117, 0.34);
-  border-radius: 3px;
-  background: rgba(5, 8, 12, 0.76);
-  padding: 5px 10px;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.24);
-  backdrop-filter: blur(14px);
-}
-
-.hero-showroom__brand img {
-  width: 224px;
-  height: auto;
-}
-
-.hero-showroom__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #85e1c7;
-}
-
 .hero-showroom h1 {
   max-width: 650px;
-  margin-top: 16px;
+  margin-top: 20px;
   font-size: 56px;
   font-weight: 600;
   line-height: 1.05;
@@ -603,15 +576,6 @@ a {
     font-size: 30px;
     font-weight: 600;
     line-height: 1.08;
-  }
-
-  .hero-showroom__brand {
-    margin-bottom: 14px;
-    padding: 4px 8px;
-  }
-
-  .hero-showroom__brand img {
-    width: 174px;
   }
 
   .hero-showroom__lead {
