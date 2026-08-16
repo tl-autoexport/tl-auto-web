@@ -345,14 +345,14 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
   if (!data) return null;
 
   // Most report blocks are rendered from normalized summary/items. Only these
-  // three report kinds need their raw JSON for the body map, Eye report and
+  // report kinds need their raw JSON for the body map, Eye report and
   // insurance-event details. Keeping the raw payload out of the relation
   // prevents unrelated diagnostic blobs from being sent on every card view.
   const { data: rawReports, error: rawReportsError } = await supabase
     .from("car_condition_reports")
     .select("report_type, raw_payload")
     .eq("car_id", data.id)
-    .in("report_type", ["carhistory", "encar_carhistory"]);
+    .in("report_type", ["carhistory", "encar_carhistory", "encar_inspection"]);
 
   if (rawReportsError) {
     console.error("[cars] Diagnostic payload query failed", { source, sourceId, rawReportsError });
