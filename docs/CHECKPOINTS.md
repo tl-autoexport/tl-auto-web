@@ -155,6 +155,32 @@ CP-04 — применить миграции в независимом Supabase
 
 CP-05 — выполнить ограниченный первый write-import Encar (начать с малого объёма), проверить созданные записи и только затем согласовать наполнение рабочего каталога.
 
+## CP-05 — подготовка переноса Encar seed из Autoexport
+
+- Status: in_review
+- Date: 2026-08-16
+
+### Выполнено
+
+- [x] Исходный Autoexport Supabase прочитан без изменения исходного проекта
+- [x] Найдено 3 847 доступных Encar-записей в исходной базе
+- [x] Подготовлен переносчик с прямым read из исходной PostgreSQL
+- [x] Переносчик по умолчанию работает в `MIGRATION_DRY_RUN=true`
+- [x] Сохранение UUID и связей между сущностями предусмотрено
+- [x] В seed входят только `cars`, `car_media`, `car_options`, `car_condition_reports`, `calc_snapshots`
+- [x] Исключены Auth, leads, lead_events, source_snapshots и HeyDealer
+- [x] Dry-run подтверждён: 3 847 cars, 107 517 media, 204 356 options, 4 876 reports, 5 784 calculations
+- [x] В TL Auto ничего не записано
+
+### Артефакты
+
+- `scripts/migrate-encar-seed.ts`
+- Команда записи требует явного `MIGRATION_DRY_RUN=false`
+
+### Следующий шаг после согласования
+
+Выполнить write-import в TL Auto батчами и после каждой группы проверить количество записей и связи. После завершения — отдельно запустить публичный каталог и визуальную проверку.
+
 ### Артефакты проверки
 
 - `output/playwright/tl-auto-home-desktop.png`
