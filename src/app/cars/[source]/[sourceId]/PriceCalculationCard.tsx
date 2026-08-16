@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import {
   BadgeCheck,
   Calculator,
@@ -119,7 +119,14 @@ export function PriceCalculationCard({
   const calculationTitleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const [activeCalc, setActiveCalc] = useState<CalculationSnapshot | undefined>(calc);
+  const [refreshedCalc, setRefreshedCalc] = useState<{
+    calc: CalculationSnapshot;
+    sourceCalculatedAt: string | null;
+  }>();
+  const activeCalc =
+    refreshedCalc?.sourceCalculatedAt === (calc?.calculated_at ?? null)
+      ? refreshedCalc.calc
+      : calc;
   const [isRefreshing, setRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const total = number(activeCalc?.total_rub);
@@ -141,10 +148,6 @@ export function PriceCalculationCard({
   const rateDetails = resultObject(activeCalc?.result, "rateDetails") as LiveCalculation["rateDetails"];
   const resultRates = resultObject(activeCalc?.result, "rates");
 
-  useEffect(() => {
-    setActiveCalc(calc);
-  }, [calc]);
-
   async function refreshCalculation() {
     if (!priceKrw || !year || !engineCc || !powerHp) return;
     setRefreshing(true);
@@ -165,16 +168,19 @@ export function PriceCalculationCard({
       const payload = (await response.json()) as LiveCalculation | { error?: string };
       if (!response.ok || "error" in payload) throw new Error("error" in payload ? payload.error : "Не удалось обновить расчёт");
       const live = payload as LiveCalculation;
-      setActiveCalc({
-        total_rub: live.totalRub,
-        car_price_rub: live.carPriceRub,
-        duty_rub: live.dutyRub,
-        fees_rub: live.feesRub,
-        util_rub: live.utilRub,
-        freight_rub: live.freightRub,
-        broker_rub: live.brokerRub,
-        calculated_at: new Date().toISOString(),
-        result: live,
+      setRefreshedCalc({
+        sourceCalculatedAt: calc?.calculated_at ?? null,
+        calc: {
+          total_rub: live.totalRub,
+          car_price_rub: live.carPriceRub,
+          duty_rub: live.dutyRub,
+          fees_rub: live.feesRub,
+          util_rub: live.utilRub,
+          freight_rub: live.freightRub,
+          broker_rub: live.brokerRub,
+          calculated_at: new Date().toISOString(),
+          result: live,
+        },
       });
     } catch (error) {
       setRefreshError(error instanceof Error ? error.message : "Не удалось обновить расчёт");

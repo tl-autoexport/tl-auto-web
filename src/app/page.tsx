@@ -6,7 +6,6 @@ import {
   ChevronRight,
   CircleDollarSign,
   FileCheck2,
-  Gauge,
   MapPin,
   MessageSquareQuote,
   Images,
@@ -110,64 +109,6 @@ export default async function Home() {
         sourceUpdatedAt={heroCar?.source_updated_at ?? null}
         totalPriceRub={heroCalc?.total_rub ?? heroCar?.price_rub ?? null}
       />
-
-      <section className="border-b border-[#dce2eb] bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-5 md:py-16">
-          <SectionHeader
-            eyebrow="Фокус TL Auto"
-            title="Южная Корея — наш основной рынок"
-            text="Работаем с автомобилями из Кореи: от выбора объявления Encar до расчёта и доставки во Владивосток."
-          />
-          <div className="mt-7 grid gap-3 md:grid-cols-3 md:gap-4">
-            <KoreaValue
-              icon={FileCheck2}
-              title="Данные Encar"
-              text="Реальные объявления, характеристики и доступная история автомобиля."
-            />
-            <KoreaValue
-              icon={CircleDollarSign}
-              title="Расчёт под ключ"
-              text="Показываем основные расходы и итоговую стоимость до Владивостока."
-            />
-            <KoreaValue
-              icon={Ship}
-              title="Понятная доставка"
-              text="Сопровождаем путь автомобиля от выбора до передачи менеджеру."
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-7 sm:px-5 sm:py-10">
-        <SectionHeader
-          eyebrow="Быстрый выбор"
-          title="Выберите сценарий покупки"
-          text="Без регистрации и без лишних шагов: подбор начинается с понятного критерия."
-        />
-        <div className="mt-5 grid grid-cols-2 gap-2.5 md:grid-cols-2 xl:grid-cols-4">
-          <Scenario
-            href="/catalog?shelf=under-160"
-            title="До 160 л.с."
-            text="Популярная витрина с ограничением по мощности."
-            icon={Gauge}
-            tone="red"
-          />
-          <Scenario
-            href="/catalog?shelf=passable"
-            title="Проходные 3-5 лет"
-            text="Определяем по месяцу первой регистрации."
-            icon={ShieldCheck}
-            tone="blue"
-          />
-          <Scenario
-            href="/catalog"
-            title="Все автомобили"
-            text="Каталог доступных автомобилей без электромобилей."
-            icon={CarFront}
-            tone="dark"
-          />
-        </div>
-      </section>
 
       <VehicleShelf
         id="under-160"
@@ -373,88 +314,6 @@ export default async function Home() {
         </div>
       </section>
     </main>
-  );
-}
-
-function Scenario({
-  href,
-  icon: Icon,
-  text,
-  title,
-  tone,
-}: {
-  href: string;
-  icon: typeof CarFront;
-  text: string;
-  title: string;
-  tone: "red" | "blue" | "green" | "dark";
-}) {
-  const tones = {
-    red: "bg-[#fbf7ed] text-[#956f2c]",
-    blue: "bg-[#eef5ff] text-[#3973c8]",
-    green: "bg-[#ebfaf5] text-[#259879]",
-    dark: "bg-[#edf0f5] text-[#101827]",
-  };
-  return (
-    <Link
-      href={href}
-      className="group rounded-md border border-[#dce2eb] bg-white p-3 transition hover:border-[#aeb8c6] hover:shadow-sm sm:p-5"
-    >
-      <span
-        className={`flex size-9 items-center justify-center rounded-md sm:size-10 ${tones[tone]}`}
-      >
-        <Icon size={20} />
-      </span>
-      <h3 className="mt-3 text-sm font-semibold leading-5 group-hover:text-[#956f2c] sm:mt-5 sm:text-lg">
-        {title}
-      </h3>
-      <p className="mt-2 hidden text-sm leading-6 text-[#647084] sm:block">{text}</p>
-      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold sm:mt-4 sm:text-sm">
-        Открыть <ArrowRight size={15} />
-      </span>
-    </Link>
-  );
-}
-
-function SectionHeader({
-  eyebrow,
-  text,
-  title,
-}: {
-  eyebrow: string;
-  text: string;
-  title: string;
-}) {
-  return (
-    <div>
-      <p className="text-xs font-semibold text-[#956f2c] sm:text-sm">{eyebrow}</p>
-      <div className="mt-2 flex flex-col justify-between gap-3 md:flex-row md:items-end">
-        <div>
-          <h2 className="text-2xl font-semibold sm:text-3xl">{title}</h2>
-          <p className="mt-2 text-[13px] leading-5 text-[#647084] sm:text-sm sm:leading-6">{text}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function KoreaValue({
-  icon: Icon,
-  text,
-  title,
-}: {
-  icon: typeof FileCheck2;
-  text: string;
-  title: string;
-}) {
-  return (
-    <article className="rounded-md border border-[#dce2eb] bg-[#fbfcfd] p-5 transition hover:-translate-y-0.5 hover:border-[#c7a55a] hover:shadow-[0_14px_34px_rgba(15,23,42,0.08)] sm:p-6">
-      <span className="flex size-10 items-center justify-center rounded-md bg-[#fbf7ed] text-[#956f2c]">
-        <Icon size={20} />
-      </span>
-      <h3 className="mt-5 text-lg font-semibold">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-[#647084]">{text}</p>
-    </article>
   );
 }
 
