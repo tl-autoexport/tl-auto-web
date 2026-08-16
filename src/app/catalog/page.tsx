@@ -334,7 +334,10 @@ function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boo
       <Link className="block" href={detailsHref}>
         <div className="relative aspect-[4/3] bg-[#dfe4ec]">
           {photo ? <RemoteImage alt={carDisplayTitle(car)} className="object-cover" fetchPriority={highPriority ? "high" : undefined} fill loading={highPriority ? "eager" : undefined} sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" src={photo} fallback={<Camera size={32} />} /> : <div className="flex h-full items-center justify-center text-[#647084]"><Camera size={32} /></div>}
-          <div className="absolute left-3 top-3 flex gap-2"><span className="rounded-sm bg-white px-2 py-1 text-xs font-semibold">Корея</span><span className="rounded-sm bg-[#177d69] px-2 py-1 text-xs font-semibold text-white">{sourceName}</span></div>
+          <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+            {car.accident_count === 0 ? <span className="rounded-sm bg-[#e8f5ef] px-2 py-1 text-xs font-semibold text-[#18794e]">Без ДТП</span> : null}
+            {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? <span className="rounded-sm bg-[#fff2e5] px-2 py-1 text-xs font-semibold text-[#9a5b1c]">Страховые выплаты: {car.insurance_payout_count}</span> : null}
+          </div>
         </div>
       </Link>
       <div className="p-4">

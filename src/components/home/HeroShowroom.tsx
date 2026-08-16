@@ -164,7 +164,7 @@ export function HeroShowroom({
 function Metric({ label, value }: { label: string; value: number }) {
   return (
     <div className="hero-showroom__metric">
-      <strong>{value}</strong>
+      <strong>{rub.format(value)}</strong>
       <span>{label}</span>
     </div>
   );

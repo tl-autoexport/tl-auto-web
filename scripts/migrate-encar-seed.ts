@@ -6,6 +6,14 @@ config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
 type Row = Record<string, unknown>;
+type FilterQuery = {
+  eq(column: string, value: unknown): FilterQuery;
+  in(column: string, values: readonly unknown[]): FilterQuery;
+};
+type QueryResponse = {
+  data: unknown[] | null;
+  error: { message: string } | null;
+};
 
 const sourceUrl = process.env.SOURCE_SUPABASE_URL;
 const sourceKey = process.env.SOURCE_SUPABASE_READ_KEY;
@@ -38,13 +46,18 @@ const target = createClient(targetUrl, targetKey, {
 async function fetchAll(
   client: SupabaseClient,
   table: string,
-  filter?: (query: any) => any,
+  filter?: (query: FilterQuery) => FilterQuery,
 ) {
   const rows: Row[] = [];
   for (let offset = 0; ; offset += pageSize) {
-    let query = client.from(table).select("*").range(offset, offset + pageSize - 1);
-    if (filter) query = filter(query);
-    const { data, error } = await query;
+    const baseQuery = client
+      .from(table)
+      .select("*")
+      .range(offset, offset + pageSize - 1);
+    const filteredQuery = filter
+      ? filter(baseQuery as unknown as FilterQuery)
+      : baseQuery;
+    const { data, error } = await (filteredQuery as unknown as PromiseLike<QueryResponse>);
     if (error) throw new Error(`${table} read failed: ${error.message}`);
     const batch = (data ?? []) as Row[];
     rows.push(...batch);

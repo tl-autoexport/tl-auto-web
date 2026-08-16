@@ -51,21 +51,22 @@ function isPassable(car: CatalogCar) {
 }
 
 export default async function Home() {
-  const [cars, catalogMetrics] = await Promise.all([
-    getCatalogCars({ limit: 80 }),
+  const [cars, under160Cars, passableCars, catalogMetrics] = await Promise.all([
+    getCatalogCars({ limit: 24 }),
+    getCatalogCars({ limit: 24, maxPowerHp: 160 }),
+    getCatalogCars({ limit: 24, passable: true }),
     getCatalogMetrics(),
   ]);
-  const showcaseCars = cars.filter(hasShowcasePhoto);
-  const heroCar =
-    showcaseCars.find((car) => (car.power_hp ?? Infinity) <= 160) ??
-    showcaseCars[0] ??
-    cars[0];
+  const heroCar = cars.find(hasShowcasePhoto) ?? cars[0];
   const usedCarIds = new Set(heroCar ? [heroCar.id] : []);
   const under160 = selectShelfCars(
-    showcaseCars.filter((car) => (car.power_hp ?? Infinity) <= 160),
+    under160Cars.filter(hasShowcasePhoto),
     usedCarIds,
   );
-  const passable = selectShelfCars(showcaseCars.filter(isPassable), usedCarIds);
+  const passable = selectShelfCars(
+    passableCars.filter((car) => hasShowcasePhoto(car) && isPassable(car)),
+    usedCarIds,
+  );
   const heroDetail = heroCar
     ? await getCarDetail(heroCar.primary_source, heroCar.source_id)
     : null;
@@ -525,12 +526,16 @@ function HomeCarCard({ car }: { car: CatalogCar }) {
           />
         )}
         <div className="absolute left-3 top-3 flex gap-2">
-          <span className="rounded-sm bg-white px-2 py-1 text-xs font-semibold">
-            Корея
-          </span>
-          <span className="rounded-sm bg-[#a98239] px-2 py-1 text-xs font-semibold text-white">
-            Encar
-          </span>
+          {car.accident_count === 0 ? (
+            <span className="rounded-sm bg-[#e8f5ef] px-2 py-1 text-xs font-semibold text-[#18794e]">
+              Без ДТП
+            </span>
+          ) : null}
+          {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? (
+            <span className="rounded-sm bg-[#fff2e5] px-2 py-1 text-xs font-semibold text-[#9a5b1c]">
+              Страховые выплаты: {car.insurance_payout_count}
+            </span>
+          ) : null}
         </div>
       </div>
       <div className="p-4">

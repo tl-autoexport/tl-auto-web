@@ -170,8 +170,6 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   if (noAccidents) query = query.eq("accident_count", 0);
   if (passable) query = query.or(passableFilterExpression());
   if (sourceId) query = query.eq("source_id", sourceId);
-  query = query.eq("car_media.is_primary", true);
-
   const order = {
     fresh: { column: "source_updated_at", ascending: false },
     price_asc: { column: "price_rub", ascending: true },
@@ -238,9 +236,13 @@ async function fetchCatalogMetrics(): Promise<CatalogMetrics> {
   return { calculated, under160, clean };
 }
 
-const getCachedCatalogMetrics = unstable_cache(fetchCatalogMetrics, ["catalog-metrics-v1"], {
+const getCachedCatalogMetrics = unstable_cache(
+  fetchCatalogMetrics,
+  ["catalog-metrics-v2", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  {
   revalidate: 300,
-});
+  },
+);
 
 export async function getCatalogMetrics(): Promise<CatalogMetrics> {
   return getCachedCatalogMetrics();
@@ -441,9 +443,15 @@ function showcasePhotoScore(media: NonNullable<CatalogCar["car_media"]>[number])
   }
 
   const fileCode = Number(media.url.match(/_(\d{3})(?:\.[a-z]+)(?:\?|$)/i)?.[1] ?? NaN);
-  const primaryBonus = media.is_primary ? 5 : 0;
+  const primaryBonus = media.is_primary ? 2 : 0;
   if (["outside", "outside_image", "exterior", "outer"].includes(category)) {
-    return 300 + (fileCode === 1 ? 40 : Number.isFinite(fileCode) && fileCode <= 8 ? 20 - fileCode : 0) + primaryBonus;
+    const exteriorAngleBonus =
+      fileCode === 2 ? 55 :
+      fileCode === 3 ? 50 :
+      fileCode === 4 ? 35 :
+      fileCode === 1 ? 18 :
+      Number.isFinite(fileCode) && fileCode <= 8 ? 20 - fileCode : 0;
+    return 300 + exteriorAngleBonus + primaryBonus;
   }
   if (category === "thumbnail") return 280 + (fileCode === 1 ? 30 : 0) + primaryBonus;
   if (category === "photo" && fileCode === 1) return 260 + primaryBonus;
