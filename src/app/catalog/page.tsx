@@ -30,6 +30,7 @@ import { RemoteImage } from "@/components/site/RemoteImage";
 import { officialSourceUrl, sourceDisplayName } from "@/lib/source-url";
 import { MobileCatalogFilters } from "./MobileCatalogFilters";
 import { BrandModelFields } from "@/components/catalog/BrandModelFields";
+import { LiveCatalogCount } from "./LiveCatalogCount";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const date = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short" });
@@ -274,7 +275,7 @@ function CatalogFilterForm({
   const additionalFields = (
     <>
       <FilterSelect label="Топливо" name="fuel" options={fuels} placeholder="Любое" translate={translateFuel} value={value("fuel")} />
-      <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} />
+      {transmissions.length > 1 ? <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} /> : null}
       <RangeField label="Объём двигателя, см3" maxName="engineMax" maxValue={value("engineMax")} minName="engineMin" minValue={value("engineMin")} />
       <FilterInput inputMode="numeric" label="Пробег до, км" name="mileageMax" placeholder="Например, 80 000" value={value("mileageMax")} />
       <FilterInput inputMode="numeric" label="Мощность до, л.с." name="powerMax" placeholder="Например, 160" value={value("powerMax")} />
@@ -321,13 +322,13 @@ function CatalogFilterForm({
                 <ChevronDown className="pointer-events-none absolute right-3 top-3 text-[#647084]" size={17} />
               </span>
             </label>
-            <button className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[#c7a55a] px-6 text-sm font-semibold text-[#15130f]" type="submit"><Search size={17} /> Показать {totalCars}</button>
+            <LiveCatalogCount initialCount={totalCars} />
           </div>
         ) : null}
       </div>
       {mobile ? (
         <div className="fixed inset-x-0 bottom-0 z-10 border-t border-[#dce2eb] bg-white p-3 pb-[max(12px,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(16,24,39,0.08)]">
-          <button className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#c7a55a] text-sm font-semibold text-[#15130f]" type="submit"><Search size={17} /> Показать {totalCars} автомобилей</button>
+          <LiveCatalogCount initialCount={totalCars} mobile />
         </div>
       ) : null}
     </form>
