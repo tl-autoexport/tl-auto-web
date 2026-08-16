@@ -29,6 +29,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { RemoteImage } from "@/components/site/RemoteImage";
 import { officialSourceUrl, sourceDisplayName } from "@/lib/source-url";
 import { MobileCatalogFilters } from "./MobileCatalogFilters";
+import { BrandModelFields } from "@/components/catalog/BrandModelFields";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const date = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short" });
@@ -115,7 +116,13 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     offset: (currentPage - 1) * pageSize,
   });
   const brands = unique(optionCars.map((car) => car.brand));
-  const models = unique(optionCars.filter((car) => !filters.brand || car.brand === filters.brand).map((car) => car.model));
+  const modelsByBrand = optionCars.reduce<Record<string, string[]>>((groups, car) => {
+    if (!car.brand || !car.model) return groups;
+    groups[car.brand] = groups[car.brand] ?? [];
+    if (!groups[car.brand].includes(car.model)) groups[car.brand].push(car.model);
+    return groups;
+  }, {});
+  for (const models of Object.values(modelsByBrand)) models.sort();
   const fuels = unique(optionCars.map((car) => car.fuel_type));
   const transmissions = unique(optionCars.map((car) => transmissionFilterValue(car.transmission)));
   const popularBrands = brands.slice(0, 7);
@@ -124,7 +131,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const activeChips = buildActiveFilterChips(rawParams);
   const filterFormProps = {
     brands,
-    models,
+    modelsByBrand,
     fuels,
     transmissions,
     under160,
@@ -225,7 +232,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
 type CatalogFilterFormProps = {
   brands: string[];
-  models: string[];
+  modelsByBrand: Record<string, string[]>;
   fuels: string[];
   transmissions: string[];
   under160: boolean;
@@ -242,7 +249,7 @@ function CatalogFilterForm({
   clean,
   fuels,
   mobile = false,
-  models,
+  modelsByBrand,
   passable,
   sort,
   totalCars,
@@ -252,11 +259,15 @@ function CatalogFilterForm({
 }: CatalogFilterFormProps) {
   const mainFields = (
     <>
-      <FilterSelect label="Марка" name="brand" options={brands} placeholder="Все марки" value={value("brand")} />
-      <FilterSelect label="Модель" name="model" options={models} placeholder="Все модели" value={value("model")} />
+      <BrandModelFields
+        brands={brands}
+        initialBrand={value("brand")}
+        initialModel={value("model")}
+        modelsByBrand={modelsByBrand}
+      />
       <RangeField label="Год выпуска" maxName="yearMax" maxValue={value("yearMax")} minName="yearMin" minValue={value("yearMin")} />
       <RangeField label="Цена до Владивостока, ₽" maxName="priceMax" maxValue={value("priceMax")} minName="priceMin" minValue={value("priceMin")} />
-      <FilterInput label="Номер лота" name="number" placeholder="42308829 или JlVOBVyE" value={value("number")} />
+      <FilterInput label="Номер лота Encar" name="number" placeholder="Например, 42557447" value={value("number")} />
     </>
   );
 
@@ -297,7 +308,7 @@ function CatalogFilterForm({
         <div className={mobile ? "grid grid-cols-2 gap-2 border-t border-[#dce2eb] pt-4" : "flex flex-wrap gap-x-5 gap-y-3 md:col-span-2 xl:col-span-4"}>
           <FilterCheck checked={under160} label="До 160 л.с." name="under160" value="1" />
           <FilterCheck checked={passable} label="Проходные 3–5 лет" name="passable" value="1" />
-          <FilterCheck checked={clean} label="Без страховых случаев" name="clean" value="1" />
+          <FilterCheck checked={clean} label="Без ДТП" name="clean" value="1" />
         </div>
         {!mobile ? (
           <div className="flex items-end gap-3 md:col-span-2 xl:col-span-4">
