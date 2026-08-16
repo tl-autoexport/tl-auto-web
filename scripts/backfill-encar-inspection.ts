@@ -27,11 +27,6 @@ function identifier(value: unknown) {
   return text(value);
 }
 
-function number(value: unknown) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
 async function getJson(url: string) {
   const response = await fetch(url, { headers: baseHeaders, signal: AbortSignal.timeout(20_000) });
   if (!response.ok) throw new Error(`${response.status} ${url}`);
