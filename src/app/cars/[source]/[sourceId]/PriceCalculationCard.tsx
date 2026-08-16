@@ -8,6 +8,7 @@ import {
   ExternalLink,
   Info,
   MessageCircle,
+  RefreshCw,
   X,
 } from "lucide-react";
 import {
@@ -28,6 +29,28 @@ type CalculationSnapshot = {
   result: unknown;
 };
 
+type LiveCalculation = {
+  carPriceRub: number;
+  freightRub: number;
+  brokerRub: number;
+  dutyRub: number;
+  feesRub: number;
+  utilRub: number;
+  totalRub: number;
+  koreaExpensesRub: number;
+  rates: { krwRub: number; usdRub: number; eurRub: number };
+  ratesAsOf: string | null;
+  ratesSource: string;
+  rateDetails: {
+    cbrMarkupPercent: number;
+    cbrUsdRub: number;
+    usdtKrwRaw: number;
+    usdtKrwAdjustment: number;
+    usdtKrwAdjusted: number;
+    fetchedAt: string;
+  } | null;
+};
+
 const rub = new Intl.NumberFormat("ru-RU");
 
 function money(value: number | null | undefined) {
@@ -40,6 +63,10 @@ function won(value: number | null | undefined) {
 
 function number(value: number | null | undefined) {
   return value ?? 0;
+}
+
+function rate(value: number | null | undefined) {
+  return value == null ? "-" : value.toLocaleString("ru-RU", { maximumFractionDigits: 5 });
 }
 
 function resultValue(result: unknown, key: string): string | number | null {
@@ -69,6 +96,7 @@ export function PriceCalculationCard({
   title,
   transmission,
   year,
+  registrationMonth,
 }: {
   calc: CalculationSnapshot | undefined;
   color: string | null;
@@ -84,28 +112,72 @@ export function PriceCalculationCard({
   title: string;
   transmission: string;
   year: number | null;
+  registrationMonth: number | null;
 }) {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDutyInfoOpen, setDutyInfoOpen] = useState(false);
   const calculationTitleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const total = number(calc?.total_rub);
-  const car = number(calc?.car_price_rub);
-  const korea = number(calc?.freight_rub) + number(calc?.broker_rub) + resultNumber(calc?.result, "koreaExpensesRub");
-  const russia = number(calc?.fees_rub) + number(calc?.util_rub);
-  const duty = number(calc?.duty_rub);
-  const excise = resultNumber(calc?.result, "exciseRub");
-  const vat = resultNumber(calc?.result, "vatRub");
+  const [activeCalc, setActiveCalc] = useState<CalculationSnapshot | undefined>(calc);
+  const [isRefreshing, setRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const total = number(activeCalc?.total_rub);
+  const car = number(activeCalc?.car_price_rub);
+  const korea = number(activeCalc?.freight_rub) + number(activeCalc?.broker_rub) + resultNumber(activeCalc?.result, "koreaExpensesRub");
+  const russia = number(activeCalc?.fees_rub) + number(activeCalc?.util_rub);
+  const duty = number(activeCalc?.duty_rub);
+  const excise = resultNumber(activeCalc?.result, "exciseRub");
+  const vat = resultNumber(activeCalc?.result, "vatRub");
   const customs = duty + excise + vat;
-  const hasCalculationResult = Boolean(calc?.result);
-  const calculatedAt = calc?.calculated_at
+  const hasCalculationResult = Boolean(activeCalc?.result);
+  const calculatedAt = activeCalc?.calculated_at
     ? new Intl.DateTimeFormat("ru-RU", {
         day: "numeric",
         month: "long",
         year: "numeric",
-      }).format(new Date(calc.calculated_at))
+      }).format(new Date(activeCalc.calculated_at))
     : null;
+  const rateDetails = resultObject(activeCalc?.result, "rateDetails") as LiveCalculation["rateDetails"];
+  const resultRates = resultObject(activeCalc?.result, "rates");
+
+  async function refreshCalculation() {
+    if (!priceKrw || !year || !engineCc || !powerHp) return;
+    setRefreshing(true);
+    setRefreshError(null);
+    try {
+      const response = await fetch("/api/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          priceKrw,
+          year,
+          month: registrationMonth ?? 6,
+          engineCc,
+          powerHp,
+          fuelType: fuel,
+        }),
+      });
+      const payload = (await response.json()) as LiveCalculation | { error?: string };
+      if (!response.ok || "error" in payload) throw new Error("error" in payload ? payload.error : "Не удалось обновить расчёт");
+      const live = payload as LiveCalculation;
+      setActiveCalc({
+        total_rub: live.totalRub,
+        car_price_rub: live.carPriceRub,
+        duty_rub: live.dutyRub,
+        fees_rub: live.feesRub,
+        util_rub: live.utilRub,
+        freight_rub: live.freightRub,
+        broker_rub: live.brokerRub,
+        calculated_at: new Date().toISOString(),
+        result: live,
+      });
+    } catch (error) {
+      setRefreshError(error instanceof Error ? error.message : "Не удалось обновить расчёт");
+    } finally {
+      setRefreshing(false);
+    }
+  }
   const leadTelegramUrl = telegramContactUrl(
     vehicleDeveloperMessage({ source, sourceId, title }),
   );
@@ -280,7 +352,7 @@ export function PriceCalculationCard({
                 </h2>
                 {calculatedAt && (
                   <p className="mt-1 text-xs text-[#647084]">
-                    Сформирован {calculatedAt}
+                  Сформирован {calculatedAt}
                   </p>
                 )}
               </div>
@@ -296,6 +368,37 @@ export function PriceCalculationCard({
             </header>
 
             <div className="space-y-4 p-5">
+              <section className="rounded bg-[#fffaf0] p-4 ring-1 ring-[#e7cf9b]">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="font-semibold text-[#121722]">Актуальный курс расчёта</h3>
+                    <p className="mt-1 text-xs leading-5 text-[#647084]">
+                      Источник: ЦБ РФ и USDT/KRW Bithumb через Naver
+                    </p>
+                  </div>
+                  <button
+                    className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded bg-[#956f2c] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#7f5d25] disabled:cursor-wait disabled:opacity-60"
+                    disabled={isRefreshing || !priceKrw || !year || !engineCc || !powerHp}
+                    onClick={refreshCalculation}
+                    type="button"
+                  >
+                    <RefreshCw className={isRefreshing ? "animate-spin" : ""} size={15} />
+                    {isRefreshing ? "Обновляем" : "Обновить цену"}
+                  </button>
+                </div>
+                <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+                  <RateRow label="KRW/RUB" value={`${rate(typeof resultRates?.krwRub === "number" ? resultRates.krwRub : null)} ₽`} />
+                  <RateRow label="USD/RUB ЦБ + 4%" value={`${rate(typeof resultRates?.usdRub === "number" ? resultRates.usdRub : null)} ₽`} />
+                  <RateRow label="USDT/KRW" value={rateDetails ? `${rate(rateDetails.usdtKrwRaw)} → ${rate(rateDetails.usdtKrwAdjusted)}` : "-"} />
+                  <RateRow label="Расходы по Корее" value={money(resultNumber(activeCalc?.result, "koreaExpensesRub"))} />
+                </div>
+                {rateDetails?.fetchedAt && (
+                  <p className="mt-3 text-xs text-[#647084]">
+                    Обновлено {new Intl.DateTimeFormat("ru-RU", { dateStyle: "short", timeStyle: "short" }).format(new Date(rateDetails.fetchedAt))}
+                  </p>
+                )}
+                {refreshError && <p className="mt-2 text-xs font-medium text-[#b42318]">{refreshError}</p>}
+              </section>
               <div className="rounded bg-white p-4 ring-1 ring-[#e1e5eb]">
                 <p className="text-sm text-[#647084]">
                   Цена автомобиля в Корее
@@ -338,15 +441,30 @@ export function PriceCalculationCard({
                 </p>
               </div>
               {hasCalculationResult && (
-                <p className="text-xs text-[#647084]">
-                  Расчёт выполнен по актуальному сохранённому тарифному снимку.
-                </p>
+                <p className="text-xs text-[#647084]">Курс и цена обновляются кнопкой выше. Сохранённый расчёт используется как исходное значение до обновления.</p>
               )}
             </div>
           </section>
         </div>
       )}
     </>
+  );
+}
+
+function resultObject(result: unknown, key: string): Record<string, unknown> | null {
+  if (!result || typeof result !== "object" || Array.isArray(result)) return null;
+  const value = (result as Record<string, unknown>)[key];
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function RateRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-[#eadfca] pb-2 last:border-0 last:pb-0">
+      <span className="text-[#647084]">{label}</span>
+      <strong className="text-right tabular-nums text-[#121722]">{value}</strong>
+    </div>
   );
 }
 

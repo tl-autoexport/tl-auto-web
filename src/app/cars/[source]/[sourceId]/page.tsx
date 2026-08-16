@@ -238,6 +238,7 @@ export default async function CarDetailPage({
             title={title}
             transmission={translateTransmission(car.transmission)}
             year={car.year}
+            registrationMonth={car.registration_month}
           />
         </div>
       </section>
