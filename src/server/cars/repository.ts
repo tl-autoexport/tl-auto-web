@@ -391,11 +391,10 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
 }
 
 export async function getCarDetail(source: string, sourceId: string): Promise<CarDetail | null> {
-  return unstable_cache(
-    () => fetchCarDetail(source, sourceId),
-    ["car-detail-v3", source, sourceId],
-    { revalidate: 300 },
-  )();
+  // Price, rates and the condition report are dynamic commercial data. A
+  // five-minute server cache could show an outdated calculation after a
+  // catalog-wide refresh, so detail pages always load the latest snapshot.
+  return fetchCarDetail(source, sourceId);
 }
 
 export function getPrimaryPhoto(car: CatalogCar) {

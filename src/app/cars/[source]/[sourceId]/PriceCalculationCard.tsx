@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   BadgeCheck,
   Calculator,
@@ -140,6 +140,10 @@ export function PriceCalculationCard({
     : null;
   const rateDetails = resultObject(activeCalc?.result, "rateDetails") as LiveCalculation["rateDetails"];
   const resultRates = resultObject(activeCalc?.result, "rates");
+
+  useEffect(() => {
+    setActiveCalc(calc);
+  }, [calc]);
 
   async function refreshCalculation() {
     if (!priceKrw || !year || !engineCc || !powerHp) return;

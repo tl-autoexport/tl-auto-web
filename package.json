@@ -12,6 +12,7 @@
     "check": "npm run lint && npm run typecheck && npm test",
     "check:deploy-env": "tsx scripts/check-deploy-env.ts",
     "audit:catalog": "tsx scripts/audit-public-catalog.ts",
+    "audit:calculation-coverage": "tsx scripts/audit-calculation-coverage.ts",
     "audit:database": "tsx scripts/audit-supabase-usage.ts",
     "deduplicate:encar": "tsx scripts/deduplicate-encar-catalog.ts",
     "deduplicate:encar:write": "ENCAR_DEDUPLICATION_DRY_RUN=false tsx scripts/deduplicate-encar-catalog.ts",
