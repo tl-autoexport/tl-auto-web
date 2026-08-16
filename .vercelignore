@@ -1,0 +1,7 @@
+.git
+.next
+.playwright-cli
+node_modules
+output
+.env*
+supabase/.temp

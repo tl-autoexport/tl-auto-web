@@ -1,0 +1,54 @@
+name: Fresh catalog sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Catalog sync mode
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - write
+  schedule:
+    - cron: "15 2 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fresh-catalog-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Validate catalog sync
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'dry-run'
+        run: npm run sync:catalog
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          ENCAR_TARGET: "420"
+          ENCAR_MAX_PAGES: "20"
+          ENCAR_DRY_RUN: "true"
+      - name: Update catalog
+        if: github.event_name == 'schedule' || inputs.mode == 'write'
+        run: npm run sync:catalog:write
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ENCAR_TARGET: "420"
+          ENCAR_MAX_PAGES: "20"
+          ENCAR_DRY_RUN: "false"
