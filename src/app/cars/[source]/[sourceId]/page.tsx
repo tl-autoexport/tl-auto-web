@@ -191,6 +191,7 @@ export default async function CarDetailPage({
               carHistory={carHistory}
               conditionItems={conditionItems}
               eyeReport={eyeReport}
+              reports={car.car_condition_reports ?? []}
             />
 
             {inspectionGroups.length > 0 && (
@@ -488,6 +489,7 @@ function ConditionOverview({
   carHistory,
   conditionItems,
   eyeReport,
+  reports,
 }: {
   car: {
     owners_count: number | null;
@@ -498,11 +500,12 @@ function ConditionOverview({
   carHistory: Record<string, unknown> | null;
   conditionItems: Array<{ label: string; description: string | null }>;
   eyeReport: Record<string, unknown> | null;
+  reports: Array<{ report_type: string; raw_payload?: unknown }>;
 }) {
   const accident = getObject(eyeReport?.accident);
   const exchangeCount = asNumber(accident?.outer_panel_exchange_count);
   const weldCount = asNumber(accident?.outer_panel_weld_count);
-  const bodyMarks = buildBodyMarks(eyeReport);
+  const bodyMarks = buildBodyMarks(eyeReport, reports);
   const insuranceEvents = buildInsuranceEvents(carHistory);
   const ownerCount =
     asNumber(carHistory?.owner_changed_count) ?? car.owners_count;
@@ -648,6 +651,12 @@ function BodyConditionMap({
         <Legend code="U" label="неровность" />
         <Legend code="T" label="повреждение" />
       </div>
+
+      {!marks.length && (
+        <p className="mt-3 rounded bg-[#fbfcfe] px-3 py-2 text-xs text-[#647084] ring-1 ring-[#edf0f5] sm:mt-4 sm:text-sm">
+          В отчёте Encar нет данных о повреждениях кузова для выделения на схеме.
+        </p>
+      )}
 
       <div className="mt-3 divide-y divide-[#edf0f5] rounded bg-[#fbfcfe] ring-1 ring-[#edf0f5] sm:mt-4">
         <DamageDetails
@@ -1248,11 +1257,25 @@ function translateEncarAccidentType(value: string | null) {
   return "Страховой случай";
 }
 
-function buildBodyMarks(eyeReport: Record<string, unknown> | null): BodyMark[] {
+function buildBodyMarks(
+  eyeReport: Record<string, unknown> | null,
+  reports: Array<{ report_type: string; raw_payload?: unknown }>,
+): BodyMark[] {
   const accident = getObject(eyeReport?.accident);
   const scan = getObject(accident?.thermographic_scan);
-  const findings = Array.isArray(scan?.findings) ? scan.findings : [];
-  return findings
+  const eyeFindings = Array.isArray(scan?.findings) ? scan.findings : [];
+  const inspection = reports.find(
+    (report) => report.report_type === "encar_inspection",
+  );
+  const rawInspection = getObject(getObject(inspection?.raw_payload)?.inspection);
+  const encarFindings = Array.isArray(rawInspection?.outers)
+    ? rawInspection.outers
+    : [];
+  const marks = eyeFindings.length > 0
+    ? eyeFindings
+    : encarFindings.map((finding) => normalizeEncarBodyFinding(finding));
+
+  return marks
     .map((finding) => {
       const record = getObject(finding);
       if (!record) return null;
@@ -1271,15 +1294,56 @@ function buildBodyMarks(eyeReport: Record<string, unknown> | null): BodyMark[] {
     .filter((mark): mark is BodyMark => Boolean(mark));
 }
 
+function normalizeEncarBodyFinding(value: unknown) {
+  const record = getObject(value);
+  if (!record) return null;
+  const type = getObject(record.type);
+  const statuses = Array.isArray(record.statusTypes) ? record.statusTypes : [];
+  const status = getObject(statuses[0]);
+  const attributes = Array.isArray(record.attributes)
+    ? record.attributes.filter((item): item is string => typeof item === "string")
+    : [];
+  const rawPart = [type?.code, type?.title, ...attributes]
+    .filter((item): item is string => typeof item === "string")
+    .join(" ");
+  const part = encarBodyPart(rawPart);
+  if (!part) return null;
+  const repair = [status?.code, status?.title]
+    .filter((item): item is string => typeof item === "string")
+    .join(" ");
+  return {
+    part,
+    repair,
+    impression: repair,
+  };
+}
+
+function encarBodyPart(value: string) {
+  const normalized = value.toLowerCase();
+  const aliases: Array<[string[], string]> = [
+    [["front_bumper", "front bumper", "앞범퍼", "전범퍼"], "front_bumper"],
+    [["rear_bumper", "rear bumper", "back bumper", "뒤범퍼", "후범퍼"], "rear_bumper"],
+    [["hood", "bonnet", "후드", "본네트"], "hood"],
+    [["trunk", "boot", "트렁크", "테일게이트"], "trunk"],
+    [["roof", "루프"], "roof"],
+    [["front_fender", "front fender", "앞휀더", "전휀더"], "fender_front_driver"],
+    [["rear_fender", "rear fender", "뒤휀더", "후휀더", "쿼터"], "fender_rear_driver"],
+    [["front_door", "front door", "앞도어", "전도어"], "door_front_driver"],
+    [["rear_door", "rear door", "뒤도어", "후도어"], "door_rear_driver"],
+    [["side_sil", "side sill", "rocker", "사이드실", "사이드스텝"], "side_sil_panel_driver"],
+  ];
+  return aliases.find(([tokens]) => tokens.some((token) => normalized.includes(token)))?.[1] ?? null;
+}
+
 function damageCode(record: Record<string, unknown>): BodyMark["code"] {
-  const repair = typeof record.repair === "string" ? record.repair : "";
-  const impression =
-    typeof record.impression === "string" ? record.impression : "";
-  if (repair === "exchange" || impression.includes("exchange")) return "X";
-  if (repair === "weld" || impression.includes("weld")) return "W";
-  if (impression.includes("corrosion")) return "C";
-  if (impression.includes("scratch")) return "A";
-  if (impression.includes("uneven")) return "U";
+  const repair = typeof record.repair === "string" ? record.repair.toLowerCase() : "";
+  const impression = typeof record.impression === "string" ? record.impression.toLowerCase() : "";
+  const text = `${repair} ${impression}`;
+  if (/exchange|교환|замен/.test(text)) return "X";
+  if (/weld|판금|용접|рихт|ремонт/.test(text)) return "W";
+  if (/corrosion|부식|корроз/.test(text)) return "C";
+  if (/scratch|긁힘|царап/.test(text)) return "A";
+  if (/uneven|요철|неров/.test(text)) return "U";
   return "T";
 }
 
