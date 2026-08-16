@@ -1,7 +1,10 @@
+import type { VehicleType } from "@/types/vehicle";
+
 export type SourceKind = "encar";
 
 export interface CarSummary {
   id: string;
+  vehicleType: VehicleType;
   primarySource: SourceKind;
   sourceId: string;
   sourceUrl: string;

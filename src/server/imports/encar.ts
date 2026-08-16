@@ -911,6 +911,8 @@ async function mapCar(
 
   return {
     car: {
+      vehicle_type: "car",
+      vehicle_specs: {},
       primary_source: "encar",
       source_kind: "encar",
       source_id: sourceId,

@@ -6,6 +6,7 @@ const buildWithoutCatalog =
 
 export type CatalogCar = {
   id: string;
+  vehicle_type: "car";
   primary_source: string;
   source_kind: string;
   source_id: string;
@@ -145,7 +146,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   let query = supabase
     .from("cars")
     .select(
-      "id, primary_source, source_kind, source_id, source_url, source_updated_at, brand, model, badge, badge_detail, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, car_media(url, thumbnail_url, media_type, category, is_primary, sort_order)",
+      "id, vehicle_type, primary_source, source_kind, source_id, source_url, source_updated_at, brand, model, badge, badge_detail, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, car_media(url, thumbnail_url, media_type, category, is_primary, sort_order)",
     )
     .eq("is_available", true)
     .eq("primary_source", "encar")
@@ -324,7 +325,7 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
   const { data, error } = await supabase
     .from("cars")
     .select(
-      "id, primary_source, source_kind, source_id, source_url, source_updated_at, brand, model, badge, badge_detail, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, car_media(url, thumbnail_url, media_type, category, is_primary, sort_order), car_options(category, source_code, name_original, name_ru, value_original, value_ru, description_original, description_ru, is_present, sort_order), car_condition_reports(source, report_type, summary, items)",
+      "id, vehicle_type, primary_source, source_kind, source_id, source_url, source_updated_at, brand, model, badge, badge_detail, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, car_media(url, thumbnail_url, media_type, category, is_primary, sort_order), car_options(category, source_code, name_original, name_ru, value_original, value_ru, description_original, description_ru, is_present, sort_order), car_condition_reports(source, report_type, summary, items)",
     )
     .eq("primary_source", "encar")
     .eq("source_id", sourceId)
