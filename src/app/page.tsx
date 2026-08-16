@@ -1,8 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUpRight,
   Calculator,
   CarFront,
   ChevronRight,
@@ -115,31 +113,25 @@ export default async function Home() {
       <section className="border-b border-[#dce2eb] bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-5 md:py-16">
           <SectionHeader
-            eyebrow="Направления поставки"
-            title="Каталоги автомобилей"
-            text="Корея уже доступна с расчётом до Владивостока. Остальные направления готовятся к запуску."
+            eyebrow="Фокус TL Auto"
+            title="Южная Корея — наш основной рынок"
+            text="Работаем с автомобилями из Кореи: от выбора объявления Encar до расчёта и доставки во Владивосток."
           />
-          <div className="mt-5 grid grid-cols-2 gap-3 sm:mt-7 sm:gap-4 xl:grid-cols-4">
-            <CountryCatalog
-              name="Корея"
-              image="/assets/country-catalogs/korea.webp"
-              href="/catalog"
-              status="Каталог открыт"
+          <div className="mt-7 grid gap-3 md:grid-cols-3 md:gap-4">
+            <KoreaValue
+              icon={FileCheck2}
+              title="Данные Encar"
+              text="Реальные объявления, характеристики и доступная история автомобиля."
             />
-            <CountryCatalog
-              name="Китай"
-              image="/assets/country-catalogs/china.webp"
-              status="Каталог наполняется"
+            <KoreaValue
+              icon={CircleDollarSign}
+              title="Расчёт под ключ"
+              text="Показываем основные расходы и итоговую стоимость до Владивостока."
             />
-            <CountryCatalog
-              name="Япония"
-              image="/assets/country-catalogs/japan.webp"
-              status="Каталог наполняется"
-            />
-            <CountryCatalog
-              name="ОАЭ"
-              image="/assets/country-catalogs/uae.webp"
-              status="Каталог наполняется"
+            <KoreaValue
+              icon={Ship}
+              title="Понятная доставка"
+              text="Сопровождаем путь автомобиля от выбора до передачи менеджеру."
             />
           </div>
         </div>
@@ -445,69 +437,22 @@ function SectionHeader({
   );
 }
 
-function CountryCatalog({
-  href,
-  image,
-  name,
-  status,
+function KoreaValue({
+  icon: Icon,
+  text,
+  title,
 }: {
-  href?: string;
-  image: string;
-  name: string;
-  status: string;
+  icon: typeof FileCheck2;
+  text: string;
+  title: string;
 }) {
-  const content = (
-    <>
-      <div className={`relative overflow-hidden bg-[#f7f8fa] ${href ? "col-span-2 aspect-[16/9] sm:col-span-1 sm:aspect-[4/3]" : "aspect-square sm:aspect-[4/3]"}`}>
-        <Image
-          src={image}
-          alt={`Автомобили из страны: ${name}`}
-          fill
-          loading={href ? "eager" : "lazy"}
-          sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition duration-500 group-hover:scale-[1.025]"
-        />
-        <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3 sm:p-5">
-          <h3 className={`${href ? "text-2xl" : "text-lg"} font-semibold text-[#101827] sm:text-2xl`}>{name}</h3>
-          {href ? (
-            <span className="flex size-9 items-center justify-center rounded-full bg-white/90 text-[#101827] shadow-sm backdrop-blur-sm transition group-hover:bg-[#c7a55a] group-hover:text-[#15130f]">
-              <ArrowUpRight size={18} />
-            </span>
-          ) : null}
-        </div>
-      </div>
-      <div className="flex min-h-12 items-center justify-between gap-2 border-t border-[#edf0f4] px-3 py-2.5 sm:min-h-16 sm:gap-3 sm:px-5 sm:py-4">
-        <span
-          className={`inline-flex items-center gap-1.5 text-[11px] font-semibold sm:gap-2 sm:text-sm ${href ? "text-[#16896f]" : "text-[#647084]"}`}
-        >
-          <span
-            className={`size-2 rounded-full ${href ? "bg-[#a98239]" : "bg-[#aeb7c5]"}`}
-          />
-          <span className="sm:hidden">{href ? "Каталог открыт" : "Скоро"}</span>
-          <span className="hidden sm:inline">{status}</span>
-        </span>
-        <span
-          className={`hidden text-sm font-semibold sm:block ${href ? "text-[#956f2c]" : "text-[#8a96a8]"}`}
-        >
-          {href ? "Открыть" : "Скоро"}
-        </span>
-      </div>
-    </>
-  );
-
-  return href ? (
-    <Link
-      href={href}
-      className="group col-span-2 overflow-hidden rounded-md border border-[#dce2eb] bg-white transition hover:-translate-y-0.5 hover:border-[#b7c0cd] hover:shadow-lg sm:col-span-1"
-    >
-      {content}
-    </Link>
-  ) : (
-    <article
-      className="group overflow-hidden rounded-md border border-[#dce2eb] bg-white"
-      aria-label={`${name}: ${status}`}
-    >
-      {content}
+  return (
+    <article className="rounded-md border border-[#dce2eb] bg-[#fbfcfd] p-5 transition hover:-translate-y-0.5 hover:border-[#c7a55a] hover:shadow-[0_14px_34px_rgba(15,23,42,0.08)] sm:p-6">
+      <span className="flex size-10 items-center justify-center rounded-md bg-[#fbf7ed] text-[#956f2c]">
+        <Icon size={20} />
+      </span>
+      <h3 className="mt-5 text-lg font-semibold">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-[#647084]">{text}</p>
     </article>
   );
 }

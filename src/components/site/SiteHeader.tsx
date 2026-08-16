@@ -27,13 +27,6 @@ const utilityLinks = [
   { label: "Контакты", href: "/#contacts", pending: false, contact: true },
 ] as const;
 
-const countryLinks = [
-  { label: "Авто из Кореи", href: "/catalog", active: true },
-  { label: "Авто из Китая", active: false },
-  { label: "Авто из Японии", active: false },
-  { label: "Авто из ОАЭ", active: false },
-] as const;
-
 const CONTACT_PROMPT_SESSION_KEY = "tl-auto-contact-prompt-v1-shown";
 const CONTACT_PROMPT_DELAY_MS = 45_000;
 
@@ -187,25 +180,12 @@ export function SiteHeader() {
         <Brand />
 
         <nav aria-label="Основная навигация" className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex">
-          {countryLinks.map((item) => (
-            item.active ? (
-              <Link
-                key={item.label}
-                className={`relative px-4 py-6 text-sm font-semibold transition hover:text-[#956f2c] ${pathname.startsWith("/catalog") || pathname.startsWith("/cars/") ? "text-[#956f2c]" : "text-[#263247]"}`}
-                href={item.href}
-              >
-                {item.label}
-                {(pathname.startsWith("/catalog") || pathname.startsWith("/cars/")) && <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#956f2c]" />}
-              </Link>
-            ) : (
-              <span key={item.label} className="flex cursor-default items-center gap-2 px-4 py-6 text-sm font-semibold text-[#68758a]" title="Каталог в процессе наполнения">
-                {item.label}
-                <span className="rounded-sm bg-[#eef1f5] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[#8792a3]">Скоро</span>
-              </span>
-            )
-          ))}
-          <Link className="px-4 py-6 text-sm font-semibold text-[#263247] transition hover:text-[#956f2c]" href="/catalog">
-            В наличии
+          <Link
+            className={`relative px-4 py-6 text-sm font-semibold transition hover:text-[#956f2c] ${pathname.startsWith("/catalog") || pathname.startsWith("/cars/") ? "text-[#956f2c]" : "text-[#263247]"}`}
+            href="/catalog"
+          >
+            Авто из Кореи
+            {(pathname.startsWith("/catalog") || pathname.startsWith("/cars/")) && <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#956f2c]" />}
           </Link>
         </nav>
 
@@ -246,18 +226,9 @@ export function SiteHeader() {
           role="navigation"
         >
           <div className="border-t border-[#dce2eb] bg-white px-5 pb-5 pt-3">
-            <p className="py-3 text-[11px] font-semibold uppercase text-[#8a96a8]">Каталоги автомобилей</p>
+            <p className="py-3 text-[11px] font-semibold uppercase text-[#8a96a8]">Каталог TL Auto</p>
             <Link className="flex items-center justify-between border-b border-[#edf0f4] py-4 text-base font-semibold text-[#956f2c]" href="/catalog" onClick={() => setMobileOpen(false)}>
               Авто из Кореи <CarFront size={19} />
-            </Link>
-            {countryLinks.filter((item) => !item.active).map((item) => (
-              <div key={item.label} className="flex items-center justify-between border-b border-[#edf0f4] py-4 text-base font-semibold text-[#68758a]">
-                {item.label}
-                <span className="rounded-sm bg-[#eef1f5] px-2 py-1 text-[10px] font-bold uppercase text-[#8792a3]">Скоро</span>
-              </div>
-            ))}
-            <Link className="flex items-center justify-between py-4 text-base font-semibold text-[#263247]" href="/catalog" onClick={() => setMobileOpen(false)}>
-              Авто в наличии <CarFront size={19} />
             </Link>
           </div>
 
