@@ -452,9 +452,9 @@ function resultObject(result: unknown, key: string): Record<string, unknown> | n
 
 function RateRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-[#eadfca] pb-2 last:border-0 last:pb-0">
-      <span className="text-[#647084]">{label}</span>
-      <strong className="text-right tabular-nums text-[#121722]">{value}</strong>
+    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 border-b border-[#eadfca] pb-2">
+      <span className="truncate text-[#647084]">{label}</span>
+      <strong className="whitespace-nowrap text-right tabular-nums text-[#121722]">{value}</strong>
     </div>
   );
 }
