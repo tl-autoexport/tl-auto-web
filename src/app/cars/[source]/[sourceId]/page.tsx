@@ -150,7 +150,7 @@ export default async function CarDetailPage({
           <div className="order-3 grid min-w-0 gap-4 sm:gap-6 lg:order-none [&>*]:min-w-0">
             <div className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
               <div className="flex items-center gap-2">
-                <CarFront className="text-[#35a58a]" size={20} />
+                <CarFront className="text-[#a98239]" size={20} />
                 <h2 className="text-lg font-semibold sm:text-xl">Общие данные</h2>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-3">
@@ -199,7 +199,7 @@ export default async function CarDetailPage({
 
             <div className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]">
               <div className="flex items-center gap-2">
-                <KeyRound className="text-[#35a58a]" size={20} />
+                <KeyRound className="text-[#a98239]" size={20} />
                 <h2 className="text-xl font-semibold">Комплектация</h2>
               </div>
               <EncarEquipmentAccordion groups={optionGroups} />
@@ -261,7 +261,7 @@ function formatHeyDealerMeasurement(value: string) {
 function OptionStatusIcon({ present }: { present: boolean | null }) {
   if (present === true) {
     return (
-      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded bg-[#e51d2a] text-white">
+      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded bg-[#956f2c] text-white">
         <Check size={13} strokeWidth={3} />
       </span>
     );
@@ -376,7 +376,7 @@ function HeyDealerEquipmentSummary({
       )}
 
       {details.inspectorNotes.length > 0 && (
-        <div className="mt-5 border-l-2 border-[#35a58a] bg-[#f7fbfa] px-4 py-3">
+        <div className="mt-5 border-l-2 border-[#a98239] bg-[#f7fbfa] px-4 py-3">
           <h3 className="text-sm font-semibold text-[#242b37]">
             Комментарий инспектора
           </h3>
@@ -408,7 +408,7 @@ function EquipmentTextList({
     >
       {items.map((item, index) => (
         <li className="flex items-start gap-2.5" key={`${item}-${index}`}>
-          <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#35a58a]" />
+          <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#a98239]" />
           <span>{item}</span>
         </li>
       ))}
@@ -521,7 +521,7 @@ function ConditionOverview({
   return (
     <div className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
       <div className="flex items-center gap-2">
-        <ShieldCheck className="text-[#35a58a]" size={20} />
+        <ShieldCheck className="text-[#a98239]" size={20} />
         <h2 className="text-lg font-semibold sm:text-xl">История и состояние кузова</h2>
       </div>
       <div className="mt-4 grid gap-4 sm:gap-5">
@@ -721,7 +721,7 @@ function InsuranceDetails({ events }: { events: InsuranceEvent[] }) {
                 <ul className="mt-2 grid gap-1">
                   {event.operations.map((operation) => (
                     <li className="flex gap-2" key={operation}>
-                      <span className="text-[#e51d2a]">•</span>
+                      <span className="text-[#956f2c]">•</span>
                       <span>{operation}</span>
                     </li>
                   ))}
@@ -918,7 +918,7 @@ function EncarInspection({ groups }: { groups: InspectionGroup[] }) {
     <div className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-2">
-          <ClipboardCheck className="text-[#35a58a]" size={20} />
+          <ClipboardCheck className="text-[#a98239]" size={20} />
           <div>
             <h2 className="text-xl font-semibold">Внутренний осмотр</h2>
             <p className="mt-1 text-sm text-[#647084]">

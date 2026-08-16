@@ -13,8 +13,9 @@ export default function Icon() {
       <div
         style={{
           alignItems: "center",
-          background: "#ed1c2b",
-          color: "white",
+          background: "#090c12",
+          border: "2px solid #d8bd75",
+          color: "#e5c97f",
           display: "flex",
           fontSize: 25,
           fontWeight: 800,
@@ -25,10 +26,10 @@ export default function Icon() {
           width: "100%",
         }}
       >
-        AE
+        TL
         <div
           style={{
-            background: "#10243e",
+            background: "#d8bd75",
             bottom: 0,
             display: "flex",
             height: 14,

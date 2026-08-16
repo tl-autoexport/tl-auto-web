@@ -197,7 +197,7 @@ export default async function Home() {
       <section id="how-it-works" className="border-y border-[#dce2eb] bg-white">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-5 sm:py-12 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
-            <p className="text-sm font-semibold text-[#e51d2a]">
+            <p className="text-sm font-semibold text-[#956f2c]">
               Точный расчёт для РФ
             </p>
             <h2 className="mt-3 text-3xl font-semibold leading-tight">
@@ -209,7 +209,7 @@ export default async function Home() {
             </p>
             <Link
               href="/catalog"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#e51d2a]"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#956f2c]"
             >
               Посмотреть расчёты в каталоге <ArrowRight size={16} />
             </Link>
@@ -241,7 +241,7 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-5 md:py-16">
           <div className="grid gap-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
             <div>
-              <p className="text-sm font-semibold text-[#e51d2a]">
+              <p className="text-sm font-semibold text-[#956f2c]">
                 Путь автомобиля
               </p>
               <h2 className="mt-3 text-3xl font-semibold leading-tight">
@@ -249,9 +249,8 @@ export default async function Home() {
               </h2>
             </div>
             <p className="max-w-2xl text-sm leading-6 text-[#647084] lg:justify-self-end">
-              Это демонстрация клиентского сценария. Конкретные сроки, договор,
-              способ оплаты и условия доставки менеджер подтверждает до
-              оформления заявки.
+              Конкретные сроки, договор, способ оплаты и условия доставки
+              менеджер подтверждает до оформления заявки.
             </p>
           </div>
 
@@ -288,7 +287,7 @@ export default async function Home() {
             </p>
             <Link
               href="/catalog"
-              className="inline-flex items-center gap-2 rounded-md bg-[#10243e] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1b3555]"
+              className="inline-flex items-center gap-2 rounded-md bg-[#11151d] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1b3555]"
             >
               Начать подбор <ArrowRight size={16} />
             </Link>
@@ -303,7 +302,7 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-5 py-14 md:py-18">
           <div className="grid gap-6 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
             <div>
-              <p className="text-sm font-semibold text-[#e51d2a]">
+              <p className="text-sm font-semibold text-[#956f2c]">
                 Отзывы и истории
               </p>
               <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-4xl">
@@ -344,12 +343,12 @@ export default async function Home() {
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-[#dce2eb] pt-6">
             <p className="inline-flex items-center gap-2 text-sm text-[#647084]">
-              <ShieldCheck size={17} className="text-[#35a58a]" />{" "}
+              <ShieldCheck size={17} className="text-[#a98239]" />{" "}
               Неподтверждённые отзывы публиковаться не будут
             </p>
             <Link
               href="/catalog"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#e51d2a]"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#956f2c]"
             >
               Выбрать автомобиль <ArrowRight size={16} />
             </Link>
@@ -373,7 +372,7 @@ export default async function Home() {
             </p>
           </div>
           <Link
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#ed1c2b] px-5 py-3 text-sm font-semibold text-white"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#c7a55a] px-5 py-3 text-sm font-semibold text-[#15130f]"
             href="/catalog"
           >
             Найти автомобиль <ChevronRight size={17} />
@@ -398,7 +397,7 @@ function Scenario({
   tone: "red" | "blue" | "green" | "dark";
 }) {
   const tones = {
-    red: "bg-[#fff1f2] text-[#e51d2a]",
+    red: "bg-[#fbf7ed] text-[#956f2c]",
     blue: "bg-[#eef5ff] text-[#3973c8]",
     green: "bg-[#ebfaf5] text-[#259879]",
     dark: "bg-[#edf0f5] text-[#101827]",
@@ -413,7 +412,7 @@ function Scenario({
       >
         <Icon size={20} />
       </span>
-      <h3 className="mt-3 text-sm font-semibold leading-5 group-hover:text-[#e51d2a] sm:mt-5 sm:text-lg">
+      <h3 className="mt-3 text-sm font-semibold leading-5 group-hover:text-[#956f2c] sm:mt-5 sm:text-lg">
         {title}
       </h3>
       <p className="mt-2 hidden text-sm leading-6 text-[#647084] sm:block">{text}</p>
@@ -435,7 +434,7 @@ function SectionHeader({
 }) {
   return (
     <div>
-      <p className="text-xs font-semibold text-[#e51d2a] sm:text-sm">{eyebrow}</p>
+      <p className="text-xs font-semibold text-[#956f2c] sm:text-sm">{eyebrow}</p>
       <div className="mt-2 flex flex-col justify-between gap-3 md:flex-row md:items-end">
         <div>
           <h2 className="text-2xl font-semibold sm:text-3xl">{title}</h2>
@@ -464,13 +463,14 @@ function CountryCatalog({
           src={image}
           alt={`Автомобили из страны: ${name}`}
           fill
+          loading={href ? "eager" : "lazy"}
           sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition duration-500 group-hover:scale-[1.025]"
         />
         <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3 sm:p-5">
           <h3 className={`${href ? "text-2xl" : "text-lg"} font-semibold text-[#101827] sm:text-2xl`}>{name}</h3>
           {href ? (
-            <span className="flex size-9 items-center justify-center rounded-full bg-white/90 text-[#101827] shadow-sm backdrop-blur-sm transition group-hover:bg-[#ed1c2b] group-hover:text-white">
+            <span className="flex size-9 items-center justify-center rounded-full bg-white/90 text-[#101827] shadow-sm backdrop-blur-sm transition group-hover:bg-[#c7a55a] group-hover:text-[#15130f]">
               <ArrowUpRight size={18} />
             </span>
           ) : null}
@@ -481,13 +481,13 @@ function CountryCatalog({
           className={`inline-flex items-center gap-1.5 text-[11px] font-semibold sm:gap-2 sm:text-sm ${href ? "text-[#16896f]" : "text-[#647084]"}`}
         >
           <span
-            className={`size-2 rounded-full ${href ? "bg-[#35a58a]" : "bg-[#aeb7c5]"}`}
+            className={`size-2 rounded-full ${href ? "bg-[#a98239]" : "bg-[#aeb7c5]"}`}
           />
           <span className="sm:hidden">{href ? "Каталог открыт" : "Скоро"}</span>
           <span className="hidden sm:inline">{status}</span>
         </span>
         <span
-          className={`hidden text-sm font-semibold sm:block ${href ? "text-[#e51d2a]" : "text-[#8a96a8]"}`}
+          className={`hidden text-sm font-semibold sm:block ${href ? "text-[#956f2c]" : "text-[#8a96a8]"}`}
         >
           {href ? "Открыть" : "Скоро"}
         </span>
@@ -536,7 +536,7 @@ function VehicleShelf({
         </div>
         <Link
           href={href}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#e51d2a]"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[#956f2c]"
         >
           Смотреть все <ArrowRight size={16} />
         </Link>
@@ -583,13 +583,13 @@ function HomeCarCard({ car }: { car: CatalogCar }) {
           <span className="rounded-sm bg-white px-2 py-1 text-xs font-semibold">
             Корея
           </span>
-          <span className="rounded-sm bg-[#35a58a] px-2 py-1 text-xs font-semibold text-white">
+          <span className="rounded-sm bg-[#a98239] px-2 py-1 text-xs font-semibold text-white">
             Encar
           </span>
         </div>
       </div>
       <div className="p-4">
-        <h3 className="line-clamp-2 min-h-12 text-base font-semibold group-hover:text-[#e51d2a]">
+        <h3 className="line-clamp-2 min-h-12 text-base font-semibold group-hover:text-[#956f2c]">
           {carDisplayTitle(car)}
         </h3>
         <p className="mt-2 text-sm text-[#647084]">
@@ -645,7 +645,7 @@ function ValueCard({
 }) {
   return (
     <div className="rounded-md border border-[#dce2eb] p-3 sm:p-5">
-      <Icon size={22} className="text-[#e51d2a]" />
+      <Icon size={22} className="text-[#956f2c]" />
       <h3 className="mt-3 text-sm font-semibold sm:mt-5 sm:text-base">{title}</h3>
       <p className="mt-2 hidden text-sm leading-6 text-[#647084] sm:block">{text}</p>
     </div>
@@ -668,7 +668,7 @@ function DeliveryStep({
       <div className="px-3 sm:px-5 sm:first:pl-0 xl:first:pl-0">
         <div className="flex items-center justify-between gap-4">
           <span className="text-xs font-bold text-[#98a3b2]">{number}</span>
-          <Icon size={20} className="text-[#e51d2a]" aria-hidden="true" />
+          <Icon size={20} className="text-[#956f2c]" aria-hidden="true" />
         </div>
         <h3 className="mt-3 text-sm font-semibold text-[#101827] sm:mt-7 sm:text-lg">{title}</h3>
         <p className="mt-2 hidden text-sm leading-6 text-[#647084] sm:block">{text}</p>
@@ -693,8 +693,8 @@ function ReviewPlaceholder({
   tone: "navy" | "red" | "light";
 }) {
   const tones = {
-    navy: "bg-[#10243e] text-white border-[#10243e]",
-    red: "bg-[#ed1c2b] text-white border-[#ed1c2b]",
+    navy: "bg-[#11151d] text-white border-[#11151d]",
+    red: "bg-[#c7a55a] text-[#15130f] border-[#c7a55a]",
     light: "bg-[#eef1f5] text-[#101827] border-[#dce2eb]",
   };
   const muted = tone === "light" ? "text-[#647084]" : "text-white/70";
@@ -712,7 +712,7 @@ function ReviewPlaceholder({
       </div>
       <div className="mt-auto pt-10">
         <p className={`text-[11px] font-semibold uppercase ${muted}`}>
-          Демонстрационный шаблон
+          История клиента
         </p>
         <h3
           className={`mt-3 font-semibold leading-tight ${featured ? "text-2xl md:text-3xl" : "text-xl"}`}

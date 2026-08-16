@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { CarFront, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import { TlAutoLogo } from "@/components/brand/TlAutoLogo";
 import {
   DEVELOPER_CONTACT,
   telegramContactUrl,
@@ -8,21 +9,11 @@ import {
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-[#dce2eb] bg-[#0d1d31] text-white">
+    <footer className="mt-auto border-t border-[#dce2eb] bg-[#090c12] text-white">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-9 md:grid-cols-[1.2fr_0.8fr_0.8fr] md:py-11">
         <div>
-          <Link className="inline-flex items-center gap-3" href="/">
-            <span className="flex size-9 items-center justify-center bg-[#ed1c2b]">
-              <CarFront size={20} aria-hidden="true" />
-            </span>
-            <span>
-              <strong className="block text-sm uppercase tracking-wide">
-                TL Auto
-              </strong>
-              <small className="text-[10px] uppercase text-white/55">
-                авто из Южной Кореи
-              </small>
-            </span>
+          <Link className="inline-flex" href="/" aria-label="TL Auto — на главную">
+            <TlAutoLogo className="px-3 py-1.5" variant="footer" />
           </Link>
           <p className="mt-4 max-w-lg text-xs leading-5 text-white/58">
             Каталог автомобилей из Южной Кореи с актуальными объявлениями
@@ -49,7 +40,7 @@ export function SiteFooter() {
 
         <div id="contacts">
           <p className="text-xs font-semibold uppercase tracking-wider text-white/45">
-            Связь с разработчиком
+            Связаться с TL Auto
           </p>
           <div className="mt-3 flex flex-col gap-2.5 text-sm">
             <a

@@ -49,7 +49,7 @@ export function MobileCatalogFilters({
         <button
           className={`flex min-h-11 items-center justify-center gap-2 rounded-md border px-3 text-sm font-semibold ${
             activeCount
-              ? "border-[#ed1c2b] bg-[#fff1f2] text-[#d71927]"
+              ? "border-[#c7a55a] bg-[#fbf7ed] text-[#d71927]"
               : "border-[#d7dee8] bg-white text-[#273246]"
           }`}
           onClick={() => setOpen(true)}
@@ -58,7 +58,7 @@ export function MobileCatalogFilters({
           <Filter size={17} />
           Фильтры
           {activeCount ? (
-            <span className="grid size-5 place-items-center rounded-full bg-[#ed1c2b] text-[11px] text-white">
+            <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[11px] text-[#15130f]">
               {activeCount}
             </span>
           ) : null}

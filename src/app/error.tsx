@@ -26,10 +26,10 @@ export default function ErrorPage({
 
       <section className="mx-auto flex min-h-[calc(100vh-108px)] max-w-4xl items-center px-5 py-12">
         <div className="w-full rounded-md bg-white p-7 shadow-sm ring-1 ring-[#d8dde6] sm:p-10">
-          <span className="flex size-12 items-center justify-center rounded-md bg-[#fff0f1] text-[#e51d2a]">
+          <span className="flex size-12 items-center justify-center rounded-md bg-[#fff0f1] text-[#956f2c]">
             <AlertTriangle size={24} aria-hidden="true" />
           </span>
-          <p className="mt-7 text-xs font-bold uppercase tracking-wide text-[#e51d2a]">
+          <p className="mt-7 text-xs font-bold uppercase tracking-wide text-[#956f2c]">
             Временная ошибка
           </p>
           <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
@@ -48,7 +48,7 @@ export default function ErrorPage({
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#ed1c2b] px-6 text-sm font-semibold text-white transition hover:bg-[#d91524]"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#c7a55a] px-6 text-sm font-semibold text-[#15130f] transition hover:bg-[#aa873e]"
               onClick={() => unstable_retry()}
               type="button"
             >

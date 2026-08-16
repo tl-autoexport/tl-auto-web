@@ -17,7 +17,7 @@ export function LegalPage({
       <SiteHeader />
       <main className="flex-1 bg-[#f5f6f8] text-[#101827]">
         <div className="mx-auto max-w-4xl px-5 py-12 md:py-16">
-          <p className="text-sm font-semibold text-[#e51d2a]">{eyebrow}</p>
+          <p className="text-sm font-semibold text-[#956f2c]">{eyebrow}</p>
           <h1 className="mt-3 text-3xl font-semibold leading-tight md:text-5xl">
             {title}
           </h1>

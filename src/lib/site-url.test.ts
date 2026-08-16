@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { normalizeSiteUrl } from "./site-url";
 
 assert.equal(
-  normalizeSiteUrl("autoexport-demo.vercel.app/catalog?x=1").toString(),
-  "https://autoexport-demo.vercel.app/",
+  normalizeSiteUrl("tl-auto-preview.vercel.app/catalog?x=1").toString(),
+  "https://tl-auto-preview.vercel.app/",
 );
 assert.equal(
   normalizeSiteUrl("http://localhost:3000/catalog").toString(),

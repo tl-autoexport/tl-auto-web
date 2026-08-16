@@ -136,13 +136,13 @@ export function PriceCalculationCard({
   return (
     <>
       <aside className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
-        <div className="flex items-center justify-between gap-3 text-xs font-semibold text-[#e51d2a] sm:text-sm">
+        <div className="flex items-center justify-between gap-3 text-xs font-semibold text-[#956f2c] sm:text-sm">
           <div className="flex min-w-0 items-center gap-2">
             <BadgeCheck className="size-4 shrink-0 sm:size-[18px]" />
             <span className="truncate">Источник Encar</span>
           </div>
           {sourceUrl ? (
-            <a className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-full border border-[#f0bcc1] px-2.5 text-[11px] font-semibold text-[#c61927] transition hover:bg-[#fff1f2] sm:text-xs" href={sourceUrl} rel="noopener noreferrer" target="_blank">
+            <a className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-full border border-[#f0bcc1] px-2.5 text-[11px] font-semibold text-[#c61927] transition hover:bg-[#fbf7ed] sm:text-xs" href={sourceUrl} rel="noopener noreferrer" target="_blank">
               Оригинал
               <ExternalLink size={13} />
             </a>
@@ -242,7 +242,7 @@ export function PriceCalculationCard({
 
         <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:grid-cols-1 sm:gap-3">
           <button
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded bg-[#e51d2a] px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#c91824] sm:px-5 sm:py-3"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded bg-[#956f2c] px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#c91824] sm:px-5 sm:py-3"
             onClick={() => setModalOpen(true)}
             type="button"
           >
@@ -252,7 +252,7 @@ export function PriceCalculationCard({
           </button>
           <a
             id="lead"
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded border border-[#e51d2a] px-3 py-2.5 text-sm font-semibold text-[#e51d2a] transition-colors hover:bg-[#fff1f2] sm:px-5 sm:py-3"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded border border-[#956f2c] px-3 py-2.5 text-sm font-semibold text-[#956f2c] transition-colors hover:bg-[#fbf7ed] sm:px-5 sm:py-3"
             href={leadTelegramUrl}
             rel="noopener noreferrer"
             target="_blank"

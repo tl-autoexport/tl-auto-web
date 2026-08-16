@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { ContactModal } from "@/components/site/ContactModal";
+import { TlAutoLogo } from "@/components/brand/TlAutoLogo";
 
 const utilityLinks = [
   { label: "О сервисе", href: "/#about", pending: false },
@@ -148,7 +149,7 @@ export function SiteHeader() {
         mobileHeaderHidden ? "max-lg:-translate-y-full" : "translate-y-0"
       }`}
     >
-      <div className="hidden bg-[#10243e] text-white lg:block">
+      <div className="hidden bg-[#11151d] text-white lg:block">
         <div className="mx-auto flex h-9 max-w-[1440px] items-center justify-between px-6 xl:px-8">
           <div className="flex items-center gap-2 text-[12px] font-medium text-white/78">
             <Globe2 size={14} aria-hidden="true" />
@@ -190,11 +191,11 @@ export function SiteHeader() {
             item.active ? (
               <Link
                 key={item.label}
-                className={`relative px-4 py-6 text-sm font-semibold transition hover:text-[#e51d2a] ${pathname.startsWith("/catalog") || pathname.startsWith("/cars/") ? "text-[#e51d2a]" : "text-[#263247]"}`}
+                className={`relative px-4 py-6 text-sm font-semibold transition hover:text-[#956f2c] ${pathname.startsWith("/catalog") || pathname.startsWith("/cars/") ? "text-[#956f2c]" : "text-[#263247]"}`}
                 href={item.href}
               >
                 {item.label}
-                {(pathname.startsWith("/catalog") || pathname.startsWith("/cars/")) && <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#e51d2a]" />}
+                {(pathname.startsWith("/catalog") || pathname.startsWith("/cars/")) && <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#956f2c]" />}
               </Link>
             ) : (
               <span key={item.label} className="flex cursor-default items-center gap-2 px-4 py-6 text-sm font-semibold text-[#68758a]" title="Каталог в процессе наполнения">
@@ -203,14 +204,14 @@ export function SiteHeader() {
               </span>
             )
           ))}
-          <Link className="px-4 py-6 text-sm font-semibold text-[#263247] transition hover:text-[#e51d2a]" href="/catalog">
+          <Link className="px-4 py-6 text-sm font-semibold text-[#263247] transition hover:text-[#956f2c]" href="/catalog">
             В наличии
           </Link>
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
           <button
-            className="flex size-10 items-center justify-center text-[#10243e] transition hover:text-[#e51d2a]"
+            className="flex size-10 items-center justify-center text-[#11151d] transition hover:text-[#956f2c]"
             onClick={openContact}
             title="Связаться с нами"
             type="button"
@@ -218,7 +219,7 @@ export function SiteHeader() {
             <MessageCircle size={20} aria-hidden="true" />
             <span className="sr-only">Связаться с нами</span>
           </button>
-          <Link className="inline-flex h-11 items-center gap-2 rounded-md bg-[#10243e] px-5 text-sm font-semibold text-white transition hover:bg-[#1d3553]" href="/catalog">
+          <Link className="inline-flex h-11 items-center gap-2 rounded-md bg-[#11151d] px-5 text-sm font-semibold text-white transition hover:bg-[#1d3553]" href="/catalog">
             <Calculator size={17} aria-hidden="true" />
             Подобрать авто
           </Link>
@@ -229,7 +230,7 @@ export function SiteHeader() {
           aria-controls="mobile-navigation"
           aria-expanded={mobileOpen}
           aria-label={mobileOpen ? "Закрыть меню" : "Открыть меню"}
-          className="flex size-11 items-center justify-center rounded-md border border-[#d7dee8] bg-white text-[#10243e] lg:hidden"
+          className="flex size-11 items-center justify-center rounded-md border border-[#d7dee8] bg-white text-[#11151d] lg:hidden"
           onClick={() => setMobileOpen((open) => !open)}
           type="button"
         >
@@ -246,7 +247,7 @@ export function SiteHeader() {
         >
           <div className="border-t border-[#dce2eb] bg-white px-5 pb-5 pt-3">
             <p className="py-3 text-[11px] font-semibold uppercase text-[#8a96a8]">Каталоги автомобилей</p>
-            <Link className="flex items-center justify-between border-b border-[#edf0f4] py-4 text-base font-semibold text-[#e51d2a]" href="/catalog" onClick={() => setMobileOpen(false)}>
+            <Link className="flex items-center justify-between border-b border-[#edf0f4] py-4 text-base font-semibold text-[#956f2c]" href="/catalog" onClick={() => setMobileOpen(false)}>
               Авто из Кореи <CarFront size={19} />
             </Link>
             {countryLinks.filter((item) => !item.active).map((item) => (
@@ -289,10 +290,10 @@ export function SiteHeader() {
             </div>
           </div>
 
-          <div className="mt-2 bg-[#10243e] px-5 py-6 text-white">
+          <div className="mt-2 bg-[#11151d] px-5 py-6 text-white">
             <p className="text-xs font-medium text-white/65">Подбор автомобиля из Кореи</p>
             <p className="mt-1 text-lg font-semibold">Получите расчёт до Владивостока</p>
-            <Link className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[#ed1c2b] px-5 text-sm font-semibold" href="/catalog" onClick={() => setMobileOpen(false)}>
+            <Link className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[#c7a55a] px-5 text-sm font-semibold text-[#15130f]" href="/catalog" onClick={() => setMobileOpen(false)}>
               <Calculator size={17} /> Подобрать авто
             </Link>
           </div>
@@ -305,15 +306,8 @@ export function SiteHeader() {
 
 function Brand() {
   return (
-    <Link href="/" className="group flex shrink-0 items-center gap-2.5 lg:gap-3">
-      <span className="relative flex size-9 items-center justify-center overflow-hidden bg-[#ed1c2b] text-white lg:size-10" aria-hidden="true">
-        <CarFront className="size-5 lg:size-[22px]" strokeWidth={2.1} />
-        <span className="absolute bottom-0 right-0 size-2 bg-[#10243e]" />
-      </span>
-      <span>
-        <strong className="block text-[15px] font-bold uppercase text-[#111927] lg:text-[16px]">TL Auto</strong>
-        <small className="block pt-0.5 text-[9px] font-semibold uppercase text-[#5f6c80] lg:text-[10px]">Авто из Кореи</small>
-      </span>
+    <Link href="/" className="group flex shrink-0" aria-label="TL Auto — на главную">
+      <TlAutoLogo className="px-2 py-1 transition duration-200 group-hover:border-[#d8bd75]/70 group-hover:shadow-[0_12px_34px_rgba(0,0,0,0.22)]" priority />
     </Link>
   );
 }

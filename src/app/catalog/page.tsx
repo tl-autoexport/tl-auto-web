@@ -143,11 +143,11 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-5 md:py-10">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end md:gap-5">
             <div>
-              <p className="text-xs font-semibold text-[#e51d2a] sm:text-sm">Корея</p>
+              <p className="text-xs font-semibold text-[#956f2c] sm:text-sm">Корея</p>
               <h1 className="mt-1.5 text-[32px] font-semibold leading-tight tracking-normal sm:mt-2 sm:text-4xl">Каталог автомобилей</h1>
               <p className="mt-2 max-w-2xl text-[13px] leading-5 text-[#647084] sm:mt-3 sm:text-sm sm:leading-6">Подбор по реальным данным источника с расчётом цены до Владивостока.</p>
             </div>
-            <div className="inline-flex items-center gap-2 self-start rounded-full bg-[#fff1f2] px-3 py-2 text-xs text-[#a51e2a] md:gap-3 md:rounded-none md:border-l-2 md:border-[#ed1c2b] md:bg-transparent md:pl-4 md:text-sm"><CarFront size={18} className="text-[#ed1c2b] md:size-5" /><span><strong className="mr-1 text-base text-[#101827] md:block md:text-xl">{totalCars}</strong><span className="text-[#647084]">автомобилей найдено</span></span></div>
+            <div className="inline-flex items-center gap-2 self-start rounded-full bg-[#fbf7ed] px-3 py-2 text-xs text-[#7b5a22] md:gap-3 md:rounded-none md:border-l-2 md:border-[#c7a55a] md:bg-transparent md:pl-4 md:text-sm"><CarFront size={18} className="text-[#c7a55a] md:size-5" /><span><strong className="mr-1 text-base text-[#101827] md:block md:text-xl">{totalCars}</strong><span className="text-[#647084]">автомобилей найдено</span></span></div>
           </div>
 
           {popularBrands.length ? (
@@ -160,8 +160,8 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                     aria-current={selected ? "page" : undefined}
                     className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition sm:text-sm ${
                       selected
-                        ? "border-[#ed1c2b] bg-[#ed1c2b] text-white"
-                        : "border-[#dce2eb] bg-white text-[#273246] hover:border-[#e51d2a] hover:text-[#e51d2a]"
+                        ? "border-[#c7a55a] bg-[#c7a55a] text-[#15130f]"
+                        : "border-[#dce2eb] bg-white text-[#273246] hover:border-[#956f2c] hover:text-[#956f2c]"
                     }`}
                     href={selected
                       ? catalogFilterHref(rawParams, { brand: null, model: null, page: null })
@@ -174,7 +174,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                   </Link>
                 );
               })}
-              <Link href="#filters" className="inline-flex min-h-9 shrink-0 items-center gap-1 px-2 text-xs font-semibold text-[#e51d2a] sm:text-sm">Все фильтры <ChevronRight size={15} /></Link>
+              <Link href="#filters" className="inline-flex min-h-9 shrink-0 items-center gap-1 px-2 text-xs font-semibold text-[#956f2c] sm:text-sm">Все фильтры <ChevronRight size={15} /></Link>
             </div>
           ) : null}
         </div>
@@ -276,7 +276,7 @@ function CatalogFilterForm({
       <div className={mobile ? "grid gap-4 p-4" : "grid gap-4 md:grid-cols-2 xl:grid-cols-4"}>
         {!mobile ? (
           <div className="flex items-center gap-3 md:col-span-2 xl:col-span-4">
-            <Filter className="text-[#e51d2a]" size={20} />
+            <Filter className="text-[#956f2c]" size={20} />
             <div>
               <h2 className="font-semibold">Подбор автомобиля</h2>
               <p className="text-xs text-[#7a8798]">Параметры сохраняются в ссылке</p>
@@ -310,13 +310,13 @@ function CatalogFilterForm({
                 <ChevronDown className="pointer-events-none absolute right-3 top-3 text-[#647084]" size={17} />
               </span>
             </label>
-            <button className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[#ed1c2b] px-6 text-sm font-semibold text-white" type="submit"><Search size={17} /> Показать {totalCars}</button>
+            <button className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[#c7a55a] px-6 text-sm font-semibold text-[#15130f]" type="submit"><Search size={17} /> Показать {totalCars}</button>
           </div>
         ) : null}
       </div>
       {mobile ? (
         <div className="fixed inset-x-0 bottom-0 z-10 border-t border-[#dce2eb] bg-white p-3 pb-[max(12px,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(16,24,39,0.08)]">
-          <button className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#ed1c2b] text-sm font-semibold text-white" type="submit"><Search size={17} /> Показать {totalCars} автомобилей</button>
+          <button className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#c7a55a] text-sm font-semibold text-[#15130f]" type="submit"><Search size={17} /> Показать {totalCars} автомобилей</button>
         </div>
       ) : null}
     </form>
@@ -338,13 +338,13 @@ function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boo
         </div>
       </Link>
       <div className="p-4">
-        <Link href={detailsHref}><h2 className="line-clamp-2 text-lg font-semibold transition group-hover:text-[#e51d2a]">{carDisplayTitle(car)}</h2></Link>
+        <Link href={detailsHref}><h2 className="line-clamp-2 text-lg font-semibold transition group-hover:text-[#956f2c]">{carDisplayTitle(car)}</h2></Link>
         <p className="mt-2 text-sm text-[#647084]">{car.year ?? "-"} год · {rub.format(car.mileage_km ?? 0)} км · {translateFuel(car.fuel_type)}</p>
         <div className="mt-4 flex items-end justify-between gap-3"><div><p className="text-xs text-[#647084]">до Владивостока</p><p className="whitespace-nowrap text-xl font-semibold">{rub.format(car.price_rub ?? 0)} ₽</p></div><div className="flex items-center gap-1 text-sm text-[#647084]"><Gauge size={16} />{car.power_hp ?? "-"} л.с.</div></div>
-        <div className="mt-4 flex items-center justify-between border-t border-[#edf0f4] pt-3 text-xs font-medium text-[#647084]"><span className="inline-flex items-center gap-1"><ShieldCheck size={14} className="text-[#35a58a]" /> Расчёт РФ</span><span>{formatUpdate(car.source_updated_at)}</span></div>
+        <div className="mt-4 flex items-center justify-between border-t border-[#edf0f4] pt-3 text-xs font-medium text-[#647084]"><span className="inline-flex items-center gap-1"><ShieldCheck size={14} className="text-[#a98239]" /> Расчёт РФ</span><span>{formatUpdate(car.source_updated_at)}</span></div>
         <div className="mt-2 flex min-h-8 items-center justify-between gap-3 border-t border-[#edf0f4] pt-2 text-xs">
           <span className="truncate text-[#7a8798]">Лот {car.source_id}</span>
-          {officialUrl ? <a className="inline-flex shrink-0 items-center gap-1 font-semibold text-[#e51d2a] hover:underline" href={officialUrl} rel="noopener noreferrer" target="_blank">На {sourceName}<ExternalLink size={13} /></a> : null}
+          {officialUrl ? <a className="inline-flex shrink-0 items-center gap-1 font-semibold text-[#956f2c] hover:underline" href={officialUrl} rel="noopener noreferrer" target="_blank">На {sourceName}<ExternalLink size={13} /></a> : null}
         </div>
       </div>
     </article>
@@ -353,24 +353,24 @@ function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boo
 
 function FilterSelect({ label, name, options, placeholder, translate, value }: { label: string; name: string; options: string[]; placeholder: string; translate?: (item: string) => string; value: string }) {
   const active = Boolean(value);
-  return <label className="grid gap-1.5 text-sm text-[#647084]"><span>{label}</span><span className="relative"><select className={`h-11 w-full appearance-none rounded-md border px-3 pr-9 text-sm font-medium outline-none transition ${active ? "border-[#ed1c2b] bg-[#fff6f6] text-[#b11825]" : "border-[#d7dee8] bg-white text-[#273246]"} focus:border-[#101827]`} defaultValue={value} name={name}><option value="">{placeholder}</option>{options.map((item) => <option key={item} value={item}>{translate ? translate(item) : item}</option>)}</select>{active ? <Check className="pointer-events-none absolute right-8 top-3 text-[#ed1c2b]" size={17} /> : null}<ChevronDown className="pointer-events-none absolute right-3 top-3 text-[#647084]" size={17} /></span></label>;
+  return <label className="grid gap-1.5 text-sm text-[#647084]"><span>{label}</span><span className="relative"><select className={`h-11 w-full appearance-none rounded-md border px-3 pr-9 text-sm font-medium outline-none transition ${active ? "border-[#c7a55a] bg-[#fbf7ed] text-[#7b5a22]" : "border-[#d7dee8] bg-white text-[#273246]"} focus:border-[#101827]`} defaultValue={value} name={name}><option value="">{placeholder}</option>{options.map((item) => <option key={item} value={item}>{translate ? translate(item) : item}</option>)}</select>{active ? <Check className="pointer-events-none absolute right-8 top-3 text-[#c7a55a]" size={17} /> : null}<ChevronDown className="pointer-events-none absolute right-3 top-3 text-[#647084]" size={17} /></span></label>;
 }
 
 function FilterInput({ inputMode = "text", label, name, placeholder, value }: { inputMode?: "numeric" | "text"; label: string; name: string; placeholder: string; value: string }) {
-  return <label className="grid gap-1.5 text-sm text-[#647084]"><span>{label}</span><input className={`h-11 w-full rounded-md border px-3 text-sm font-medium text-[#273246] outline-none placeholder:text-[#a7b0bd] ${value ? "border-[#ed1c2b] bg-[#fff6f6]" : "border-[#d7dee8] bg-white"} focus:border-[#101827]`} defaultValue={value} inputMode={inputMode} name={name} placeholder={placeholder} /></label>;
+  return <label className="grid gap-1.5 text-sm text-[#647084]"><span>{label}</span><input className={`h-11 w-full rounded-md border px-3 text-sm font-medium text-[#273246] outline-none placeholder:text-[#a7b0bd] ${value ? "border-[#c7a55a] bg-[#fbf7ed]" : "border-[#d7dee8] bg-white"} focus:border-[#101827]`} defaultValue={value} inputMode={inputMode} name={name} placeholder={placeholder} /></label>;
 }
 
 function RangeField({ label, maxName, maxValue, minName, minValue }: { label: string; maxName: string; maxValue: string; minName: string; minValue: string }) {
   const active = Boolean(minValue || maxValue);
-  return <fieldset className="grid gap-1.5"><legend className="text-sm text-[#647084]">{label}</legend><div className={`grid grid-cols-2 overflow-hidden rounded-md border ${active ? "border-[#ed1c2b] bg-[#fff6f6]" : "border-[#d7dee8] bg-white"}`}><input aria-label={`${label}: от`} className="h-11 min-w-0 border-r border-[#d7dee8] bg-transparent px-3 text-sm font-medium outline-none placeholder:text-[#a7b0bd]" defaultValue={minValue} inputMode="numeric" name={minName} placeholder="от" /><input aria-label={`${label}: до`} className="h-11 min-w-0 bg-transparent px-3 text-sm font-medium outline-none placeholder:text-[#a7b0bd]" defaultValue={maxValue} inputMode="numeric" name={maxName} placeholder="до" /></div></fieldset>;
+  return <fieldset className="grid gap-1.5"><legend className="text-sm text-[#647084]">{label}</legend><div className={`grid grid-cols-2 overflow-hidden rounded-md border ${active ? "border-[#c7a55a] bg-[#fbf7ed]" : "border-[#d7dee8] bg-white"}`}><input aria-label={`${label}: от`} className="h-11 min-w-0 border-r border-[#d7dee8] bg-transparent px-3 text-sm font-medium outline-none placeholder:text-[#a7b0bd]" defaultValue={minValue} inputMode="numeric" name={minName} placeholder="от" /><input aria-label={`${label}: до`} className="h-11 min-w-0 bg-transparent px-3 text-sm font-medium outline-none placeholder:text-[#a7b0bd]" defaultValue={maxValue} inputMode="numeric" name={maxName} placeholder="до" /></div></fieldset>;
 }
 
 function FilterCheck({ checked, label, name, value }: { checked: boolean; label: string; name: string; value: string }) {
-  return <label className={`flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-md border px-2 text-center text-xs font-semibold transition md:min-h-0 md:justify-start md:border-0 md:px-0 md:text-sm ${checked ? "border-[#ed1c2b] bg-[#fff1f2] text-[#bd1724]" : "border-[#d7dee8] bg-white text-[#3f4b5e]"}`}><input className="size-4 shrink-0 accent-[#ed1c2b]" defaultChecked={checked} name={name} type="checkbox" value={value} />{label}</label>;
+  return <label className={`flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-md border px-2 text-center text-xs font-semibold transition md:min-h-0 md:justify-start md:border-0 md:px-0 md:text-sm ${checked ? "border-[#c7a55a] bg-[#fbf7ed] text-[#7b5a22]" : "border-[#d7dee8] bg-white text-[#3f4b5e]"}`}><input className="size-4 shrink-0 accent-[#c7a55a]" defaultChecked={checked} name={name} type="checkbox" value={value} />{label}</label>;
 }
 
 function EmptyState() {
-  return <div className="border border-dashed border-[#c7d0dc] bg-white p-8 text-center"><Search className="mx-auto text-[#e51d2a]" size={28} /><h2 className="mt-4 text-xl font-semibold">Нет подходящих автомобилей</h2><p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-[#647084]">Снимите часть ограничений или сбросьте фильтры, чтобы увидеть доступные предложения.</p><Link href="/catalog" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#e51d2a]">Сбросить фильтры <ArrowRight size={16} /></Link></div>;
+  return <div className="border border-dashed border-[#c7d0dc] bg-white p-8 text-center"><Search className="mx-auto text-[#956f2c]" size={28} /><h2 className="mt-4 text-xl font-semibold">Нет подходящих автомобилей</h2><p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-[#647084]">Снимите часть ограничений или сбросьте фильтры, чтобы увидеть доступные предложения.</p><Link href="/catalog" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#956f2c]">Сбросить фильтры <ArrowRight size={16} /></Link></div>;
 }
 
 function Pagination({ currentPage, rawParams, totalPages }: { currentPage: number; rawParams: Record<string, string | string[] | undefined>; totalPages: number }) {
@@ -379,14 +379,14 @@ function Pagination({ currentPage, rawParams, totalPages }: { currentPage: numbe
     <PaginationLink disabled={currentPage === 1} href={catalogPageHref(rawParams, currentPage - 1)} label="Назад"><ChevronLeft size={17} /></PaginationLink>
     {pages.map((page, index) => page === null
       ? <span key={`ellipsis-${index}`} className="px-2 text-[#7a8798]">…</span>
-      : <Link key={page} aria-current={page === currentPage ? "page" : undefined} className={`inline-flex size-10 items-center justify-center rounded-md border text-sm font-semibold transition ${page === currentPage ? "border-[#ed1c2b] bg-[#ed1c2b] text-white" : "border-[#d7dee8] bg-white text-[#273246] hover:border-[#ed1c2b] hover:text-[#ed1c2b]"}`} href={catalogPageHref(rawParams, page)} scroll>{page}</Link>)}
+      : <Link key={page} aria-current={page === currentPage ? "page" : undefined} className={`inline-flex size-10 items-center justify-center rounded-md border text-sm font-semibold transition ${page === currentPage ? "border-[#c7a55a] bg-[#c7a55a] text-[#15130f]" : "border-[#d7dee8] bg-white text-[#273246] hover:border-[#c7a55a] hover:text-[#956f2c]"}`} href={catalogPageHref(rawParams, page)} scroll>{page}</Link>)}
     <PaginationLink disabled={currentPage === totalPages} href={catalogPageHref(rawParams, currentPage + 1)} label="Вперёд"><ChevronRight size={17} /></PaginationLink>
   </nav>;
 }
 
 function PaginationLink({ children, disabled, href, label }: { children: React.ReactNode; disabled: boolean; href: string; label: string }) {
   if (disabled) return <span aria-disabled="true" className="inline-flex h-10 items-center gap-1 rounded-md border border-[#e3e7ed] bg-[#f0f2f5] px-3 text-sm font-semibold text-[#a0a9b6]">{children}<span className="hidden sm:inline">{label}</span></span>;
-  return <Link aria-label={label} className="inline-flex h-10 items-center gap-1 rounded-md border border-[#d7dee8] bg-white px-3 text-sm font-semibold text-[#273246] transition hover:border-[#ed1c2b] hover:text-[#ed1c2b]" href={href} scroll>{children}<span className="hidden sm:inline">{label}</span></Link>;
+  return <Link aria-label={label} className="inline-flex h-10 items-center gap-1 rounded-md border border-[#d7dee8] bg-white px-3 text-sm font-semibold text-[#273246] transition hover:border-[#c7a55a] hover:text-[#c7a55a]" href={href} scroll>{children}<span className="hidden sm:inline">{label}</span></Link>;
 }
 
 function catalogQueryString(rawParams: Record<string, string | string[] | undefined>) {

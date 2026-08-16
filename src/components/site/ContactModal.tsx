@@ -116,8 +116,8 @@ export function ContactModal({ onClose, open }: ContactModalProps) {
           <div className="relative order-2 flex flex-col justify-between overflow-hidden bg-[#0b1728] px-6 pb-7 pt-8 text-white sm:order-1 sm:px-8 sm:pb-8 sm:pt-9">
             <div aria-hidden="true" className="contact-modal__grid absolute inset-0 opacity-35" />
             <div className="relative">
-              <p className="text-[11px] font-bold uppercase text-[#73dfc0]">TL Auto</p>
-              <h3 className="mt-2 max-w-[270px] text-xl font-semibold leading-tight">Откройте демо с телефона</h3>
+              <p className="text-[11px] font-bold uppercase text-[#d8bd75]">TL Auto</p>
+              <h3 className="mt-2 max-w-[270px] text-xl font-semibold leading-tight">Откройте TL Auto с телефона</h3>
               <p className="mt-2 max-w-[300px] text-sm leading-6 text-white/62">
                 QR-код ведёт на текущую версию проекта и автоматически обновится после публикации домена.
               </p>
@@ -143,15 +143,15 @@ export function ContactModal({ onClose, open }: ContactModalProps) {
             </div>
 
             <div className="relative mt-6 flex items-center justify-center gap-2 text-[11px] text-white/52">
-              <Check size={14} className="text-[#73dfc0]" />
+              <Check size={14} className="text-[#d8bd75]" />
               Сканируемый QR без внешнего сервиса
             </div>
           </div>
 
           <div className="order-1 flex flex-col justify-center px-6 pb-8 pt-16 sm:order-2 sm:px-9 sm:pb-9 sm:pt-12">
-            <p className="text-[11px] font-bold uppercase text-[#e51d2a]">Связь с разработчиком</p>
+            <p className="text-[11px] font-bold uppercase text-[#956f2c]">Связаться с TL Auto</p>
             <h2 id={titleId} className="mt-2 max-w-[390px] text-[28px] font-semibold leading-[1.15] text-[#101827] sm:text-[34px]">
-              Хотите такой инструмент для своего автобизнеса?
+              Подберём автомобиль из Южной Кореи
             </h2>
             <p id={descriptionId} className="mt-4 max-w-[410px] text-sm leading-6 text-[#647084]">
               Оставьте сообщение удобным способом, чтобы получить консультацию по автомобилю, расчёту и доставке.
@@ -174,7 +174,7 @@ export function ContactModal({ onClose, open }: ContactModalProps) {
                       <span className="block text-[15px] font-semibold text-[#1e293b]">{label}</span>
                       <span className="mt-0.5 block truncate text-xs text-[#758196]">{detail}</span>
                     </span>
-                    <ArrowUpRight className="text-[#99a4b4] transition group-hover:text-[#e51d2a]" size={18} />
+                    <ArrowUpRight className="text-[#99a4b4] transition group-hover:text-[#956f2c]" size={18} />
                   </a>
                 ) : (
                   <div
@@ -195,10 +195,10 @@ export function ContactModal({ onClose, open }: ContactModalProps) {
               )}
             </div>
 
-            <div className="mt-6 border-l-2 border-[#e51d2a] bg-[#fff6f6] px-4 py-3">
-              <p className="text-xs font-semibold text-[#263247]">Прямой контакт без посредников</p>
+            <div className="mt-6 border-l-2 border-[#956f2c] bg-[#fbf7ed] px-4 py-3">
+              <p className="text-xs font-semibold text-[#263247]">Поддержка на каждом этапе</p>
               <p className="mt-1 text-xs leading-5 text-[#69768a]">
-                Сейчас обращения поступают лично разработчику проекта. Для дилерской версии контакты и сценарий заявки можно заменить на каналы заказчика.
+                Уточним комплектацию, подготовим расчёт и ответим на вопросы по доставке автомобиля.
               </p>
             </div>
           </div>

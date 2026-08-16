@@ -217,7 +217,7 @@ export function CarMediaShowcase({
               <button
                 aria-label={`Открыть фото ${index + 1}: ${mediaCategoryLabel(media.category)}`}
                 className={`relative aspect-[7/5] w-[88px] shrink-0 snap-start overflow-hidden rounded bg-[#dfe4ec] ring-offset-2 transition sm:w-auto sm:min-w-0 ${
-                  mode === "photo" && index === selected ? "ring-2 ring-[#e51d2a]" : "ring-1 ring-[#d8dde6]"
+                  mode === "photo" && index === selected ? "ring-2 ring-[#956f2c]" : "ring-1 ring-[#d8dde6]"
                 }`}
                 key={media.url}
                 onClick={() => {
@@ -336,7 +336,7 @@ export function CarMediaShowcase({
               {albums.map((album) => (
                 <button
                   className={`shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition ${
-                    galleryAlbum === album.key ? "bg-[#e51d2a] text-white" : "bg-white/10 text-white/75 hover:bg-white/20"
+                    galleryAlbum === album.key ? "bg-[#956f2c] text-white" : "bg-white/10 text-white/75 hover:bg-white/20"
                   }`}
                   key={album.key}
                   onClick={() => selectAlbum(album.key)}
@@ -354,7 +354,7 @@ export function CarMediaShowcase({
                 <button
                   aria-label={`Открыть фото ${imageIndex + 1}`}
                   className={`relative h-14 w-20 shrink-0 overflow-hidden rounded ${
-                    imageIndex === selected ? "ring-2 ring-[#e51d2a]" : "ring-1 ring-white/20"
+                    imageIndex === selected ? "ring-2 ring-[#956f2c]" : "ring-1 ring-white/20"
                   }`}
                   key={`${media.url}-modal`}
                   onClick={() => setSelected(imageIndex)}
@@ -783,7 +783,7 @@ function Exterior360Viewer({ media, title }: { media: Media; title: string }) {
           <ChevronLeft size={18} />
         </button>
         <div className="relative h-11 w-16 overflow-hidden rounded-full bg-black/65 px-2 shadow backdrop-blur sm:w-20">
-          <div className="absolute inset-y-0 left-0 bg-[#e51d2a]/85 transition-[width] duration-100" style={{ width: `${progress}%` }} />
+          <div className="absolute inset-y-0 left-0 bg-[#956f2c]/85 transition-[width] duration-100" style={{ width: `${progress}%` }} />
           <div className="relative flex h-full items-center justify-center gap-2 text-xs font-bold text-white">
             <Rotate3D className={`hidden sm:block ${dragging ? "" : "animate-pulse"}`} size={16} />
             360°
@@ -828,7 +828,7 @@ function Interior360Viewer({ media, title }: { media: Media; title: string }) {
   );
 }
 
-const activePillClass = "inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#e51d2a] px-3 py-2 text-xs font-bold text-white shadow sm:gap-2 sm:px-4 sm:text-sm";
+const activePillClass = "inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#956f2c] px-3 py-2 text-xs font-bold text-white shadow sm:gap-2 sm:px-4 sm:text-sm";
 const idlePillClass = "inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#172033] px-3 py-2 text-xs font-bold text-white shadow transition hover:bg-black/85 sm:gap-2 sm:bg-black/70 sm:px-4 sm:text-sm";
 
 function mediaCategoryLabel(category: string | null) {

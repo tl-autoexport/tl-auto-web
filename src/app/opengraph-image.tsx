@@ -61,7 +61,9 @@ export default function OpenGraphImage() {
             <div
               style={{
                 alignItems: "center",
-                background: "#ed1c2b",
+                background: "#090c12",
+                border: "2px solid #d8bd75",
+                color: "#e5c97f",
                 display: "flex",
                 fontSize: 28,
                 fontWeight: 800,
@@ -72,7 +74,7 @@ export default function OpenGraphImage() {
                 width: 58,
               }}
             >
-              AE
+              TL
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
               <div
@@ -93,7 +95,7 @@ export default function OpenGraphImage() {
                   textTransform: "uppercase",
                 }}
               >
-                Digital automotive platform
+                Автомобили из Южной Кореи
               </div>
             </div>
           </div>
@@ -101,7 +103,7 @@ export default function OpenGraphImage() {
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div
               style={{
-                color: "#73dfc0",
+                  color: "#e5c97f",
                 fontSize: 19,
                 fontWeight: 700,
                 letterSpacing: "1px",
@@ -135,7 +137,7 @@ export default function OpenGraphImage() {
           </div>
 
           <div style={{ display: "flex", gap: 14 }}>
-            {["Цена до Владивостока", "360° и отчёты", "Без регистрации"].map(
+            {["Цена до Владивостока", "Источник Encar", "Расчёт под ключ"].map(
               (label) => (
                 <div
                   key={label}
@@ -155,7 +157,7 @@ export default function OpenGraphImage() {
         </div>
         <div
           style={{
-            background: "#ed1c2b",
+            background: "#d8bd75",
             bottom: 0,
             display: "flex",
             height: 12,

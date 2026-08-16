@@ -65,18 +65,18 @@ export default function GlobalError({
               display: "grid",
               placeItems: "center",
               borderRadius: 6,
-              background: "#ed1c2b",
+              background: "#c7a55a",
               color: "white",
               fontSize: 22,
               fontWeight: 800,
             }}
           >
-            AE
+            TL
           </div>
           <p
             style={{
               margin: "28px 0 0",
-              color: "#e51d2a",
+              color: "#956f2c",
               fontSize: 12,
               fontWeight: 800,
               textTransform: "uppercase",
@@ -102,7 +102,7 @@ export default function GlobalError({
               style={{
                 ...actionStyle,
                 border: 0,
-                background: "#ed1c2b",
+                background: "#c7a55a",
                 color: "white",
               }}
               type="button"
