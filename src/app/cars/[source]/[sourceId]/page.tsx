@@ -147,8 +147,13 @@ export default async function CarDetailPage({
           <div className="order-1 min-w-0 lg:order-none">
             <CarMediaShowcase
               actions={actionMedia}
+              badges={[
+                ...(car.accident_count === 0 ? ["Без ДТП"] : []),
+                ...(car.insurance_payout_count != null && car.insurance_payout_count > 0
+                  ? [`Страховые выплаты: ${car.insurance_payout_count}`]
+                  : []),
+              ]}
               images={galleryMedia.length ? galleryMedia : imageMedia}
-              sourceLabel="Encar"
               title={title}
             />
           </div>

@@ -18,12 +18,12 @@ export function CarMediaShowcase({
   title,
   images,
   actions,
-  sourceLabel,
+  badges,
 }: {
   title: string;
   images: Media[];
   actions: Media[];
-  sourceLabel: string;
+  badges: string[];
 }) {
   const exterior360 = actions.find((media) => media.category === "exterior_360");
   const interior360 = actions.find((media) => media.category === "interior_360");
@@ -112,10 +112,20 @@ export function CarMediaShowcase({
           <div className="flex h-full items-center justify-center text-[#647084]">Нет фото</div>
         )}
 
-        <div className="absolute left-3 top-3 flex gap-1.5 sm:left-4 sm:top-4 sm:gap-2">
-          <span className="rounded bg-white/95 px-2 py-1 text-[10px] font-semibold shadow-sm sm:px-3 sm:text-xs">Корея</span>
-          <span className="rounded bg-[#177d69]/95 px-2 py-1 text-[10px] font-semibold text-white shadow-sm sm:px-3 sm:text-xs">{sourceLabel}</span>
-        </div>
+        {badges.length > 0 && (
+          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 sm:left-4 sm:top-4 sm:gap-2">
+            {badges.map((badge) => (
+              <span
+                className={badge.startsWith("Без ДТП")
+                  ? "rounded bg-[#e8f5ef]/95 px-2 py-1 text-[10px] font-semibold text-[#18794e] shadow-sm sm:px-3 sm:text-xs"
+                  : "rounded bg-[#fff2e5]/95 px-2 py-1 text-[10px] font-semibold text-[#9a5b1c] shadow-sm sm:px-3 sm:text-xs"}
+                key={badge}
+              >
+                {badge}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="absolute bottom-4 left-4 hidden flex-wrap gap-2 sm:flex">
           {exterior360 && (
