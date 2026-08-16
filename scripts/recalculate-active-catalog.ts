@@ -46,7 +46,7 @@ async function main() {
     const { data: existing, error: existingError } = await supabase
       .from("calc_snapshots")
       .select("car_id")
-      .eq("calc_version", "ru-individual-autoexport-tks-2026.01")
+      .eq("calc_version", "ru-individual-autoexport-tks-usdt-2026.01")
       .limit(10000);
     if (existingError) throw existingError;
     for (const item of existing ?? []) existingVersionIds.add(item.car_id);

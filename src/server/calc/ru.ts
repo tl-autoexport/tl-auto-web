@@ -1,6 +1,6 @@
 import type { CalcInput, CalcRates, CalcResult } from "./types";
 
-export const CALC_VERSION = "ru-individual-autoexport-tks-2026.01";
+export const CALC_VERSION = "ru-individual-autoexport-tks-usdt-2026.01";
 
 const DEFAULT_RATES: CalcRates = { krwRub: 0.04718, eurRub: 87.403, usdRub: 70.95 };
 const DEFAULT_CLEARANCE_DAYS = 90;
