@@ -6,6 +6,7 @@ const DEFAULT_RATES: CalcRates = { krwRub: 0.04718, eurRub: 87.403, usdRub: 70.9
 const DEFAULT_CLEARANCE_DAYS = 90;
 const BROKER_RUB = 90_000;
 const FREIGHT_USD = 1_200;
+const KOREA_EXPENSES_KRW = 2_100_000;
 const UTIL_BASE_RUB = 20_000;
 
 function roundRub(value: number) { return Math.round(value * 100) / 100; }
@@ -110,15 +111,18 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
   const carPriceRub = Math.round(customsValueRub);
   const customs = getIndividualDutyRub({ priceRub: customsValueRub, engineCc: input.engineCc, ageYearsAtClearance: carAgeYears, eurRub: rates.eurRub });
   const freightRub = Math.round(FREIGHT_USD * rates.usdRub);
+  const koreaExpensesRub = Math.round(KOREA_EXPENSES_KRW * rates.krwRub);
   const brokerRub = BROKER_RUB;
   const feesRub = getCustomsFeeRub(customsValueRub);
   const utilCoefficient = getUtilCoeff(input.powerHp, input.engineCc, carAgeYears < 3);
   const utilRub = Math.round(UTIL_BASE_RUB * utilCoefficient);
-  const totalRub = roundRub(customsValueRub + freightRub + brokerRub + customs.dutyRub + feesRub + utilRub);
+  const totalRub = roundRub(customsValueRub + freightRub + koreaExpensesRub + brokerRub + customs.dutyRub + feesRub + utilRub);
   return {
     countryCode: "RU", destinationCity: "Владивосток", importerType: "individual", calcVersion: CALC_VERSION,
     carPriceRub, freightRub, brokerRub, dutyRub: customs.dutyRub, exciseRub: 0, vatRub: 0, feesRub, utilRub, totalRub,
     rates, ratesAsOf: input.ratesAsOf ?? null, ratesSource: input.ratesSource ?? "provided-or-default",
+    rateDetails: input.rateDetails ?? null,
+    koreaExpensesRub,
     customs: { eurPerCc: customs.eurPerCc, percentRate: customs.percentRate, mode: customs.mode, excisePerHp: 0, vatRate: 0 },
     util: { baseRub: UTIL_BASE_RUB, coefficient: utilCoefficient },
     estimatedClearanceDate: clearanceDate.toISOString(), carAgeYears: Number(carAgeYears.toFixed(3)), currentCarAgeYears: Number(currentCarAgeYears.toFixed(3)),

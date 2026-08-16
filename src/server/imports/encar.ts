@@ -890,6 +890,7 @@ async function mapCar(
           rates: rateSnapshot.rates,
           ratesAsOf: rateSnapshot.asOf,
           ratesSource: rateSnapshot.source,
+          rateDetails: rateSnapshot.rateDetails,
         })
       : null;
   if (
@@ -1333,7 +1334,7 @@ export async function importEncar(options: ImportOptions = {}) {
             car_id: carId,
             calc_version: item.calc.calcVersion,
             inputs: item.car,
-            rates: item.calc.rates,
+            rates: { ...item.calc.rates, details: item.calc.rateDetails },
             result: item.calc,
             car_price_rub: item.calc.carPriceRub,
             duty_rub: item.calc.dutyRub,

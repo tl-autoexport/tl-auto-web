@@ -71,6 +71,7 @@ export async function POST(request: Request) {
         rates: rateSnapshot.rates,
         ratesAsOf: rateSnapshot.asOf,
         ratesSource: rateSnapshot.source,
+        rateDetails: rateSnapshot.rateDetails,
       }),
       { headers: responseHeaders },
     );

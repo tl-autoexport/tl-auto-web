@@ -11,6 +11,7 @@ export interface CalcInput {
   rates?: Partial<CalcRates>;
   ratesAsOf?: string | null;
   ratesSource?: string;
+  rateDetails?: CalcRateDetails;
   calculationDate?: string;
   clearanceDays?: number;
 }
@@ -19,6 +20,18 @@ export interface CalcRates {
   krwRub: number;
   usdRub: number;
   eurRub: number;
+}
+
+export interface CalcRateDetails {
+  cbrMarkupPercent: number;
+  cbrUsdRub: number;
+  cbrEurRub: number;
+  cbrKrwRub: number;
+  usdtKrwRaw: number;
+  usdtKrwAdjustment: number;
+  usdtKrwAdjusted: number;
+  fetchedAt: string;
+  source: string;
 }
 
 export interface CalcResult {
@@ -38,6 +51,8 @@ export interface CalcResult {
   rates: CalcRates;
   ratesAsOf: string | null;
   ratesSource: string;
+  rateDetails: CalcRateDetails | null;
+  koreaExpensesRub: number;
   customs: {
     eurPerCc: number;
     percentRate: number;

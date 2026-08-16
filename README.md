@@ -42,6 +42,7 @@ Workflow `.github/workflows/catalog-sync.yml` ежедневно запуска�
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SECRET_KEY`
+- `SUPABASE_DB_URL` — нужен workflow миграций для таблицы снимков курсов
 - `TELEGRAM_BOT_TOKEN` — необязательно, для уведомлений
 - `TELEGRAM_CHAT_ID` — необязательно, для уведомлений
 
@@ -63,3 +64,8 @@ npm run sync:catalog:write
 npm run refresh:encar:history
 npm run refresh:encar:history:write
 ```
+
+Курсы для расчёта обновляются автоматически: ЦБ РФ и курс USDT/KRW Bithumb
+проверяются каждые 15 минут, а активный каталог пересчитывается раз в сутки.
+В расчёте сохраняются официальный курс ЦБ, поправка `+4%`, исходный и
+скорректированный USDT/KRW (`−20 KRW`), а также время получения данных.

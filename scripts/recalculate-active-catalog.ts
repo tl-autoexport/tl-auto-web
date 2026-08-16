@@ -51,7 +51,8 @@ async function main() {
     if (existingError) throw existingError;
     for (const item of existing ?? []) existingVersionIds.add(item.car_id);
   }
-  const pending = data.filter((car) => !existingVersionIds.has(car.id));
+  const force = process.env.RECALCULATE_FORCE === "true";
+  const pending = force ? data : data.filter((car) => !existingVersionIds.has(car.id));
   const rows: Array<Record<string, unknown>> = [];
   let skipped = 0;
   const concurrency = Math.max(1, Number(process.env.RECALCULATE_CONCURRENCY ?? 10));
@@ -75,6 +76,7 @@ async function main() {
       rates: rateSnapshot.rates,
       ratesAsOf: rateSnapshot.asOf,
       ratesSource: rateSnapshot.source,
+      rateDetails: rateSnapshot.rateDetails,
     });
     const oldPriceRub = car.price_rub;
     const row = {
@@ -108,6 +110,7 @@ async function main() {
           ...calc.rates,
           asOf: calc.ratesAsOf,
           source: calc.ratesSource,
+          details: calc.rateDetails,
         },
         result: calc,
         car_price_rub: Math.round(calc.carPriceRub),

@@ -1,0 +1,32 @@
+name: Recalculate published catalog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 3 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: calculation-catalog-recalc
+  cancel-in-progress: false
+
+jobs:
+  recalculate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run recalculate:catalog:write
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          RECALCULATE_DRY_RUN: "false"
+          RECALCULATE_FORCE: "true"
+          RECALCULATE_CONCURRENCY: "10"

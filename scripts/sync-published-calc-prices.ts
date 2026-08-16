@@ -89,6 +89,7 @@ async function main() {
         rates: rateSnapshot!.rates,
         ratesAsOf: rateSnapshot!.asOf,
         ratesSource: rateSnapshot!.source,
+        rateDetails: rateSnapshot!.rateDetails,
       });
 
       return {

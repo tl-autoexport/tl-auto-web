@@ -10,7 +10,8 @@ assert.equal(genesisG70.carPriceRub, 1_338_103);
 assert.equal(genesisG70.dutyRub, 850_735.61);
 assert.equal(genesisG70.feesRub, 13_541);
 assert.equal(genesisG70.utilRub, 1_838_400);
-assert.equal(genesisG70.totalRub, 4_224_294.76);
+assert.equal(genesisG70.koreaExpensesRub, 105_284);
+assert.equal(genesisG70.totalRub, 4_329_578.76);
 assert.equal(genesisG70.customs.mode, "volume");
 
 const ageBoundary = calculateRuVladivostok({

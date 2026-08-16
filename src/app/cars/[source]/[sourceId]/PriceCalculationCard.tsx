@@ -92,14 +92,13 @@ export function PriceCalculationCard({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const total = number(calc?.total_rub);
   const car = number(calc?.car_price_rub);
-  const korea = number(calc?.freight_rub) + number(calc?.broker_rub);
+  const korea = number(calc?.freight_rub) + number(calc?.broker_rub) + resultNumber(calc?.result, "koreaExpensesRub");
   const russia = number(calc?.fees_rub) + number(calc?.util_rub);
   const duty = number(calc?.duty_rub);
   const excise = resultNumber(calc?.result, "exciseRub");
   const vat = resultNumber(calc?.result, "vatRub");
   const customs = duty + excise + vat;
   const hasCalculationResult = Boolean(calc?.result);
-  const isHybrid = fuel.toLowerCase().includes("гибрид");
   const calculatedAt = calc?.calculated_at
     ? new Intl.DateTimeFormat("ru-RU", {
         day: "numeric",
@@ -221,9 +220,7 @@ export function PriceCalculationCard({
           </button>
           {isDutyInfoOpen && (
             <div className="absolute z-10 mt-2 rounded bg-[#07152d] p-4 text-sm leading-5 text-white shadow-xl" role="status">
-              {isHybrid
-                ? "Для гибридов отдельно рассчитываются пошлина 15%, акциз по мощности, НДС и утилизационный сбор по специальному коэффициенту."
-                : "Для автомобилей старше трёх лет пошлина определяется объёмом двигателя. Для более новых авто итог зависит от стоимости в евро на дату таможенного оформления."}
+              <>Для автомобилей старше трёх лет пошлина определяется объёмом двигателя. Для более новых авто итог зависит от стоимости в евро на дату таможенного оформления. Коммерческий режим в TL Auto не используется.</>
             </div>
           )}
         </div>
@@ -311,6 +308,7 @@ export function PriceCalculationCard({
                 title="Расходы в Южной Корее"
                 rows={[
                   ["Стоимость автомобиля", car],
+                  ["Фиксированные расходы в Корее", resultNumber(calc?.result, "koreaExpensesRub")],
                   ["Фрахт", number(calc?.freight_rub)],
                   ["Брокерские услуги", number(calc?.broker_rub)],
                 ]}
