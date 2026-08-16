@@ -90,25 +90,72 @@ async function main() {
   }
 
   const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-  const sourceIds = (process.env.ENCAR_INSPECTION_IDS ?? "42534447")
+  const requestedIds = (process.env.ENCAR_INSPECTION_IDS ?? "42534447")
     .split(",").map((value) => value.trim()).filter(Boolean);
-  const { data: cars, error: carsError } = await client
-    .from("cars")
-    .select("id, source_id")
-    .eq("primary_source", "encar")
-    .in("source_id", sourceIds);
-  if (carsError) throw carsError;
+  const allMissing = process.env.ENCAR_INSPECTION_ALL_MISSING === "true";
+  const allCars: Array<{ id: string; source_id: string }> = [];
+  for (let from = 0; ; from += 1000) {
+    const { data: page, error: carsError } = await client
+      .from("cars")
+      .select("id, source_id")
+      .eq("primary_source", "encar")
+      .order("source_id")
+      .range(from, from + 999);
+    if (carsError) throw carsError;
+    allCars.push(...(page ?? []));
+    if (!page || page.length < 1000) break;
+  }
+
+  const selectedCars = allMissing
+    ? allCars ?? []
+    : (allCars ?? []).filter((car) => requestedIds.includes(car.source_id));
+  const { data: existingMedia, error: mediaError } = selectedCars.length
+    ? await client
+      .from("car_media")
+      .select("car_id")
+      .eq("source", "encar")
+      .eq("category", "encar_inspection_document")
+      .limit(10000)
+    : { data: [], error: null };
+  if (mediaError) throw mediaError;
+  const carsWithInspectionMedia = new Set(
+    (existingMedia ?? []).map((media) => media.car_id),
+  );
+  const { data: existingReports, error: reportsError } = selectedCars.length
+    ? await client
+      .from("car_condition_reports")
+      .select("car_id")
+      .eq("source", "encar")
+      .eq("report_type", "encar_inspection")
+      .limit(10000)
+    : { data: [], error: null };
+  if (reportsError) throw reportsError;
+  const carsWithInspectionReports = new Set(
+    (existingReports ?? []).map((report) => report.car_id),
+  );
+  const cars = allMissing
+    ? selectedCars.filter((car) => !carsWithInspectionMedia.has(car.id) && !carsWithInspectionReports.has(car.id))
+    : selectedCars;
+  const sourceIds = cars.map((car) => car.source_id);
 
   const results: Array<Record<string, unknown>> = [];
-  for (const car of cars ?? []) {
-    const enriched = await enrich(car.source_id);
+  const concurrency = Math.max(1, Number(process.env.ENCAR_INSPECTION_CONCURRENCY ?? 6));
+  async function processCar(car: { id: string; source_id: string }) {
+    let enriched: Awaited<ReturnType<typeof enrich>>;
+    try {
+      enriched = await enrich(car.source_id);
+    } catch (error) {
+      return {
+        sourceId: car.source_id,
+        status: "unavailable",
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
     if (!enriched) {
-      results.push({ sourceId: car.source_id, status: "no-canonical-id" });
-      continue;
+      return { sourceId: car.source_id, status: "no-canonical-id" };
     }
     if (!write) {
-      results.push({ sourceId: car.source_id, canonicalId: enriched.canonicalId, images: enriched.images.length, bodyFindings: enriched.report.summary.body_findings_count, status: "dry-run" });
-      continue;
+      return { sourceId: car.source_id, canonicalId: enriched.canonicalId, images: enriched.images.length, bodyFindings: enriched.report.summary.body_findings_count, status: "dry-run" };
     }
 
     const { data: existing, error: existingError } = await client
@@ -137,9 +184,21 @@ async function main() {
       })));
       if (mediaError) throw mediaError;
     }
-    results.push({ sourceId: car.source_id, canonicalId: enriched.canonicalId, images: enriched.images.length, bodyFindings: enriched.report.summary.body_findings_count, status: "written" });
+    return { sourceId: car.source_id, canonicalId: enriched.canonicalId, images: enriched.images.length, bodyFindings: enriched.report.summary.body_findings_count, status: "written" };
   }
-  console.log(JSON.stringify({ write, requested: sourceIds.length, matched: cars?.length ?? 0, results }, null, 2));
+  for (let offset = 0; offset < cars.length; offset += concurrency) {
+    const batch = cars.slice(offset, offset + concurrency);
+    results.push(...await Promise.all(batch.map(processCar)));
+    console.error(`Processed ${Math.min(offset + batch.length, cars.length)}/${cars.length}`);
+  }
+  console.log(JSON.stringify({
+    write,
+    allMissing,
+    requested: sourceIds.length,
+    matched: cars?.length ?? 0,
+    skippedWithExistingData: allMissing ? selectedCars.length - (cars?.length ?? 0) : 0,
+    results,
+  }, null, 2));
 }
 
 main().catch((error) => {
