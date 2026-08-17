@@ -2,7 +2,6 @@
 
 import Image, { type ImageProps } from "next/image";
 import { useState, type ReactNode, type SyntheticEvent } from "react";
-import { publicMediaUrl } from "@/lib/media-url";
 
 type RemoteImageProps = ImageProps & { fallback?: ReactNode };
 
@@ -18,12 +17,9 @@ export function RemoteImage({ alt, fallback, onError, ...props }: RemoteImagePro
     );
   }
 
-  const src = typeof props.src === "string" ? publicMediaUrl(props.src) : props.src;
-
   return (
     <Image
       {...props}
-      src={src}
       alt={alt}
       unoptimized
       onError={(event: SyntheticEvent<HTMLImageElement, Event>) => {
