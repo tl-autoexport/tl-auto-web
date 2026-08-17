@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { createSupabaseAdmin } from "@/server/supabase/admin";
 import { createSupabasePublic } from "@/server/supabase/public";
 
 const buildWithoutCatalog =
@@ -109,6 +110,24 @@ export type CatalogMetrics = {
   clean: number;
 };
 
+export type HomeCatalogData = {
+  cars: CatalogCar[];
+  under160Cars: CatalogCar[];
+  passableCars: CatalogCar[];
+};
+
+export type LatestCalculation = {
+  total_rub: number | null;
+  car_price_rub: number | null;
+  duty_rub: number | null;
+  fees_rub: number | null;
+  util_rub: number | null;
+  freight_rub: number | null;
+  broker_rub: number | null;
+  calculated_at: string;
+  result: unknown;
+};
+
 export type CatalogFacetCar = Pick<
   CatalogCar,
   "brand" | "model" | "fuel_type" | "transmission"
@@ -118,6 +137,20 @@ export type SitemapCar = Pick<
   CatalogCar,
   "primary_source" | "source_id" | "source_updated_at"
 >;
+
+/**
+ * Public visitors access the database through RLS. Server-rendered pages do
+ * not need that additional per-row policy evaluation, which becomes costly
+ * for cars joined with all their media. Use the server key when available and
+ * retain the public client as a safe fallback for local previews.
+ */
+function createSupabaseServerRead() {
+  if (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return createSupabaseAdmin();
+  }
+
+  return createSupabasePublic();
+}
 
 export async function getCatalogCars(filters: CatalogFilters = {}): Promise<CatalogCar[]> {
   if (buildWithoutCatalog) return [];
@@ -142,7 +175,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     sourceId,
     sort = "fresh",
   } = filters;
-  const supabase = createSupabasePublic();
+  const supabase = createSupabaseServerRead();
   let query = supabase
     .from("cars")
     .select(
@@ -192,7 +225,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
 
 export async function getCatalogCount(filters: CatalogFilters = {}): Promise<number> {
   if (buildWithoutCatalog) return 0;
-  const supabase = createSupabasePublic();
+  const supabase = createSupabaseServerRead();
   let query = supabase
     .from("cars")
     .select("id", { count: "exact", head: true })
@@ -228,12 +261,20 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
 }
 
 async function fetchCatalogMetrics(): Promise<CatalogMetrics> {
-  const [calculated, under160, clean] = await Promise.all([
-    getCatalogCount(),
-    getCatalogCount({ maxPowerHp: 160 }),
-    getCatalogCount({ noAccidents: true }),
-  ]);
-  return { calculated, under160, clean };
+  const supabase = createSupabaseServerRead();
+  const { data, error } = await supabase.rpc("catalog_public_metrics");
+
+  if (error) {
+    console.error("[cars] Catalog metrics query failed", error);
+    throw error;
+  }
+
+  const metrics = Array.isArray(data) ? data[0] : data;
+  return {
+    calculated: Number(metrics?.calculated ?? 0),
+    under160: Number(metrics?.under160 ?? 0),
+    clean: Number(metrics?.clean ?? 0),
+  };
 }
 
 const getCachedCatalogMetrics = unstable_cache(
@@ -248,8 +289,32 @@ export async function getCatalogMetrics(): Promise<CatalogMetrics> {
   return getCachedCatalogMetrics();
 }
 
+async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
+  const [cars, under160Cars, passableCars] = await Promise.all([
+    getCatalogCars({ limit: 12 }),
+    getCatalogCars({ limit: 12, maxPowerHp: 160 }),
+    getCatalogCars({ limit: 12, passable: true }),
+  ]);
+
+  return { cars, under160Cars, passableCars };
+}
+
+const getCachedHomeCatalogData = unstable_cache(
+  fetchHomeCatalogData,
+  ["home-catalog-showcases-v2", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  { revalidate: 60 },
+);
+
+export async function getHomeCatalogData(): Promise<HomeCatalogData> {
+  if (buildWithoutCatalog) {
+    return { cars: [], under160Cars: [], passableCars: [] };
+  }
+
+  return getCachedHomeCatalogData();
+}
+
 async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
-  const supabase = createSupabasePublic();
+  const supabase = createSupabaseServerRead();
   const pageSize = 1000;
   const facets: CatalogFacetCar[] = [];
 
@@ -291,7 +356,7 @@ export async function getCatalogFacetCars(): Promise<CatalogFacetCar[]> {
 
 export async function getSitemapCars(): Promise<SitemapCar[]> {
   if (buildWithoutCatalog) return [];
-  const supabase = createSupabasePublic();
+  const supabase = createSupabaseServerRead();
   const pageSize = 1000;
   const cars: SitemapCar[] = [];
 
@@ -323,7 +388,7 @@ export async function getSitemapCars(): Promise<SitemapCar[]> {
 async function fetchCarDetail(source: string, sourceId: string): Promise<CarDetail | null> {
   if (buildWithoutCatalog || source !== "encar") return null;
 
-  const supabase = createSupabasePublic();
+  const supabase = createSupabaseServerRead();
   const { data, error } = await supabase
     .from("cars")
     .select(
@@ -395,6 +460,24 @@ export async function getCarDetail(source: string, sourceId: string): Promise<Ca
   // five-minute server cache could show an outdated calculation after a
   // catalog-wide refresh, so detail pages always load the latest snapshot.
   return fetchCarDetail(source, sourceId);
+}
+
+export async function getLatestCalculation(carId: string): Promise<LatestCalculation | null> {
+  const supabase = createSupabaseServerRead();
+  const { data, error } = await supabase
+    .from("calc_snapshots")
+    .select("total_rub, car_price_rub, duty_rub, fees_rub, util_rub, freight_rub, broker_rub, calculated_at, result")
+    .eq("car_id", carId)
+    .order("calculated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[cars] Latest calculation query failed", { carId, error });
+    throw error;
+  }
+
+  return data as LatestCalculation | null;
 }
 
 export function getPrimaryPhoto(car: CatalogCar) {

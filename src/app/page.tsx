@@ -16,11 +16,10 @@ import {
   Sparkles,
 } from "lucide-react";
 import {
-  getCatalogCars,
   getCatalogMetrics,
-  getCarDetail,
-  getShowcasePhoto,
-  hasShowcasePhoto,
+  getHomeCatalogData,
+  getLatestCalculation,
+  getPrimaryPhoto,
   type CatalogCar,
 } from "@/server/cars/repository";
 import { carDisplayTitle, translateFuel } from "@/server/normalization/display";
@@ -28,7 +27,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { HeroShowroom } from "@/components/home/HeroShowroom";
 import { RemoteImage } from "@/components/site/RemoteImage";
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 const rub = new Intl.NumberFormat("ru-RU");
 
@@ -50,31 +49,32 @@ function isPassable(car: CatalogCar) {
 }
 
 export default async function Home() {
-  const [cars, under160Cars, passableCars, catalogMetrics] = await Promise.all([
-    getCatalogCars({ limit: 24 }),
-    getCatalogCars({ limit: 24, maxPowerHp: 160 }),
-    getCatalogCars({ limit: 24, passable: true }),
+  const [homeDataResult, metricsResult] = await Promise.allSettled([
+    getHomeCatalogData(),
     getCatalogMetrics(),
   ]);
-  const heroCar = cars.find(hasShowcasePhoto) ?? cars[0];
+  const { cars, under160Cars, passableCars } =
+    homeDataResult.status === "fulfilled"
+      ? homeDataResult.value
+      : { cars: [], under160Cars: [], passableCars: [] };
+  const catalogMetrics =
+    metricsResult.status === "fulfilled"
+      ? metricsResult.value
+      : { calculated: 0, under160: 0, clean: 0 };
+  const heroCar = cars.find((car) => Boolean(getPrimaryPhoto(car))) ?? cars[0];
   const usedCarIds = new Set(heroCar ? [heroCar.id] : []);
   const under160 = selectShelfCars(
-    under160Cars.filter(hasShowcasePhoto),
+    under160Cars.filter((car) => Boolean(getPrimaryPhoto(car))),
     usedCarIds,
   );
   const passable = selectShelfCars(
-    passableCars.filter((car) => hasShowcasePhoto(car) && isPassable(car)),
+    passableCars.filter((car) => Boolean(getPrimaryPhoto(car)) && isPassable(car)),
     usedCarIds,
   );
-  const heroDetail = heroCar
-    ? await getCarDetail(heroCar.primary_source, heroCar.source_id)
+  const heroCalc = heroCar
+    ? await getLatestCalculation(heroCar.id).catch(() => null)
     : null;
-  const heroImage = heroDetail
-    ? getShowcasePhoto(heroDetail)
-    : heroCar
-      ? getShowcasePhoto(heroCar)
-      : null;
-  const heroCalc = heroDetail?.calc_snapshots?.[0];
+  const heroImage = heroCar ? getPrimaryPhoto(heroCar) : null;
   const heroDomesticCosts =
     (heroCalc?.freight_rub ?? 0) + (heroCalc?.broker_rub ?? 0);
   const heroCustomsCosts =
@@ -362,7 +362,10 @@ function VehicleShelf({
 }
 
 function HomeCarCard({ car }: { car: CatalogCar }) {
-  const photo = getShowcasePhoto(car);
+  // The catalogue itself falls back to the first Encar photo. Use the same
+  // choice on the home shelves so an unfamiliar media category never produces
+  // an empty card while the catalogue correctly has a photo.
+  const photo = getPrimaryPhoto(car);
   return (
     <Link
       href={`/cars/${car.primary_source}/${car.source_id}`}
