@@ -139,7 +139,16 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
       {
-        source: "/api/:path*",
+        source: "/api/calculate",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, max-age=0",
+          },
+        ],
+      },
+      {
+        source: "/api/catalog/count",
         headers: [
           {
             key: "Cache-Control",

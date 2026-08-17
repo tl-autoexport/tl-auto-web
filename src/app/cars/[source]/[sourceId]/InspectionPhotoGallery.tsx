@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Camera, X } from "lucide-react";
 import { RemoteImage } from "@/components/site/RemoteImage";
+import { publicMediaUrl } from "@/lib/media-url";
 
 type InspectionPhoto = {
   url: string;
@@ -101,7 +102,7 @@ export function InspectionPhotoGallery({
               fill
               priority
               sizes="94vw"
-              src={selected.url}
+              src={publicMediaUrl(selected.url)}
               unoptimized
             />
           </div>
