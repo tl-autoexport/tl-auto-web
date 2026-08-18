@@ -96,6 +96,18 @@ async function main() {
     };
 
     if (!dryRun) {
+      const { error: leadError } = await supabase
+        .from("leads")
+        .update({ calc_snapshot_id: null })
+        .eq("car_id", car.id);
+      if (leadError) throw leadError;
+
+      const { error: cleanupError } = await supabase
+        .from("calc_snapshots")
+        .delete()
+        .eq("car_id", car.id);
+      if (cleanupError) throw cleanupError;
+
       const { error: updateError } = await supabase
         .from("cars")
         .update({ price_rub: Math.round(calc.totalRub) })

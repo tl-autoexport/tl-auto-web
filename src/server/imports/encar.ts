@@ -249,6 +249,18 @@ type EncarConditionReport = {
   raw_payload: unknown;
 };
 
+function compactOptionRow(option: EncarOptionRow) {
+  return {
+    category: option.category,
+    name_original: option.name_original,
+    name_ru: option.name_ru,
+    value_original: option.value_original,
+    value_ru: option.value_ru,
+    is_present: option.is_present,
+    sort_order: option.sort_order,
+  };
+}
+
 type ImportOptions = {
   target?: number;
   maxPages?: number;
@@ -608,7 +620,9 @@ function buildInspectionReport(
       body_findings: summary?.outerSummarys ?? [],
     },
     items: (inspection.inners ?? []).map(normalizeInspectionNode),
-    raw_payload: { inspection, summary },
+    raw_payload: {
+      inspection: { outers: inspection.outers ?? [] },
+    },
   };
 }
 
@@ -636,7 +650,7 @@ function buildDiagnosisReport(
       has_selling_point: Boolean(diagnosis.sellingPoint),
     },
     items: [],
-    raw_payload: diagnosis,
+    raw_payload: {},
   };
 }
 
@@ -697,8 +711,6 @@ function buildEncarHistoryReport(
     (sum, event) => sum + event.repairCost,
     0,
   );
-  const release = payload.releaseResponse;
-
   return {
     source: "encar",
     report_type: "encar_carhistory",
@@ -712,23 +724,7 @@ function buildEncarHistoryReport(
     },
     items: accidents,
     raw_payload: {
-      releaseResponse: release
-        ? {
-            registerDate: nullableText(release.registerDate),
-            firstRegisterDate: nullableText(release.firstRegisterDate),
-            manufacturingDate: nullableText(release.manufacturingDate),
-            newVehiclePrice: nullableNumber(release.newVehiclePrice),
-            releaseVehiclePrice: nullableNumber(release.releaseVehiclePrice),
-            fuel: nullableText(release.fuel),
-            manufacturerNation: nullableText(release.manufacturerNation),
-            manufacturingPurpose: nullableText(release.manufacturingPurpose),
-          }
-        : null,
-      cautionResponse: payload.cautionResponse ?? null,
-      oneLineSentenceResponse: payload.oneLineSentenceResponse ?? null,
       accidentHistoryResponse: accidents,
-      nonInsurancePeriodResponse: nonInsurancePeriods,
-      ownerHistoryResponse: ownerHistory,
     },
   };
 }
@@ -1304,7 +1300,7 @@ export async function importEncar(options: ImportOptions = {}) {
             item.options.map((option) => ({
               car_id: carId,
               source: "encar",
-              ...option,
+              ...compactOptionRow(option),
             })),
           ),
         );
@@ -1329,6 +1325,15 @@ export async function importEncar(options: ImportOptions = {}) {
       }
 
       if (item.calc) {
+        assertSupabaseResult(
+          await supabase
+            .from("leads")
+            .update({ calc_snapshot_id: null })
+            .eq("car_id", carId),
+        );
+        assertSupabaseResult(
+          await supabase.from("calc_snapshots").delete().eq("car_id", carId),
+        );
         assertSupabaseResult(
           await supabase.from("calc_snapshots").insert({
             car_id: carId,
@@ -1374,12 +1379,24 @@ export async function importEncar(options: ImportOptions = {}) {
         .filter((car) => !activeSourceIds.has(String(car.source_id)))
         .map((car) => car.id as string);
       if (staleIds.length) {
-        const { error: retireError } = await supabase
-          .from("cars")
-          .update({ is_available: false })
-          .in("id", staleIds);
-        if (retireError) errors.push(retireError);
-        else deactivated = staleIds.length;
+        const staleSourceIds = (currentCars ?? [])
+          .filter((car) => staleIds.includes(car.id as string))
+          .map((car) => String(car.source_id));
+        let relationsPurged = true;
+        try {
+          await purgeRetiredEncarRelations(supabase, staleIds, staleSourceIds);
+        } catch (error) {
+          errors.push(error);
+          relationsPurged = false;
+        }
+        if (relationsPurged) {
+          const { error: retireError } = await supabase
+            .from("cars")
+            .update({ is_available: false })
+            .in("id", staleIds);
+          if (retireError) errors.push(retireError);
+          else deactivated = staleIds.length;
+        }
       }
     }
   }
@@ -1418,6 +1435,36 @@ export async function importEncar(options: ImportOptions = {}) {
 
 function assertSupabaseResult(result: { error: unknown }) {
   if (result.error) throw result.error;
+}
+
+async function purgeRetiredEncarRelations(
+  supabase: ReturnType<typeof createSupabaseAdmin>,
+  carIds: string[],
+  sourceIds: string[],
+) {
+  assertSupabaseResult(
+    await supabase
+      .from("leads")
+      .update({ calc_snapshot_id: null })
+      .in("car_id", carIds),
+  );
+  for (const table of [
+    "car_media",
+    "car_options",
+    "car_condition_reports",
+    "calc_snapshots",
+  ] as const) {
+    assertSupabaseResult(await supabase.from(table).delete().in("car_id", carIds));
+  }
+  if (sourceIds.length) {
+    assertSupabaseResult(
+      await supabase
+        .from("source_snapshots")
+        .delete()
+        .eq("source", "encar")
+        .in("source_id", sourceIds),
+    );
+  }
 }
 
 export async function inspectEncarVehicles(vehicleIds: string[]) {

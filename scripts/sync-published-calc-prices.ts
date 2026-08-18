@@ -128,6 +128,8 @@ async function main() {
         ...recalculated.map((row) => ({ id: row.id, price_rub: row.newPriceRub })),
       ];
       const snapshots = recalculated.map((row) => row.snapshot);
+      await client.query("update leads set calc_snapshot_id = null where calc_snapshot_id in (select id from calc_snapshots where car_id = any($1::uuid[]))", [recalculated.map((row) => row.id)]);
+      await client.query("delete from calc_snapshots where car_id = any($1::uuid[])", [recalculated.map((row) => row.id)]);
       const { rows: written } = await client.query<{
         updated_prices: number;
         inserted_snapshots: number;
