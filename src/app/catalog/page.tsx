@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import {
   ArrowRight,
-  Camera,
   CarFront,
   Check,
   ChevronDown,
@@ -21,13 +20,17 @@ import {
   getCatalogCount,
   getCatalogFacetCars,
   getPrimaryPhoto,
+  getPassoStagingCars,
+  getPassoStagingCount,
   type CatalogCar,
   type CatalogFilters,
+  type StagingCatalogType,
 } from "@/server/cars/repository";
 import { carDisplayTitle, translateFuel, translateTransmission } from "@/server/normalization/display";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { RemoteImage } from "@/components/site/RemoteImage";
 import { officialSourceUrl, sourceDisplayName } from "@/lib/source-url";
+import { passoImageProxyUrl } from "@/lib/passo-image";
+import { RemoteImage } from "@/components/site/RemoteImage";
 import { MobileCatalogFilters } from "./MobileCatalogFilters";
 import { BrandModelFields } from "@/components/catalog/BrandModelFields";
 import { LiveCatalogCount } from "./LiveCatalogCount";
@@ -80,6 +83,10 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const rawParams = await searchParams;
   const value = (name: string) => typeof rawParams[name] === "string" ? rawParams[name] : "";
   const shelf = value("shelf");
+  const category = value("category") as "car" | StagingCatalogType;
+  if (category === "motorcycle" || category === "scooter" || category === "jetski") {
+    return <StagingCatalogPage category={category} page={positiveInteger(value("page")) ?? 1} />;
+  }
   const under160 = value("under160") === "1" || shelf === "under-160";
   const passable = value("passable") === "1" || shelf === "passable";
   const sortValue = value("sort");
@@ -146,6 +153,8 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   return (
     <main className="min-h-screen bg-[#f5f6f8] text-[#101827]">
       <SiteHeader />
+
+      <CatalogCategoryTabs active="car" />
 
       <section className="border-b border-[#dce2eb] bg-white">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-5 md:py-10">
@@ -229,6 +238,27 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       </section>
     </main>
   );
+}
+
+async function StagingCatalogPage({ category, page }: { category: StagingCatalogType; page: number }) {
+  const pageSize = 24;
+  const [totalCars, shownCars] = await Promise.all([
+    getPassoStagingCount(category),
+    getPassoStagingCars(category, { limit: pageSize, offset: (page - 1) * pageSize }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(totalCars / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const labels = {
+    motorcycle: { eyebrow: "Passo Bike", title: "Мототехника из Кореи", description: "Свежие объявления мотоциклов и скутеров с характеристиками и фотографиями из Passo." },
+    scooter: { eyebrow: "Passo Bike", title: "Скутеры из Кореи", description: "Свежие объявления скутеров с характеристиками и фотографиями из Passo." },
+    jetski: { eyebrow: "Passo Boat", title: "Гидроциклы из Кореи", description: "Только гидроциклы из раздела Passo. Лодки и яхты исключены." },
+  }[category];
+  return <main className="min-h-screen bg-[#f5f6f8] text-[#101827]"><SiteHeader /><CatalogCategoryTabs active={category} /><section className="border-b border-[#dce2eb] bg-white"><div className="mx-auto max-w-7xl px-4 py-7 sm:px-5 md:py-10"><p className="text-xs font-semibold text-[#956f2c] sm:text-sm">{labels.eyebrow}</p><div className="mt-1.5 flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><h1 className="text-[32px] font-semibold leading-tight sm:text-4xl">{labels.title}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-[#647084]">{labels.description}</p></div><div className="rounded-full bg-[#f5f0e4] px-4 py-2 text-sm text-[#7b5a22]"><strong className="mr-1 text-xl text-[#101827]">{totalCars}</strong> объявлений</div></div></div></section><section className="mx-auto max-w-7xl px-3 py-8 sm:px-5"><div className="mb-5 flex items-center justify-between border-b border-[#dce2eb] pb-4 text-sm text-[#647084]"><span>Показано {shownCars.length ? `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, totalCars)} из ${totalCars}` : "0 объявлений"}</span><span>Сначала свежие объявления</span></div>{shownCars.length ? <><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{shownCars.map((car, index) => <CatalogCard key={car.id} car={car} highPriority={index === 0} />)}</div>{totalPages > 1 ? <Pagination currentPage={currentPage} rawParams={{ category }} totalPages={totalPages} /> : null}</> : <EmptyState />}</section></main>;
+}
+
+function CatalogCategoryTabs({ active }: { active: "car" | StagingCatalogType }) {
+  const tabs = [{ key: "car", label: "Автомобили", href: "/catalog" }, { key: "motorcycle", label: "Мототехника", href: "/catalog?category=motorcycle" }, { key: "jetski", label: "Гидроциклы", href: "/catalog?category=jetski" }] as const;
+  return <nav aria-label="Категории техники" className="border-b border-[#dce2eb] bg-white"><div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 sm:px-5">{tabs.map((tab) => <Link key={tab.key} href={tab.href} className={`relative whitespace-nowrap px-4 py-4 text-sm font-semibold transition ${active === tab.key ? "text-[#956f2c]" : "text-[#647084] hover:text-[#956f2c]"}`}>{tab.label}{active === tab.key ? <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#956f2c]" /> : null}</Link>)}</div></nav>;
 }
 
 type CatalogFilterFormProps = {
@@ -337,26 +367,47 @@ function CatalogFilterForm({
 
 function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boolean }) {
   const photo = getPrimaryPhoto(car);
-  const detailsHref = `/cars/${car.primary_source}/${car.source_id}`;
+  const isPasso = car.primary_source.startsWith("passo_");
+  const passoSpecs = car.vehicle_specs ?? {};
+  const passoFacts = [
+    typeof passoSpecs.engine_cc === "number" ? `${rub.format(passoSpecs.engine_cc)} см³` : null,
+    typeof passoSpecs.power_hp === "number" ? `${passoSpecs.power_hp} л.с.` : null,
+    typeof passoSpecs.fuel === "string" ? passoSpecs.fuel : null,
+    typeof passoSpecs.transmission === "string" ? passoSpecs.transmission : null,
+  ].filter((value): value is string => Boolean(value));
+  const detailsHref = isPasso ? `/catalog/item/${car.primary_source}/${car.source_id}` : `/cars/${car.primary_source}/${car.source_id}`;
   const officialUrl = officialSourceUrl(car.source_url, car.primary_source);
   const sourceName = sourceDisplayName(car.primary_source);
 
   return (
     <article className="group overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-[#d8dde6] transition hover:-translate-y-0.5 hover:shadow-md">
-      <Link className="block" href={detailsHref}>
-        <div className="relative aspect-[4/3] bg-[#dfe4ec]">
-          {photo ? <RemoteImage alt={carDisplayTitle(car)} className="object-cover" fetchPriority={highPriority ? "high" : undefined} fill loading={highPriority ? "eager" : undefined} sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" src={photo} fallback={<Camera size={32} />} /> : <div className="flex h-full items-center justify-center text-[#647084]"><Camera size={32} /></div>}
-          <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-            {car.accident_count === 0 ? <span className="rounded-sm bg-[#e8f5ef] px-2 py-1 text-xs font-semibold text-[#18794e]">Без ДТП</span> : null}
-            {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? <span className="rounded-sm bg-[#fff2e5] px-2 py-1 text-xs font-semibold text-[#9a5b1c]">Страховые выплаты: {car.insurance_payout_count}</span> : null}
-          </div>
+      <div className="relative aspect-[4/3] bg-[#dfe4ec]">
+        <Link aria-label={`Открыть объявление: ${carDisplayTitle(car)}`} className="block h-full w-full" href={detailsHref}>
+          {photo ? (
+            <RemoteImage
+              alt={carDisplayTitle(car)}
+              className="object-cover transition duration-300 group-hover:scale-[1.02]"
+              fetchPriority={highPriority ? "high" : undefined}
+              fill
+              loading={highPriority ? "eager" : undefined}
+              sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+              src={isPasso ? passoImageProxyUrl(photo) : photo}
+              fallback={<CarFront size={32} />}
+            />
+          ) : <div className="flex h-full items-center justify-center text-[#647084]"><CarFront size={32} /></div>}
+        </Link>
+        <div className="pointer-events-none absolute left-3 top-3 flex flex-wrap gap-2">
+          {car.accident_count === 0 ? <span className="rounded-sm bg-[#e8f5ef] px-2 py-1 text-xs font-semibold text-[#18794e]">Без ДТП</span> : null}
+          {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? <span className="rounded-sm bg-[#fff2e5] px-2 py-1 text-xs font-semibold text-[#9a5b1c]">Страховые выплаты: {car.insurance_payout_count}</span> : null}
+          {isPasso ? <span className={`rounded-sm px-2 py-1 text-xs font-semibold ${car.vehicle_type === "jetski" ? "bg-[#e4f4f5] text-[#16727a]" : "bg-[#eef0f7] text-[#445276]"}`}>{car.vehicle_type === "jetski" ? "Гидроцикл" : car.vehicle_type === "scooter" ? "Скутер" : "Мотоцикл"}</span> : null}
         </div>
-      </Link>
+      </div>
       <div className="p-4">
         <Link href={detailsHref}><h2 className="line-clamp-2 text-lg font-semibold transition group-hover:text-[#956f2c]">{carDisplayTitle(car)}</h2></Link>
-        <p className="mt-2 text-sm text-[#647084]">{car.year ?? "-"} год · {rub.format(car.mileage_km ?? 0)} км · {translateFuel(car.fuel_type)}</p>
-        <div className="mt-4 flex items-end justify-between gap-3"><div><p className="text-xs text-[#647084]">до Владивостока</p><p className="whitespace-nowrap text-xl font-semibold">{rub.format(car.price_rub ?? 0)} ₽</p></div><div className="flex items-center gap-1 text-sm text-[#647084]"><Gauge size={16} />{car.power_hp ?? "-"} л.с.</div></div>
-        <div className="mt-4 flex items-center justify-between border-t border-[#edf0f4] pt-3 text-xs font-medium text-[#647084]"><span className="inline-flex items-center gap-1"><ShieldCheck size={14} className="text-[#a98239]" /> Расчёт РФ</span><span>{formatUpdate(car.source_updated_at)}</span></div>
+        <p className="mt-2 text-sm text-[#647084]">{car.year ?? "-"} год · {car.mileage_km ? `${rub.format(car.mileage_km)} км` : "Пробег не указан"}{isPasso && typeof passoSpecs.category === "string" ? ` · ${passoSpecs.category}` : isPasso ? "" : ` · ${translateFuel(car.fuel_type)}`}</p>
+        {isPasso && passoFacts.length ? <p className="mt-2 line-clamp-1 text-xs font-medium text-[#445276]">{passoFacts.join(" · ")}</p> : null}
+        <div className="mt-4 flex items-end justify-between gap-3"><div><p className="text-xs text-[#647084]">{isPasso ? "Цена в Корее" : "до Владивостока"}</p><p className="whitespace-nowrap text-xl font-semibold">{isPasso ? `${rub.format(car.price_krw ?? 0)} ₩` : `${rub.format(car.price_rub ?? 0)} ₽`}</p></div><div className="flex items-center gap-1 text-sm text-[#647084]"><Gauge size={16} />{isPasso ? (car.vehicle_specs?.power_hp ? `${car.vehicle_specs.power_hp} л.с.` : "") : `${car.power_hp ?? "-"} л.с.`}</div></div>
+        <div className="mt-4 flex items-center justify-between border-t border-[#edf0f4] pt-3 text-xs font-medium text-[#647084]"><span className="inline-flex items-center gap-1"><ShieldCheck size={14} className={isPasso ? "text-[#16727a]" : "text-[#a98239]"} /> {isPasso ? "Проверено Passo" : "Расчёт РФ"}</span><span>{formatUpdate(car.source_updated_at)}</span></div>
         <div className="mt-2 flex min-h-8 items-center justify-between gap-3 border-t border-[#edf0f4] pt-2 text-xs">
           <span className="truncate text-[#7a8798]">Лот {car.source_id}</span>
           {officialUrl ? <a className="inline-flex shrink-0 items-center gap-1 font-semibold text-[#956f2c] hover:underline" href={officialUrl} rel="noopener noreferrer" target="_blank">На {sourceName}<ExternalLink size={13} /></a> : null}

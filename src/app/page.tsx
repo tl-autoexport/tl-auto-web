@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowRight,
   Calculator,
@@ -18,24 +19,17 @@ import {
 import {
   getCatalogMetrics,
   getHomeCatalogData,
-  getLatestCalculation,
+  getPassoStagingCount,
   getPrimaryPhoto,
   type CatalogCar,
 } from "@/server/cars/repository";
 import { carDisplayTitle, translateFuel } from "@/server/normalization/display";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { HeroShowroom } from "@/components/home/HeroShowroom";
 import { RemoteImage } from "@/components/site/RemoteImage";
 
 export const revalidate = 60;
 
 const rub = new Intl.NumberFormat("ru-RU");
-
-function snapshotResultNumber(result: unknown, key: string) {
-  if (!result || typeof result !== "object" || Array.isArray(result)) return 0;
-  const value = (result as Record<string, unknown>)[key];
-  return typeof value === "number" ? value : 0;
-}
 
 function isPassable(car: CatalogCar) {
   if (!car.year || !car.registration_month) return false;
@@ -49,67 +43,70 @@ function isPassable(car: CatalogCar) {
 }
 
 export default async function Home() {
-  const [homeDataResult, metricsResult] = await Promise.allSettled([
+  const [homeDataResult, metricsResult, motorcycleCountResult, jetskiCountResult] = await Promise.allSettled([
     getHomeCatalogData(),
     getCatalogMetrics(),
+    getPassoStagingCount("motorcycle"),
+    getPassoStagingCount("jetski"),
   ]);
-  const { cars, under160Cars, passableCars } =
+  const { under160Cars, passableCars } =
     homeDataResult.status === "fulfilled"
       ? homeDataResult.value
-      : { cars: [], under160Cars: [], passableCars: [] };
+      : { under160Cars: [], passableCars: [] };
   const catalogMetrics =
     metricsResult.status === "fulfilled"
       ? metricsResult.value
       : { calculated: 0, under160: 0, clean: 0 };
-  const heroCar = cars.find((car) => Boolean(getPrimaryPhoto(car))) ?? cars[0];
-  const usedCarIds = new Set(heroCar ? [heroCar.id] : []);
+  const motorcycleCount = motorcycleCountResult.status === "fulfilled" ? motorcycleCountResult.value : 0;
+  const jetskiCount = jetskiCountResult.status === "fulfilled" ? jetskiCountResult.value : 0;
+  const usedCarIds = new Set<string>();
   const under160 = selectShelfCars(
-    under160Cars.filter((car) => Boolean(getPrimaryPhoto(car))),
+    under160Cars,
     usedCarIds,
   );
   const passable = selectShelfCars(
-    passableCars.filter((car) => Boolean(getPrimaryPhoto(car)) && isPassable(car)),
+    passableCars.filter(isPassable),
     usedCarIds,
   );
-  const heroCalc = heroCar
-    ? await getLatestCalculation(heroCar.id).catch(() => null)
-    : null;
-  const heroImage = heroCar ? getPrimaryPhoto(heroCar) : null;
-  const heroDomesticCosts =
-    (heroCalc?.freight_rub ?? 0) + (heroCalc?.broker_rub ?? 0);
-  const heroCustomsCosts =
-    (heroCalc?.duty_rub ?? 0) +
-    snapshotResultNumber(heroCalc?.result, "exciseRub") +
-    snapshotResultNumber(heroCalc?.result, "vatRub") +
-    (heroCalc?.fees_rub ?? 0) +
-    (heroCalc?.util_rub ?? 0);
 
   return (
-    <main className="min-h-screen bg-[#f5f6f8] text-[#101827]">
+    <main className="min-h-screen bg-[#090c12] text-[#101827]">
       <SiteHeader />
 
-      <HeroShowroom
-        carHref={
-          heroCar
-            ? `/cars/${heroCar.primary_source}/${heroCar.source_id}`
-            : null
-        }
-        carTitle={heroCar ? carDisplayTitle(heroCar) : "Автомобиль из Кореи"}
-        imageUrl={heroImage}
-        metrics={catalogMetrics}
-        priceSteps={[
-          { label: "Автомобиль", value: heroCalc?.car_price_rub ?? null },
-          { label: "Корея и доставка", value: heroDomesticCosts || null },
-          { label: "Таможня и сборы", value: heroCustomsCosts || null },
-          {
-            label: "Итого",
-            value: heroCalc?.total_rub ?? heroCar?.price_rub ?? null,
-          },
-        ]}
-        sourceUpdatedAt={heroCar?.source_updated_at ?? null}
-        totalPriceRub={heroCalc?.total_rub ?? heroCar?.price_rub ?? null}
-      />
+      <section className="relative overflow-hidden border-b border-[#c9a24e]/25 bg-[radial-gradient(circle_at_50%_-30%,#253044_0%,#111925_40%,#090c12_75%)]" aria-labelledby="catalogs-title">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#e5c979] to-transparent" />
+        <div className="mx-auto max-w-7xl px-5 pb-8 pt-8 sm:px-6 sm:pb-10 sm:pt-10 lg:pb-12 lg:pt-12">
+          <div className="mx-auto max-w-xl text-center">
+            <p id="catalogs-title" className="text-sm font-medium leading-6 text-[#c0c7d1] sm:text-base">Выберите подходящий вариант из актуальной витрины Южной Кореи.</p>
+          </div>
 
+          <div className="mt-6 grid gap-3 md:grid-cols-3 lg:mt-8 lg:gap-4">
+            <CatalogGatewayCard
+              count={catalogMetrics.calculated}
+              href="/catalog"
+              image="/branding/catalog/car.png"
+              label="Автомобили"
+              description="Каталог автомобилей с расчётом до Владивостока."
+            />
+            <CatalogGatewayCard
+              count={motorcycleCount}
+              href="/catalog?category=motorcycle"
+              image="/branding/catalog/motorcycle.png"
+              label="Мототехника"
+              description="Мотоциклы и скутеры из актуальных объявлений."
+            />
+            <CatalogGatewayCard
+              count={jetskiCount}
+              href="/catalog?category=jetski"
+              image="/branding/catalog/jetski.png"
+              label="Гидроциклы"
+              description="Персональная водная техника из Южной Кореи."
+            />
+          </div>
+        </div>
+      </section>
+
+      <div className="bg-[#f5f6f8]">
       <VehicleShelf
         id="under-160"
         title="Рекомендации до 160 л.с."
@@ -313,7 +310,42 @@ export default async function Home() {
           </Link>
         </div>
       </section>
+      </div>
     </main>
+  );
+}
+
+function CatalogGatewayCard({
+  count,
+  description,
+  href,
+  image,
+  label,
+}: {
+  count: number;
+  description: string;
+  href: string;
+  image: string;
+  label: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group relative flex min-h-[246px] flex-col overflow-hidden rounded-lg border border-white/10 bg-[#111821] p-4 shadow-[0_16px_42px_rgba(0,0,0,0.2)] transition duration-300 hover:-translate-y-1 hover:border-[#e5c979]/60 hover:shadow-[0_24px_56px_rgba(0,0,0,0.32)] sm:min-h-[270px]"
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(229,201,121,0.11),transparent_43%)]" />
+      <div className="relative flex items-start justify-between gap-4">
+        <h2 className="text-xl font-semibold tracking-[-0.03em] text-white sm:text-2xl">{label}</h2>
+        <span className="rounded-full border border-[#e5c979]/25 bg-[#e5c979]/10 px-2.5 py-1 text-[11px] font-semibold text-[#f4df9d]">{rub.format(count)} объявлений</span>
+      </div>
+      <div className="relative flex flex-1 items-center justify-center py-1">
+        <Image src={image} alt="" width={1536} height={1024} className="h-auto max-h-[142px] w-full object-contain mix-blend-screen transition duration-500 group-hover:scale-[1.045] sm:max-h-[158px]" />
+      </div>
+      <div className="relative flex items-center justify-between border-t border-white/10 pt-3">
+        <p className="text-xs text-[#abb5c3]">{description}</p>
+        <span className="ml-3 inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#f1d58d]">Открыть <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" /></span>
+      </div>
+    </Link>
   );
 }
 

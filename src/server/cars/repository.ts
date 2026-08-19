@@ -7,7 +7,7 @@ const buildWithoutCatalog =
 
 export type CatalogCar = {
   id: string;
-  vehicle_type: "car";
+  vehicle_type: "car" | "motorcycle" | "scooter" | "jetski";
   primary_source: string;
   source_kind: string;
   source_id: string;
@@ -39,6 +39,7 @@ export type CatalogCar = {
   has_thermal_images: boolean;
   data_confidence: number | null;
   source_updated_at: string | null;
+  vehicle_specs?: Record<string, unknown>;
   car_media?: Array<{
     url: string;
     thumbnail_url: string | null;
@@ -103,6 +104,8 @@ export type CatalogFilters = {
   sourceId?: string;
   sort?: "fresh" | "price_asc" | "price_desc" | "mileage_asc" | "year_desc";
 };
+
+export type StagingCatalogType = "motorcycle" | "scooter" | "jetski";
 
 export type CatalogMetrics = {
   calculated: number;
@@ -257,6 +260,116 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
     console.error("[cars] Catalog count query failed", error);
     throw error;
   }
+  return count ?? 0;
+}
+
+export async function getPassoStagingCars(
+  vehicleType: StagingCatalogType,
+  options: { limit?: number; offset?: number } = {},
+): Promise<CatalogCar[]> {
+  if (buildWithoutCatalog) return [];
+  const supabase = createSupabaseServerRead();
+  const { limit = 24, offset = 0 } = options;
+  let query = supabase
+    .from("passo_catalog_staging")
+    .select("id, source, source_id, source_url, vehicle_type, source_updated_at, brand, model, year, mileage_km, price_krw, vehicle_specs, image_urls")
+    .eq("import_status", "validated");
+  query = vehicleType === "motorcycle"
+    ? query.in("vehicle_type", ["motorcycle", "scooter"])
+    : query.eq("vehicle_type", vehicleType);
+  const { data, error } = await query
+    .order("source_updated_at", { ascending: false, nullsFirst: false })
+    .range(offset, offset + limit - 1);
+  if (error) throw error;
+  return (data ?? []).map(mapPassoStagingRow);
+}
+
+export async function getPassoStagingCar(source: string, sourceId: string): Promise<CatalogCar | null> {
+  if (buildWithoutCatalog) return null;
+  const supabase = createSupabaseServerRead();
+  const { data, error } = await supabase
+    .from("passo_catalog_staging")
+    .select("id, source, source_id, source_url, vehicle_type, source_updated_at, brand, model, year, mileage_km, price_krw, vehicle_specs, image_urls")
+    .eq("import_status", "validated")
+    .eq("source", source)
+    .eq("source_id", sourceId)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapPassoStagingRow(data) : null;
+}
+
+function mapPassoStagingRow(row: {
+  id: string;
+  source: string;
+  source_id: string;
+  source_url: string | null;
+  vehicle_type: "motorcycle" | "scooter" | "jetski";
+  source_updated_at: string | null;
+  brand: string | null;
+  model: string | null;
+  year: number | null;
+  mileage_km: number | null;
+  price_krw: number | null;
+  vehicle_specs: Record<string, unknown> | null;
+  image_urls: unknown;
+}): CatalogCar {
+    const imageUrls = Array.isArray(row.image_urls) ? row.image_urls : [];
+    const media = imageUrls.flatMap((item, index) => {
+      if (typeof item === "string") return [{ url: item, thumbnail_url: null, media_type: "image", category: "exterior", is_primary: index === 0, sort_order: index }];
+      if (!item || typeof item !== "object" || typeof item.url !== "string") return [];
+      return [{ url: item.url, thumbnail_url: null, media_type: "image", category: "exterior", is_primary: item.is_primary === true || index === 0, sort_order: typeof item.sort_order === "number" ? item.sort_order : index }];
+    });
+    return {
+      id: row.id,
+      vehicle_type: row.vehicle_type,
+      primary_source: row.source,
+      source_kind: "classified",
+      source_id: row.source_id,
+      source_url: row.source_url,
+      brand: row.brand,
+      model: row.model,
+      badge: null,
+      badge_detail: null,
+      year: row.year,
+      registration_month: null,
+      mileage_km: row.mileage_km,
+      price_krw: row.price_krw,
+      price_rub: null,
+      engine_cc: typeof row.vehicle_specs?.engine_cc === "number" ? row.vehicle_specs.engine_cc : null,
+      power_hp: null,
+      fuel_type: typeof row.vehicle_specs?.fuel === "string" ? row.vehicle_specs.fuel : null,
+      transmission: typeof row.vehicle_specs?.transmission === "string" ? row.vehicle_specs.transmission : null,
+      drive_type: null,
+      color: typeof row.vehicle_specs?.color === "string" ? row.vehicle_specs.color : null,
+      owners_count: null,
+      accident_count: null,
+      insurance_payout_count: null,
+      insurance_payout_total_krw: null,
+      has_360_exterior: false,
+      has_360_interior: false,
+      has_heydealer_eye: false,
+      has_obd_scan: false,
+      has_underbody_photo: false,
+      has_thermal_images: false,
+      data_confidence: null,
+      source_updated_at: row.source_updated_at,
+      vehicle_specs: row.vehicle_specs ?? {},
+      car_media: media,
+    } as CatalogCar;
+}
+
+export async function getPassoStagingCount(vehicleType: StagingCatalogType): Promise<number> {
+  if (buildWithoutCatalog) return 0;
+  const supabase = createSupabaseServerRead();
+  let query = supabase
+    .from("passo_catalog_staging")
+    .select("id", { count: "exact", head: true })
+    .eq("import_status", "validated");
+  query = vehicleType === "motorcycle"
+    ? query.in("vehicle_type", ["motorcycle", "scooter"])
+    : query.eq("vehicle_type", vehicleType);
+  const { count, error } = await query;
+  if (error) throw error;
   return count ?? 0;
 }
 

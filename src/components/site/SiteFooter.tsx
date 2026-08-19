@@ -16,8 +16,8 @@ export function SiteFooter() {
             <TlAutoLogo className="px-3 py-1.5" variant="footer" />
           </Link>
           <p className="mt-4 max-w-lg text-xs leading-5 text-white/58">
-            Каталог автомобилей из Южной Кореи с актуальными объявлениями
-            Encar и предварительным расчётом стоимости доставки.
+            Актуальные каталоги автомобилей, мототехники и гидроциклов из
+            Южной Кореи.
           </p>
         </div>
 

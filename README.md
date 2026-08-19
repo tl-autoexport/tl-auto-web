@@ -19,6 +19,42 @@ npm run dev
 
 Сайт откроется на [http://localhost:3000](http://localhost:3000).
 
+## Публикация на GitHub и Vercel
+
+1. Создайте приватный или публичный репозиторий в отдельном GitHub-аккаунте TL
+   Auto и отправьте в него ветку `main`. Файлы `.env.local`, `.env` и локальное
+   состояние Supabase уже исключены из git.
+2. В Vercel выберите `Add New...` → `Project`, импортируйте этот GitHub-
+   репозиторий и оставьте framework `Next.js`. Конфигурация проекта закреплена
+   в `vercel.json`; команды установки и сборки используют `npm ci` и
+   `npm run build`.
+3. Добавьте в Vercel → `Settings` → `Environment Variables` для `Production`,
+   `Preview` и `Development`:
+
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `NEXT_PUBLIC_SITE_URL` — канонический HTTPS-домен production; для Preview
+     можно оставить значение пустым, тогда используется URL Vercel.
+
+   `SUPABASE_SECRET_KEY`, `SUPABASE_DB_URL`, токены Encar и Telegram в Vercel
+   не добавляйте: они нужны только обслуживающим скриптам GitHub Actions.
+4. После привязки собственного домена замените `NEXT_PUBLIC_SITE_URL` на его
+   HTTPS-адрес и запустите новый production deploy. Preview-деплои автоматически
+   закрыты от индексации через `robots.txt` и metadata.
+
+Для GitHub Actions добавьте в `Settings` → `Secrets and variables` → `Actions`
+следующие Secrets:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SECRET_KEY`
+- `SUPABASE_DB_URL`
+- `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` — необязательно
+
+Workflow `ci.yml` проверяет pull request и push в `main`; остальные workflow
+обновляют каталог и расчётные курсы по расписанию. Миграции Supabase запускайте
+отдельно после проверки SQL и перед первым production deploy.
+
 ## Проверка перед публикацией
 
 ```bash

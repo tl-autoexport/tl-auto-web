@@ -7,7 +7,7 @@ type TlAutoLogoProps = {
 };
 
 const widthByVariant = {
-  header: "w-[132px] sm:w-[148px] lg:w-[166px]",
+  header: "w-[106px] sm:w-[118px] lg:w-[132px]",
   footer: "w-[190px] sm:w-[220px]",
   hero: "w-[180px] sm:w-[224px]",
 } as const;

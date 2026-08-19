@@ -4,15 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
-  Calculator,
-  Camera,
   CarFront,
   ChevronDown,
   Globe2,
   Menu,
   MessageCircle,
-  Play,
-  Send,
+  ShipWheel,
+  Bike,
   X,
 } from "lucide-react";
 import { ContactModal } from "@/components/site/ContactModal";
@@ -25,6 +23,12 @@ const utilityLinks = [
   { label: "Доставка", href: "/#delivery", pending: false },
   { label: "Отзывы", href: "/#reviews", pending: false },
   { label: "Контакты", href: "/#contacts", pending: false, contact: true },
+] as const;
+
+const catalogLinks = [
+  { label: "Автомобили", href: "/catalog", icon: CarFront },
+  { label: "Мототехника", href: "/catalog?category=motorcycle", icon: Bike },
+  { label: "Гидроциклы", href: "/catalog?category=jetski", icon: ShipWheel },
 ] as const;
 
 const CONTACT_PROMPT_SESSION_KEY = "tl-auto-contact-prompt-v1-shown";
@@ -138,19 +142,21 @@ export function SiteHeader() {
 
   return (
     <header
-      className={`sticky top-0 z-50 border-b border-[#dce2eb] bg-white/95 text-[#111927] shadow-[0_1px_0_rgba(15,23,42,0.03)] backdrop-blur-xl transition-transform duration-200 lg:translate-y-0 ${
+      className={`sticky top-0 z-50 border-b border-[#c9a24e]/20 bg-[#090c12]/95 text-white shadow-[0_14px_38px_rgba(0,0,0,0.18)] backdrop-blur-xl transition-transform duration-200 lg:translate-y-0 ${
         mobileHeaderHidden ? "max-lg:-translate-y-full" : "translate-y-0"
       }`}
     >
-      <div className="hidden bg-[#11151d] text-white lg:block">
-        <div className="mx-auto flex h-9 max-w-[1440px] items-center justify-between px-6 xl:px-8">
-          <div className="flex items-center gap-2 text-[12px] font-medium text-white/78">
+      <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between gap-3 px-4 sm:h-[60px] sm:px-6 xl:px-8">
+        <div className="flex shrink-0 items-center gap-3 sm:gap-5">
+          <Brand />
+          <div className="hidden items-center gap-1.5 border-l border-white/10 pl-4 text-[12px] font-medium text-white/68 sm:flex">
             <Globe2 size={14} aria-hidden="true" />
             <span>Русский</span>
             <ChevronDown size={13} aria-hidden="true" />
           </div>
+        </div>
 
-          <nav aria-label="Сервисная навигация" className="flex items-center gap-6 text-[12px] font-medium text-white/76">
+        <nav aria-label="Сервисная навигация" className="hidden items-center gap-5 text-[12px] font-medium text-white/72 xl:flex">
             {utilityLinks.map((item) => (
               "contact" in item && item.contact ? (
                 <button key={item.label} className="transition hover:text-white" onClick={openContact} type="button">
@@ -166,51 +172,28 @@ export function SiteHeader() {
                 </Link>
               )
             ))}
-          </nav>
-
-          <div className="flex items-center gap-1.5">
-            <SocialIcon label="Telegram" icon={Send} onClick={openContact} />
-            <SocialIcon label="YouTube" icon={Play} onClick={openContact} />
-            <SocialIcon label="Instagram" icon={Camera} onClick={openContact} />
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 lg:h-[72px] lg:gap-6 lg:px-5 xl:px-8">
-        <Brand />
-
-        <nav aria-label="Основная навигация" className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex">
-          <Link
-            className={`relative px-4 py-6 text-sm font-semibold transition hover:text-[#956f2c] ${pathname.startsWith("/catalog") || pathname.startsWith("/cars/") ? "text-[#956f2c]" : "text-[#263247]"}`}
-            href="/catalog"
-          >
-            Авто из Кореи
-            {(pathname.startsWith("/catalog") || pathname.startsWith("/cars/")) && <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#956f2c]" />}
-          </Link>
         </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden items-center gap-1 sm:flex">
           <button
-            className="flex size-10 items-center justify-center text-[#11151d] transition hover:text-[#956f2c]"
+            className="flex size-9 items-center justify-center text-white/75 transition hover:text-[#f1d58d]"
             onClick={openContact}
             title="Связаться с нами"
             type="button"
           >
-            <MessageCircle size={20} aria-hidden="true" />
+            <MessageCircle size={19} aria-hidden="true" />
             <span className="sr-only">Связаться с нами</span>
           </button>
-          <Link className="inline-flex h-11 items-center gap-2 rounded-md bg-[#11151d] px-5 text-sm font-semibold text-white transition hover:bg-[#1d3553]" href="/catalog">
-            <Calculator size={17} aria-hidden="true" />
-            Подобрать авто
-          </Link>
+          <button className="inline-flex h-9 items-center gap-2 rounded-md bg-[#c9a24e] px-4 text-[13px] font-semibold text-[#15130f] transition hover:bg-[#e5c979]" onClick={openContact} type="button">
+            Оставить заявку
+          </button>
         </div>
-
         <button
           ref={mobileMenuButtonRef}
           aria-controls="mobile-navigation"
           aria-expanded={mobileOpen}
           aria-label={mobileOpen ? "Закрыть меню" : "Открыть меню"}
-          className="flex size-11 items-center justify-center rounded-md border border-[#d7dee8] bg-white text-[#11151d] lg:hidden"
+          className="flex size-9 items-center justify-center rounded-md border border-white/18 bg-white/5 text-white sm:hidden"
           onClick={() => setMobileOpen((open) => !open)}
           type="button"
         >
@@ -221,25 +204,27 @@ export function SiteHeader() {
       {mobileOpen && (
         <div
           aria-label="Мобильная навигация"
-          className="absolute inset-x-0 top-full z-50 h-[calc(100dvh-64px)] overflow-y-auto border-t border-[#dce2eb] bg-[#f4f6f9] pb-[env(safe-area-inset-bottom)] lg:hidden"
+          className="absolute inset-x-0 top-full z-50 h-[calc(100dvh-56px)] overflow-y-auto border-t border-white/10 bg-[#090c12] pb-[env(safe-area-inset-bottom)] sm:hidden"
           id="mobile-navigation"
           role="navigation"
         >
-          <div className="border-t border-[#dce2eb] bg-white px-5 pb-5 pt-3">
-            <p className="py-3 text-[11px] font-semibold uppercase text-[#8a96a8]">Каталог TL Auto</p>
-            <Link className="flex items-center justify-between border-b border-[#edf0f4] py-4 text-base font-semibold text-[#956f2c]" href="/catalog" onClick={() => setMobileOpen(false)}>
-              Авто из Кореи <CarFront size={19} />
-            </Link>
+          <div className="border-t border-white/10 px-5 pb-5 pt-3">
+            <p className="py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e5c979]">Каталоги TL Auto</p>
+            {catalogLinks.map(({ href, icon: Icon, label }) => (
+              <Link key={label} className="flex items-center justify-between border-b border-white/10 py-4 text-base font-semibold text-white" href={href} onClick={() => setMobileOpen(false)}>
+                {label} <Icon size={19} className="text-[#e5c979]" />
+              </Link>
+            ))}
           </div>
 
-          <div className="mt-2 bg-white px-5 py-5">
-            <p className="text-[11px] font-semibold uppercase text-[#8a96a8]">Информация</p>
+          <div className="border-t border-white/10 px-5 py-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">Информация</p>
             <div className="mt-2 grid grid-cols-2 gap-x-5">
               {utilityLinks.map((item) => (
                 "contact" in item && item.contact ? (
                   <button
                     key={item.label}
-                    className="border-b border-[#edf0f4] py-3 text-left text-sm font-medium text-[#263247]"
+                    className="border-b border-white/10 py-3 text-left text-sm font-medium text-white/80"
                     onClick={() => {
                       setMobileOpen(false);
                       openContact();
@@ -249,11 +234,11 @@ export function SiteHeader() {
                     {item.label}
                   </button>
                 ) : item.pending ? (
-                  <div key={item.label} className="flex items-center justify-between border-b border-[#edf0f4] py-3 text-sm font-medium text-[#68758a]">
+                  <div key={item.label} className="flex items-center justify-between border-b border-white/10 py-3 text-sm font-medium text-white/50">
                     {item.label}<span className="text-[9px] font-bold uppercase text-[#a0a9b6]">Скоро</span>
                   </div>
                 ) : (
-                  <Link key={item.label} className="border-b border-[#edf0f4] py-3 text-sm font-medium text-[#263247]" href={item.href} onClick={() => setMobileOpen(false)}>
+                  <Link key={item.label} className="border-b border-white/10 py-3 text-sm font-medium text-white/80" href={item.href} onClick={() => setMobileOpen(false)}>
                     {item.label}
                   </Link>
                 )
@@ -261,12 +246,12 @@ export function SiteHeader() {
             </div>
           </div>
 
-          <div className="mt-2 bg-[#11151d] px-5 py-6 text-white">
-            <p className="text-xs font-medium text-white/65">Подбор автомобиля из Кореи</p>
-            <p className="mt-1 text-lg font-semibold">Получите расчёт до Владивостока</p>
-            <Link className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[#c7a55a] px-5 text-sm font-semibold text-[#15130f]" href="/catalog" onClick={() => setMobileOpen(false)}>
-              <Calculator size={17} /> Подобрать авто
-            </Link>
+          <div className="border-t border-white/10 bg-[#111821] px-5 py-6 text-white">
+            <p className="text-xs font-medium text-white/65">Автомобили, мотоциклы и гидроциклы</p>
+            <p className="mt-1 text-lg font-semibold">Оставьте заявку на подбор</p>
+            <button className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[#c9a24e] px-5 text-sm font-semibold text-[#15130f]" onClick={() => { setMobileOpen(false); openContact(); }} type="button">
+              <MessageCircle size={17} /> Оставить заявку
+            </button>
           </div>
         </div>
       )}
@@ -278,16 +263,7 @@ export function SiteHeader() {
 function Brand() {
   return (
     <Link href="/" className="group flex shrink-0" aria-label="TL Auto — на главную">
-      <TlAutoLogo className="px-2 py-1 transition duration-200 group-hover:border-[#d8bd75]/70 group-hover:shadow-[0_12px_34px_rgba(0,0,0,0.22)]" priority />
+      <TlAutoLogo className="px-1 py-0.5 transition duration-200 group-hover:border-[#d8bd75]/70 group-hover:shadow-[0_12px_34px_rgba(0,0,0,0.36)]" priority />
     </Link>
-  );
-}
-
-function SocialIcon({ icon: Icon, label, onClick }: { icon: typeof Send; label: string; onClick: () => void }) {
-  return (
-    <button className="flex size-7 items-center justify-center text-white/70 transition hover:text-white" onClick={onClick} title={`${label} — открыть варианты связи`} type="button">
-      <Icon size={15} aria-hidden="true" />
-      <span className="sr-only">{label}</span>
-    </button>
   );
 }

@@ -6,13 +6,15 @@ export function officialSourceUrl(
 
   try {
     const url = new URL(value);
-    if (url.protocol !== "https:") return null;
-
     const hostname = url.hostname.toLowerCase();
     const normalizedSource = source.toLowerCase();
+    if (normalizedSource === "encar" && url.protocol !== "https:") return null;
+    if ((normalizedSource === "passo_bike" || normalizedSource === "passo_boat") && !["http:", "https:"].includes(url.protocol)) return null;
     const isAllowed =
-      normalizedSource === "encar" &&
-      (hostname === "encar.com" || hostname.endsWith(".encar.com"));
+      (normalizedSource === "encar" &&
+        (hostname === "encar.com" || hostname.endsWith(".encar.com"))) ||
+      ((normalizedSource === "passo_bike" || normalizedSource === "passo_boat") &&
+        (hostname === "passo.co.kr" || hostname.endsWith(".passo.co.kr")));
 
     return isAllowed ? url.toString() : null;
   } catch {
@@ -21,5 +23,7 @@ export function officialSourceUrl(
 }
 
 export function sourceDisplayName(source: string) {
-  return source.toLowerCase() === "encar" ? "Encar" : "Неизвестный источник";
+  if (source.toLowerCase() === "encar") return "Encar";
+  if (["passo_bike", "passo_boat"].includes(source.toLowerCase())) return "Passo";
+  return "Неизвестный источник";
 }

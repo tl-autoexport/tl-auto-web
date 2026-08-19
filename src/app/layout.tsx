@@ -17,12 +17,12 @@ const geistMono = Geist_Mono({
 });
 
 const siteDescription =
-  "Каталог автомобилей из Кореи: реальные объявления Encar, история, диагностика и расчёт стоимости до Владивостока.";
+  "Каталоги автомобилей, мототехники и гидроциклов из Южной Кореи. Актуальные предложения и сопровождение покупки.";
 
 export const metadata: Metadata = {
   metadataBase: getSiteUrl(),
   title: {
-    default: "TL Auto — автомобили из Кореи с расчётом для РФ",
+    default: "TL Auto — автомобили, мототехника и гидроциклы из Кореи",
     template: "%s | TL Auto",
   },
   description: siteDescription,
@@ -33,7 +33,9 @@ export const metadata: Metadata = {
   category: "automotive",
   keywords: [
     "автомобили из Кореи",
-    "каталог авто Корея",
+    "мототехника из Кореи",
+    "гидроциклы из Кореи",
+    "каталог транспорта Корея",
     "Encar",
     "расчёт автомобиля до Владивостока",
     "автокаталог для дилера",
@@ -46,12 +48,12 @@ export const metadata: Metadata = {
     locale: "ru_RU",
     url: "/",
     siteName: "TL Auto",
-    title: "TL Auto — автомобили из Кореи с расчётом для РФ",
+    title: "TL Auto — автомобили, мототехника и гидроциклы из Кореи",
     description: siteDescription,
   },
   twitter: {
     card: "summary_large_image",
-    title: "TL Auto — автомобили из Кореи",
+    title: "TL Auto — каталоги из Кореи",
     description: siteDescription,
   },
   robots: {
