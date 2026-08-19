@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import {
   telegramContactUrl,
-  vehicleDeveloperMessage,
+  vehicleClientMessage,
 } from "@/lib/contact";
 import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
 
@@ -183,7 +183,7 @@ export function PriceCalculationCard({
     }
   }
   const leadTelegramUrl = telegramContactUrl(
-    vehicleDeveloperMessage({ source, sourceId, title }),
+    vehicleClientMessage({ source, sourceId, title }),
   );
 
   const portions = useMemo(

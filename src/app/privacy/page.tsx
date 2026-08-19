@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPage, LegalSection } from "@/components/site/LegalPage";
-import { DEVELOPER_CONTACT } from "@/lib/contact";
+import { CLIENT_CONTACT } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Политика конфиденциальности",
@@ -59,7 +59,7 @@ export default function PrivacyPage() {
       <LegalSection title="5. Обращения">
         <p>
           По вопросам обработки данных или удаления информации можно написать
-          представителю TL Auto в Telegram: @{DEVELOPER_CONTACT.telegramUsername}.
+          представителю TL Auto в Telegram: @{CLIENT_CONTACT.telegramUsername}.
           Политика актуальна с 31 июля 2026 года.
         </p>
       </LegalSection>

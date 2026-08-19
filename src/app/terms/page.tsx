@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPage, LegalSection } from "@/components/site/LegalPage";
-import { DEVELOPER_CONTACT } from "@/lib/contact";
+import { CLIENT_CONTACT } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Условия использования",
@@ -59,7 +59,7 @@ export default function TermsPage() {
       <LegalSection title="5. Обратная связь">
         <p>
           Вопросы по каталогу, расчёту и подбору автомобиля можно направить в
-          Telegram: @{DEVELOPER_CONTACT.telegramUsername}. Условия актуальны с
+          Telegram: @{CLIENT_CONTACT.telegramUsername}. Условия актуальны с
           31 июля 2026 года.
         </p>
       </LegalSection>

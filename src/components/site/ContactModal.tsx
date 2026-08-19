@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import {
   ArrowUpRight,
   Check,
+  Images,
   MessageCircle,
   MessagesSquare,
   Send,
@@ -13,9 +14,10 @@ import {
 } from "lucide-react";
 import QRCode from "qrcode";
 import {
-  DEVELOPER_CONTACT,
+  CLIENT_CONTACT,
   telegramContactUrl,
   whatsappContactUrl,
+  whatsappPowersportsContactUrl,
 } from "@/lib/contact";
 import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
 
@@ -26,25 +28,32 @@ type ContactModalProps = {
 
 const channels = [
   {
-    label: "Telegram",
-    detail: `@${DEVELOPER_CONTACT.telegramUsername}`,
+    label: "Телеграм-канал",
+    detail: `t.me/${CLIENT_CONTACT.telegramUsername}`,
     href: telegramContactUrl(),
     icon: Send,
     tone: "bg-[#229ed9]",
   },
   {
-    label: "WhatsApp",
-    detail: DEVELOPER_CONTACT.whatsappLabel,
+    label: CLIENT_CONTACT.whatsappCarLabel,
+    detail: "wa.me/821076260741",
     href: whatsappContactUrl(),
     icon: MessageCircle,
     tone: "bg-[#25a766]",
   },
   {
-    label: "MAX",
-    detail: "Аккаунта пока нет",
-    href: null,
+    label: CLIENT_CONTACT.whatsappPowersportsLabel,
+    detail: "wa.me/821067986644",
+    href: whatsappPowersportsContactUrl(),
     icon: MessagesSquare,
-    tone: "bg-[#5267df]",
+    tone: "bg-[#25a766]",
+  },
+  {
+    label: "Instagram TL Auto",
+    detail: "@tl_auto_export",
+    href: CLIENT_CONTACT.instagramUrl,
+    icon: Images,
+    tone: "bg-gradient-to-br from-[#f58529] via-[#dd2a7b] to-[#8134af]",
   },
 ];
 
@@ -151,7 +160,7 @@ export function ContactModal({ onClose, open }: ContactModalProps) {
           <div className="order-1 flex flex-col justify-center px-6 pb-8 pt-16 sm:order-2 sm:px-9 sm:pb-9 sm:pt-12">
             <p className="text-[11px] font-bold uppercase text-[#956f2c]">Связаться с TL Auto</p>
             <h2 id={titleId} className="mt-2 max-w-[390px] text-[28px] font-semibold leading-[1.15] text-[#101827] sm:text-[34px]">
-              Подберём автомобиль из Южной Кореи
+              Подберём нужное объявление
             </h2>
             <p id={descriptionId} className="mt-4 max-w-[410px] text-sm leading-6 text-[#647084]">
               Оставьте сообщение удобным способом, чтобы получить консультацию по автомобилю, расчёту и доставке.
@@ -176,22 +185,7 @@ export function ContactModal({ onClose, open }: ContactModalProps) {
                     </span>
                     <ArrowUpRight className="text-[#99a4b4] transition group-hover:text-[#956f2c]" size={18} />
                   </a>
-                ) : (
-                  <div
-                    key={label}
-                    aria-disabled="true"
-                    className="flex min-h-[62px] cursor-not-allowed items-center overflow-hidden rounded-md border border-[#e2e6ec] bg-[#f8f9fb] pr-4 text-left opacity-70"
-                  >
-                    <span className={`flex min-h-[62px] w-[62px] items-center justify-center self-stretch text-white ${tone}`}>
-                      <Icon size={21} strokeWidth={1.9} />
-                    </span>
-                    <span className="min-w-0 flex-1 px-4">
-                      <span className="block text-[15px] font-semibold text-[#1e293b]">{label}</span>
-                      <span className="mt-0.5 block text-xs text-[#758196]">{detail}</span>
-                    </span>
-                    <span className="rounded-sm bg-[#e9edf2] px-2 py-1 text-[9px] font-bold uppercase text-[#7f8998]">Позже</span>
-                  </div>
-                ),
+                ) : null,
               )}
             </div>
 

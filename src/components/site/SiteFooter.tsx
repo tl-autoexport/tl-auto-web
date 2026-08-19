@@ -2,9 +2,10 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { TlAutoLogo } from "@/components/brand/TlAutoLogo";
 import {
-  DEVELOPER_CONTACT,
+  CLIENT_CONTACT,
   telegramContactUrl,
   whatsappContactUrl,
+  whatsappPowersportsContactUrl,
 } from "@/lib/contact";
 
 export function SiteFooter() {
@@ -49,7 +50,7 @@ export function SiteFooter() {
               rel="noreferrer"
               target="_blank"
             >
-              Telegram @{DEVELOPER_CONTACT.telegramUsername}
+              Telegram @{CLIENT_CONTACT.telegramUsername}
               <ExternalLink size={13} aria-hidden="true" />
             </a>
             <a
@@ -58,7 +59,25 @@ export function SiteFooter() {
               rel="noreferrer"
               target="_blank"
             >
-              WhatsApp {DEVELOPER_CONTACT.whatsappLabel}
+              WhatsApp {CLIENT_CONTACT.whatsappCarLabel}
+              <ExternalLink size={13} aria-hidden="true" />
+            </a>
+            <a
+              className="inline-flex items-center gap-1.5 text-white/72 transition hover:text-white"
+              href={whatsappPowersportsContactUrl()}
+              rel="noreferrer"
+              target="_blank"
+            >
+              WhatsApp — {CLIENT_CONTACT.whatsappPowersportsLabel}
+              <ExternalLink size={13} aria-hidden="true" />
+            </a>
+            <a
+              className="inline-flex items-center gap-1.5 text-white/72 transition hover:text-white"
+              href={CLIENT_CONTACT.instagramUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              Instagram @tl_auto_export
               <ExternalLink size={13} aria-hidden="true" />
             </a>
           </div>
