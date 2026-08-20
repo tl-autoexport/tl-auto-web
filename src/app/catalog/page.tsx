@@ -7,7 +7,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ExternalLink,
   Filter,
   Gauge,
   RotateCcw,
@@ -28,7 +27,7 @@ import {
 } from "@/server/cars/repository";
 import { carDisplayTitle, translateFuel, translateTransmission } from "@/server/normalization/display";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { officialSourceUrl, sourceDisplayName } from "@/lib/source-url";
+import { sourceDisplayName } from "@/lib/source-url";
 import { passoImageProxyUrl } from "@/lib/passo-image";
 import { RemoteImage } from "@/components/site/RemoteImage";
 import { MobileCatalogFilters } from "./MobileCatalogFilters";
@@ -376,7 +375,6 @@ function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boo
     typeof passoSpecs.transmission === "string" ? passoSpecs.transmission : null,
   ].filter((value): value is string => Boolean(value));
   const detailsHref = isPasso ? `/catalog/item/${car.primary_source}/${car.source_id}` : `/cars/${car.primary_source}/${car.source_id}`;
-  const officialUrl = officialSourceUrl(car.source_url, car.primary_source);
   const sourceName = sourceDisplayName(car.primary_source);
 
   return (
@@ -410,7 +408,7 @@ function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boo
         <div className="mt-4 flex items-center justify-between border-t border-[#edf0f4] pt-3 text-xs font-medium text-[#647084]"><span className="inline-flex items-center gap-1"><ShieldCheck size={14} className={isPasso ? "text-[#16727a]" : "text-[#a98239]"} /> {isPasso ? "Проверено Passo" : "Расчёт РФ"}</span><span>{formatUpdate(car.source_updated_at)}</span></div>
         <div className="mt-2 flex min-h-8 items-center justify-between gap-3 border-t border-[#edf0f4] pt-2 text-xs">
           <span className="truncate text-[#7a8798]">Лот {car.source_id}</span>
-          {officialUrl ? <a className="inline-flex shrink-0 items-center gap-1 font-semibold text-[#956f2c] hover:underline" href={officialUrl} rel="noopener noreferrer" target="_blank">На {sourceName}<ExternalLink size={13} /></a> : null}
+          <span className="shrink-0 text-[#7a8798]">Источник: {sourceName}</span>
         </div>
       </div>
     </article>

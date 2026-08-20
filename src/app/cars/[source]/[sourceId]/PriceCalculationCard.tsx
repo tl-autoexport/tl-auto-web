@@ -5,7 +5,6 @@ import {
   BadgeCheck,
   Calculator,
   ChevronDown,
-  ExternalLink,
   Info,
   MessageCircle,
   RefreshCw,
@@ -90,7 +89,6 @@ export function PriceCalculationCard({
   priceKrw,
   source,
   sourceId,
-  sourceUrl,
   title,
   year,
   registrationMonth,
@@ -103,7 +101,6 @@ export function PriceCalculationCard({
   priceKrw: number | null;
   source: string;
   sourceId: string;
-  sourceUrl: string | null;
   title: string;
   year: number | null;
   registrationMonth: number | null;
@@ -216,12 +213,6 @@ export function PriceCalculationCard({
             <BadgeCheck className="size-4 shrink-0 sm:size-[18px]" />
             <span className="truncate">Источник Encar</span>
           </div>
-          {sourceUrl ? (
-            <a className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-full border border-[#f0bcc1] px-2.5 text-[11px] font-semibold text-[#c61927] transition hover:bg-[#fbf7ed] sm:text-xs" href={sourceUrl} rel="noopener noreferrer" target="_blank">
-              Оригинал
-              <ExternalLink size={13} />
-            </a>
-          ) : null}
         </div>
         <h1 className="mt-2 line-clamp-2 text-2xl font-semibold leading-[1.12] text-[#121722] sm:mt-3 sm:text-3xl">
           {title}

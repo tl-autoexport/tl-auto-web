@@ -405,6 +405,7 @@ function HomeCarCard({ car, tone }: { car: CatalogCar; tone: HomeCardTone }) {
   return (
     <Link
       href={`/cars/${car.primary_source}/${car.source_id}`}
+      prefetch={false}
       className="group w-[78vw] max-w-[300px] shrink-0 snap-start overflow-hidden rounded-[22px] bg-white p-2 shadow-[0_10px_28px_rgba(28,43,61,0.10)] ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-[0_18px_35px_rgba(28,43,61,0.16)] sm:w-auto sm:max-w-none"
     >
       <div className={`relative aspect-[4/3] overflow-hidden rounded-[16px] bg-gradient-to-br p-1.5 ${style.frame}`}>

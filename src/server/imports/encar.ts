@@ -909,7 +909,7 @@ async function mapCar(
   return {
     car: {
       vehicle_type: "car",
-      vehicle_specs: {},
+      vehicle_specs: { seats: detail?.seats ?? null },
       primary_source: "encar",
       source_kind: "encar",
       source_id: sourceId,

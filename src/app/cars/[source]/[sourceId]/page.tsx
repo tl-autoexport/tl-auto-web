@@ -32,7 +32,6 @@ import { InspectionPhotoGallery } from "./InspectionPhotoGallery";
 import type { ThermalEntry, ThermalReference } from "./thermalTypes";
 import { PriceCalculationCard } from "./PriceCalculationCard";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { officialSourceUrl } from "@/lib/source-url";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const getCachedCarDetail = cache(getCarDetail);
@@ -232,7 +231,6 @@ export default async function CarDetailPage({
             priceKrw={car.price_krw}
             source={source}
             sourceId={sourceId}
-            sourceUrl={officialSourceUrl(car.source_url, car.primary_source)}
             title={title}
             year={car.year}
             registrationMonth={car.registration_month}

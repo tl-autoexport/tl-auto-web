@@ -12,8 +12,11 @@ export type CatalogCar = {
   source_kind: string;
   source_id: string;
   source_url: string | null;
+  published_at: string | null;
+  created_at: string | null;
   brand: string | null;
   model: string | null;
+  trim: string | null;
   badge: string | null;
   badge_detail: string | null;
   year: number | null;
@@ -26,6 +29,7 @@ export type CatalogCar = {
   fuel_type: string | null;
   transmission: string | null;
   drive_type: string | null;
+  body_type: string | null;
   color: string | null;
   owners_count: number | null;
   accident_count: number | null;
@@ -49,6 +53,9 @@ export type CatalogCar = {
     sort_order: number;
   }>;
 };
+
+const CATALOG_CAR_SELECT =
+  "id, primary_source, source_kind, source_id, source_url, published_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(url, thumbnail_url, media_type, category, is_primary, sort_order)";
 
 export type CarDetail = CatalogCar & {
   car_options?: Array<{
@@ -182,9 +189,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   const supabase = createSupabaseServerRead();
   let query = supabase
     .from("cars")
-    .select(
-      "id, primary_source, source_kind, source_id, source_url, source_updated_at, brand, model, badge, badge_detail, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, car_media(url, thumbnail_url, media_type, category, is_primary, sort_order)",
-    )
+    .select(CATALOG_CAR_SELECT)
     .eq("is_available", true)
     .eq("primary_source", "encar")
     .in("fuel_type", ["gasoline", "diesel", "electric"])
@@ -327,8 +332,11 @@ function mapPassoStagingRow(row: {
       source_kind: "classified",
       source_id: row.source_id,
       source_url: row.source_url,
+      published_at: null,
+      created_at: null,
       brand: row.brand,
       model: row.model,
+      trim: null,
       badge: null,
       badge_detail: null,
       year: row.year,
@@ -341,6 +349,7 @@ function mapPassoStagingRow(row: {
       fuel_type: typeof row.vehicle_specs?.fuel === "string" ? row.vehicle_specs.fuel : null,
       transmission: typeof row.vehicle_specs?.transmission === "string" ? row.vehicle_specs.transmission : null,
       drive_type: null,
+      body_type: null,
       color: typeof row.vehicle_specs?.color === "string" ? row.vehicle_specs.color : null,
       owners_count: null,
       accident_count: null,
@@ -506,9 +515,7 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
   const supabase = createSupabaseServerRead();
   const { data, error } = await supabase
     .from("cars")
-    .select(
-      "id, primary_source, source_kind, source_id, source_url, source_updated_at, brand, model, badge, badge_detail, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, car_media(url, thumbnail_url, media_type, category, is_primary, sort_order), car_options(category, source_code, name_original, name_ru, value_original, value_ru, description_original, description_ru, is_present, sort_order), car_condition_reports(source, report_type, summary, items)",
-    )
+    .select(`${CATALOG_CAR_SELECT}, car_options(category, source_code, name_original, name_ru, value_original, value_ru, description_original, description_ru, is_present, sort_order), car_condition_reports(source, report_type, summary, items)`)
     .eq("primary_source", "encar")
     .eq("source_id", sourceId)
     .in("fuel_type", ["gasoline", "diesel"])
