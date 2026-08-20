@@ -132,7 +132,6 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
-  const [mobileHeaderHidden, setMobileHeaderHidden] = useState(false);
   const [desktopUtilityHidden, setDesktopUtilityHidden] = useState(false);
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -187,13 +186,10 @@ export function SiteHeader() {
   }, [mobileOpen]);
 
   useEffect(() => {
-    let lastScrollY = window.scrollY;
     let ticking = false;
 
     const updateHeader = () => {
       const currentScrollY = window.scrollY;
-      const scrollingDown = currentScrollY > lastScrollY;
-      const movedEnough = Math.abs(currentScrollY - lastScrollY) > 6;
 
       if (window.innerWidth >= 1024) {
         // Do not toggle the utility row on every tiny change of scroll
@@ -204,17 +200,14 @@ export function SiteHeader() {
         } else if (currentScrollY <= DESKTOP_UTILITY_SHOW_BEFORE) {
           setDesktopUtilityHidden(false);
         }
-        setMobileHeaderHidden(false);
       } else {
+        // Keep the mobile header in the document flow. The quick catalog nav
+        // is sticky below this row, so hiding the header with transform makes
+        // Safari compose two different sticky layers and causes content to
+        // flash through while scrolling.
         setDesktopUtilityHidden(false);
-        if (!mobileOpen && movedEnough) {
-          setMobileHeaderHidden(scrollingDown && currentScrollY > 96);
-        } else if (currentScrollY <= 24) {
-          setMobileHeaderHidden(false);
-        }
       }
 
-      lastScrollY = currentScrollY;
       ticking = false;
     };
 
@@ -230,13 +223,11 @@ export function SiteHeader() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", updateHeader);
     };
-  }, [mobileOpen]);
+  }, []);
 
   return (
     <header
-      className={`sticky top-0 z-50 border-b border-[#d9e5ef] bg-white text-[#111827] shadow-[0_4px_16px_rgba(15,53,84,0.08)] transition-transform duration-200 lg:translate-y-0 ${
-        mobileHeaderHidden ? "max-lg:-translate-y-full" : "translate-y-0"
-      }`}
+      className="sticky top-0 z-50 border-b border-[#d9e5ef] bg-white text-[#111827] shadow-[0_4px_16px_rgba(15,53,84,0.08)]"
     >
       <div
         className={`hidden overflow-hidden border-b border-[#0a4778] bg-[#07528b] text-white transition-[max-height,opacity] duration-200 lg:block ${

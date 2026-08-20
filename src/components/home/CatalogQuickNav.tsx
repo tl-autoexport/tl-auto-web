@@ -42,7 +42,7 @@ export function CatalogQuickNav() {
   return (
     <nav
       aria-label="Быстрый подбор автомобиля"
-      className="sticky top-[68px] z-40 border-b border-[#dce2eb] bg-white/95 shadow-[0_5px_12px_rgba(15,31,49,0.06)] backdrop-blur lg:top-[76px]"
+      className="sticky top-[68px] z-40 isolate border-b border-[#dce2eb] bg-white/95 shadow-[0_5px_12px_rgba(15,31,49,0.06)] backdrop-blur lg:top-[76px]"
     >
       <div className="mx-auto max-w-7xl px-4 py-2.5 sm:px-5">
         <div className="scrollbar-none flex items-center gap-2 overflow-x-auto">
