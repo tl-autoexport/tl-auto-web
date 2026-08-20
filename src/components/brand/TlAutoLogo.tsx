@@ -7,7 +7,7 @@ type TlAutoLogoProps = {
 };
 
 const widthByVariant = {
-  header: "w-[106px] sm:w-[118px] lg:w-[132px]",
+  header: "w-[112px] sm:w-[126px] lg:w-[150px]",
   footer: "w-[190px] sm:w-[220px]",
   hero: "w-[180px] sm:w-[224px]",
 } as const;
@@ -28,7 +28,7 @@ export function TlAutoLogo({
         loading={priority ? "eager" : "lazy"}
         sizes={
           variant === "header"
-            ? "(min-width: 1024px) 166px, 132px"
+            ? "(min-width: 1024px) 150px, 126px"
             : variant === "hero"
               ? "(min-width: 640px) 224px, 180px"
               : "(min-width: 640px) 220px, 190px"

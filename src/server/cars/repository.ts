@@ -117,6 +117,7 @@ export type HomeCatalogData = {
   cars: CatalogCar[];
   under160Cars: CatalogCar[];
   passableCars: CatalogCar[];
+  electricCars: CatalogCar[];
 };
 
 export type LatestCalculation = {
@@ -186,7 +187,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     )
     .eq("is_available", true)
     .eq("primary_source", "encar")
-    .in("fuel_type", ["gasoline", "diesel"])
+    .in("fuel_type", ["gasoline", "diesel", "electric"])
     .not("price_rub", "is", null)
     .not("power_hp", "is", null);
 
@@ -234,7 +235,7 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
     .select("id", { count: "exact", head: true })
     .eq("is_available", true)
     .eq("primary_source", "encar")
-    .in("fuel_type", ["gasoline", "diesel"])
+    .in("fuel_type", ["gasoline", "diesel", "electric"])
     .not("price_rub", "is", null)
     .not("power_hp", "is", null);
 
@@ -403,24 +404,25 @@ export async function getCatalogMetrics(): Promise<CatalogMetrics> {
 }
 
 async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
-  const [cars, under160Cars, passableCars] = await Promise.all([
-    getCatalogCars({ limit: 12 }),
-    getCatalogCars({ limit: 12, maxPowerHp: 160 }),
+  const [cars, under160Cars, passableCars, electricCars] = await Promise.all([
+    getCatalogCars({ limit: 16 }),
+    getCatalogCars({ limit: 16, maxPowerHp: 160 }),
     getCatalogCars({ limit: 12, passable: true }),
+    getCatalogCars({ limit: 16, fuelType: "electric" }),
   ]);
 
-  return { cars, under160Cars, passableCars };
+  return { cars, under160Cars, passableCars, electricCars };
 }
 
 const getCachedHomeCatalogData = unstable_cache(
   fetchHomeCatalogData,
-  ["home-catalog-showcases-v2", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  ["home-catalog-showcases-v3", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
   { revalidate: 60 },
 );
 
 export async function getHomeCatalogData(): Promise<HomeCatalogData> {
   if (buildWithoutCatalog) {
-    return { cars: [], under160Cars: [], passableCars: [] };
+    return { cars: [], under160Cars: [], passableCars: [], electricCars: [] };
   }
 
   return getCachedHomeCatalogData();

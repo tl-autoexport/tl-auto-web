@@ -17,112 +17,110 @@ import {
   Sparkles,
 } from "lucide-react";
 import {
-  getCatalogMetrics,
+  getCatalogCars,
   getHomeCatalogData,
-  getPassoStagingCount,
   getPrimaryPhoto,
   type CatalogCar,
 } from "@/server/cars/repository";
 import { carDisplayTitle, translateFuel } from "@/server/normalization/display";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { RemoteImage } from "@/components/site/RemoteImage";
+import { CatalogQuickNav } from "@/components/home/CatalogQuickNav";
+import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 
 export const revalidate = 60;
 
 const rub = new Intl.NumberFormat("ru-RU");
-
-function isPassable(car: CatalogCar) {
-  if (!car.year || !car.registration_month) return false;
-  const registration = new Date(car.year, car.registration_month - 1, 1);
-  const now = new Date();
-  const ageMonths =
-    (now.getFullYear() - registration.getFullYear()) * 12 +
-    now.getMonth() -
-    registration.getMonth();
-  return ageMonths >= 36 && ageMonths < 60;
-}
+const prototypeSourceId = "42554713";
 
 export default async function Home() {
-  const [homeDataResult, metricsResult, motorcycleCountResult, jetskiCountResult] = await Promise.allSettled([
+  const [homeDataResult, prototypeResult] = await Promise.allSettled([
     getHomeCatalogData(),
-    getCatalogMetrics(),
-    getPassoStagingCount("motorcycle"),
-    getPassoStagingCount("jetski"),
+    getCatalogCars({ sourceId: prototypeSourceId, limit: 1 }),
   ]);
-  const { under160Cars, passableCars } =
+  const { cars, under160Cars, electricCars } =
     homeDataResult.status === "fulfilled"
       ? homeDataResult.value
-      : { under160Cars: [], passableCars: [] };
-  const catalogMetrics =
-    metricsResult.status === "fulfilled"
-      ? metricsResult.value
-      : { calculated: 0, under160: 0, clean: 0 };
-  const motorcycleCount = motorcycleCountResult.status === "fulfilled" ? motorcycleCountResult.value : 0;
-  const jetskiCount = jetskiCountResult.status === "fulfilled" ? jetskiCountResult.value : 0;
+      : { cars: [], under160Cars: [], electricCars: [] };
   const usedCarIds = new Set<string>();
-  const under160 = selectShelfCars(
-    under160Cars,
-    usedCarIds,
-  );
-  const passable = selectShelfCars(
-    passableCars.filter(isPassable),
-    usedCarIds,
-  );
+  const under160 = selectShelfCars(under160Cars, usedCarIds);
+  const electric = selectShelfCars(electricCars, usedCarIds);
+  const newArrivals = selectShelfCars(cars, usedCarIds);
+  const prototypeCar = prototypeResult.status === "fulfilled" ? prototypeResult.value[0] : undefined;
+  const newArrivalCards = prototypeCar
+    ? newArrivals.filter((car) => car.id !== prototypeCar.id).slice(0, 3)
+    : newArrivals;
 
   return (
-    <main className="min-h-screen bg-[#090c12] text-[#101827]">
+    <main className="min-h-screen bg-[#f5f6f8] text-[#101827]">
       <SiteHeader />
 
-      <section className="relative overflow-hidden border-b border-[#c9a24e]/25 bg-[radial-gradient(circle_at_50%_-30%,#253044_0%,#111925_40%,#090c12_75%)]" aria-labelledby="catalogs-title">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#e5c979] to-transparent" />
-        <div className="mx-auto max-w-7xl px-5 pb-8 pt-8 sm:px-6 sm:pb-10 sm:pt-10 lg:pb-12 lg:pt-12">
-          <div className="mx-auto max-w-xl text-center">
-            <p id="catalogs-title" className="text-sm font-medium leading-6 text-[#c0c7d1] sm:text-base">Выберите подходящий вариант из актуальной витрины Южной Кореи.</p>
-          </div>
-
-          <div className="mt-6 grid gap-3 md:grid-cols-3 lg:mt-8 lg:gap-4">
-            <CatalogGatewayCard
-              count={catalogMetrics.calculated}
+      <section className="border-b border-[#e2e6ed] bg-white" aria-label="Актуальные предложения">
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-5 sm:py-6">
+          <div className="scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+            <DodoStoryCard
+              title="Спецпредложения"
               href="/catalog"
-              image="/branding/catalog/car.png"
-              label="Автомобили"
-              description="Каталог автомобилей с расчётом до Владивостока."
+              image="/assets/stories/special-offers-v2.png"
+              position="object-center"
             />
-            <CatalogGatewayCard
-              count={motorcycleCount}
-              href="/catalog?category=motorcycle"
-              image="/branding/catalog/motorcycle.png"
-              label="Мототехника"
-              description="Мотоциклы и скутеры из актуальных объявлений."
+            <DodoStoryCard
+              title="Новое поступление"
+              href="/catalog"
+              image="/assets/stories/new-arrivals.png"
+              position="object-center"
             />
-            <CatalogGatewayCard
-              count={jetskiCount}
-              href="/catalog?category=jetski"
-              image="/branding/catalog/jetski.png"
-              label="Гидроциклы"
-              description="Персональная водная техника из Южной Кореи."
+            <DodoStoryCard
+              title="Проверка до покупки"
+              href="/catalog"
+              image="/assets/stories/inspection-v2.png"
+              position="object-center"
+            />
+            <DodoStoryCard
+              title="Доставка из Кореи"
+              href="/#delivery"
+              image="/assets/stories/delivery.png"
+              position="object-center"
             />
           </div>
         </div>
       </section>
 
+      <CatalogQuickNav />
+
       <div className="bg-[#f5f6f8]">
       <VehicleShelf
         id="under-160"
-        title="Рекомендации до 160 л.с."
-        description="Автомобили с доступной мощностью и уже рассчитанной стоимостью до Владивостока."
+        eyebrow="Подборка"
+        title="Автомобили до 160 л.с."
+        description="Автомобили с доступной мощностью и рассчитанной стоимостью до Владивостока."
         href="/catalog?shelf=under-160"
         cars={under160}
         empty="В текущей витрине ещё нет подходящих автомобилей."
+        tone="navy"
       />
 
       <VehicleShelf
-        id="passable"
-        title="Проходные автомобили 3-5 лет"
-        description="Витрина строится по месяцу первой регистрации, а не по условному году выпуска."
-        href="/catalog?shelf=passable"
-        cars={passable}
-        empty="В текущем импорте нет автомобилей в этом возрастном диапазоне."
+        id="electric"
+        eyebrow="Электромобили"
+        title="Электромобили из Кореи"
+        description="Реальные объявления с доступными данными и ценой до Владивостока."
+        href="/catalog?fuel=electric"
+        cars={electric}
+        empty="Сейчас в витрине нет электромобилей с полным расчётом стоимости."
+        tone="mint"
+      />
+
+      <VehicleShelf
+        id="new-arrivals"
+        eyebrow="Свежие поступления"
+        title="Новые автомобили"
+        description="Недавно добавленные объявления, которые можно изучить и сразу рассчитать."
+        href="/catalog?sort=fresh"
+        cars={newArrivalCards}
+        empty="Свежие поступления появятся в этой витрине после обновления каталога."
+        tone="sand"
+        prototypeCar={prototypeCar}
       />
 
       <section id="how-it-works" className="border-y border-[#dce2eb] bg-white">
@@ -315,36 +313,25 @@ export default async function Home() {
   );
 }
 
-function CatalogGatewayCard({
-  count,
-  description,
-  href,
+function DodoStoryCard({
   image,
-  label,
+  position,
+  title,
+  href,
 }: {
-  count: number;
-  description: string;
-  href: string;
   image: string;
-  label: string;
+  position: string;
+  title: string;
+  href: string;
 }) {
   return (
     <Link
       href={href}
-      className="group relative flex min-h-[246px] flex-col overflow-hidden rounded-lg border border-white/10 bg-[#111821] p-4 shadow-[0_16px_42px_rgba(0,0,0,0.2)] transition duration-300 hover:-translate-y-1 hover:border-[#e5c979]/60 hover:shadow-[0_24px_56px_rgba(0,0,0,0.32)] sm:min-h-[270px]"
+      className="group relative aspect-[0.78] w-[132px] shrink-0 overflow-hidden rounded-[24px] bg-[#edf0f4] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg sm:w-[200px] sm:rounded-[30px] lg:w-[230px]"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(229,201,121,0.11),transparent_43%)]" />
-      <div className="relative flex items-start justify-between gap-4">
-        <h2 className="text-xl font-semibold tracking-[-0.03em] text-white sm:text-2xl">{label}</h2>
-        <span className="rounded-full border border-[#e5c979]/25 bg-[#e5c979]/10 px-2.5 py-1 text-[11px] font-semibold text-[#f4df9d]">{rub.format(count)} объявлений</span>
-      </div>
-      <div className="relative flex flex-1 items-center justify-center py-1">
-        <Image src={image} alt="" width={1536} height={1024} className="h-auto max-h-[142px] w-full object-contain mix-blend-screen transition duration-500 group-hover:scale-[1.045] sm:max-h-[158px]" />
-      </div>
-      <div className="relative flex items-center justify-between border-t border-white/10 pt-3">
-        <p className="text-xs text-[#abb5c3]">{description}</p>
-        <span className="ml-3 inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#f1d58d]">Открыть <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" /></span>
-      </div>
+      <Image src={image} alt="" fill sizes="(min-width: 1024px) 230px, (min-width: 640px) 200px, 132px" className={`object-cover transition duration-500 group-hover:scale-105 ${position}`} />
+      <span className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      <span className="absolute inset-x-3 bottom-3 text-sm font-bold leading-tight text-white drop-shadow-sm sm:inset-x-4 sm:bottom-4 sm:text-lg">{title}</span>
     </Link>
   );
 }
@@ -353,21 +340,28 @@ function VehicleShelf({
   cars,
   description,
   empty,
+  eyebrow,
   href,
   id,
+  prototypeCar,
   title,
+  tone,
 }: {
   cars: CatalogCar[];
   description: string;
   empty: string;
+  eyebrow: string;
   href: string;
   id: string;
+  prototypeCar?: CatalogCar;
   title: string;
+  tone: HomeCardTone;
 }) {
   return (
     <section id={id} className="mx-auto max-w-7xl px-4 py-7 sm:px-5 sm:py-10">
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
         <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#956f2c]">{eyebrow}</p>
           <h2 className="text-2xl font-semibold sm:text-3xl">{title}</h2>
           <p className="mt-2 text-sm leading-6 text-[#647084]">{description}</p>
         </div>
@@ -379,9 +373,10 @@ function VehicleShelf({
         </Link>
       </div>
       {cars.length ? (
-        <div className="scrollbar-none mt-5 flex snap-x gap-3 overflow-x-auto pb-1 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible xl:grid-cols-4">
+        <div className="scrollbar-none mt-5 flex snap-x gap-3 overflow-x-auto pb-1 sm:mt-6 sm:grid sm:grid-cols-2 sm:items-start sm:gap-4 sm:overflow-visible xl:grid-cols-4">
+          {prototypeCar ? <PrototypeVehicleCard car={prototypeCar} /> : null}
           {cars.map((car) => (
-            <HomeCarCard key={car.id} car={car} />
+            <HomeCarCard key={car.id} car={car} tone={tone} />
           ))}
         </div>
       ) : (
@@ -393,24 +388,34 @@ function VehicleShelf({
   );
 }
 
-function HomeCarCard({ car }: { car: CatalogCar }) {
+type HomeCardTone = "navy" | "mint" | "sand";
+
+const homeCardTones: Record<HomeCardTone, { frame: string; accent: string; badge: string }> = {
+  navy: { frame: "from-[#dce8fb] via-[#edf3ff] to-[#d3e1f5]", accent: "bg-[#1f4679]", badge: "bg-[#e9f1ff] text-[#1f4679]" },
+  mint: { frame: "from-[#d9f4ed] via-[#effbf7] to-[#d2ebe5]", accent: "bg-[#167a67]", badge: "bg-[#e4f8f1] text-[#14705e]" },
+  sand: { frame: "from-[#f8ecd6] via-[#fff8ed] to-[#efe0c7]", accent: "bg-[#9a6b23]", badge: "bg-[#fff2d8] text-[#8a5c16]" },
+};
+
+function HomeCarCard({ car, tone }: { car: CatalogCar; tone: HomeCardTone }) {
   // The catalogue itself falls back to the first Encar photo. Use the same
   // choice on the home shelves so an unfamiliar media category never produces
   // an empty card while the catalogue correctly has a photo.
   const photo = getPrimaryPhoto(car);
+  const style = homeCardTones[tone];
   return (
     <Link
       href={`/cars/${car.primary_source}/${car.source_id}`}
-      className="group w-[78vw] max-w-[300px] shrink-0 snap-start overflow-hidden rounded-md bg-white ring-1 ring-[#dce2eb] transition hover:-translate-y-0.5 hover:shadow-md sm:w-auto sm:max-w-none"
+      className="group w-[78vw] max-w-[300px] shrink-0 snap-start overflow-hidden rounded-[22px] bg-white p-2 shadow-[0_10px_28px_rgba(28,43,61,0.10)] ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-[0_18px_35px_rgba(28,43,61,0.16)] sm:w-auto sm:max-w-none"
     >
-      <div className="relative aspect-[4/3] bg-[#e9edf3]">
+      <div className={`relative aspect-[4/3] overflow-hidden rounded-[16px] bg-gradient-to-br p-1.5 ${style.frame}`}>
+        <div className="relative h-full w-full overflow-hidden rounded-[12px] bg-white/70">
         {photo ? (
           <RemoteImage
             src={photo}
             alt={carDisplayTitle(car)}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover"
+            className="object-cover transition duration-500 group-hover:scale-[1.035]"
             fallback={<CarFront size={34} />}
           />
         ) : (
@@ -419,20 +424,22 @@ function HomeCarCard({ car }: { car: CatalogCar }) {
             size={34}
           />
         )}
-        <div className="absolute left-3 top-3 flex gap-2">
+        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+          {car.fuel_type === "electric" ? <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${style.badge}`}>Электро</span> : null}
           {car.accident_count === 0 ? (
-            <span className="rounded-sm bg-[#e8f5ef] px-2 py-1 text-xs font-semibold text-[#18794e]">
+            <span className="rounded-full bg-[#e8f5ef] px-2.5 py-1 text-[11px] font-bold text-[#18794e]">
               Без ДТП
             </span>
           ) : null}
           {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? (
-            <span className="rounded-sm bg-[#fff2e5] px-2 py-1 text-xs font-semibold text-[#9a5b1c]">
+            <span className="rounded-full bg-[#fff2e5] px-2.5 py-1 text-[11px] font-bold text-[#9a5b1c]">
               Страховые выплаты: {car.insurance_payout_count}
             </span>
           ) : null}
         </div>
+        </div>
       </div>
-      <div className="p-4">
+      <div className="px-3 pb-3 pt-3 sm:px-4 sm:pb-4">
         <h3 className="line-clamp-2 min-h-12 text-base font-semibold group-hover:text-[#956f2c]">
           {carDisplayTitle(car)}
         </h3>
@@ -442,11 +449,11 @@ function HomeCarCard({ car }: { car: CatalogCar }) {
         <div className="mt-4 flex items-end justify-between gap-2">
           <div>
             <p className="text-xs text-[#647084]">до Владивостока</p>
-            <p className="whitespace-nowrap text-xl font-semibold tabular-nums">
+            <p className="whitespace-nowrap text-lg font-semibold tabular-nums sm:text-xl">
               {rub.format(car.price_rub ?? 0)}{"\u00A0"}₽
             </p>
           </div>
-          <p className="text-xs text-[#647084]">
+          <p className={`rounded-full px-2.5 py-1 text-right text-[11px] font-semibold ${style.badge}`}>
             {car.power_hp ?? "-"} л.с.
             <br />
             {translateFuel(car.fuel_type)}
@@ -473,6 +480,18 @@ function selectShelfCars(
     usedCarIds.add(car.id);
     usedModels.add(modelKey);
     if (selected.length === limit) break;
+  }
+
+  // A narrow shelf (for example, cars under 160 hp) can contain only a few
+  // distinct models in the latest import. Fill the remaining places with
+  // other real listings instead of rendering an incomplete 3-card row.
+  if (selected.length < limit) {
+    for (const car of candidates) {
+      if (usedCarIds.has(car.id)) continue;
+      selected.push(car);
+      usedCarIds.add(car.id);
+      if (selected.length === limit) break;
+    }
   }
 
   return selected;
