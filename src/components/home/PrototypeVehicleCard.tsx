@@ -74,25 +74,29 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
   };
 
   return (
-    <article className="w-[84vw] max-w-[360px] shrink-0 snap-start overflow-hidden rounded-[24px] bg-white shadow-[0_14px_35px_rgba(28,43,61,0.13)] ring-1 ring-[#dce2eb] sm:w-auto sm:max-w-none">
-      <div className="relative aspect-[2.25/1] overflow-hidden bg-[#e8edf3]">
+    <article
+      className="relative w-[84vw] max-w-[360px] shrink-0 snap-start overflow-hidden rounded-[24px] bg-white shadow-[0_14px_35px_rgba(28,43,61,0.13)] ring-1 ring-[#dce2eb] sm:w-auto sm:max-w-none"
+    >
+      <Link aria-label={`Открыть карточку ${title}`} className="absolute inset-0 z-0" href={detailsHref} prefetch={false} />
+
+      <div className="pointer-events-none relative z-10 aspect-[2.25/1] overflow-hidden bg-[#e8edf3]">
         {photos.length ? <RemoteImage alt={title} className="object-cover" fill sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 84vw" src={photos[photoIndex].url} /> : <div className="flex h-full items-center justify-center text-sm text-[#647084]">Фото временно недоступно</div>}
         {photos.length > 1 ? <>
-          <button aria-label="Предыдущее фото" className="absolute left-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#182234] shadow-sm transition hover:bg-white" onClick={() => changePhoto(-1)} type="button"><ChevronLeft size={18} /></button>
-          <button aria-label="Следующее фото" className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#182234] shadow-sm transition hover:bg-white" onClick={() => changePhoto(1)} type="button"><ChevronRight size={18} /></button>
+          <button aria-label="Предыдущее фото" className="pointer-events-auto absolute left-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#182234] shadow-sm transition hover:bg-white" onClick={(event) => { event.stopPropagation(); changePhoto(-1); }} type="button"><ChevronLeft size={18} /></button>
+          <button aria-label="Следующее фото" className="pointer-events-auto absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#182234] shadow-sm transition hover:bg-white" onClick={(event) => { event.stopPropagation(); changePhoto(1); }} type="button"><ChevronRight size={18} /></button>
           <span className="absolute bottom-2 right-2 rounded-full bg-[#101827]/78 px-2.5 py-1 text-[11px] font-semibold text-white">{photoIndex + 1} / {photos.length}</span>
         </> : null}
       </div>
 
-      <div className="p-4">
+      <div className="pointer-events-none relative z-10 p-4">
         <div>
           <p className="text-2xl font-bold tabular-nums text-[#101827]">{rub.format(car.price_rub ?? 0)} ₽</p>
           <p className="mt-1 text-sm text-[#647084]">Цена под ключ до Владивостока</p>
         </div>
 
-        <Link className="mt-4 block text-xl font-bold leading-tight text-[#101827] transition hover:text-[#956f2c]" href={detailsHref} prefetch={false}>
+        <h3 className="mt-4 block text-xl font-bold leading-tight text-[#101827] transition hover:text-[#956f2c]">
           {primaryFacts.length ? primaryFacts.slice(0, 2).join(" ") : title}
-        </Link>
+        </h3>
         <p className="mt-2 text-sm leading-6 text-[#273246]">
           {primaryFacts.slice(2).join(" · ") || "Основные характеристики уточняются"}
         </p>
@@ -106,13 +110,13 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 border-y border-[#f0e4e4] bg-[#fff8f7] text-xs font-semibold text-[#ba4b42]">
-        <button aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"} className="flex min-h-12 items-center justify-center gap-1 border-r border-[#f0e4e4] px-1 transition hover:bg-[#fff0ee]" onClick={() => setFavorite((current) => !current)} type="button"><Heart fill={favorite ? "currentColor" : "none"} size={17} /> Избранное</button>
-        <a className="flex min-h-12 items-center justify-center gap-1 border-r border-[#f0e4e4] px-1 transition hover:bg-[#fff0ee]" href={whatsappContactUrl(message)} rel="noreferrer" target="_blank"><MessageCircle size={17} /> Консультация</a>
-        <button aria-label="Поделиться объявлением" className="flex min-h-12 items-center justify-center gap-1 px-1 transition hover:bg-[#fff0ee]" onClick={share} type="button"><Share2 size={17} /> Поделиться</button>
+      <div className="relative z-10 grid grid-cols-3 border-y border-[#f0e4e4] bg-[#fff8f7] text-xs font-semibold text-[#ba4b42]">
+        <button aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"} className="flex min-h-12 items-center justify-center gap-1 border-r border-[#f0e4e4] px-1 transition hover:bg-[#fff0ee]" onClick={(event) => { event.stopPropagation(); setFavorite((current) => !current); }} type="button"><Heart fill={favorite ? "currentColor" : "none"} size={17} /> Избранное</button>
+        <a className="flex min-h-12 items-center justify-center gap-1 border-r border-[#f0e4e4] px-1 transition hover:bg-[#fff0ee]" href={whatsappContactUrl(message)} onClick={(event) => event.stopPropagation()} rel="noreferrer" target="_blank"><MessageCircle size={17} /> Консультация</a>
+        <button aria-label="Поделиться объявлением" className="flex min-h-12 items-center justify-center gap-1 px-1 transition hover:bg-[#fff0ee]" onClick={(event) => { event.stopPropagation(); void share(); }} type="button"><Share2 size={17} /> Поделиться</button>
       </div>
 
-      <div className="px-4 py-3 text-xs text-[#7a8798]">
+      <div className="pointer-events-none relative z-10 px-4 py-3 text-xs text-[#7a8798]">
         <span>{saleDays != null ? `В продаже ${saleDays} дней` : "Срок продажи уточняется"}</span>
       </div>
       {shareNotice ? <span aria-live="polite" className="sr-only">{shareNotice}</span> : null}
