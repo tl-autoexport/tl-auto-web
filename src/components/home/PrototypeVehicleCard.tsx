@@ -18,6 +18,26 @@ const rub = new Intl.NumberFormat("ru-RU");
 const engine = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const day = 24 * 60 * 60 * 1000;
 
+const BODY_SHAPE_BY_MODEL: Record<string, string> = {
+  K8: "Седан",
+  K5: "Седан",
+  Sonata: "Седан",
+  G80: "Седан",
+  G90: "Седан",
+  Grandeur: "Седан",
+  Avante: "Седан",
+  Elantra: "Седан",
+};
+
+function bodyShapeForCard(car: CatalogCar) {
+  const storedShape = car.vehicle_specs?.body_shape;
+  if (typeof storedShape === "string" && storedShape.trim()) return storedShape;
+  if (car.body_type === "SUV") return "SUV";
+  if (car.body_type === "Минивэн") return "Минивэн";
+  if (car.body_type === "Спорткар") return "Спорткар";
+  return BODY_SHAPE_BY_MODEL[car.model ?? ""] ?? null;
+}
+
 function daysOnSale(car: CatalogCar) {
   const listedAt = car.published_at ?? car.source_updated_at ?? car.created_at;
   if (!listedAt) return null;
@@ -51,7 +71,7 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
     car.fuel_type ? translateFuel(car.fuel_type) : null,
     car.power_hp ? `${car.power_hp} л.с.` : null,
     car.drive_type,
-    car.body_type,
+    bodyShapeForCard(car),
     seats ?? "Места уточняются",
   ].filter((value): value is string => Boolean(value));
   const saleDays = daysOnSale(car);
