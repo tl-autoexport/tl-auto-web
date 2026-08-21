@@ -297,7 +297,7 @@ export function PriceCalculationCard({
           />
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:grid-cols-1 sm:gap-3">
+        <div className="mt-4 grid gap-2.5 sm:mt-5 sm:gap-3">
           <button
             className="flex min-h-12 w-full items-center justify-center gap-2 rounded bg-[#956f2c] px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#c91824] sm:px-5 sm:py-3"
             onClick={() => setModalOpen(true)}
@@ -308,7 +308,7 @@ export function PriceCalculationCard({
             <span className="hidden sm:inline">Показать расчёт цены</span>
           </button>
         </div>
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-3">
+        <div className="mt-2 hidden grid-cols-2 gap-2 sm:mt-3 sm:grid">
           <a
             className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded border border-[#d8dde6] px-2 py-2 text-xs font-semibold text-[#273246] transition-colors hover:border-[#956f2c] hover:bg-[#fbf7ed] sm:gap-2 sm:px-3 sm:text-sm"
             href="tel:+821076260741"
@@ -328,6 +328,25 @@ export function PriceCalculationCard({
           </a>
         </div>
       </aside>
+
+      <div className="fixed inset-x-0 bottom-0 z-50 flex items-center gap-2 border-t border-[#dce2eb] bg-white/95 px-3 pt-2 shadow-[0_-8px_24px_rgba(16,24,39,0.12)] backdrop-blur sm:hidden" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
+        <a
+          className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white shadow-sm transition-colors active:bg-[#3f9855]"
+          href="tel:+821076260741"
+        >
+          <Phone size={21} />
+          Позвонить
+        </a>
+        <a
+          aria-label="Написать в WhatsApp"
+          className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-[#4caf64] text-white shadow-sm transition-colors active:bg-[#3f9855]"
+          href={leadWhatsAppUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <MessageCircle size={24} />
+        </a>
+      </div>
 
       {isModalOpen && (
         <div

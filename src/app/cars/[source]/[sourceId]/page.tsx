@@ -140,7 +140,7 @@ export default async function CarDetailPage({
     <main className="min-h-screen bg-[#f4f5f7] text-[#121722]">
       <SiteHeader />
 
-      <section className="mx-auto flex max-w-7xl flex-col gap-4 px-3 py-4 sm:gap-6 sm:px-5 sm:py-6 lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+      <section className="mx-auto flex max-w-7xl flex-col gap-4 px-3 pb-24 pt-4 sm:gap-6 sm:px-5 sm:py-6 lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
         <div className="contents lg:col-start-1 lg:row-start-1 lg:grid lg:min-w-0 lg:gap-6">
           <div className="order-1 min-w-0 lg:order-none">
             <CarMediaShowcase
