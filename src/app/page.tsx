@@ -373,7 +373,7 @@ function VehicleShelf({
         </Link>
       </div>
       {cars.length ? (
-        <div className="scrollbar-none mt-5 flex snap-x gap-3 overflow-x-auto pb-1 sm:mt-6 sm:grid sm:grid-cols-2 sm:items-start sm:gap-4 sm:overflow-visible xl:grid-cols-4">
+        <div className="mt-5 grid gap-3 pb-1 sm:mt-6 sm:grid-cols-2 sm:items-start sm:gap-4 xl:grid-cols-4">
           {prototypeCar ? <PrototypeVehicleCard car={prototypeCar} /> : null}
           {cars.map((car) => (
             <HomeCarCard key={car.id} car={car} tone={tone} />
@@ -406,7 +406,7 @@ function HomeCarCard({ car, tone }: { car: CatalogCar; tone: HomeCardTone }) {
     <Link
       href={`/cars/${car.primary_source}/${car.source_id}`}
       prefetch={false}
-      className="group w-[78vw] max-w-[300px] shrink-0 snap-start overflow-hidden rounded-[22px] bg-white p-2 shadow-[0_10px_28px_rgba(28,43,61,0.10)] ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-[0_18px_35px_rgba(28,43,61,0.16)] sm:w-auto sm:max-w-none"
+      className="group w-full overflow-hidden rounded-[22px] bg-white p-2 shadow-[0_10px_28px_rgba(28,43,61,0.10)] ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-[0_18px_35px_rgba(28,43,61,0.16)]"
     >
       <div className={`relative aspect-[4/3] overflow-hidden rounded-[16px] bg-gradient-to-br p-1.5 ${style.frame}`}>
         <div className="relative h-full w-full overflow-hidden rounded-[12px] bg-white/70">

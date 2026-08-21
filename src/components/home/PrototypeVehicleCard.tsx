@@ -96,7 +96,7 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
 
   return (
     <article
-      className="relative w-[84vw] max-w-[360px] shrink-0 snap-start overflow-hidden rounded-[24px] bg-white shadow-[0_14px_35px_rgba(28,43,61,0.13)] ring-1 ring-[#dce2eb] sm:w-auto sm:max-w-none"
+      className="relative w-full overflow-hidden rounded-[24px] bg-white shadow-[0_14px_35px_rgba(28,43,61,0.13)] ring-1 ring-[#dce2eb]"
     >
       <Link aria-label={`Открыть карточку ${title}`} className="absolute inset-0 z-0" href={detailsHref} prefetch={false} />
 
@@ -109,35 +109,35 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
         </> : null}
       </div>
 
-      <div className="pointer-events-none relative z-10 p-4">
+      <div className="pointer-events-none relative z-10 p-3 sm:p-4">
         <div>
-          <p className="text-2xl font-bold tabular-nums text-[#101827]">{rub.format(car.price_rub ?? 0)} ₽</p>
-          <p className="mt-1 text-sm text-[#647084]">Цена под ключ до Владивостока</p>
+          <p className="text-xl font-bold tabular-nums text-[#101827] sm:text-2xl">{rub.format(car.price_rub ?? 0)} ₽</p>
+          <p className="mt-0.5 text-xs text-[#647084] sm:mt-1 sm:text-sm">Цена под ключ до Владивостока</p>
         </div>
 
-        <h3 className="mt-4 flex flex-wrap items-center gap-2 text-xl font-bold leading-tight text-[#101827] transition hover:text-[#956f2c]">
+        <h3 className="mt-3 flex flex-wrap items-center gap-1.5 text-lg font-bold leading-tight text-[#101827] transition hover:text-[#956f2c] sm:mt-4 sm:gap-2 sm:text-xl">
           <span>{primaryFacts.length ? primaryFacts.slice(0, 2).join(" ") : title}</span>
-          {car.year ? <span className="rounded-full border border-[#cfd6e0] px-2.5 py-1 text-sm font-medium text-[#4e5b6d]">{car.year}</span> : null}
+          {car.year ? <span className="rounded-full border border-[#cfd6e0] px-2 py-0.5 text-xs font-medium text-[#4e5b6d] sm:px-2.5 sm:py-1 sm:text-sm">{car.year}</span> : null}
         </h3>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {car.accident_count === 0 ? <span className="rounded-full bg-[#e8f5ef] px-2.5 py-1 text-xs font-semibold text-[#18794e]">Без ДТП</span> : null}
-          {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? <span className="rounded-full bg-[#fff2e5] px-2.5 py-1 text-xs font-semibold text-[#9a5b1c]">Страховые выплаты: {car.insurance_payout_count}</span> : null}
+        <div className="mt-2 flex flex-wrap gap-1.5 sm:mt-3">
+          {car.accident_count === 0 ? <span className="rounded-full bg-[#e8f5ef] px-2 py-0.5 text-[11px] font-semibold text-[#18794e] sm:px-2.5 sm:py-1 sm:text-xs">Без ДТП</span> : null}
+          {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? <span className="rounded-full bg-[#fff2e5] px-2 py-0.5 text-[11px] font-semibold text-[#9a5b1c] sm:px-2.5 sm:py-1 sm:text-xs">Страховые выплаты: {car.insurance_payout_count}</span> : null}
         </div>
-        <p className="mt-2 text-sm leading-6 text-[#273246]">
+        <p className="mt-1.5 text-xs leading-5 text-[#273246] sm:mt-2 sm:text-sm sm:leading-6">
           {primaryFacts.slice(2).join(" · ") || "Основные характеристики уточняются"}
         </p>
-        <p className="mt-2 text-sm leading-6 text-[#273246]">
+        <p className="mt-1.5 text-xs leading-5 text-[#273246] sm:mt-2 sm:text-sm sm:leading-6">
           {secondaryFacts.join(" · ") || "Комплектация уточняется"}
         </p>
       </div>
 
-      <div className="relative z-10 grid grid-cols-3 border-y border-[#f0e4e4] bg-[#fff8f7] text-xs font-semibold text-[#ba4b42]">
-        <button aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"} className="flex min-h-12 items-center justify-center gap-1 border-r border-[#f0e4e4] px-1 transition hover:bg-[#fff0ee]" onClick={(event) => { event.stopPropagation(); setFavorite((current) => !current); }} type="button"><Heart fill={favorite ? "currentColor" : "none"} size={17} /> Избранное</button>
-        <a className="flex min-h-12 items-center justify-center gap-1 border-r border-[#f0e4e4] px-1 transition hover:bg-[#fff0ee]" href={whatsappContactUrl(message)} onClick={(event) => event.stopPropagation()} rel="noreferrer" target="_blank"><MessageCircle size={17} /> Консультация</a>
-        <button aria-label="Поделиться объявлением" className="flex min-h-12 items-center justify-center gap-1 px-1 transition hover:bg-[#fff0ee]" onClick={(event) => { event.stopPropagation(); void share(); }} type="button"><Share2 size={17} /> Поделиться</button>
+      <div className="relative z-10 grid grid-cols-3 border-y border-[#f0e4e4] bg-[#fff8f7] text-[11px] font-semibold text-[#ba4b42] sm:text-xs">
+        <button aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"} className="flex min-h-10 items-center justify-center gap-0.5 border-r border-[#f0e4e4] px-0.5 transition hover:bg-[#fff0ee] sm:min-h-12 sm:gap-1 sm:px-1" onClick={(event) => { event.stopPropagation(); setFavorite((current) => !current); }} type="button"><Heart fill={favorite ? "currentColor" : "none"} size={15} /> Избранное</button>
+        <a className="flex min-h-10 items-center justify-center gap-0.5 border-r border-[#f0e4e4] px-0.5 transition hover:bg-[#fff0ee] sm:min-h-12 sm:gap-1 sm:px-1" href={whatsappContactUrl(message)} onClick={(event) => event.stopPropagation()} rel="noreferrer" target="_blank"><MessageCircle size={15} /> Консультация</a>
+        <button aria-label="Поделиться объявлением" className="flex min-h-10 items-center justify-center gap-0.5 px-0.5 transition hover:bg-[#fff0ee] sm:min-h-12 sm:gap-1 sm:px-1" onClick={(event) => { event.stopPropagation(); void share(); }} type="button"><Share2 size={15} /> Поделиться</button>
       </div>
 
-      <div className="pointer-events-none relative z-10 px-4 py-3 text-xs text-[#7a8798]">
+      <div className="pointer-events-none relative z-10 px-3 py-2 text-[11px] text-[#7a8798] sm:px-4 sm:py-3 sm:text-xs">
         <span>{saleDays != null ? `В продаже ${saleDays} дней` : "Срок продажи уточняется"}</span>
       </div>
       {shareNotice ? <span aria-live="polite" className="sr-only">{shareNotice}</span> : null}
