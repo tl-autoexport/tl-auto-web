@@ -191,16 +191,16 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           </div>
 
           {popularBrands.length ? (
-            <div className="scrollbar-none mt-6 flex items-center gap-2 overflow-x-auto sm:mt-8 sm:flex-wrap sm:gap-2.5">
+            <div className="scrollbar-none mt-6 flex items-center gap-5 overflow-x-auto sm:mt-8 sm:flex-wrap sm:gap-x-7 sm:gap-y-3">
               {popularBrands.map((brand) => {
                 const selected = filters.brand === brand;
                 return (
                   <Link
                     aria-current={selected ? "page" : undefined}
-                    className={`inline-flex h-12 shrink-0 items-center gap-2 rounded-full pl-1 pr-4 text-[15px] font-medium transition sm:h-14 sm:gap-2.5 sm:pl-1.5 sm:pr-5 sm:text-lg ${
+                    className={`inline-flex h-10 shrink-0 items-center gap-2 border-b-2 px-0 text-[15px] font-medium transition sm:h-12 sm:gap-2.5 sm:text-lg ${
                       selected
-                        ? "bg-[#15171b] text-white"
-                        : "bg-[#edf0f2] text-[#15171b] hover:bg-[#e1e5e8]"
+                        ? "border-[#a98239] text-[#15171b]"
+                        : "border-transparent text-[#15171b] hover:border-[#d7c49c]"
                     }`}
                     href={selected
                       ? catalogFilterHref(rawParams, { brand: null, model: null, page: null })
@@ -208,12 +208,12 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                     key={brand}
                   >
                     {brand}
-                    <span className={selected ? "text-white/60" : "text-[#757b84]"}>{brandCounts[brand] ?? 0}</span>
-                    {selected ? <span aria-hidden="true">×</span> : null}
+                    <span className="text-[#757b84]">{brandCounts[brand] ?? 0}</span>
+                    {selected ? <span aria-hidden="true" className="text-[#a98239]">×</span> : null}
                   </Link>
                 );
               })}
-              <Link href="#filters" className="inline-flex h-12 shrink-0 items-center gap-2 rounded-full bg-[#edf0f2] px-5 text-[15px] font-medium text-[#15171b] transition hover:bg-[#e1e5e8] sm:h-14 sm:text-lg">Все марки <ChevronRight size={18} /></Link>
+              <Link href="#filters" className="inline-flex h-10 shrink-0 items-center gap-2 border-b-2 border-transparent text-[15px] font-medium text-[#7b5a22] transition hover:border-[#d7c49c] sm:h-12 sm:text-lg">Все марки <ChevronRight size={18} /></Link>
             </div>
           ) : null}
         </div>
