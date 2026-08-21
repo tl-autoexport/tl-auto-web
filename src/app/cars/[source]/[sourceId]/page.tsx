@@ -32,6 +32,7 @@ import { InspectionPhotoGallery } from "./InspectionPhotoGallery";
 import type { ThermalEntry, ThermalReference } from "./thermalTypes";
 import { PriceCalculationCard } from "./PriceCalculationCard";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const getCachedCarDetail = cache(getCarDetail);
@@ -59,7 +60,7 @@ export async function generateMetadata({
 
   const title = carDisplayTitle(car);
   const details = [
-    car.year ? `${car.year} год` : null,
+    car.year ? formatVehicleYear(car.year) : null,
     car.mileage_km ? `${rub.format(car.mileage_km)} км` : null,
     car.power_hp ? `${car.power_hp} л.с.` : null,
     car.price_rub
@@ -175,9 +176,7 @@ export default async function CarDetailPage({
                 />
                 <KeyFact
                   label="Двигатель"
-                  value={
-                    car.engine_cc ? `${rub.format(car.engine_cc)} см3` : "-"
-                  }
+                  value={formatEngineCapacity(car.engine_cc)}
                 />
                 <KeyFact
                   label="Мощность"
@@ -995,7 +994,7 @@ function inspectionStatusClass(statusCode: string | null, status: string) {
 
 function formatYearMonth(year: number | null, month: number | null) {
   if (!year) return "-";
-  if (!month) return `${year} год`;
+  if (!month) return formatVehicleYear(year);
   return `${String(month).padStart(2, "0")}.${year}`;
 }
 

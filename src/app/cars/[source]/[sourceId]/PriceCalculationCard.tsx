@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { whatsappContactUrl, vehicleClientMessage } from "@/lib/contact";
 import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
+import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
 
 type CalculationSnapshot = {
   total_rub: number | null;
@@ -216,8 +217,8 @@ export function PriceCalculationCard({
           {title}
         </h1>
         <p className="mt-1.5 text-[13px] text-[#647084] sm:mt-2 sm:text-sm">
-          {year ?? "-"} год · {rub.format(mileageKm ?? 0)} км ·{" "}
-          {engineCc ?? "-"} см3
+          {formatVehicleYear(year)} · {rub.format(mileageKm ?? 0)} км ·{" "}
+          {formatEngineCapacity(engineCc)}
         </p>
 
         <div className="flex flex-wrap items-center gap-2">

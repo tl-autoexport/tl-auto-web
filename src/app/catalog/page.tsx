@@ -335,7 +335,7 @@ function CatalogFilterForm({
     <>
       <FilterSelect label="Топливо" name="fuel" options={fuels} placeholder="Любое" translate={translateFuel} value={value("fuel")} />
       <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} />
-      <RangeField label="Объём двигателя, см3" maxName="engineMax" maxValue={value("engineMax")} minName="engineMin" minValue={value("engineMin")} />
+      <RangeField label="Объём двигателя, см³" maxName="engineMax" maxValue={value("engineMax")} minName="engineMin" minValue={value("engineMin")} />
       <FilterInput inputMode="numeric" label="Пробег до, км" name="mileageMax" placeholder="Например, 80 000" value={value("mileageMax")} />
       <FilterInput inputMode="numeric" label="Пробег от, км" name="mileageMin" placeholder="Например, 10 000" value={value("mileageMin")} />
       <FilterInput inputMode="numeric" label="Мощность до, л.с." name="powerMax" placeholder="Например, 160" value={value("powerMax")} />
@@ -446,7 +446,7 @@ function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boo
       </div>
       <div className="p-4">
         <Link href={detailsHref}><h2 className="line-clamp-2 text-lg font-semibold transition group-hover:text-[#956f2c]">{carDisplayTitle(car)}</h2></Link>
-        <p className="mt-2 text-sm text-[#647084]">{car.year ?? "-"} год · {car.mileage_km ? `${rub.format(car.mileage_km)} км` : "Пробег не указан"}{isPasso && typeof passoSpecs.category === "string" ? ` · ${passoSpecs.category}` : isPasso ? "" : ` · ${translateFuel(car.fuel_type)}`}</p>
+        <p className="mt-2 text-sm text-[#647084]">{car.year ? `${car.year} г.` : "-"} · {car.mileage_km ? `${rub.format(car.mileage_km)} км` : "Пробег не указан"}{isPasso && typeof passoSpecs.category === "string" ? ` · ${passoSpecs.category}` : isPasso ? "" : ` · ${translateFuel(car.fuel_type)}`}</p>
         {isPasso && passoFacts.length ? <p className="mt-2 line-clamp-1 text-xs font-medium text-[#445276]">{passoFacts.join(" · ")}</p> : null}
         <div className="mt-4 flex items-end justify-between gap-3"><div><p className="text-xs text-[#647084]">{isPasso ? "Цена в Корее" : "до Владивостока"}</p><p className="whitespace-nowrap text-xl font-semibold">{isPasso ? `${rub.format(car.price_krw ?? 0)} ₩` : `${rub.format(car.price_rub ?? 0)} ₽`}</p></div><div className="flex items-center gap-1 text-sm text-[#647084]"><Gauge size={16} />{isPasso ? (car.vehicle_specs?.power_hp ? `${car.vehicle_specs.power_hp} л.с.` : "") : `${car.power_hp ?? "-"} л.с.`}</div></div>
         <div className="mt-4 flex items-center justify-between border-t border-[#edf0f4] pt-3 text-xs font-medium text-[#647084]"><span className="inline-flex items-center gap-1"><ShieldCheck size={14} className={isPasso ? "text-[#16727a]" : "text-[#a98239]"} /> {isPasso ? "Проверено Passo" : "Расчёт РФ"}</span><span>{formatUpdate(car.source_updated_at)}</span></div>
