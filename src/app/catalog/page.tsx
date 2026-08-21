@@ -32,6 +32,7 @@ import { passoImageProxyUrl } from "@/lib/passo-image";
 import { RemoteImage } from "@/components/site/RemoteImage";
 import { MobileCatalogFilters } from "./MobileCatalogFilters";
 import { BrandModelFields } from "@/components/catalog/BrandModelFields";
+import { BrandLogo } from "@/components/catalog/BrandLogo";
 import { LiveCatalogCount } from "./LiveCatalogCount";
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 
@@ -191,31 +192,30 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           </div>
 
           {popularBrands.length ? (
-            <div className="scrollbar-none mt-5 flex items-center gap-2 overflow-x-auto border-t border-[#edf0f4] pt-4 sm:mt-8 sm:flex-wrap sm:gap-x-3 sm:gap-y-3 sm:pt-5">
-              <span className="shrink-0 text-xs text-[#7a8798] sm:text-sm">Марки</span>
+            <div className="scrollbar-none mt-6 flex items-center gap-2 overflow-x-auto sm:mt-8 sm:flex-wrap sm:gap-2.5">
               {popularBrands.map((brand) => {
                 const selected = filters.brand === brand;
                 return (
                   <Link
                     aria-current={selected ? "page" : undefined}
-                    className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition sm:text-sm ${
+                    className={`inline-flex h-12 shrink-0 items-center gap-2 rounded-full pl-1 pr-4 text-[15px] font-medium transition sm:h-14 sm:gap-2.5 sm:pl-1.5 sm:pr-5 sm:text-lg ${
                       selected
-                        ? "border-[#c7a55a] bg-[#c7a55a] text-[#15130f]"
-                        : "border-[#dce2eb] bg-white text-[#273246] hover:border-[#956f2c] hover:text-[#956f2c]"
+                        ? "bg-[#15171b] text-white"
+                        : "bg-[#edf0f2] text-[#15171b] hover:bg-[#e1e5e8]"
                     }`}
                     href={selected
                       ? catalogFilterHref(rawParams, { brand: null, model: null, page: null })
                       : catalogFilterHref(rawParams, { brand, model: null, page: null })}
                     key={brand}
                   >
-                    <BrandMark brand={brand} />
+                    <BrandLogo brand={brand} />
                     {brand}
-                    <span className="text-[#7a8798]">{brandCounts[brand] ?? 0}</span>
+                    <span className={selected ? "text-white/60" : "text-[#757b84]"}>{brandCounts[brand] ?? 0}</span>
                     {selected ? <span aria-hidden="true">×</span> : null}
                   </Link>
                 );
               })}
-              <Link href="#filters" className="inline-flex min-h-9 shrink-0 items-center gap-1 px-2 text-xs font-semibold text-[#956f2c] sm:text-sm">Все фильтры <ChevronRight size={15} /></Link>
+              <Link href="#filters" className="inline-flex h-12 shrink-0 items-center gap-2 rounded-full bg-[#edf0f2] px-5 text-[15px] font-medium text-[#15171b] transition hover:bg-[#e1e5e8] sm:h-14 sm:text-lg">Все марки <ChevronRight size={18} /></Link>
             </div>
           ) : null}
         </div>
@@ -656,10 +656,6 @@ function translateMonth(value: string) {
   return months[Number(value) - 1] ?? value;
 }
 
-function BrandMark({ brand }: { brand: string }) {
-  const initials = brand.replace(/[^A-Za-zА-Яа-я0-9]/g, "").slice(0, 3).toUpperCase();
-  return <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded-full border border-[#d7dee8] bg-[#f5f6f8] text-[9px] font-bold tracking-[-0.04em] text-[#273246]">{initials}</span>;
-}
 function transmissionFilterValue(value: string | null) {
   const raw = String(value ?? "").trim().toLowerCase();
   if (!raw) return null;
