@@ -61,7 +61,6 @@
     "qrcode": "^1.5.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "simple-icons": "^16.28.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

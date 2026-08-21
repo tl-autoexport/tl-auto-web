@@ -32,7 +32,6 @@ import { passoImageProxyUrl } from "@/lib/passo-image";
 import { RemoteImage } from "@/components/site/RemoteImage";
 import { MobileCatalogFilters } from "./MobileCatalogFilters";
 import { BrandModelFields } from "@/components/catalog/BrandModelFields";
-import { BrandLogo } from "@/components/catalog/BrandLogo";
 import { LiveCatalogCount } from "./LiveCatalogCount";
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 
@@ -208,7 +207,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                       : catalogFilterHref(rawParams, { brand, model: null, page: null })}
                     key={brand}
                   >
-                    <BrandLogo brand={brand} />
                     {brand}
                     <span className={selected ? "text-white/60" : "text-[#757b84]"}>{brandCounts[brand] ?? 0}</span>
                     {selected ? <span aria-hidden="true">×</span> : null}
