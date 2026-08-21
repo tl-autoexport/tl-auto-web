@@ -360,7 +360,7 @@ function VehicleShelf({
         </Link>
       </div>
       {cars.length ? (
-        <div className="mt-5 grid gap-3 pb-1 sm:mt-6 sm:grid-cols-2 sm:items-start sm:gap-4 xl:grid-cols-4">
+        <div className="mt-5 grid items-stretch gap-3 pb-1 sm:mt-6 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
           {cars.map((car) => <PrototypeVehicleCard key={car.id} car={car} />)}
         </div>
       ) : (

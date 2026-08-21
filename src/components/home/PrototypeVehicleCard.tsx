@@ -96,7 +96,7 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
 
   return (
     <article
-      className="relative w-full overflow-hidden rounded-[24px] bg-white shadow-[0_14px_35px_rgba(28,43,61,0.13)] ring-1 ring-[#dce2eb]"
+      className="relative flex h-full min-h-[412px] w-full flex-col overflow-hidden rounded-[24px] bg-white shadow-[0_14px_35px_rgba(28,43,61,0.13)] ring-1 ring-[#dce2eb]"
     >
       <Link aria-label={`Открыть карточку ${title}`} className="absolute inset-0 z-0" href={detailsHref} prefetch={false} />
 
@@ -109,7 +109,7 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
         </> : null}
       </div>
 
-      <div className="pointer-events-none relative z-10 p-3 sm:p-4">
+      <div className="pointer-events-none relative z-10 flex-1 p-3 sm:p-4">
         <div>
           <p className="text-xl font-bold tabular-nums text-[#101827] sm:text-2xl">{rub.format(car.price_rub ?? 0)} ₽</p>
           <p className="mt-0.5 text-xs text-[#647084] sm:mt-1 sm:text-sm">Цена под ключ до Владивостока</p>
