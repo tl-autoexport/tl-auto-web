@@ -33,6 +33,7 @@ import { RemoteImage } from "@/components/site/RemoteImage";
 import { MobileCatalogFilters } from "./MobileCatalogFilters";
 import { BrandModelFields } from "@/components/catalog/BrandModelFields";
 import { LiveCatalogCount } from "./LiveCatalogCount";
+import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const date = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short" });
@@ -231,7 +232,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         </div>
 
         {shownCars.length ? <>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{shownCars.map((car, index) => <CatalogCard key={car.id} car={car} highPriority={index === 0} />)}</div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{shownCars.map((car) => <CatalogResultCard key={car.id} car={car} />)}</div>
           {totalPages > 1 ? <Pagination currentPage={currentPage} rawParams={rawParams} totalPages={totalPages} /> : null}
         </> : <EmptyState />}
       </section>
@@ -252,7 +253,7 @@ async function StagingCatalogPage({ category, page }: { category: StagingCatalog
     scooter: { eyebrow: "Passo Bike", title: "Скутеры из Кореи", description: "Свежие объявления скутеров с характеристиками и фотографиями из Passo." },
     jetski: { eyebrow: "Passo Boat", title: "Гидроциклы из Кореи", description: "Только гидроциклы из раздела Passo. Лодки и яхты исключены." },
   }[category];
-  return <main className="min-h-screen bg-[#f5f6f8] text-[#101827]"><SiteHeader /><CatalogCategoryTabs active={category} /><section className="border-b border-[#dce2eb] bg-white"><div className="mx-auto max-w-7xl px-4 py-7 sm:px-5 md:py-10"><p className="text-xs font-semibold text-[#956f2c] sm:text-sm">{labels.eyebrow}</p><div className="mt-1.5 flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><h1 className="text-[32px] font-semibold leading-tight sm:text-4xl">{labels.title}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-[#647084]">{labels.description}</p></div><div className="rounded-full bg-[#f5f0e4] px-4 py-2 text-sm text-[#7b5a22]"><strong className="mr-1 text-xl text-[#101827]">{totalCars}</strong> объявлений</div></div></div></section><section className="mx-auto max-w-7xl px-3 py-8 sm:px-5"><div className="mb-5 flex items-center justify-between border-b border-[#dce2eb] pb-4 text-sm text-[#647084]"><span>Показано {shownCars.length ? `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, totalCars)} из ${totalCars}` : "0 объявлений"}</span><span>Сначала свежие объявления</span></div>{shownCars.length ? <><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{shownCars.map((car, index) => <CatalogCard key={car.id} car={car} highPriority={index === 0} />)}</div>{totalPages > 1 ? <Pagination currentPage={currentPage} rawParams={{ category }} totalPages={totalPages} /> : null}</> : <EmptyState />}</section></main>;
+  return <main className="min-h-screen bg-[#f5f6f8] text-[#101827]"><SiteHeader /><CatalogCategoryTabs active={category} /><section className="border-b border-[#dce2eb] bg-white"><div className="mx-auto max-w-7xl px-4 py-7 sm:px-5 md:py-10"><p className="text-xs font-semibold text-[#956f2c] sm:text-sm">{labels.eyebrow}</p><div className="mt-1.5 flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><h1 className="text-[32px] font-semibold leading-tight sm:text-4xl">{labels.title}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-[#647084]">{labels.description}</p></div><div className="rounded-full bg-[#f5f0e4] px-4 py-2 text-sm text-[#7b5a22]"><strong className="mr-1 text-xl text-[#101827]">{totalCars}</strong> объявлений</div></div></div></section><section className="mx-auto max-w-7xl px-3 py-8 sm:px-5"><div className="mb-5 flex items-center justify-between border-b border-[#dce2eb] pb-4 text-sm text-[#647084]"><span>Показано {shownCars.length ? `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, totalCars)} из ${totalCars}` : "0 объявлений"}</span><span>Сначала свежие объявления</span></div>{shownCars.length ? <><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{shownCars.map((car) => <CatalogResultCard key={car.id} car={car} />)}</div>{totalPages > 1 ? <Pagination currentPage={currentPage} rawParams={{ category }} totalPages={totalPages} /> : null}</> : <EmptyState />}</section></main>;
 }
 
 function CatalogCategoryTabs({ active }: { active: "car" | StagingCatalogType }) {
@@ -362,6 +363,11 @@ function CatalogFilterForm({
       ) : null}
     </form>
   );
+}
+
+function CatalogResultCard({ car }: { car: CatalogCar }) {
+  if (!car.primary_source.startsWith("passo_")) return <PrototypeVehicleCard car={car} />;
+  return <CatalogCard car={car} highPriority={false} />;
 }
 
 function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boolean }) {

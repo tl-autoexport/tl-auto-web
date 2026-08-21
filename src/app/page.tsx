@@ -3,7 +3,6 @@ import Image from "next/image";
 import {
   ArrowRight,
   Calculator,
-  CarFront,
   ChevronRight,
   CircleDollarSign,
   FileCheck2,
@@ -19,18 +18,14 @@ import {
 import {
   getCatalogCars,
   getHomeCatalogData,
-  getPrimaryPhoto,
   type CatalogCar,
 } from "@/server/cars/repository";
-import { carDisplayTitle, translateFuel } from "@/server/normalization/display";
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { RemoteImage } from "@/components/site/RemoteImage";
 import { CatalogQuickNav } from "@/components/home/CatalogQuickNav";
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 
 export const revalidate = 60;
 
-const rub = new Intl.NumberFormat("ru-RU");
 const prototypeSourceId = "42554713";
 
 export default async function Home() {
@@ -48,7 +43,7 @@ export default async function Home() {
   const newArrivals = selectShelfCars(cars, usedCarIds);
   const prototypeCar = prototypeResult.status === "fulfilled" ? prototypeResult.value[0] : undefined;
   const newArrivalCards = prototypeCar
-    ? newArrivals.filter((car) => car.id !== prototypeCar.id).slice(0, 3)
+    ? [prototypeCar, ...newArrivals.filter((car) => car.id !== prototypeCar.id).slice(0, 3)]
     : newArrivals;
 
   return (
@@ -97,7 +92,6 @@ export default async function Home() {
         href="/catalog?shelf=under-160"
         cars={under160}
         empty="В текущей витрине ещё нет подходящих автомобилей."
-        tone="navy"
       />
 
       <VehicleShelf
@@ -108,7 +102,6 @@ export default async function Home() {
         href="/catalog?fuel=electric"
         cars={electric}
         empty="Сейчас в витрине нет электромобилей с полным расчётом стоимости."
-        tone="mint"
       />
 
       <VehicleShelf
@@ -119,8 +112,6 @@ export default async function Home() {
         href="/catalog?sort=fresh"
         cars={newArrivalCards}
         empty="Свежие поступления появятся в этой витрине после обновления каталога."
-        tone="sand"
-        prototypeCar={prototypeCar}
       />
 
       <section id="how-it-works" className="border-y border-[#dce2eb] bg-white">
@@ -343,9 +334,7 @@ function VehicleShelf({
   eyebrow,
   href,
   id,
-  prototypeCar,
   title,
-  tone,
 }: {
   cars: CatalogCar[];
   description: string;
@@ -353,9 +342,7 @@ function VehicleShelf({
   eyebrow: string;
   href: string;
   id: string;
-  prototypeCar?: CatalogCar;
   title: string;
-  tone: HomeCardTone;
 }) {
   return (
     <section id={id} className="mx-auto max-w-7xl px-4 py-7 sm:px-5 sm:py-10">
@@ -374,10 +361,7 @@ function VehicleShelf({
       </div>
       {cars.length ? (
         <div className="mt-5 grid gap-3 pb-1 sm:mt-6 sm:grid-cols-2 sm:items-start sm:gap-4 xl:grid-cols-4">
-          {prototypeCar ? <PrototypeVehicleCard car={prototypeCar} /> : null}
-          {cars.map((car) => (
-            <HomeCarCard key={car.id} car={car} tone={tone} />
-          ))}
+          {cars.map((car) => <PrototypeVehicleCard key={car.id} car={car} />)}
         </div>
       ) : (
         <div className="mt-6 rounded-md border border-dashed border-[#c7d0dc] bg-white p-5 text-sm text-[#647084]">
@@ -385,83 +369,6 @@ function VehicleShelf({
         </div>
       )}
     </section>
-  );
-}
-
-type HomeCardTone = "navy" | "mint" | "sand";
-
-const homeCardTones: Record<HomeCardTone, { frame: string; accent: string; badge: string }> = {
-  navy: { frame: "from-[#dce8fb] via-[#edf3ff] to-[#d3e1f5]", accent: "bg-[#1f4679]", badge: "bg-[#e9f1ff] text-[#1f4679]" },
-  mint: { frame: "from-[#d9f4ed] via-[#effbf7] to-[#d2ebe5]", accent: "bg-[#167a67]", badge: "bg-[#e4f8f1] text-[#14705e]" },
-  sand: { frame: "from-[#f8ecd6] via-[#fff8ed] to-[#efe0c7]", accent: "bg-[#9a6b23]", badge: "bg-[#fff2d8] text-[#8a5c16]" },
-};
-
-function HomeCarCard({ car, tone }: { car: CatalogCar; tone: HomeCardTone }) {
-  // The catalogue itself falls back to the first Encar photo. Use the same
-  // choice on the home shelves so an unfamiliar media category never produces
-  // an empty card while the catalogue correctly has a photo.
-  const photo = getPrimaryPhoto(car);
-  const style = homeCardTones[tone];
-  return (
-    <Link
-      href={`/cars/${car.primary_source}/${car.source_id}`}
-      prefetch={false}
-      className="group w-full overflow-hidden rounded-[22px] bg-white p-2 shadow-[0_10px_28px_rgba(28,43,61,0.10)] ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-[0_18px_35px_rgba(28,43,61,0.16)]"
-    >
-      <div className={`relative aspect-[4/3] overflow-hidden rounded-[16px] bg-gradient-to-br p-1.5 ${style.frame}`}>
-        <div className="relative h-full w-full overflow-hidden rounded-[12px] bg-white/70">
-        {photo ? (
-          <RemoteImage
-            src={photo}
-            alt={carDisplayTitle(car)}
-            fill
-            sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition duration-500 group-hover:scale-[1.035]"
-            fallback={<CarFront size={34} />}
-          />
-        ) : (
-          <CarFront
-            className="absolute inset-0 m-auto text-[#8a96a8]"
-            size={34}
-          />
-        )}
-        <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-          {car.fuel_type === "electric" ? <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${style.badge}`}>Электро</span> : null}
-          {car.accident_count === 0 ? (
-            <span className="rounded-full bg-[#e8f5ef] px-2.5 py-1 text-[11px] font-bold text-[#18794e]">
-              Без ДТП
-            </span>
-          ) : null}
-          {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? (
-            <span className="rounded-full bg-[#fff2e5] px-2.5 py-1 text-[11px] font-bold text-[#9a5b1c]">
-              Страховые выплаты: {car.insurance_payout_count}
-            </span>
-          ) : null}
-        </div>
-        </div>
-      </div>
-      <div className="px-3 pb-3 pt-3 sm:px-4 sm:pb-4">
-        <h3 className="line-clamp-2 min-h-12 text-base font-semibold group-hover:text-[#956f2c]">
-          {carDisplayTitle(car)}
-        </h3>
-        <p className="mt-2 text-sm text-[#647084]">
-          {car.year ?? "-"} год · {rub.format(car.mileage_km ?? 0)} км
-        </p>
-        <div className="mt-4 flex items-end justify-between gap-2">
-          <div>
-            <p className="text-xs text-[#647084]">до Владивостока</p>
-            <p className="whitespace-nowrap text-lg font-semibold tabular-nums sm:text-xl">
-              {rub.format(car.price_rub ?? 0)}{"\u00A0"}₽
-            </p>
-          </div>
-          <p className={`rounded-full px-2.5 py-1 text-right text-[11px] font-semibold ${style.badge}`}>
-            {car.power_hp ?? "-"} л.с.
-            <br />
-            {translateFuel(car.fuel_type)}
-          </p>
-        </div>
-      </div>
-    </Link>
   );
 }
 

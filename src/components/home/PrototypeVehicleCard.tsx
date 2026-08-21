@@ -32,7 +32,7 @@ const BODY_SHAPE_BY_MODEL: Record<string, string> = {
 function bodyShapeForCard(car: CatalogCar) {
   const storedShape = car.vehicle_specs?.body_shape;
   if (typeof storedShape === "string" && storedShape.trim()) return storedShape;
-  if (car.body_type === "SUV") return "SUV";
+  if (car.body_type === "SUV") return "Кроссовер";
   if (car.body_type === "Минивэн") return "Минивэн";
   if (car.body_type === "Спорткар") return "Спорткар";
   return BODY_SHAPE_BY_MODEL[car.model ?? ""] ?? null;
