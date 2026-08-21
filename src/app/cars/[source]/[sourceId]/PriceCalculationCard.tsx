@@ -7,13 +7,11 @@ import {
   ChevronDown,
   Info,
   MessageCircle,
+  Phone,
   RefreshCw,
   X,
 } from "lucide-react";
-import {
-  telegramContactUrl,
-  vehicleClientMessage,
-} from "@/lib/contact";
+import { whatsappContactUrl, vehicleClientMessage } from "@/lib/contact";
 import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
 
 type CalculationSnapshot = {
@@ -179,7 +177,7 @@ export function PriceCalculationCard({
       setRefreshing(false);
     }
   }
-  const leadTelegramUrl = telegramContactUrl(
+  const leadWhatsAppUrl = whatsappContactUrl(
     vehicleClientMessage({ source, sourceId, title }),
   );
 
@@ -309,16 +307,24 @@ export function PriceCalculationCard({
             <span className="sm:hidden">Расчёт</span>
             <span className="hidden sm:inline">Показать расчёт цены</span>
           </button>
+        </div>
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:mt-3">
+          <a
+            className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded border border-[#d8dde6] px-2 py-2 text-xs font-semibold text-[#273246] transition-colors hover:border-[#956f2c] hover:bg-[#fbf7ed] sm:gap-2 sm:px-3 sm:text-sm"
+            href="tel:+821076260741"
+          >
+            <Phone size={16} />
+            Позвонить
+          </a>
           <a
             id="lead"
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded border border-[#956f2c] px-3 py-2.5 text-sm font-semibold text-[#956f2c] transition-colors hover:bg-[#fbf7ed] sm:px-5 sm:py-3"
-            href={leadTelegramUrl}
+            className="flex min-h-11 w-full items-center justify-center gap-1.5 rounded bg-[#22a861] px-2 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#16864c] sm:gap-2 sm:px-3 sm:text-sm"
+            href={leadWhatsAppUrl}
             rel="noopener noreferrer"
             target="_blank"
           >
-            <MessageCircle size={17} />
-            <span className="sm:hidden">Связаться</span>
-            <span className="hidden sm:inline">Оставить заявку</span>
+            <MessageCircle size={16} />
+            Написать
           </a>
         </div>
       </aside>
