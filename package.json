@@ -38,6 +38,8 @@
     "refresh:encar:history:write": "ENCAR_HISTORY_DRY_RUN=false tsx scripts/refresh-encar-history.ts",
     "backfill:encar:inspection": "tsx scripts/backfill-encar-inspection.ts",
     "backfill:encar:inspection:write": "ENCAR_INSPECTION_DRY_RUN=false tsx scripts/backfill-encar-inspection.ts",
+    "backfill:encar:seats": "tsx scripts/backfill-encar-seats.ts",
+    "backfill:encar:seats:write": "ENCAR_SEATS_DRY_RUN=false tsx scripts/backfill-encar-seats.ts",
     "refresh:encar": "tsx scripts/refresh-encar-catalog.ts",
     "refresh:encar:write": "ENCAR_DRY_RUN=false tsx scripts/refresh-encar-catalog.ts",
     "recalculate:catalog": "tsx scripts/recalculate-active-catalog.ts",
