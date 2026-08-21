@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -53,8 +53,10 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
     [car.car_media],
   );
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const [favorite, setFavorite] = useState(false);
   const [shareNotice, setShareNotice] = useState("");
+  const touchStartX = useRef<number | null>(null);
   const title = [car.brand, car.model].filter(Boolean).join(" ") || "Автомобиль из Кореи";
   const detailsHref = `/cars/${car.primary_source}/${car.source_id}`;
   const message = vehicleClientMessage({ source: car.primary_source, sourceId: car.source_id, title });
@@ -77,9 +79,20 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
   ].filter((value): value is string => Boolean(value));
   const saleDays = daysOnSale(car);
 
-  const changePhoto = (direction: -1 | 1) => {
+  const changePhoto = useCallback((direction: -1 | 1) => {
     setPhotoIndex((current) => (current + direction + photos.length) % photos.length);
-  };
+  }, [photos.length]);
+
+  useEffect(() => {
+    if (!galleryOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setGalleryOpen(false);
+      if (event.key === "ArrowLeft") changePhoto(-1);
+      if (event.key === "ArrowRight") changePhoto(1);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [changePhoto, galleryOpen]);
 
   const share = async () => {
     const shareData = { title, text: `Автомобиль ${title} в каталоге TL Auto`, url: window.location.origin + detailsHref };
@@ -100,7 +113,19 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
     >
       <Link aria-label={`Открыть карточку ${title}`} className="absolute inset-0 z-0" href={detailsHref} prefetch={false} />
 
-      <div className="pointer-events-none relative z-10 aspect-[2.25/1] overflow-hidden bg-[#e8edf3]">
+      <div
+        aria-label={`Открыть галерею: ${title}`}
+        className="relative z-10 aspect-[2.25/1] cursor-zoom-in overflow-hidden bg-[#e8edf3]"
+        onClick={() => photos.length && setGalleryOpen(true)}
+        onKeyDown={(event) => {
+          if ((event.key === "Enter" || event.key === " ") && photos.length) {
+            event.preventDefault();
+            setGalleryOpen(true);
+          }
+        }}
+        role="button"
+        tabIndex={photos.length ? 0 : -1}
+      >
         {photos.length ? <RemoteImage alt={title} className="object-cover" fill sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 84vw" src={photos[photoIndex].url} /> : <div className="flex h-full items-center justify-center text-sm text-[#647084]">Фото временно недоступно</div>}
         {photos.length > 1 ? <>
           <button aria-label="Предыдущее фото" className="pointer-events-auto absolute left-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-[#182234] shadow-sm transition hover:bg-white" onClick={(event) => { event.stopPropagation(); changePhoto(-1); }} type="button"><ChevronLeft size={18} /></button>
@@ -141,6 +166,41 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
         <span>{saleDays != null ? `В продаже ${saleDays} дней` : "Срок продажи уточняется"}</span>
       </div>
       {shareNotice ? <span aria-live="polite" className="sr-only">{shareNotice}</span> : null}
+      {galleryOpen && photos.length ? (
+        <div
+          aria-label={`Фотогалерея ${title}`}
+          aria-modal="true"
+          className="fixed inset-0 z-[100] flex flex-col bg-[#101318]/95 p-3 text-white sm:p-6"
+          onClick={() => setGalleryOpen(false)}
+          role="dialog"
+        >
+          <div className="flex items-center justify-between gap-4 px-1 pb-3 sm:px-2">
+            <p className="truncate text-sm font-semibold sm:text-base">{title}</p>
+            <button aria-label="Закрыть галерею" className="grid size-10 shrink-0 place-items-center rounded-full bg-white/10 text-2xl leading-none hover:bg-white/20" onClick={() => setGalleryOpen(false)} type="button">×</button>
+          </div>
+          <div
+            className="relative min-h-0 flex-1"
+            onClick={(event) => event.stopPropagation()}
+            onTouchEnd={(event) => {
+              const start = touchStartX.current;
+              touchStartX.current = null;
+              if (start == null) return;
+              const distance = event.changedTouches[0].clientX - start;
+              if (Math.abs(distance) > 45) changePhoto(distance > 0 ? -1 : 1);
+            }}
+            onTouchStart={(event) => { touchStartX.current = event.touches[0].clientX; }}
+          >
+            <RemoteImage alt={`${title}, фото ${photoIndex + 1}`} className="object-contain" fill priority sizes="100vw" src={photos[photoIndex].url} />
+            {photos.length > 1 ? <>
+              <button aria-label="Предыдущее фото" className="absolute left-1 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-black/55 hover:bg-black/75 sm:left-4" onClick={() => changePhoto(-1)} type="button"><ChevronLeft size={25} /></button>
+              <button aria-label="Следующее фото" className="absolute right-1 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-black/55 hover:bg-black/75 sm:right-4" onClick={() => changePhoto(1)} type="button"><ChevronRight size={25} /></button>
+            </> : null}
+          </div>
+          <div className="flex shrink-0 items-center justify-center gap-2 overflow-x-auto px-1 pt-3 sm:pt-4">
+            {photos.map((photo, index) => <button aria-label={`Открыть фото ${index + 1}`} className={`relative size-14 shrink-0 overflow-hidden rounded-md ${index === photoIndex ? "ring-2 ring-[#c7a55a]" : "opacity-60 hover:opacity-100"}`} key={`${photo.url}-${index}`} onClick={() => setPhotoIndex(index)} type="button"><RemoteImage alt="" className="object-cover" fill sizes="56px" src={photo.url} /></button>)}
+          </div>
+        </div>
+      ) : null}
     </article>
   );
 }
