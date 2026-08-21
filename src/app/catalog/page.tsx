@@ -102,11 +102,22 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     maxEngineCc: numberParam(value("engineMax")),
     minYear: numberParam(value("yearMin")),
     maxYear: numberParam(value("yearMax")),
+    registrationMonth: numberParam(value("month")),
+    trim: value("trim") || undefined,
+    bodyType: value("body") || undefined,
+    driveType: value("drive") || undefined,
+    color: value("color") || undefined,
+    minOwners: numberParam(value("ownersMin")),
+    maxOwners: numberParam(value("ownersMax")),
+    minMileageKm: numberParam(value("mileageMin")),
     maxMileageKm: numberParam(value("mileageMax")),
     minPriceRub: numberParam(value("priceMin")),
     maxPriceRub: numberParam(value("priceMax")),
     maxPowerHp: under160 ? 160 : numberParam(value("powerMax")),
     noAccidents: value("clean") === "1",
+    noInsurance: value("noInsurance") === "1",
+    minInsurancePayoutKrw: numberParam(value("insuranceMin")),
+    maxInsurancePayoutKrw: numberParam(value("insuranceMax")),
     passable,
     sourceId: value("number") || undefined,
     sort,
@@ -133,7 +144,15 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   for (const models of Object.values(modelsByBrand)) models.sort();
   const fuels = unique(optionCars.map((car) => car.fuel_type));
   const transmissions = unique(optionCars.map((car) => transmissionFilterValue(car.transmission)));
-  const popularBrands = brands.slice(0, 7);
+  const trims = unique(optionCars.map((car) => car.trim));
+  const bodies = unique(optionCars.map((car) => car.body_type));
+  const drives = unique(optionCars.map((car) => car.drive_type));
+  const colors = unique(optionCars.map((car) => car.color));
+  const popularBrands = brands.slice(0, 12);
+  const brandCounts = optionCars.reduce<Record<string, number>>((counts, car) => {
+    if (car.brand) counts[car.brand] = (counts[car.brand] ?? 0) + 1;
+    return counts;
+  }, {});
   const activeCount = catalogActiveFilterCount(rawParams);
   const currentQuery = catalogQueryString(rawParams);
   const activeChips = buildActiveFilterChips(rawParams);
@@ -142,6 +161,10 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     modelsByBrand,
     fuels,
     transmissions,
+    trims,
+    bodies,
+    drives,
+    colors,
     under160,
     passable,
     clean: value("clean") === "1",
@@ -185,8 +208,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                       : catalogFilterHref(rawParams, { brand, model: null, page: null })}
                     key={brand}
                   >
-                    {selected ? <Check size={14} strokeWidth={3} /> : null}
+                    <BrandMark brand={brand} />
                     {brand}
+                    <span className="text-[#7a8798]">{brandCounts[brand] ?? 0}</span>
                     {selected ? <span aria-hidden="true">×</span> : null}
                   </Link>
                 );
@@ -266,6 +290,10 @@ type CatalogFilterFormProps = {
   modelsByBrand: Record<string, string[]>;
   fuels: string[];
   transmissions: string[];
+  trims: string[];
+  bodies: string[];
+  drives: string[];
+  colors: string[];
   under160: boolean;
   passable: boolean;
   clean: boolean;
@@ -285,6 +313,10 @@ function CatalogFilterForm({
   sort,
   totalCars,
   transmissions,
+  trims,
+  bodies,
+  drives,
+  colors,
   under160,
   value,
 }: CatalogFilterFormProps) {
@@ -298,17 +330,24 @@ function CatalogFilterForm({
       />
       <RangeField label="Год выпуска" maxName="yearMax" maxValue={value("yearMax")} minName="yearMin" minValue={value("yearMin")} />
       <RangeField label="Цена до Владивостока, ₽" maxName="priceMax" maxValue={value("priceMax")} minName="priceMin" minValue={value("priceMin")} />
-      <FilterInput label="Номер лота Encar" name="number" placeholder="Например, 42557447" value={value("number")} />
     </>
   );
 
   const additionalFields = (
     <>
       <FilterSelect label="Топливо" name="fuel" options={fuels} placeholder="Любое" translate={translateFuel} value={value("fuel")} />
-      {transmissions.length > 1 ? <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} /> : null}
+      <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} />
       <RangeField label="Объём двигателя, см3" maxName="engineMax" maxValue={value("engineMax")} minName="engineMin" minValue={value("engineMin")} />
       <FilterInput inputMode="numeric" label="Пробег до, км" name="mileageMax" placeholder="Например, 80 000" value={value("mileageMax")} />
+      <FilterInput inputMode="numeric" label="Пробег от, км" name="mileageMin" placeholder="Например, 10 000" value={value("mileageMin")} />
       <FilterInput inputMode="numeric" label="Мощность до, л.с." name="powerMax" placeholder="Например, 160" value={value("powerMax")} />
+      <FilterSelect label="Комплектация" name="trim" options={trims} placeholder="Любая" value={value("trim")} />
+      <FilterSelect label="Кузов" name="body" options={bodies} placeholder="Любой" translate={translateBody} value={value("body")} />
+      <FilterSelect label="Привод" name="drive" options={drives} placeholder="Любой" translate={translateDrive} value={value("drive")} />
+      <FilterSelect label="Цвет кузова" name="color" options={colors} placeholder="Любой" value={value("color")} />
+      <FilterSelect label="Месяц выпуска" name="month" options={Array.from({ length: 12 }, (_, index) => String(index + 1))} placeholder="Любой" translate={translateMonth} value={value("month")} />
+      <RangeField label="Количество владельцев" maxName="ownersMax" maxValue={value("ownersMax")} minName="ownersMin" minValue={value("ownersMin")} />
+      <RangeField label="Страховые выплаты, ₩" maxName="insuranceMax" maxValue={value("insuranceMax")} minName="insuranceMin" minValue={value("insuranceMin")} />
     </>
   );
 
@@ -340,6 +379,7 @@ function CatalogFilterForm({
           <FilterCheck checked={under160} label="До 160 л.с." name="under160" value="1" />
           <FilterCheck checked={passable} label="Проходные 3–5 лет" name="passable" value="1" />
           <FilterCheck checked={clean} label="Без ДТП" name="clean" value="1" />
+          <FilterCheck checked={value("noInsurance") === "1"} label="Без страховых выплат" name="noInsurance" value="1" />
         </div>
         {!mobile ? (
           <div className="flex items-end gap-3 md:col-span-2 xl:col-span-4">
@@ -494,7 +534,18 @@ function catalogActiveFilterCount(rawParams: Record<string, string | string[] | 
     "priceMin",
     "priceMax",
     "mileageMax",
+    "mileageMin",
     "powerMax",
+    "trim",
+    "body",
+    "drive",
+    "color",
+    "month",
+    "ownersMin",
+    "ownersMax",
+    "insuranceMin",
+    "insuranceMax",
+    "noInsurance",
     "source",
     "number",
     "under160",
@@ -526,10 +577,19 @@ function buildActiveFilterChips(rawParams: Record<string, string | string[] | un
   if (value("priceMin") || value("priceMax")) add("price", "Цена задана", { priceMin: null, priceMax: null, page: null });
   if (value("engineMin") || value("engineMax")) add("engine", "Объём задан", { engineMin: null, engineMax: null, page: null });
   if (value("mileageMax")) add("mileageMax", `До ${value("mileageMax")} км`);
+  if (value("mileageMin")) add("mileageMin", `От ${value("mileageMin")} км`);
   if (value("powerMax")) add("powerMax", `До ${value("powerMax")} л.с.`);
+  if (value("trim")) add("trim", `Комплектация: ${value("trim")}`);
+  if (value("body")) add("body", `Кузов: ${translateBody(value("body"))}`);
+  if (value("drive")) add("drive", `Привод: ${translateDrive(value("drive"))}`);
+  if (value("color")) add("color", `Цвет: ${value("color")}`);
+  if (value("month")) add("month", translateMonth(value("month")));
+  if (value("ownersMin") || value("ownersMax")) add("owners", `Владельцы ${value("ownersMin") || "от"}–${value("ownersMax") || "до"}`, { ownersMin: null, ownersMax: null, page: null });
+  if (value("insuranceMin") || value("insuranceMax")) add("insurance", "Сумма страховых задана", { insuranceMin: null, insuranceMax: null, page: null });
+  if (value("noInsurance")) add("noInsurance", "Без страховых выплат");
   if (value("under160")) add("under160", "До 160 л.с.");
   if (value("passable")) add("passable", "Проходные 3–5 лет");
-  if (value("clean")) add("clean", "Без страховых случаев");
+  if (value("clean")) add("clean", "Без ДТП");
   if (value("shelf")) add("shelf", shelfLabel(value("shelf")));
 
   return chips;
@@ -568,6 +628,38 @@ function isSort(value: string): value is keyof typeof sortLabels { return value 
 function numberParam(value: string) { const number = Number(value.replace(/\s/g, "")); return Number.isFinite(number) && number > 0 ? number : undefined; }
 function positiveInteger(value: string) { const number = Number(value); return Number.isInteger(number) && number > 0 ? number : undefined; }
 function unique(values: Array<string | null>) { return [...new Set(values.filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b, "ru")); }
+
+function translateBody(value: string) {
+  const labels: Record<string, string> = {
+    SUV: "Кроссовер",
+    sedan: "Седан",
+    Sedan: "Седан",
+    hatchback: "Хэтчбек",
+    wagon: "Универсал",
+    minivan: "Минивэн",
+    Спорткар: "Спорткар",
+    "Большой автомобиль": "Седан",
+    "Среднеразмерный автомобиль": "Седан",
+    "Компактный автомобиль": "Хэтчбек",
+    Микроавтомобиль: "Хэтчбек",
+  };
+  return labels[value] ?? value;
+}
+
+function translateDrive(value: string) {
+  const labels: Record<string, string> = { "2WD": "Передний или задний", "4WD": "Полный", AWD: "Полный", FWD: "Передний", RWD: "Задний" };
+  return labels[value] ?? value;
+}
+
+function translateMonth(value: string) {
+  const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+  return months[Number(value) - 1] ?? value;
+}
+
+function BrandMark({ brand }: { brand: string }) {
+  const initials = brand.replace(/[^A-Za-zА-Яа-я0-9]/g, "").slice(0, 3).toUpperCase();
+  return <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded-full border border-[#d7dee8] bg-[#f5f6f8] text-[9px] font-bold tracking-[-0.04em] text-[#273246]">{initials}</span>;
+}
 function transmissionFilterValue(value: string | null) {
   const raw = String(value ?? "").trim().toLowerCase();
   if (!raw) return null;

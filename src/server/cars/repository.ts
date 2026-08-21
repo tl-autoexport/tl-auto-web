@@ -104,9 +104,20 @@ export type CatalogFilters = {
   minYear?: number;
   maxYear?: number;
   maxMileageKm?: number;
+  minMileageKm?: number;
   minPriceRub?: number;
   maxPriceRub?: number;
+  registrationMonth?: number;
+  trim?: string;
+  bodyType?: string;
+  driveType?: string;
+  color?: string;
+  minOwners?: number;
+  maxOwners?: number;
   noAccidents?: boolean;
+  noInsurance?: boolean;
+  minInsurancePayoutKrw?: number;
+  maxInsurancePayoutKrw?: number;
   passable?: boolean;
   sourceId?: string;
   sort?: "fresh" | "price_asc" | "price_desc" | "mileage_asc" | "year_desc";
@@ -141,7 +152,15 @@ export type LatestCalculation = {
 
 export type CatalogFacetCar = Pick<
   CatalogCar,
-  "brand" | "model" | "fuel_type" | "transmission"
+  | "brand"
+  | "model"
+  | "trim"
+  | "body_type"
+  | "fuel_type"
+  | "transmission"
+  | "drive_type"
+  | "color"
+  | "owners_count"
 >;
 
 export type SitemapCar = Pick<
@@ -179,9 +198,20 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     minYear,
     maxYear,
     maxMileageKm,
+    minMileageKm,
     minPriceRub,
     maxPriceRub,
+    registrationMonth,
+    trim,
+    bodyType,
+    driveType,
+    color,
+    minOwners,
+    maxOwners,
     noAccidents,
+    noInsurance,
+    minInsurancePayoutKrw,
+    maxInsurancePayoutKrw,
     passable,
     sourceId,
     sort = "fresh",
@@ -206,10 +236,21 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   if (maxEngineCc) query = query.lte("engine_cc", maxEngineCc);
   if (minYear) query = query.gte("year", minYear);
   if (maxYear) query = query.lte("year", maxYear);
+  if (registrationMonth) query = query.eq("registration_month", registrationMonth);
+  if (trim) query = query.eq("trim", trim);
+  if (bodyType) query = query.eq("body_type", bodyType);
+  if (driveType) query = query.eq("drive_type", driveType);
+  if (color) query = query.eq("color", color);
+  if (minOwners) query = query.gte("owners_count", minOwners);
+  if (maxOwners) query = query.lte("owners_count", maxOwners);
+  if (minMileageKm) query = query.gte("mileage_km", minMileageKm);
   if (maxMileageKm) query = query.lte("mileage_km", maxMileageKm);
   if (minPriceRub) query = query.gte("price_rub", minPriceRub);
   if (maxPriceRub) query = query.lte("price_rub", maxPriceRub);
   if (noAccidents) query = query.eq("accident_count", 0);
+  if (noInsurance) query = query.eq("insurance_payout_count", 0);
+  if (minInsurancePayoutKrw) query = query.gte("insurance_payout_total_krw", minInsurancePayoutKrw);
+  if (maxInsurancePayoutKrw) query = query.lte("insurance_payout_total_krw", maxInsurancePayoutKrw);
   if (passable) query = query.or(passableFilterExpression());
   if (sourceId) query = query.eq("source_id", sourceId);
   const order = {
@@ -254,10 +295,21 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
   if (filters.maxEngineCc) query = query.lte("engine_cc", filters.maxEngineCc);
   if (filters.minYear) query = query.gte("year", filters.minYear);
   if (filters.maxYear) query = query.lte("year", filters.maxYear);
+  if (filters.registrationMonth) query = query.eq("registration_month", filters.registrationMonth);
+  if (filters.trim) query = query.eq("trim", filters.trim);
+  if (filters.bodyType) query = query.eq("body_type", filters.bodyType);
+  if (filters.driveType) query = query.eq("drive_type", filters.driveType);
+  if (filters.color) query = query.eq("color", filters.color);
+  if (filters.minOwners) query = query.gte("owners_count", filters.minOwners);
+  if (filters.maxOwners) query = query.lte("owners_count", filters.maxOwners);
+  if (filters.minMileageKm) query = query.gte("mileage_km", filters.minMileageKm);
   if (filters.maxMileageKm) query = query.lte("mileage_km", filters.maxMileageKm);
   if (filters.minPriceRub) query = query.gte("price_rub", filters.minPriceRub);
   if (filters.maxPriceRub) query = query.lte("price_rub", filters.maxPriceRub);
   if (filters.noAccidents) query = query.eq("accident_count", 0);
+  if (filters.noInsurance) query = query.eq("insurance_payout_count", 0);
+  if (filters.minInsurancePayoutKrw) query = query.gte("insurance_payout_total_krw", filters.minInsurancePayoutKrw);
+  if (filters.maxInsurancePayoutKrw) query = query.lte("insurance_payout_total_krw", filters.maxInsurancePayoutKrw);
   if (filters.passable) query = query.or(passableFilterExpression());
   if (filters.sourceId) query = query.eq("source_id", filters.sourceId);
 
@@ -445,10 +497,10 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
   for (let offset = 0; ; offset += pageSize) {
     const { data, error } = await supabase
       .from("cars")
-      .select("brand, model, fuel_type, transmission")
+      .select("brand, model, trim, body_type, fuel_type, transmission, drive_type, color, owners_count")
       .eq("is_available", true)
       .eq("primary_source", "encar")
-      .in("fuel_type", ["gasoline", "diesel"])
+      .in("fuel_type", ["gasoline", "diesel", "electric"])
       .not("price_rub", "is", null)
       .not("power_hp", "is", null)
       .order("id", { ascending: true })
@@ -469,7 +521,7 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
 
 const getCachedCatalogFacetCars = unstable_cache(
   fetchCatalogFacetCars,
-  ["catalog-filter-facets-v1"],
+  ["catalog-filter-facets-v2"],
   { revalidate: 3600 },
 );
 
