@@ -6,6 +6,8 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { PassoMediaGallery } from "@/components/catalog/PassoMediaGallery";
 import { getPassoStagingCar } from "@/server/cars/repository";
 import { carDisplayTitle } from "@/server/normalization/display";
+import { getCbrCalcRates } from "@/server/calc/rates";
+import { calculatePowersportsPrice } from "@/server/calc/powersports";
 
 const number = new Intl.NumberFormat("ru-RU");
 const date = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", year: "numeric" });
@@ -31,6 +33,11 @@ export default async function PassoCatalogItemPage({ params }: Props) {
   const typeLabel = isJetski ? "Гидроцикл" : car.vehicle_type === "scooter" ? "Скутер" : "Мотоцикл";
   const sourceName = source === "passo_boat" ? "Passo Boat" : "Passo Bike";
   const detailRows = buildDetailRows(car.vehicle_specs ?? {});
+  const rateSnapshot = await getCbrCalcRates().catch((error: unknown) => {
+    console.error("Unable to load powersports calculation rates", error);
+    return null;
+  });
+  const calculation = calculatePowersportsPrice(isJetski ? "jetski" : "motorcycle", car.price_krw, rateSnapshot?.rates ?? null);
 
   return (
     <main className="min-h-screen bg-[#f4f5f7] text-[#101827]">
@@ -55,6 +62,18 @@ export default async function PassoCatalogItemPage({ params }: Props) {
             <div className="mt-7 border-t border-[#edf0f4] pt-5">
               <p className="text-sm text-[#647084]">Цена в Корее</p>
               <p className="mt-1 text-3xl font-semibold">{car.price_krw != null ? `${number.format(car.price_krw)} ₩` : "Цена не указана"}</p>
+              {calculation.sourcePriceRub != null ? <p className="mt-1 text-sm text-[#647084]">≈ {number.format(calculation.sourcePriceRub)} ₽ по текущему курсу</p> : null}
+            </div>
+            <div className="mt-5 rounded-md bg-[#fbf7ed] p-4">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-sm text-[#647084]">Предварительно до Москвы</p>
+                <p className="text-2xl font-semibold text-[#101827]">{calculation.totalRub != null ? `${number.format(calculation.totalRub)} ₽` : "Расчёт уточняется"}</p>
+              </div>
+              <p className="mt-3 text-xs text-[#647084]">{calculation.routeAndClearanceUsd.toLocaleString("ru-RU")} $ — расходы в Корее, логистика, экспортные документы, доставка через Бишкек и до Москвы</p>
+              <div className="mt-3 grid gap-1.5 border-t border-[#eadfca] pt-3 text-xs text-[#55637a]">
+                {calculation.russianCosts.map((item) => <div className="flex justify-between gap-3" key={item.label}><span>{item.label}</span><span className="font-semibold">{number.format(item.amountRub)} ₽</span></div>)}
+              </div>
+              <p className="mt-3 text-[11px] leading-4 text-[#7a8798]">{calculation.disclaimer}</p>
             </div>
             {detailRows.length ? <div className="mt-6 grid gap-3 border-t border-[#edf0f4] pt-5 text-sm">{detailRows.map((row) => <InfoRow key={row.label} {...row} />)}</div> : null}
             {car.source_url ? <a className="mt-7 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded bg-[#101827] px-4 text-sm font-semibold text-white transition hover:bg-[#28344a]" href={car.source_url} target="_blank" rel="noopener noreferrer">Открыть оригинал Passo <ExternalLink size={15} /></a> : null}

@@ -34,6 +34,8 @@ import { MobileCatalogFilters } from "./MobileCatalogFilters";
 import { BrandModelFields } from "@/components/catalog/BrandModelFields";
 import { LiveCatalogCount } from "./LiveCatalogCount";
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
+import { getCbrCalcRates } from "@/server/calc/rates";
+import { calculatePowersportsPrice, type PowersportsCalculation } from "@/server/calc/powersports";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const date = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short" });
@@ -270,12 +272,17 @@ async function StagingCatalogPage({ category, page }: { category: StagingCatalog
   ]);
   const totalPages = Math.max(1, Math.ceil(totalCars / pageSize));
   const currentPage = Math.min(page, totalPages);
+  const rateSnapshot = await getCbrCalcRates().catch((error: unknown) => {
+    console.error("Unable to load powersports calculation rates", error);
+    return null;
+  });
+  const calculationRates = rateSnapshot?.rates ?? null;
   const labels = {
     motorcycle: { eyebrow: "Passo Bike", title: "Мототехника из Кореи", description: "Свежие объявления мотоциклов и скутеров с характеристиками и фотографиями из Passo." },
     scooter: { eyebrow: "Passo Bike", title: "Скутеры из Кореи", description: "Свежие объявления скутеров с характеристиками и фотографиями из Passo." },
     jetski: { eyebrow: "Passo Boat", title: "Гидроциклы из Кореи", description: "Только гидроциклы из раздела Passo. Лодки и яхты исключены." },
   }[category];
-  return <main className="min-h-screen bg-[#f5f6f8] text-[#101827]"><SiteHeader /><CatalogCategoryTabs active={category} /><section className="border-b border-[#dce2eb] bg-white"><div className="mx-auto max-w-7xl px-4 py-7 sm:px-5 md:py-10"><p className="text-xs font-semibold text-[#956f2c] sm:text-sm">{labels.eyebrow}</p><div className="mt-1.5 flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><h1 className="text-[32px] font-semibold leading-tight sm:text-4xl">{labels.title}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-[#647084]">{labels.description}</p></div><div className="rounded-full bg-[#f5f0e4] px-4 py-2 text-sm text-[#7b5a22]"><strong className="mr-1 text-xl text-[#101827]">{totalCars}</strong> объявлений</div></div></div></section><section className="mx-auto max-w-7xl px-3 py-8 sm:px-5"><div className="mb-5 flex items-center justify-between border-b border-[#dce2eb] pb-4 text-sm text-[#647084]"><span>Показано {shownCars.length ? `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, totalCars)} из ${totalCars}` : "0 объявлений"}</span><span>Сначала свежие объявления</span></div>{shownCars.length ? <><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{shownCars.map((car) => <CatalogResultCard key={car.id} car={car} />)}</div>{totalPages > 1 ? <Pagination currentPage={currentPage} rawParams={{ category }} totalPages={totalPages} /> : null}</> : <EmptyState />}</section></main>;
+  return <main className="min-h-screen bg-[#f5f6f8] text-[#101827]"><SiteHeader /><CatalogCategoryTabs active={category} /><section className="border-b border-[#dce2eb] bg-white"><div className="mx-auto max-w-7xl px-4 py-7 sm:px-5 md:py-10"><p className="text-xs font-semibold text-[#956f2c] sm:text-sm">{labels.eyebrow}</p><div className="mt-1.5 flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><h1 className="text-[32px] font-semibold leading-tight sm:text-4xl">{labels.title}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-[#647084]">{labels.description}</p></div><div className="rounded-full bg-[#f5f0e4] px-4 py-2 text-sm text-[#7b5a22]"><strong className="mr-1 text-xl text-[#101827]">{totalCars}</strong> объявлений</div></div></div></section><section className="mx-auto max-w-7xl px-3 py-8 sm:px-5"><div className="mb-5 flex items-center justify-between border-b border-[#dce2eb] pb-4 text-sm text-[#647084]"><span>Показано {shownCars.length ? `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, totalCars)} из ${totalCars}` : "0 объявлений"}</span><span>Сначала свежие объявления</span></div>{shownCars.length ? <><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{shownCars.map((car) => <CatalogResultCard key={car.id} car={car} calculationRates={calculationRates} />)}</div>{totalPages > 1 ? <Pagination currentPage={currentPage} rawParams={{ category }} totalPages={totalPages} /> : null}</> : <EmptyState />}</section></main>;
 }
 
 function CatalogCategoryTabs({ active }: { active: "car" | StagingCatalogType }) {
@@ -403,12 +410,12 @@ function CatalogFilterForm({
   );
 }
 
-function CatalogResultCard({ car }: { car: CatalogCar }) {
+function CatalogResultCard({ car, calculationRates }: { car: CatalogCar; calculationRates?: import("@/server/calc/types").CalcRates | null }) {
   if (!car.primary_source.startsWith("passo_")) return <PrototypeVehicleCard car={car} />;
-  return <CatalogCard car={car} highPriority={false} />;
+  return <CatalogCard car={car} highPriority={false} calculationRates={calculationRates} />;
 }
 
-function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boolean }) {
+function CatalogCard({ car, highPriority, calculationRates }: { car: CatalogCar; highPriority: boolean; calculationRates?: import("@/server/calc/types").CalcRates | null }) {
   const photo = getPrimaryPhoto(car);
   const isPasso = car.primary_source.startsWith("passo_");
   const passoSpecs = car.vehicle_specs ?? {};
@@ -420,6 +427,9 @@ function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boo
   ].filter((value): value is string => Boolean(value));
   const detailsHref = isPasso ? `/catalog/item/${car.primary_source}/${car.source_id}` : `/cars/${car.primary_source}/${car.source_id}`;
   const sourceName = sourceDisplayName(car.primary_source);
+  const calculation: PowersportsCalculation | null = calculationRates
+    ? calculatePowersportsPrice(car.vehicle_type === "jetski" ? "jetski" : "motorcycle", car.price_krw, calculationRates)
+    : null;
 
   return (
     <article className="group overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-[#d8dde6] transition hover:-translate-y-0.5 hover:shadow-md">
@@ -448,7 +458,7 @@ function CatalogCard({ car, highPriority }: { car: CatalogCar; highPriority: boo
         <Link href={detailsHref}><h2 className="line-clamp-2 text-lg font-semibold transition group-hover:text-[#956f2c]">{carDisplayTitle(car)}</h2></Link>
         <p className="mt-2 text-sm text-[#647084]">{car.year ? `${car.year} г.` : "-"} · {car.mileage_km ? `${rub.format(car.mileage_km)} км` : "Пробег не указан"}{isPasso && typeof passoSpecs.category === "string" ? ` · ${passoSpecs.category}` : isPasso ? "" : ` · ${translateFuel(car.fuel_type)}`}</p>
         {isPasso && passoFacts.length ? <p className="mt-2 line-clamp-1 text-xs font-medium text-[#445276]">{passoFacts.join(" · ")}</p> : null}
-        <div className="mt-4 flex items-end justify-between gap-3"><div><p className="text-xs text-[#647084]">{isPasso ? "Цена в Корее" : "до Владивостока"}</p><p className="whitespace-nowrap text-xl font-semibold">{isPasso ? `${rub.format(car.price_krw ?? 0)} ₩` : `${rub.format(car.price_rub ?? 0)} ₽`}</p></div><div className="flex items-center gap-1 text-sm text-[#647084]"><Gauge size={16} />{isPasso ? (car.vehicle_specs?.power_hp ? `${car.vehicle_specs.power_hp} л.с.` : "") : `${car.power_hp ?? "-"} л.с.`}</div></div>
+        <div className="mt-4 flex items-end justify-between gap-3"><div><p className="text-xs text-[#647084]">{isPasso ? "Ориентировочно до Москвы" : "до Владивостока"}</p><p className="whitespace-nowrap text-xl font-semibold">{isPasso ? (calculation?.totalRub != null ? `${rub.format(calculation.totalRub)} ₽` : "Расчёт уточняется") : `${rub.format(car.price_rub ?? 0)} ₽`}</p>{isPasso && car.price_krw != null ? <p className="mt-1 text-[11px] text-[#7a8798]">Цена в Корее: {rub.format(car.price_krw)} ₩</p> : null}</div><div className="flex items-center gap-1 text-sm text-[#647084]"><Gauge size={16} />{isPasso ? (car.vehicle_specs?.power_hp ? `${car.vehicle_specs.power_hp} л.с.` : "") : `${car.power_hp ?? "-"} л.с.`}</div></div>
         <div className="mt-4 flex items-center justify-between border-t border-[#edf0f4] pt-3 text-xs font-medium text-[#647084]"><span className="inline-flex items-center gap-1"><ShieldCheck size={14} className={isPasso ? "text-[#16727a]" : "text-[#a98239]"} /> {isPasso ? "Проверено Passo" : "Расчёт РФ"}</span><span>{formatUpdate(car.source_updated_at)}</span></div>
         <div className="mt-2 flex min-h-8 items-center justify-between gap-3 border-t border-[#edf0f4] pt-2 text-xs">
           <span className="truncate text-[#7a8798]">Лот {car.source_id}</span>
