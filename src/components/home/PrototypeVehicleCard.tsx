@@ -65,6 +65,7 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
     car.engine_cc ? `${engine.format(car.engine_cc / 1000)} л` : null,
     car.transmission,
     car.year ? `${car.year} г.` : null,
+    car.mileage_km ? `${rub.format(car.mileage_km)} км` : null,
   ].filter((value): value is string => Boolean(value));
   const secondaryFacts = [
     car.trim || car.badge,
@@ -114,20 +115,20 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
           <p className="mt-1 text-sm text-[#647084]">Цена под ключ до Владивостока</p>
         </div>
 
-        <h3 className="mt-4 block text-xl font-bold leading-tight text-[#101827] transition hover:text-[#956f2c]">
-          {primaryFacts.length ? primaryFacts.slice(0, 2).join(" ") : title}
+        <h3 className="mt-4 flex flex-wrap items-center gap-2 text-xl font-bold leading-tight text-[#101827] transition hover:text-[#956f2c]">
+          <span>{primaryFacts.length ? primaryFacts.slice(0, 2).join(" ") : title}</span>
+          {car.year ? <span className="rounded-full border border-[#cfd6e0] px-2.5 py-1 text-sm font-medium text-[#4e5b6d]">{car.year}</span> : null}
         </h3>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {car.accident_count === 0 ? <span className="rounded-full bg-[#e8f5ef] px-2.5 py-1 text-xs font-semibold text-[#18794e]">Без ДТП</span> : null}
+          {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? <span className="rounded-full bg-[#fff2e5] px-2.5 py-1 text-xs font-semibold text-[#9a5b1c]">Страховые выплаты: {car.insurance_payout_count}</span> : null}
+        </div>
         <p className="mt-2 text-sm leading-6 text-[#273246]">
           {primaryFacts.slice(2).join(" · ") || "Основные характеристики уточняются"}
         </p>
         <p className="mt-2 text-sm leading-6 text-[#273246]">
           {secondaryFacts.join(" · ") || "Комплектация уточняется"}
         </p>
-
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {car.accident_count === 0 ? <span className="rounded-full bg-[#e8f5ef] px-2.5 py-1 text-xs font-semibold text-[#18794e]">Без ДТП</span> : null}
-          {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? <span className="rounded-full bg-[#fff2e5] px-2.5 py-1 text-xs font-semibold text-[#9a5b1c]">Страховые выплаты: {car.insurance_payout_count}</span> : null}
-        </div>
       </div>
 
       <div className="relative z-10 grid grid-cols-3 border-y border-[#f0e4e4] bg-[#fff8f7] text-xs font-semibold text-[#ba4b42]">
