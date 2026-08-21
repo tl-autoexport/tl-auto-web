@@ -18,6 +18,7 @@
     "dry-run:passo": "tsx scripts/passo-import-dry-run.ts",
     "stage:passo": "tsx scripts/pilot-passo.ts",
     "import:passo:staging": "tsx scripts/import-passo-staging.ts",
+    "backfill:passo:media": "tsx scripts/backfill-passo-media.ts",
     "audit:calculation-coverage": "tsx scripts/audit-calculation-coverage.ts",
     "audit:database": "tsx scripts/audit-supabase-usage.ts",
     "deduplicate:encar": "tsx scripts/deduplicate-encar-catalog.ts",

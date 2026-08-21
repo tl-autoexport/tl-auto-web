@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
 import { config } from "dotenv";
+import { createPassoMediaClient, ensurePassoMediaBucket, mirrorPassoImages } from "./passo-media-mirror";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -34,11 +35,30 @@ async function main() {
   if (records.length !== 20) throw new Error(`Expected exactly 20 validated pilot records, got ${records.length}`);
   if (records.some((record) => !["motorcycle", "scooter", "jetski"].includes(record.vehicleType))) throw new Error("Pilot contains unsupported vehicle type");
 
+  const supabase = createPassoMediaClient();
+  await ensurePassoMediaBucket(supabase);
+  let mirrored = 0;
+  let reused = 0;
+  let failed = 0;
+  const preparedRecords = [];
+  for (const record of records) {
+    const media = await mirrorPassoImages({
+      supabase,
+      source: record.source,
+      sourceId: record.sourceId,
+      imageUrls: record.imageUrls,
+    });
+    mirrored += media.mirrored;
+    reused += media.reused;
+    failed += media.failed;
+    preparedRecords.push({ record, imageUrls: media.items });
+  }
+
   const client = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await client.connect();
   try {
     await client.query("begin");
-    for (const record of records) {
+    for (const { record, imageUrls } of preparedRecords) {
       await client.query(
         `insert into public.passo_catalog_staging
           (source, source_id, source_url, vehicle_type, source_updated_at, brand, model, year,
@@ -71,14 +91,14 @@ async function main() {
           record.mileageKm,
           record.priceKrw,
           JSON.stringify(record.vehicleSpecs),
-          JSON.stringify(record.imageUrls.map((url, index) => ({ url, is_primary: index === 0, sort_order: index }))),
+          JSON.stringify(imageUrls),
           record.rejectedReason ? [record.rejectedReason] : [],
           "passo-pilot-v2",
         ],
       );
     }
     await client.query("commit");
-    console.log(JSON.stringify({ written: records.length, table: "public.passo_catalog_staging", sources: { passo_bike: records.filter((r) => r.source === "passo_bike").length, passo_boat: records.filter((r) => r.source === "passo_boat").length } }, null, 2));
+    console.log(JSON.stringify({ written: records.length, mirrored, reused, failed, table: "public.passo_catalog_staging", sources: { passo_bike: records.filter((r) => r.source === "passo_bike").length, passo_boat: records.filter((r) => r.source === "passo_boat").length } }, null, 2));
   } catch (error) {
     await client.query("rollback");
     throw error;
