@@ -80,6 +80,24 @@ export function SiteFooter() {
               Instagram @tl_auto_export
               <ExternalLink size={13} aria-hidden="true" />
             </a>
+            <a
+              className="inline-flex items-center gap-1.5 text-white/72 transition hover:text-white"
+              href={CLIENT_CONTACT.youtubeUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              YouTube TL Auto
+              <ExternalLink size={13} aria-hidden="true" />
+            </a>
+            <a
+              className="inline-flex items-center gap-1.5 text-white/72 transition hover:text-white"
+              href={CLIENT_CONTACT.tiktokUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              TikTok @tl_auto
+              <ExternalLink size={13} aria-hidden="true" />
+            </a>
           </div>
         </div>
       </div>

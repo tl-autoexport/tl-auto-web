@@ -45,13 +45,14 @@ const topLinks = [
 
 const clientWhatsAppPhone = "+82 10 7626 0741";
 
-type SocialKind = "telegram" | "whatsapp" | "youtube" | "instagram" | "vk";
+type SocialKind = "telegram" | "whatsapp" | "youtube" | "instagram" | "tiktok" | "vk";
 
 const socialLinks = [
   { label: "Telegram", href: "https://t.me/TL_Auto_export", kind: "telegram" },
   { label: "WhatsApp", href: `https://wa.me/${CLIENT_CONTACT.whatsappCarPhone}`, kind: "whatsapp" },
-  { label: "YouTube", href: null, kind: "youtube" },
+  { label: "YouTube", href: CLIENT_CONTACT.youtubeUrl, kind: "youtube" },
   { label: "Instagram", href: CLIENT_CONTACT.instagramUrl, kind: "instagram" },
+  { label: "TikTok", href: CLIENT_CONTACT.tiktokUrl, kind: "tiktok" },
   { label: "VK", href: null, kind: "vk" },
 ] as const;
 
@@ -117,6 +118,14 @@ function SocialIcon({ kind, size = 17 }: { kind: SocialKind; size?: number }) {
         <rect height="16.5" rx="4.5" stroke="currentColor" strokeWidth="1.8" width="16.5" x="3.75" y="3.75" />
         <circle cx="12" cy="12" r="3.8" stroke="currentColor" strokeWidth="1.8" />
         <circle cx="17.7" cy="6.45" fill="currentColor" r="1.05" />
+      </svg>
+    );
+  }
+
+  if (kind === "tiktok") {
+    return (
+      <svg {...commonProps} fill="currentColor">
+        <path d="M15.6 3.2h2.7c.3 2.1 1.5 3.6 3.7 4.2v2.8c-1.5 0-2.8-.4-3.9-1.1v5.6a5.1 5.1 0 1 1-5.1-5.1c.3 0 .7 0 1 .1v2.8a2.4 2.4 0 1 0 1.4 2.2V3.2h.2Z" />
       </svg>
     );
   }

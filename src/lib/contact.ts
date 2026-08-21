@@ -5,6 +5,8 @@ export const CLIENT_CONTACT = {
   whatsappCarLabel: "Заявка на авто 🚘",
   whatsappPowersportsLabel: "Заявка на гидроциклы и мототехнику",
   instagramUrl: "https://www.instagram.com/tl_auto_export/",
+  youtubeUrl: "https://youtube.com/@tl_auto_export?si=8VYlz-wvmUO87cuF",
+  tiktokUrl: "https://www.tiktok.com/@tl_auto?_r=1&_t=ZS-992jL22Sud2",
 } as const;
 
 export const GENERAL_CLIENT_MESSAGE =
