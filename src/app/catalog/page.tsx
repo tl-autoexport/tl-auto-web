@@ -145,7 +145,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const fuels = unique(optionCars.map((car) => car.fuel_type));
   const transmissions = unique(optionCars.map((car) => transmissionFilterValue(car.transmission)));
   const trims = unique(optionCars.map((car) => car.trim));
-  const bodies = unique(optionCars.map((car) => car.body_type));
+  const bodies = unique(optionCars.map((car) => car.body_type).map((body) => body ? translateBody(body) : null));
   const drives = unique(optionCars.map((car) => car.drive_type));
   const colors = unique(optionCars.map((car) => car.color));
   const popularBrands = brands.slice(0, 12);

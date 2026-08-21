@@ -238,7 +238,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   if (maxYear) query = query.lte("year", maxYear);
   if (registrationMonth) query = query.eq("registration_month", registrationMonth);
   if (trim) query = query.eq("trim", trim);
-  if (bodyType) query = query.eq("body_type", bodyType);
+  if (bodyType) query = query.in("body_type", bodyTypeValues(bodyType));
   if (driveType) query = query.eq("drive_type", driveType);
   if (color) query = query.eq("color", color);
   if (minOwners) query = query.gte("owners_count", minOwners);
@@ -297,7 +297,7 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
   if (filters.maxYear) query = query.lte("year", filters.maxYear);
   if (filters.registrationMonth) query = query.eq("registration_month", filters.registrationMonth);
   if (filters.trim) query = query.eq("trim", filters.trim);
-  if (filters.bodyType) query = query.eq("body_type", filters.bodyType);
+  if (filters.bodyType) query = query.in("body_type", bodyTypeValues(filters.bodyType));
   if (filters.driveType) query = query.eq("drive_type", filters.driveType);
   if (filters.color) query = query.eq("color", filters.color);
   if (filters.minOwners) query = query.gte("owners_count", filters.minOwners);
@@ -730,6 +730,19 @@ function transmissionValues(value: string) {
     manual: ["manual", "Механика", "수동", "수동(M/T)"],
     cvt: ["cvt"],
     dct: ["dct"],
+  };
+
+  return groups[value] ?? [value];
+}
+
+function bodyTypeValues(value: string) {
+  const groups: Record<string, string[]> = {
+    "Седан": ["Большой автомобиль", "Среднеразмерный автомобиль", "sedan", "Sedan"],
+    "Хэтчбек": ["Компактный автомобиль", "Микроавтомобиль", "hatchback"],
+    "Кроссовер": ["SUV"],
+    "Универсал": ["wagon"],
+    "Минивэн": ["Минивэн", "minivan"],
+    "Спорткар": ["Спорткар"],
   };
 
   return groups[value] ?? [value];
