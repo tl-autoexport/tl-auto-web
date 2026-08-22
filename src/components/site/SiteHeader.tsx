@@ -46,10 +46,11 @@ const topLinks = [
 
 const clientWhatsAppPhone = "+82 10 7626 0741";
 
-type SocialKind = "telegram" | "whatsapp" | "youtube" | "instagram" | "tiktok" | "vk";
+type SocialKind = "telegram" | "max" | "whatsapp" | "youtube" | "instagram" | "tiktok" | "vk";
 
 const socialLinks = [
   { label: "Telegram", href: "https://t.me/TL_Auto_export", kind: "telegram" },
+  { label: "MAX", href: CLIENT_CONTACT.maxUrl, kind: "max" },
   { label: "WhatsApp", href: `https://wa.me/${CLIENT_CONTACT.whatsappCarPhone}`, kind: "whatsapp" },
   { label: "YouTube", href: CLIENT_CONTACT.youtubeUrl, kind: "youtube" },
   { label: "Instagram", href: CLIENT_CONTACT.instagramUrl, kind: "instagram" },
@@ -87,6 +88,10 @@ function SocialIcon({ kind, size = 17 }: { kind: SocialKind; size?: number }) {
     viewBox: "0 0 24 24",
     width: size,
   } as const;
+
+  if (kind === "max") {
+    return <span aria-hidden="true" className="font-black leading-none tracking-[-0.08em]" style={{ fontSize: Math.max(10, size - 3) }}>MAX</span>;
+  }
 
   if (kind === "telegram") {
     return (
@@ -143,6 +148,7 @@ export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [desktopUtilityHidden, setDesktopUtilityHidden] = useState(false);
+  const [mobileUtilityHidden, setMobileUtilityHidden] = useState(false);
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
 
   const openContact = () => {
@@ -197,6 +203,7 @@ export function SiteHeader() {
 
   useEffect(() => {
     let ticking = false;
+    let lastScrollY = window.scrollY;
 
     const updateHeader = () => {
       const currentScrollY = window.scrollY;
@@ -211,13 +218,14 @@ export function SiteHeader() {
           setDesktopUtilityHidden(false);
         }
       } else {
-        // Keep the mobile header in the document flow. The quick catalog nav
-        // is sticky below this row, so hiding the header with transform makes
-        // Safari compose two different sticky layers and causes content to
-        // flash through while scrolling.
+        const scrollDelta = currentScrollY - lastScrollY;
+        if (currentScrollY <= 12) setMobileUtilityHidden(false);
+        else if (scrollDelta > 4) setMobileUtilityHidden(true);
+        else if (scrollDelta < -4) setMobileUtilityHidden(false);
         setDesktopUtilityHidden(false);
       }
 
+      lastScrollY = currentScrollY;
       ticking = false;
     };
 
@@ -262,6 +270,19 @@ export function SiteHeader() {
               <span key={label} role="img" aria-label={`${label}: ссылка появится позже`} className="cursor-default opacity-80" title="Ссылка появится позже">
                 <SocialIcon kind={kind} />
               </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={`flex max-h-11 overflow-hidden bg-[#07528b] text-white transition-[max-height,opacity] duration-200 lg:hidden ${mobileUtilityHidden ? "max-h-0 opacity-0" : "max-h-11 opacity-100"}`}
+      >
+        <div className="mx-auto flex min-h-11 w-full items-center justify-between gap-3 px-4 text-xs font-medium">
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap"><Globe2 size={16} /> Русский <ChevronDown size={13} /></span>
+          <div className="flex items-center gap-4">
+            {socialLinks.filter(({ href }) => href).map(({ href, kind, label }) => (
+              <a key={label} href={href!} aria-label={label} className="transition hover:text-[#f6d37a]" rel="noreferrer" target="_blank"><SocialIcon kind={kind} size={18} /></a>
             ))}
           </div>
         </div>
