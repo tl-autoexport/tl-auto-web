@@ -60,8 +60,6 @@ const socialLinks = [
 
 const CONTACT_PROMPT_SESSION_KEY = "tl-auto-contact-prompt-v1-shown";
 const CONTACT_PROMPT_DELAY_MS = 45_000;
-const DESKTOP_UTILITY_HIDE_AFTER = 84;
-const DESKTOP_UTILITY_SHOW_BEFORE = 24;
 
 function contactPromptWasShown() {
   try {
@@ -147,8 +145,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
-  const [desktopUtilityHidden, setDesktopUtilityHidden] = useState(false);
-  const [mobileUtilityHidden, setMobileUtilityHidden] = useState(false);
+  const mobileUtilityRef = useRef<HTMLDivElement>(null);
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
 
   const openContact = () => {
@@ -203,64 +200,33 @@ export function SiteHeader() {
 
   useEffect(() => {
     let ticking = false;
-    let lastScrollY = window.scrollY;
 
-    const updateHeader = () => {
-      const currentScrollY = window.scrollY;
-
-      if (window.innerWidth >= 1024) {
-        // Do not toggle the utility row on every tiny change of scroll
-        // direction. Trackpads naturally emit alternating scroll deltas,
-        // which previously made both header rows jump between their heights.
-        if (currentScrollY >= DESKTOP_UTILITY_HIDE_AFTER) {
-          setDesktopUtilityHidden(true);
-        } else if (currentScrollY <= DESKTOP_UTILITY_SHOW_BEFORE) {
-          setDesktopUtilityHidden(false);
-        }
-      } else {
-        const scrollDelta = currentScrollY - lastScrollY;
-        if (currentScrollY <= 12) setMobileUtilityHidden(false);
-        else if (scrollDelta > 4) setMobileUtilityHidden(true);
-        else if (scrollDelta < -4) setMobileUtilityHidden(false);
-        setDesktopUtilityHidden(false);
+    const updateUtilityOpacity = () => {
+      const utility = mobileUtilityRef.current;
+      if (utility) {
+        const progress = Math.min(Math.max(window.scrollY / 40, 0), 1);
+        utility.style.opacity = String(1 - progress);
       }
-
-      lastScrollY = currentScrollY;
       ticking = false;
     };
 
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
-      window.requestAnimationFrame(updateHeader);
+      window.requestAnimationFrame(updateUtilityOpacity);
     };
 
+    updateUtilityOpacity();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", updateHeader);
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", updateHeader);
     };
   }, []);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    root.style.setProperty("--site-header-mobile-offset", mobileUtilityHidden ? "68px" : "112px");
-    root.style.setProperty("--site-header-mobile-offset-sm", mobileUtilityHidden ? "74px" : "118px");
-    return () => {
-      root.style.removeProperty("--site-header-mobile-offset");
-      root.style.removeProperty("--site-header-mobile-offset-sm");
-    };
-  }, [mobileUtilityHidden]);
-
   return (
-    <header
-      className="sticky top-0 z-50 border-b border-[#d9e5ef] bg-white text-[#111827] shadow-[0_4px_16px_rgba(15,53,84,0.08)]"
-    >
+    <>
       <div
-        className={`hidden overflow-hidden border-b border-[#0a4778] bg-[#07528b] text-white transition-[max-height,opacity] duration-200 lg:block ${
-          desktopUtilityHidden ? "lg:max-h-0 lg:border-b-0 lg:opacity-0" : "lg:max-h-[42px] lg:opacity-100"
-        }`}
+        className="hidden border-b border-[#0a4778] bg-[#07528b] text-white lg:block"
       >
         <div className="mx-auto flex min-h-[42px] max-w-[1440px] items-center justify-between gap-5 px-6 text-[12px] font-medium xl:px-8">
           <div className="flex items-center gap-4">
@@ -286,7 +252,8 @@ export function SiteHeader() {
       </div>
 
       <div
-        className={`flex max-h-11 overflow-hidden bg-[#07528b] text-white transition-[max-height,opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[max-height,opacity,transform] lg:hidden ${mobileUtilityHidden ? "max-h-0 -translate-y-1 opacity-0" : "max-h-11 translate-y-0 opacity-100"}`}
+        ref={mobileUtilityRef}
+        className="flex h-11 bg-[#07528b] text-white will-change-[opacity] lg:hidden"
       >
         <div className="mx-auto flex min-h-11 w-full items-center justify-between gap-3 px-4 text-xs font-medium">
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap"><Globe2 size={16} /> Русский <ChevronDown size={13} /></span>
@@ -298,33 +265,34 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="mx-auto flex min-h-[68px] max-w-[1440px] items-center justify-between gap-3 bg-white px-4 sm:min-h-[74px] sm:px-6 lg:min-h-[76px] xl:px-8">
-        <Brand />
+      <header className="sticky top-0 z-50 border-b border-[#d9e5ef] bg-white text-[#111827] shadow-[0_4px_16px_rgba(15,53,84,0.08)]">
+        <div className="mx-auto flex min-h-[68px] max-w-[1440px] items-center justify-between gap-3 bg-white px-4 sm:min-h-[74px] sm:px-6 lg:min-h-[76px] xl:px-8">
+          <Brand />
 
-        <nav aria-label="Каталоги" className="hidden items-center gap-5 text-[14px] font-semibold text-[#171717] xl:flex 2xl:gap-7 2xl:text-[15px]">
-          {catalogLinks.map((item) => item.pending ? (
-            <span key={item.label} className="inline-flex items-center gap-1.5 text-[#7d8791]" title="Раздел готовится">{item.label}<span className="rounded bg-[#eef2f5] px-1.5 py-0.5 text-[9px] uppercase tracking-wide">Скоро</span></span>
-          ) : <Link key={item.label} href={item.href} className="whitespace-nowrap transition hover:text-[#07528b]">{item.label}</Link>)}
-        </nav>
+          <nav aria-label="Каталоги" className="hidden items-center gap-5 text-[14px] font-semibold text-[#171717] xl:flex 2xl:gap-7 2xl:text-[15px]">
+            {catalogLinks.map((item) => item.pending ? (
+              <span key={item.label} className="inline-flex items-center gap-1.5 text-[#7d8791]" title="Раздел готовится">{item.label}<span className="rounded bg-[#eef2f5] px-1.5 py-0.5 text-[9px] uppercase tracking-wide">Скоро</span></span>
+            ) : <Link key={item.label} href={item.href} className="whitespace-nowrap transition hover:text-[#07528b]">{item.label}</Link>)}
+          </nav>
 
-        <div className="hidden items-center gap-3 sm:flex">
-          <a className="hidden items-center gap-2.5 xl:flex" href={`https://wa.me/${CLIENT_CONTACT.whatsappCarPhone}`} rel="noreferrer" target="_blank">
-            <span className="flex size-10 items-center justify-center rounded-full bg-[#293448] text-white"><SocialIcon kind="whatsapp" size={19} /></span>
-            <span className="leading-tight"><span className="block text-[16px] font-bold text-[#171717]">{clientWhatsAppPhone}</span><span className="block text-[12px] text-[#07528b]">Написать в WhatsApp</span></span>
-          </a>
+          <div className="hidden items-center gap-3 sm:flex">
+            <a className="hidden items-center gap-2.5 xl:flex" href={`https://wa.me/${CLIENT_CONTACT.whatsappCarPhone}`} rel="noreferrer" target="_blank">
+              <span className="flex size-10 items-center justify-center rounded-full bg-[#293448] text-white"><SocialIcon kind="whatsapp" size={19} /></span>
+              <span className="leading-tight"><span className="block text-[16px] font-bold text-[#171717]">{clientWhatsAppPhone}</span><span className="block text-[12px] text-[#07528b]">Написать в WhatsApp</span></span>
+            </a>
+          </div>
+          <button
+            ref={mobileMenuButtonRef}
+            aria-controls="mobile-navigation"
+            aria-expanded={mobileOpen}
+            aria-label={mobileOpen ? "Закрыть меню" : "Открыть меню"}
+            className="flex size-9 items-center justify-center rounded-md border border-[#c8d7e4] bg-white text-[#293448] sm:hidden"
+            onClick={() => setMobileOpen((open) => !open)}
+            type="button"
+          >
+            {mobileOpen ? <X size={21} /> : <Menu size={21} />}
+          </button>
         </div>
-        <button
-          ref={mobileMenuButtonRef}
-          aria-controls="mobile-navigation"
-          aria-expanded={mobileOpen}
-          aria-label={mobileOpen ? "Закрыть меню" : "Открыть меню"}
-          className="flex size-9 items-center justify-center rounded-md border border-[#c8d7e4] bg-white text-[#293448] sm:hidden"
-          onClick={() => setMobileOpen((open) => !open)}
-          type="button"
-        >
-          {mobileOpen ? <X size={21} /> : <Menu size={21} />}
-        </button>
-      </div>
 
       {mobileOpen && (
         <div
@@ -371,9 +339,10 @@ export function SiteHeader() {
 
         </div>
       )}
-      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
-      <FloatingMessengerWidget />
-    </header>
+        <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
+        <FloatingMessengerWidget />
+      </header>
+    </>
   );
 }
 
