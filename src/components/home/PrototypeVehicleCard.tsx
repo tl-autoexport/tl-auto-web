@@ -8,6 +8,7 @@ import {
   Share2,
 } from "lucide-react";
 import { RemoteImage } from "@/components/site/RemoteImage";
+import { useDestination } from "@/components/site/DestinationProvider";
 import { vehicleClientMessage, whatsappContactUrl } from "@/lib/contact";
 import { translateFuel } from "@/server/normalization/display";
 import type { CatalogCar } from "@/server/cars/repository";
@@ -44,6 +45,7 @@ function daysOnSale(car: CatalogCar) {
 }
 
 export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
+  const { country, city } = useDestination();
   const photos = useMemo(
     () => (car.car_media ?? [])
       .filter((media) => media.media_type === "image")
@@ -73,6 +75,13 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
     seats ?? "Места уточняются",
   ].filter((value): value is string => Boolean(value));
   const saleDays = daysOnSale(car);
+  const isVladivostokPrice = country.countryCode === "RU" && city.id === "vladivostok";
+  const pendingPriceLabel = country.countryCode === "KZ" && city.id === "almaty"
+    ? "Расчёт до Алматы уточняется"
+    : `Расчёт до ${city.label} уточняется`;
+  const pendingPriceMeta = country.countryCode === "KZ"
+    ? "В тенге · с доставкой · без таможни"
+    : `Тариф для направления ${country.countryLabel} уточняется`;
 
   const share = async () => {
     const shareData = { title, text: `Автомобиль ${title} в каталоге TL Auto`, url: window.location.origin + detailsHref };
@@ -103,8 +112,17 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
 
       <div className="pointer-events-none relative z-10 flex-1 p-2.5 sm:p-4">
         <div>
-          <p className="text-xl font-bold tabular-nums text-[#101827] sm:text-2xl">{rub.format(car.price_rub ?? 0)} ₽</p>
-          <p className="mt-0.5 text-xs text-[#647084] sm:mt-1 sm:text-sm">Цена под ключ до Владивостока</p>
+          {isVladivostokPrice ? (
+            <>
+              <p className="text-xl font-bold tabular-nums text-[#101827] sm:text-2xl">{rub.format(car.price_rub ?? 0)} ₽</p>
+              <p className="mt-0.5 text-xs text-[#647084] sm:mt-1 sm:text-sm">Цена под ключ до Владивостока</p>
+            </>
+          ) : (
+            <>
+              <p className="text-base font-bold leading-tight text-[#101827] sm:text-lg">{pendingPriceLabel}</p>
+              <p className="mt-0.5 text-xs text-[#647084] sm:mt-1 sm:text-sm">{pendingPriceMeta}</p>
+            </>
+          )}
         </div>
 
         <h3 className="mt-2 flex flex-wrap items-center gap-1.5 text-lg font-bold leading-tight text-[#101827] transition hover:text-[#956f2c] sm:mt-4 sm:gap-2 sm:text-xl">
