@@ -119,7 +119,7 @@ export function CarMediaShowcase({
           <div className="relative bg-[#edf0f5] p-1.5">
             <div
               aria-label={`Лента фотографий: ${title}`}
-              className="scrollbar-none flex snap-x snap-mandatory gap-2 overflow-x-auto touch-pan-y"
+              className="scrollbar-none flex snap-x snap-mandatory gap-2 overflow-x-auto touch-auto"
               onClick={openMobileGallery}
               onScroll={(event) => updateSelectedFromPhotoRail(event.currentTarget.scrollLeft, event.currentTarget.firstElementChild as HTMLElement | null)}
               onTouchEnd={(event) => {
