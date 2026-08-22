@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, ExternalLink, Images, Maximize2, Rotate3D, RotateCcw, X, ZoomIn, ZoomOut } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type WheelEvent as ReactWheelEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
 import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
 import { RemoteImage } from "@/components/site/RemoteImage";
 
@@ -33,6 +33,8 @@ export function CarMediaShowcase({
   const [galleryAlbum, setGalleryAlbum] = useState<GalleryAlbum>("all");
   const galleryDialogRef = useRef<HTMLDivElement>(null);
   const galleryCloseRef = useRef<HTMLButtonElement>(null);
+  const mobilePhotoTouchStartX = useRef<number | null>(null);
+  const suppressMobilePhotoClick = useRef(false);
   const selectedImage = images[selected] ?? images[0] ?? null;
   const previewImages = images.length > 6 ? images.slice(0, 5) : images.slice(0, 6);
   const hiddenImagesCount = images.length > 6 ? images.length - previewImages.length : 0;
@@ -70,6 +72,22 @@ export function CarMediaShowcase({
     if (firstIndex >= 0) setSelected(firstIndex);
   }
 
+  function updateSelectedFromPhotoRail(scrollLeft: number, firstSlide: HTMLElement | null) {
+    if (!firstSlide || images.length < 2) return;
+    const gap = 8;
+    const nextIndex = Math.max(0, Math.min(images.length - 1, Math.round(scrollLeft / (firstSlide.offsetWidth + gap))));
+    setSelected(nextIndex);
+  }
+
+  function openMobileGallery() {
+    if (suppressMobilePhotoClick.current) {
+      suppressMobilePhotoClick.current = false;
+      return;
+    }
+    setGalleryAlbum("all");
+    setGalleryOpen(true);
+  }
+
   useDialogAccessibility({
     dialogRef: galleryDialogRef,
     initialFocusRef: galleryCloseRef,
@@ -92,7 +110,44 @@ export function CarMediaShowcase({
   return (
     <>
     <div className="overflow-hidden rounded bg-white shadow-sm ring-1 ring-[#d8dde6]">
-      <div className="relative aspect-[16/10] bg-[#dfe4ec]">
+      <div className="sm:hidden">
+        {mode === "exterior360" && exterior360 ? (
+          <div className="aspect-[16/10] bg-[#dfe4ec]"><Exterior360Viewer media={exterior360} title={title} /></div>
+        ) : mode === "interior360" && interior360 ? (
+          <div className="aspect-[16/10] bg-[#dfe4ec]"><Interior360Viewer media={interior360} title={title} /></div>
+        ) : selectedImage ? (
+          <div className="relative bg-[#edf0f5] p-1.5">
+            <div
+              aria-label={`Лента фотографий: ${title}`}
+              className="scrollbar-none flex snap-x snap-mandatory gap-2 overflow-x-auto touch-pan-y"
+              onClick={openMobileGallery}
+              onScroll={(event) => updateSelectedFromPhotoRail(event.currentTarget.scrollLeft, event.currentTarget.firstElementChild as HTMLElement | null)}
+              onTouchEnd={(event) => {
+                const start = mobilePhotoTouchStartX.current;
+                mobilePhotoTouchStartX.current = null;
+                if (start != null && Math.abs(event.changedTouches[0].clientX - start) > 10) {
+                  suppressMobilePhotoClick.current = true;
+                  window.setTimeout(() => { suppressMobilePhotoClick.current = false; }, 0);
+                }
+              }}
+              onTouchStart={(event) => { mobilePhotoTouchStartX.current = event.touches[0]?.clientX ?? null; }}
+              role="button"
+              tabIndex={0}
+            >
+              {images.map((media, index) => (
+                <div className="relative aspect-[16/10] w-[calc(100%-34px)] shrink-0 snap-start overflow-hidden rounded-[20px] bg-[#dfe4ec]" key={media.url}>
+                  <RemoteImage alt={`${title}, фото ${index + 1}`} className="object-cover" fill loading={index === 0 ? "eager" : "lazy"} sizes="calc(100vw - 54px)" src={media.url} fallback="Фото временно недоступно" />
+                </div>
+              ))}
+            </div>
+            {counter ? <div className="pointer-events-none absolute bottom-4 right-4 rounded-full bg-black/65 px-2.5 py-1 text-xs font-semibold text-white">{counter}</div> : null}
+          </div>
+        ) : (
+          <div className="flex aspect-[16/10] items-center justify-center bg-[#dfe4ec] text-[#647084]">Нет фото</div>
+        )}
+      </div>
+
+      <div className="relative hidden aspect-[16/10] bg-[#dfe4ec] sm:block">
         {mode === "exterior360" && exterior360 ? (
           <Exterior360Viewer media={exterior360} title={title} />
         ) : mode === "interior360" && interior360 ? (
@@ -182,19 +237,8 @@ export function CarMediaShowcase({
         )}
       </div>
 
-      {(exterior360 || selectedImage || interior360) && (
+      {(exterior360 || interior360) && (
         <div className="scrollbar-none flex gap-2 overflow-x-auto border-t border-[#edf0f5] px-3 py-2.5 sm:hidden">
-          {selectedImage && (
-            <button
-              aria-pressed={mode === "photo"}
-              className={mode === "photo" ? activePillClass : idlePillClass}
-              onClick={() => setMode("photo")}
-              type="button"
-            >
-              <Images size={15} />
-              Фото
-            </button>
-          )}
           {exterior360 && (
             <button
               aria-pressed={mode === "exterior360"}
@@ -221,7 +265,7 @@ export function CarMediaShowcase({
       )}
 
       {images.length > 0 && (
-        <div className="border-t border-[#edf0f5] px-3 py-2.5 sm:p-3">
+        <div className="hidden border-t border-[#edf0f5] p-3 sm:block">
           <div className="scrollbar-none flex snap-x gap-2 overflow-x-auto pb-0.5 sm:grid sm:grid-cols-6 sm:overflow-visible">
             {previewImages.map((media, index) => (
               <button
@@ -285,7 +329,7 @@ export function CarMediaShowcase({
         ref={galleryDialogRef}
         aria-label={`Фотогалерея ${title}`}
         aria-modal="true"
-        className="fixed inset-0 z-[90] flex flex-col bg-[#090d14]/[0.97] text-white"
+        className="fixed inset-0 z-[90] flex flex-col bg-[#090d14] text-white"
         role="dialog"
       >
         <div className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-white/10 px-4 sm:px-6">
@@ -309,38 +353,9 @@ export function CarMediaShowcase({
           key={selectedImage.url}
           onSwipe={moveGallery}
           src={selectedImage.url}
-        >
-          {filteredIndexes.length > 1 && (
-            <>
-              <button
-                aria-label="Предыдущее фото"
-                className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-black/55 backdrop-blur transition hover:bg-black/80 sm:left-6"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  moveGallery(-1);
-                }}
-                onPointerDown={(event) => event.stopPropagation()}
-                type="button"
-              >
-                <ChevronLeft size={24} />
-              </button>
-              <button
-                aria-label="Следующее фото"
-                className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-black/55 backdrop-blur transition hover:bg-black/80 sm:right-6"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  moveGallery(1);
-                }}
-                onPointerDown={(event) => event.stopPropagation()}
-                type="button"
-              >
-                <ChevronRight size={24} />
-              </button>
-            </>
-          )}
-        </ZoomableGalleryImage>
+        />
 
-        <div className="shrink-0 border-t border-white/10 bg-black/25 px-4 pb-4 pt-3 sm:px-6">
+        <div className="hidden shrink-0 border-t border-white/10 bg-black/25 px-4 pb-4 pt-3 sm:block sm:px-6">
           {albums.length > 1 && (
             <div className="scrollbar-none mb-3 flex gap-2 overflow-x-auto">
               {albums.map((album) => (
@@ -404,12 +419,10 @@ type GalleryGesture = {
 
 function ZoomableGalleryImage({
   alt,
-  children,
   onSwipe,
   src,
 }: {
   alt: string;
-  children: ReactNode;
   onSwipe: (direction: -1 | 1) => void;
   src: string;
 }) {
@@ -635,7 +648,7 @@ function ZoomableGalleryImage({
       </div>
 
       <div
-        className="absolute left-1/2 top-3 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/65 p-1 text-white shadow backdrop-blur"
+        className="absolute left-1/2 top-3 z-10 hidden -translate-x-1/2 items-center gap-1 rounded-full bg-black/65 p-1 text-white shadow backdrop-blur sm:flex"
         onClick={(event) => event.stopPropagation()}
         onPointerDown={(event) => event.stopPropagation()}
       >
@@ -670,7 +683,7 @@ function ZoomableGalleryImage({
       </div>
 
       <a
-        className="absolute bottom-4 right-4 z-10 inline-flex items-center gap-2 rounded-full bg-black/65 px-3 py-2 text-xs font-semibold text-white shadow backdrop-blur transition hover:bg-black/85"
+        className="absolute bottom-4 right-4 z-10 hidden items-center gap-2 rounded-full bg-black/65 px-3 py-2 text-xs font-semibold text-white shadow backdrop-blur transition hover:bg-black/85 sm:inline-flex"
         href={src}
         onClick={(event) => event.stopPropagation()}
         onPointerDown={(event) => event.stopPropagation()}
@@ -682,17 +695,15 @@ function ZoomableGalleryImage({
       </a>
 
       {!isZoomed && (
-        <p className="pointer-events-none absolute bottom-4 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/60 px-3 py-2 text-[11px] font-medium text-white/90 backdrop-blur">
+        <p className="pointer-events-none absolute bottom-4 left-1/2 z-10 hidden -translate-x-1/2 whitespace-nowrap rounded-full bg-black/60 px-3 py-2 text-[11px] font-medium text-white/90 backdrop-blur sm:block">
           Нажмите для увеличения · на телефоне разведите пальцы
         </p>
       )}
       {isZoomed && !originalReady && (
-        <p className="pointer-events-none absolute bottom-16 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/65 px-3 py-2 text-[11px] font-medium text-white/90 backdrop-blur">
+        <p className="pointer-events-none absolute bottom-16 left-1/2 z-10 hidden -translate-x-1/2 rounded-full bg-black/65 px-3 py-2 text-[11px] font-medium text-white/90 backdrop-blur sm:block">
           Загружаем оригинал…
         </p>
       )}
-
-      {children}
     </div>
   );
 }
