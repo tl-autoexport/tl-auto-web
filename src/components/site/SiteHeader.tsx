@@ -243,6 +243,16 @@ export function SiteHeader() {
     };
   }, []);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--site-header-mobile-offset", mobileUtilityHidden ? "68px" : "112px");
+    root.style.setProperty("--site-header-mobile-offset-sm", mobileUtilityHidden ? "74px" : "118px");
+    return () => {
+      root.style.removeProperty("--site-header-mobile-offset");
+      root.style.removeProperty("--site-header-mobile-offset-sm");
+    };
+  }, [mobileUtilityHidden]);
+
   return (
     <header
       className="sticky top-0 z-50 border-b border-[#d9e5ef] bg-white text-[#111827] shadow-[0_4px_16px_rgba(15,53,84,0.08)]"
@@ -276,7 +286,7 @@ export function SiteHeader() {
       </div>
 
       <div
-        className={`flex max-h-11 overflow-hidden bg-[#07528b] text-white transition-[max-height,opacity] duration-200 lg:hidden ${mobileUtilityHidden ? "max-h-0 opacity-0" : "max-h-11 opacity-100"}`}
+        className={`flex max-h-11 overflow-hidden bg-[#07528b] text-white transition-[max-height,opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[max-height,opacity,transform] lg:hidden ${mobileUtilityHidden ? "max-h-0 -translate-y-1 opacity-0" : "max-h-11 translate-y-0 opacity-100"}`}
       >
         <div className="mx-auto flex min-h-11 w-full items-center justify-between gap-3 px-4 text-xs font-medium">
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap"><Globe2 size={16} /> Русский <ChevronDown size={13} /></span>
