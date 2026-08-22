@@ -1,5 +1,6 @@
 export const CLIENT_CONTACT = {
   telegramUsername: "TL_Auto_export",
+  maxUrl: "https://max.ru/u/f9LHodD0cOIbbrnixgCklxVJDZIlM34DRERMCzVgn9RAgFkAEE2giwsuORA",
   whatsappCarPhone: "821076260741",
   whatsappPowersportsPhone: "821067986644",
   whatsappCarLabel: "Заявка на авто 🚘",

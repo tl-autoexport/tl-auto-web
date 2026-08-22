@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { ContactModal } from "@/components/site/ContactModal";
+import { FloatingMessengerWidget } from "@/components/site/FloatingMessengerWidget";
 import { TlAutoLogo } from "@/components/brand/TlAutoLogo";
 import { CLIENT_CONTACT } from "@/lib/contact";
 
@@ -340,6 +341,7 @@ export function SiteHeader() {
         </div>
       )}
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
+      <FloatingMessengerWidget />
     </header>
   );
 }
