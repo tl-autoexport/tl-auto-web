@@ -123,10 +123,10 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
         </p>
       </div>
 
-      <div className="relative z-10 grid grid-cols-3 border-y border-[#f0e4e4] bg-[#fff8f7] text-[11px] font-semibold text-[#ba4b42] sm:text-xs">
-        <button aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"} className="flex min-h-9 items-center justify-center gap-0.5 border-r border-[#f0e4e4] px-0.5 transition hover:bg-[#fff0ee] sm:min-h-12 sm:gap-1 sm:px-1" onClick={(event) => { event.stopPropagation(); setFavorite((current) => !current); }} type="button"><Heart fill={favorite ? "currentColor" : "none"} size={15} /> Избранное</button>
-        <a className="flex min-h-9 items-center justify-center gap-0.5 border-r border-[#f0e4e4] px-0.5 transition hover:bg-[#fff0ee] sm:min-h-12 sm:gap-1 sm:px-1" href={whatsappContactUrl(message)} onClick={(event) => event.stopPropagation()} rel="noreferrer" target="_blank"><MessageCircle size={15} /> Консультация</a>
-        <button aria-label="Поделиться объявлением" className="flex min-h-9 items-center justify-center gap-0.5 px-0.5 transition hover:bg-[#fff0ee] sm:min-h-12 sm:gap-1 sm:px-1" onClick={(event) => { event.stopPropagation(); void share(); }} type="button"><Share2 size={15} /> Поделиться</button>
+      <div className="relative z-10 grid grid-cols-[minmax(0,1fr)_auto_auto] border-y border-[#eadfca] bg-[#fffaf1] text-[11px] font-semibold text-[#7b5a22] sm:text-xs">
+        <a aria-label={`Получить консультацию по автомобилю ${title}`} className="flex min-h-10 min-w-0 items-center justify-center gap-1.5 bg-[#956f2c] px-2.5 py-2 text-white transition hover:bg-[#7b5a22] sm:min-h-12 sm:px-3" href={whatsappContactUrl(message)} onClick={(event) => event.stopPropagation()} rel="noreferrer" target="_blank"><MessageCircle size={16} /><span className="truncate">Консультация</span></a>
+        <button aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"} className="grid size-10 place-items-center border-l border-[#eadfca] transition hover:bg-[#fff0d9] sm:size-12" onClick={(event) => { event.stopPropagation(); setFavorite((current) => !current); }} title={favorite ? "Убрать из избранного" : "Добавить в избранное"} type="button"><Heart fill={favorite ? "currentColor" : "none"} size={17} /><span className="sr-only">{favorite ? "Убрать из избранного" : "Добавить в избранное"}</span></button>
+        <button aria-label="Поделиться объявлением" className="grid size-10 place-items-center border-l border-[#eadfca] transition hover:bg-[#fff0d9] sm:size-12" onClick={(event) => { event.stopPropagation(); void share(); }} title="Поделиться объявлением" type="button"><Share2 size={17} /><span className="sr-only">Поделиться объявлением</span></button>
       </div>
 
       <div className="pointer-events-none relative z-10 px-2.5 py-1.5 text-[11px] text-[#7a8798] sm:px-4 sm:py-3 sm:text-xs">
