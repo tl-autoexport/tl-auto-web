@@ -20,6 +20,8 @@ const calcSchema = z.object({
   engineCc: z.coerce.number().int().positive(),
   powerHp: z.coerce.number().int().positive(),
   fuelType: z.string().optional(),
+  countryCode: z.enum(["RU", "KZ", "BY", "UZ", "KG", "DE", "SE", "IT", "NL", "AE"]).default("RU"),
+  destinationCity: z.string().default("Владивосток"),
 });
 
 export async function POST(request: Request) {
@@ -64,6 +66,12 @@ export async function POST(request: Request) {
   }
 
   try {
+    if (parsed.data.countryCode !== "RU" || parsed.data.destinationCity !== "Владивосток") {
+      return NextResponse.json(
+        { error: "Для выбранного направления тарифы ещё уточняются.", calculationStatus: "pending" },
+        { status: 422, headers: responseHeaders },
+      );
+    }
     const rateSnapshot = await getCbrCalcRates();
     return NextResponse.json(
       calculateRuVladivostok({

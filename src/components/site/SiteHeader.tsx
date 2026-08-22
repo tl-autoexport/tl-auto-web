@@ -17,6 +17,8 @@ import { ContactModal } from "@/components/site/ContactModal";
 import { FloatingMessengerWidget } from "@/components/site/FloatingMessengerWidget";
 import { TlAutoLogo } from "@/components/brand/TlAutoLogo";
 import { CLIENT_CONTACT } from "@/lib/contact";
+import { useDestination } from "@/components/site/DestinationProvider";
+import { DESTINATIONS, type CountryCode } from "@/lib/destinations";
 
 const utilityLinks = [
   { label: "О сервисе", href: "/#about", pending: false },
@@ -145,8 +147,10 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [destinationOpen, setDestinationOpen] = useState(false);
   const mobileUtilityRef = useRef<HTMLDivElement>(null);
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const { city, country, setDestination } = useDestination();
 
   const openContact = () => {
     setContactOpen(true);
@@ -231,8 +235,12 @@ export function SiteHeader() {
         <div className="mx-auto flex min-h-[42px] max-w-[1440px] items-center justify-between gap-5 px-6 text-[12px] font-medium xl:px-8">
           <div className="flex items-center gap-4">
             <span className="inline-flex items-center gap-1.5"><Globe2 size={14} /> Русский <ChevronDown size={12} /></span>
-            <span>Южная Корея</span>
-            <span className="inline-flex items-center gap-1.5"><MapPin size={13} /> Владивосток</span>
+            <button className="inline-flex items-center gap-1 transition hover:text-[#f6d37a]" onClick={() => setDestinationOpen(true)} type="button">
+              {country.countryLabel}<ChevronDown size={12} />
+            </button>
+            <button className="inline-flex items-center gap-1.5 transition hover:text-[#f6d37a]" onClick={() => setDestinationOpen(true)} type="button">
+              <MapPin size={13} /> {city.label}<ChevronDown size={12} />
+            </button>
           </div>
           <nav aria-label="Дополнительная навигация" className="flex items-center gap-4 text-white/95">
             {topLinks.map((item) => <Link key={item.label} href={item.href} className="whitespace-nowrap transition hover:text-[#f6d37a]">{item.label}</Link>)}
@@ -256,7 +264,9 @@ export function SiteHeader() {
         className="flex h-11 bg-[#07528b] text-white will-change-[opacity] lg:hidden"
       >
         <div className="mx-auto flex min-h-11 w-full items-center justify-between gap-3 px-4 text-xs font-medium">
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap"><Globe2 size={16} /> Русский <ChevronDown size={13} /></span>
+          <button className="inline-flex min-w-0 items-center gap-1.5 whitespace-nowrap" onClick={() => setDestinationOpen(true)} type="button">
+            <MapPin className="shrink-0" size={16} /><span className="max-w-[130px] truncate">{city.label}</span><ChevronDown className="shrink-0" size={13} />
+          </button>
           <div className="flex items-center gap-4">
             {socialLinks.filter(({ href }) => href).map(({ href, kind, label }) => (
               <a key={label} href={href!} aria-label={label} className="transition hover:text-[#f6d37a]" rel="noreferrer" target="_blank"><SocialIcon kind={kind} size={18} /></a>
@@ -342,7 +352,42 @@ export function SiteHeader() {
         <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
         <FloatingMessengerWidget />
       </header>
+      <DestinationDialog
+        cityId={city.id}
+        countryCode={country.countryCode}
+        onClose={() => setDestinationOpen(false)}
+        onSelect={(countryCode, cityId) => {
+          setDestination(countryCode, cityId);
+          if (cityId) setDestinationOpen(false);
+        }}
+        open={destinationOpen}
+      />
     </>
+  );
+}
+
+function DestinationDialog({ cityId, countryCode, onClose, onSelect, open }: { cityId: string; countryCode: CountryCode; onClose: () => void; onSelect: (countryCode: CountryCode, cityId?: string) => void; open: boolean }) {
+  if (!open) return null;
+  const selectedCountry = DESTINATIONS.find((item) => item.countryCode === countryCode) ?? DESTINATIONS[0];
+
+  return (
+    <div aria-label="Выбор страны и города доставки" aria-modal="true" className="fixed inset-0 z-[90] flex items-start justify-center bg-[#0b1524]/45 px-4 pt-16 backdrop-blur-[2px] sm:pt-20" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose(); }} role="dialog">
+      <div className="max-h-[calc(100dvh-5rem)] w-full max-w-[640px] overflow-y-auto rounded-2xl border border-[#dce2eb] bg-white p-5 text-[#111827] shadow-[0_24px_70px_rgba(11,21,36,0.25)] sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div><p className="text-lg font-bold">Страна и город доставки</p><p className="mt-1 text-sm text-[#647084]">Выбор сохраняется для каталога и расчётов. Геолокация не используется.</p></div>
+          <button aria-label="Закрыть" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f0f3f7] text-[#263247] transition hover:bg-[#e3e8ef]" onClick={onClose} type="button"><X size={18} /></button>
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {DESTINATIONS.map((item) => <button className={`rounded-xl border px-3 py-3 text-left text-sm font-semibold transition ${item.countryCode === countryCode ? "border-[#07528b] bg-[#07528b] text-white" : "border-[#dce2eb] hover:border-[#07528b]/50 hover:bg-[#f5f8fb]"}`} key={item.countryCode} onClick={() => onSelect(item.countryCode)} type="button">{item.countryLabel}<span className={`mt-0.5 block text-xs font-normal ${item.countryCode === countryCode ? "text-white/75" : "text-[#7a8798]"}`}>{item.currencyCode} · {item.currencySymbol}</span></button>)}
+        </div>
+        <div className="mt-5 border-t border-[#edf0f4] pt-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#7b8798]">Город доставки</p>
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {selectedCountry.cities.map((item) => <button className={`rounded-xl border px-3 py-3 text-left text-sm font-medium transition ${item.id === cityId ? "border-[#c7a55a] bg-[#f8f2e5] text-[#5c4317]" : "border-[#dce2eb] hover:border-[#956f2c]"}`} key={item.id} onClick={() => onSelect(countryCode, item.id)} type="button">{item.label}{item.id === cityId ? <span className="mt-0.5 block text-xs font-normal">Выбрано</span> : null}</button>)}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

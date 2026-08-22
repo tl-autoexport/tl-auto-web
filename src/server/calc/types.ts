@@ -5,8 +5,8 @@ export interface CalcInput {
   engineCc: number;
   powerHp: number;
   fuelType?: string;
-  countryCode?: "RU";
-  destinationCity?: "Владивосток";
+  countryCode?: "RU" | "KZ" | "BY" | "UZ" | "KG" | "DE" | "SE" | "IT" | "NL" | "AE";
+  destinationCity?: string;
   importerType?: "individual";
   rates?: Partial<CalcRates>;
   ratesAsOf?: string | null;
