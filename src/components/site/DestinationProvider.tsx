@@ -37,7 +37,7 @@ export function DestinationProvider({ children }: { children: React.ReactNode })
       ...state,
       country: resolved.country,
       city: resolved.city,
-      calculationReady: state.countryCode === "RU" && resolved.city.id === "vladivostok",
+      calculationReady: (state.countryCode === "RU" && resolved.city.id === "vladivostok") || (state.countryCode === "KZ" && resolved.city.id === "almaty"),
       setDestination: (countryCode, cityId) => {
         const resolvedNext = getDestination(countryCode, cityId);
         const next = { countryCode: resolvedNext.country.countryCode, cityId: resolvedNext.city.id };

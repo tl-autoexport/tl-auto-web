@@ -4,7 +4,7 @@ import { calculateRuVladivostok } from "./ru";
 const genesisG70 = calculateRuVladivostok({
   priceKrw: 26_690_000, year: 2021, month: 10, engineCc: 1998, powerHp: 252,
   fuelType: "gasoline", calculationDate: "2026-07-26T00:00:00.000Z",
-  rates: { krwRub: 0.050135, usdRub: 77.929, eurRub: 88.707 },
+  rates: { krwRub: 0.050135, usdRub: 77.929, eurRub: 88.707, kztRub: 0.15 },
 });
 assert.equal(genesisG70.carPriceRub, 1_338_103);
 assert.equal(genesisG70.dutyRub, 850_735.61);
@@ -17,7 +17,7 @@ assert.equal(genesisG70.customs.mode, "volume");
 const ageBoundary = calculateRuVladivostok({
   priceKrw: 10_000_000, year: 2021, month: 8, engineCc: 998, powerHp: 76,
   calculationDate: "2026-07-26T00:00:00.000Z",
-  rates: { krwRub: 0.0531039, usdRub: 78.0308, eurRub: 88.8927 },
+  rates: { krwRub: 0.0531039, usdRub: 78.0308, eurRub: 88.8927, kztRub: 0.15 },
 });
 assert.ok(ageBoundary.currentCarAgeYears < 5);
 assert.ok(ageBoundary.carAgeYears > 5);
@@ -27,7 +27,7 @@ assert.equal(ageBoundary.util.coefficient, 0.26);
 const hybridUsesIndividualRegime = calculateRuVladivostok({
   priceKrw: 14_150_000, year: 2019, month: 2, engineCc: 2359, powerHp: 159,
   fuelType: "hybrid", calculationDate: "2026-07-26T00:00:00.000Z",
-  rates: { krwRub: 0.0531039, usdRub: 78.0308, eurRub: 88.8927 },
+  rates: { krwRub: 0.0531039, usdRub: 78.0308, eurRub: 88.8927, kztRub: 0.15 },
 });
 assert.equal(hybridUsesIndividualRegime.exciseRub, 0);
 assert.equal(hybridUsesIndividualRegime.vatRub, 0);
@@ -36,7 +36,7 @@ assert.equal(hybridUsesIndividualRegime.utilRub, 5_200);
 
 const feeBoundary = (carPriceRub: number) => calculateRuVladivostok({
   priceKrw: carPriceRub, year: 2022, month: 1, engineCc: 1000, powerHp: 100,
-  calculationDate: "2026-07-26T00:00:00.000Z", rates: { krwRub: 1, usdRub: 1, eurRub: 1 },
+  calculationDate: "2026-07-26T00:00:00.000Z", rates: { krwRub: 1, usdRub: 1, eurRub: 1, kztRub: 1 },
 }).feesRub;
 assert.equal(feeBoundary(450_000), 2_462);
 assert.equal(feeBoundary(450_001), 4_924);

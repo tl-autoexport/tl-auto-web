@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   BadgeCheck,
   Calculator,
@@ -14,6 +14,7 @@ import {
 import { whatsappContactUrl, vehicleClientMessage } from "@/lib/contact";
 import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
 import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
+import { useDestination } from "@/components/site/DestinationProvider";
 
 type CalculationSnapshot = {
   total_rub: number | null;
@@ -36,7 +37,7 @@ type LiveCalculation = {
   utilRub: number;
   totalRub: number;
   koreaExpensesRub: number;
-  rates: { krwRub: number; usdRub: number; eurRub: number };
+  rates: { krwRub: number; usdRub: number; eurRub: number; kztRub: number };
   ratesAsOf: string | null;
   ratesSource: string;
   rateDetails: {
@@ -49,6 +50,32 @@ type LiveCalculation = {
   } | null;
 };
 
+type PriceCalculationCardProps = {
+  calc: CalculationSnapshot | undefined;
+  engineCc: number | null;
+  fuel: string;
+  mileageKm: number | null;
+  powerHp: number | null;
+  priceKrw: number | null;
+  source: string;
+  sourceId: string;
+  title: string;
+  year: number | null;
+  registrationMonth: number | null;
+};
+
+type KzLiveCalculation = {
+  calculationStatus: "ready";
+  carPriceKzt: number;
+  koreaExpensesKzt: number;
+  deliveryKzt: number;
+  serviceFeeKzt: number;
+  customsKzt: 0;
+  totalKzt: number;
+  rates: { krwKzt: number; usdKzt: number; kztRub: number };
+  disclaimer: string;
+};
+
 const rub = new Intl.NumberFormat("ru-RU");
 
 function money(value: number | null | undefined) {
@@ -57,6 +84,10 @@ function money(value: number | null | undefined) {
 
 function won(value: number | null | undefined) {
   return `${rub.format(value ?? 0)}\u00A0₩`;
+}
+
+function tenge(value: number | null | undefined) {
+  return `${new Intl.NumberFormat("ru-KZ").format(value ?? 0)}\u00A0₸`;
 }
 
 function number(value: number | null | undefined) {
@@ -79,7 +110,14 @@ function resultNumber(result: unknown, key: string) {
   return typeof value === "number" ? value : 0;
 }
 
-export function PriceCalculationCard({
+export function PriceCalculationCard(props: PriceCalculationCardProps) {
+  const { country, city } = useDestination();
+  if (country.countryCode === "KZ" && city.id === "almaty") return <KzPriceCalculationCard {...props} />;
+  if (country.countryCode !== "RU" || city.id !== "vladivostok") return <PendingDestinationCard {...props} />;
+  return <RuPriceCalculationCard {...props} />;
+}
+
+function RuPriceCalculationCard({
   calc,
   engineCc,
   fuel,
@@ -91,19 +129,7 @@ export function PriceCalculationCard({
   title,
   year,
   registrationMonth,
-}: {
-  calc: CalculationSnapshot | undefined;
-  engineCc: number | null;
-  fuel: string;
-  mileageKm: number | null;
-  powerHp: number | null;
-  priceKrw: number | null;
-  source: string;
-  sourceId: string;
-  title: string;
-  year: number | null;
-  registrationMonth: number | null;
-}) {
+}: PriceCalculationCardProps) {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDutyInfoOpen, setDutyInfoOpen] = useState(false);
   const calculationTitleId = useId();
@@ -456,6 +482,105 @@ export function PriceCalculationCard({
       )}
     </>
   );
+}
+
+function KzPriceCalculationCard(props: PriceCalculationCardProps) {
+  const [calculation, setCalculation] = useState<KzLiveCalculation | null>(null);
+  const [message, setMessage] = useState("Получаем актуальный расчёт…");
+  const [isLoading, setLoading] = useState(true);
+  const leadWhatsAppUrl = whatsappContactUrl(vehicleClientMessage({ source: props.source, sourceId: props.sourceId, title: props.title }));
+
+  const loadCalculation = useCallback(async () => {
+    if (!props.priceKrw || !props.year || !props.engineCc || !props.powerHp) {
+      setMessage("Для расчёта недостаточно данных автомобиля.");
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setMessage("Получаем актуальный расчёт…");
+    try {
+      const response = await fetch("/api/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          priceKrw: props.priceKrw,
+          year: props.year,
+          month: props.registrationMonth ?? 6,
+          engineCc: props.engineCc,
+          powerHp: props.powerHp,
+          fuelType: props.fuel,
+          countryCode: "KZ",
+          destinationCity: "Алматы",
+        }),
+      });
+      const payload = await response.json() as KzLiveCalculation | { error?: string };
+      if (!response.ok || "error" in payload) {
+        setCalculation(null);
+        setMessage("error" in payload && payload.error ? payload.error : "Расчёт пока недоступен.");
+        return;
+      }
+      setCalculation(payload as KzLiveCalculation);
+      setMessage("");
+    } catch {
+      setCalculation(null);
+      setMessage("Не удалось получить расчёт. Попробуйте позже.");
+    } finally {
+      setLoading(false);
+    }
+  }, [props.engineCc, props.fuel, props.powerHp, props.priceKrw, props.registrationMonth, props.year]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void loadCalculation(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [loadCalculation]);
+
+  return (
+    <>
+      <aside className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
+        <div className="flex items-center gap-2 text-sm font-semibold text-[#956f2c]"><BadgeCheck size={18} />Источник Encar</div>
+        <h1 className="mt-3 line-clamp-2 text-2xl font-semibold leading-tight text-[#121722] sm:text-3xl">{props.title}</h1>
+        <p className="mt-2 text-sm text-[#647084]">{formatVehicleYear(props.year)} · {rub.format(props.mileageKm ?? 0)} км · {formatEngineCapacity(props.engineCc)}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="rounded-full bg-[#e8f5ee] px-3 py-1 text-xs font-semibold text-[#18784a]">Расчёт для Казахстана</span>
+          <span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold text-[#536174]">Алматы</span>
+          <span className="rounded-full bg-[#fff3df] px-3 py-1 text-xs font-semibold text-[#875315]">Без таможни</span>
+        </div>
+        <div className="mt-4 flex items-center gap-3 text-sm text-[#647084]"><span>Оплата</span><span className="rounded border border-[#d8dde6] px-3 py-2 font-medium text-[#121722]">₸ в тенге</span></div>
+        <div className="mt-5">
+          <p className="text-3xl font-semibold tracking-tight text-[#121722] tabular-nums">{calculation ? tenge(calculation.totalKzt) : "Расчёт уточняется"}</p>
+          <span className="mt-1.5 block text-sm text-[#647084]">с доставкой до Алматы, без таможни</span>
+        </div>
+        {calculation ? (
+          <div className="mt-5 grid gap-3 text-sm">
+            <KzRow label="Автомобиль" value={calculation.carPriceKzt} />
+            <KzRow label="Расходы в Корее" value={calculation.koreaExpensesKzt} />
+            <KzRow label="Доставка до Алматы" value={calculation.deliveryKzt} />
+            <KzRow label="Комиссия TL Auto" value={calculation.serviceFeeKzt} />
+            <KzRow label="Таможня Казахстана" value={calculation.customsKzt} />
+          </div>
+        ) : (
+          <div className="mt-5 rounded border border-[#ead8ac] bg-[#fffaf0] p-3 text-sm leading-5 text-[#6b5325]">{message}</div>
+        )}
+        <button className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded bg-[#111827] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isLoading} onClick={() => void loadCalculation()} type="button"><RefreshCw className={isLoading ? "animate-spin" : ""} size={16} />{isLoading ? "Обновляем" : "Обновить расчёт"}</button>
+        <p className="mt-4 text-xs leading-5 text-[#647084]">{calculation?.disclaimer ?? "Числовой итог появится после подтверждения коммерческих тарифов TL Auto."}</p>
+      </aside>
+      <MobileContactBar leadWhatsAppUrl={leadWhatsAppUrl} />
+    </>
+  );
+}
+
+function PendingDestinationCard(props: PriceCalculationCardProps) {
+  const { country, city } = useDestination();
+  const leadWhatsAppUrl = whatsappContactUrl(vehicleClientMessage({ source: props.source, sourceId: props.sourceId, title: props.title }));
+  return <><aside className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]"><div className="flex items-center gap-2 text-sm font-semibold text-[#956f2c]"><BadgeCheck size={18} />Источник Encar</div><h1 className="mt-3 text-2xl font-semibold text-[#121722]">{props.title}</h1><div className="mt-4 flex gap-2"><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{country.countryLabel}</span><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{city.label}</span></div><p className="mt-5 text-2xl font-semibold">Расчёт уточняется</p><p className="mt-2 text-sm leading-6 text-[#647084]">Тарифы доставки и оформления для выбранного направления ещё не подтверждены.</p></aside><MobileContactBar leadWhatsAppUrl={leadWhatsAppUrl} /></>;
+}
+
+function KzRow({ label, value }: { label: string; value: number }) {
+  return <div className="flex justify-between gap-4 border-b border-dashed border-[#cbd3df] pb-3"><span className="text-[#647084]">{label}</span><strong className="whitespace-nowrap tabular-nums">{tenge(value)}</strong></div>;
+}
+
+function MobileContactBar({ leadWhatsAppUrl }: { leadWhatsAppUrl: string }) {
+  return <div className="fixed inset-x-0 bottom-0 z-50 flex items-center gap-2 border-t border-[#dce2eb] bg-white/95 px-3 pt-2 shadow-[0_-8px_24px_rgba(16,24,39,0.12)] backdrop-blur sm:hidden" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}><a className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white" href="tel:+821076260741"><Phone size={21} />Позвонить</a><a aria-label="Написать в WhatsApp" className="flex size-14 items-center justify-center rounded-xl bg-[#4caf64] text-white" href={leadWhatsAppUrl} rel="noopener noreferrer" target="_blank"><MessageCircle size={24} /></a></div>;
 }
 
 function resultObject(result: unknown, key: string): Record<string, unknown> | null {

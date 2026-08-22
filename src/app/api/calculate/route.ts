@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { calculateRuVladivostok } from "@/server/calc/ru";
+import { calculateKzAlmaty, getKzTariffs } from "@/server/calc/kz";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import {
   FixedWindowRateLimiter,
@@ -66,6 +67,35 @@ export async function POST(request: Request) {
   }
 
   try {
+    if (parsed.data.countryCode === "KZ" && parsed.data.destinationCity === "Алматы") {
+      const { tariffs, missing } = getKzTariffs();
+      if (!tariffs) {
+        return NextResponse.json(
+          {
+            error: `Для расчёта Казахстана нужно подтвердить: ${missing.join(", ")}.`,
+            calculationStatus: "pending",
+            countryCode: "KZ",
+            destinationCity: "Алматы",
+            currencyCode: "KZT",
+            currencySymbol: "₸",
+            customsIncluded: false,
+            missingTariffs: missing,
+          },
+          { status: 422, headers: responseHeaders },
+        );
+      }
+      const rateSnapshot = await getCbrCalcRates();
+      return NextResponse.json(
+        calculateKzAlmaty({
+          priceKrw: parsed.data.priceKrw,
+          rates: rateSnapshot.rates,
+          tariffs,
+          ratesAsOf: rateSnapshot.asOf,
+          ratesSource: rateSnapshot.source,
+        }),
+        { headers: responseHeaders },
+      );
+    }
     if (parsed.data.countryCode !== "RU" || parsed.data.destinationCity !== "Владивосток") {
       return NextResponse.json(
         { error: "Для выбранного направления тарифы ещё уточняются.", calculationStatus: "pending" },

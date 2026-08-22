@@ -2,7 +2,7 @@ import type { CalcInput, CalcRates, CalcResult } from "./types";
 
 export const CALC_VERSION = "ru-individual-autoexport-tks-usdt-2026.01";
 
-const DEFAULT_RATES: CalcRates = { krwRub: 0.04718, eurRub: 87.403, usdRub: 70.95 };
+const DEFAULT_RATES: CalcRates = { krwRub: 0.04718, eurRub: 87.403, usdRub: 70.95, kztRub: 0.14 };
 const DEFAULT_CLEARANCE_DAYS = 90;
 const BROKER_RUB = 90_000;
 const FREIGHT_USD = 1_200;
@@ -101,6 +101,7 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
     krwRub: input.rates?.krwRub ?? DEFAULT_RATES.krwRub,
     eurRub: input.rates?.eurRub ?? DEFAULT_RATES.eurRub,
     usdRub: input.rates?.usdRub ?? DEFAULT_RATES.usdRub,
+    kztRub: input.rates?.kztRub ?? DEFAULT_RATES.kztRub,
   };
   const calculationDate = input.calculationDate ? new Date(input.calculationDate) : new Date();
   if (Number.isNaN(calculationDate.getTime())) throw new Error("Invalid calculation date");

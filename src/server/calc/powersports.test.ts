@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { calculatePowersportsPrice } from "./powersports";
 
-const rates = { krwRub: 0.06, usdRub: 80, eurRub: 90 };
+const rates = { krwRub: 0.06, usdRub: 80, eurRub: 90, kztRub: 0.15 };
 const motorcycle = calculatePowersportsPrice("motorcycle", 1_000_000, rates);
 assert.equal(motorcycle.sourcePriceRub, 60_000);
 assert.equal(motorcycle.routeAndClearanceRub, 360_000);
@@ -17,4 +17,3 @@ const unavailable = calculatePowersportsPrice("motorcycle", null, rates);
 assert.equal(unavailable.totalRub, null);
 
 console.log("powersports calculation passed");
-

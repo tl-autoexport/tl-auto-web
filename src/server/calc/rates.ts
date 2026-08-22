@@ -20,6 +20,7 @@ type CbrSnapshot = {
   usdRub: number;
   eurRub: number;
   krwRub: number;
+  kztRub: number;
   asOf: string;
 };
 
@@ -66,6 +67,7 @@ async function fetchCbrRates(): Promise<CbrSnapshot> {
     usdRub: readCurrency(xml, "USD"),
     eurRub: readCurrency(xml, "EUR"),
     krwRub: readCurrency(xml, "KRW"),
+    kztRub: readCurrency(xml, "KZT"),
     asOf: parseCbrDate(xml),
   };
   cbrCache = { expiresAt: Date.now() + CBR_CACHE_TTL_MS, snapshot };
@@ -132,6 +134,7 @@ async function buildLiveRateSnapshot(): Promise<CalcRateSnapshot> {
     cbrUsdRub: cbr.usdRub,
     cbrEurRub: cbr.eurRub,
     cbrKrwRub: cbr.krwRub,
+    cbrKztRub: cbr.kztRub,
     usdtKrwRaw,
     usdtKrwAdjustment: -USDT_KRW_ADJUSTMENT,
     usdtKrwAdjusted,
@@ -139,7 +142,7 @@ async function buildLiveRateSnapshot(): Promise<CalcRateSnapshot> {
     source: "cbr.ru + naver.com/Bithumb",
   };
   return {
-    rates: { krwRub, usdRub, eurRub },
+    rates: { krwRub, usdRub, eurRub, kztRub: cbr.kztRub },
     asOf: cbr.asOf,
     source: "cbr.ru + naver.com/Bithumb",
     rateDetails,
@@ -160,9 +163,9 @@ async function getStoredRateSnapshot(): Promise<CalcRateSnapshot | null> {
   if (!Number.isFinite(fetchedAt.getTime()) || Date.now() - fetchedAt.getTime() > MAX_STORED_RATE_AGE_MS) return null;
   const rates = data.rates as Partial<CalcRates>;
   const details = data.rate_details as Partial<CalcRateDetails>;
-  if (!Number.isFinite(rates.krwRub) || !Number.isFinite(rates.usdRub) || !Number.isFinite(rates.eurRub)) return null;
+  if (!Number.isFinite(rates.krwRub) || !Number.isFinite(rates.usdRub) || !Number.isFinite(rates.eurRub) || !Number.isFinite(rates.kztRub)) return null;
   return {
-    rates: { krwRub: Number(rates.krwRub), usdRub: Number(rates.usdRub), eurRub: Number(rates.eurRub) },
+    rates: { krwRub: Number(rates.krwRub), usdRub: Number(rates.usdRub), eurRub: Number(rates.eurRub), kztRub: Number(rates.kztRub) },
     asOf: String(data.as_of),
     source: String(data.source) as CalcRateSnapshot["source"],
     rateDetails: {
@@ -170,6 +173,7 @@ async function getStoredRateSnapshot(): Promise<CalcRateSnapshot | null> {
       cbrUsdRub: Number(details.cbrUsdRub ?? rates.usdRub),
       cbrEurRub: Number(details.cbrEurRub ?? rates.eurRub),
       cbrKrwRub: Number(details.cbrKrwRub ?? rates.krwRub),
+      cbrKztRub: Number(details.cbrKztRub ?? rates.kztRub),
       usdtKrwRaw: Number(details.usdtKrwRaw ?? 0),
       usdtKrwAdjustment: Number(details.usdtKrwAdjustment ?? -USDT_KRW_ADJUSTMENT),
       usdtKrwAdjusted: Number(details.usdtKrwAdjusted ?? 0),

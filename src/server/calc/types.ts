@@ -20,6 +20,7 @@ export interface CalcRates {
   krwRub: number;
   usdRub: number;
   eurRub: number;
+  kztRub: number;
 }
 
 export interface CalcRateDetails {
@@ -27,6 +28,7 @@ export interface CalcRateDetails {
   cbrUsdRub: number;
   cbrEurRub: number;
   cbrKrwRub: number;
+  cbrKztRub: number;
   usdtKrwRaw: number;
   usdtKrwAdjustment: number;
   usdtKrwAdjusted: number;
