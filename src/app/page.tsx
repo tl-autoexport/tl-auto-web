@@ -354,7 +354,7 @@ function VehicleShelf({
         </div>
         <Link
           href={href}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#956f2c]"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[#111827] transition hover:text-[#4b5563]"
         >
           Смотреть все <ArrowRight size={16} />
         </Link>
