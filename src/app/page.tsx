@@ -345,12 +345,12 @@ function VehicleShelf({
   title: string;
 }) {
   return (
-    <section id={id} className="mx-auto max-w-7xl px-4 py-7 sm:px-5 sm:py-10">
-      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+    <section id={id} className="mx-auto max-w-7xl px-4 py-4 sm:px-5 sm:py-10">
+      <div className="flex flex-col justify-between gap-2 md:flex-row md:items-end md:gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#956f2c]">{eyebrow}</p>
           <h2 className="text-2xl font-semibold sm:text-3xl">{title}</h2>
-          <p className="mt-2 text-sm leading-6 text-[#647084]">{description}</p>
+          <p className="mt-1 text-sm leading-5 text-[#647084] sm:mt-2 sm:leading-6">{description}</p>
         </div>
         <Link
           href={href}
@@ -360,8 +360,12 @@ function VehicleShelf({
         </Link>
       </div>
       {cars.length ? (
-        <div className="mt-5 grid items-stretch gap-3 pb-1 sm:mt-6 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
-          {cars.map((car) => <PrototypeVehicleCard key={car.id} car={car} />)}
+        <div className="scrollbar-none -mr-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 pr-4 sm:mr-0 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:p-0 xl:grid-cols-4">
+          {cars.map((car) => (
+            <div className="w-[calc(100%-44px)] shrink-0 snap-start sm:w-auto sm:shrink" key={car.id}>
+              <PrototypeVehicleCard car={car} />
+            </div>
+          ))}
         </div>
       ) : (
         <div className="mt-6 rounded-md border border-dashed border-[#c7d0dc] bg-white p-5 text-sm text-[#647084]">
