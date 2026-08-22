@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { MessageCircle, Music2, Send } from "lucide-react";
 import { TlAutoLogo } from "@/components/brand/TlAutoLogo";
 import {
   CLIENT_CONTACT,
@@ -43,61 +43,14 @@ export function SiteFooter() {
           <p className="text-xs font-semibold uppercase tracking-wider text-white/45">
             Связаться с TL Auto
           </p>
-          <div className="mt-3 flex flex-col gap-2.5 text-sm">
-            <a
-              className="inline-flex items-center gap-1.5 text-white/72 transition hover:text-white"
-              href={telegramContactUrl()}
-              rel="noreferrer"
-              target="_blank"
-            >
-              Telegram @{CLIENT_CONTACT.telegramUsername}
-              <ExternalLink size={13} aria-hidden="true" />
-            </a>
-            <a
-              className="inline-flex items-center gap-1.5 text-white/72 transition hover:text-white"
-              href={whatsappContactUrl()}
-              rel="noreferrer"
-              target="_blank"
-            >
-              WhatsApp {CLIENT_CONTACT.whatsappCarLabel}
-              <ExternalLink size={13} aria-hidden="true" />
-            </a>
-            <a
-              className="inline-flex items-center gap-1.5 text-white/72 transition hover:text-white"
-              href={whatsappPowersportsContactUrl()}
-              rel="noreferrer"
-              target="_blank"
-            >
-              WhatsApp — {CLIENT_CONTACT.whatsappPowersportsLabel}
-              <ExternalLink size={13} aria-hidden="true" />
-            </a>
-            <a
-              className="inline-flex items-center gap-1.5 text-white/72 transition hover:text-white"
-              href={CLIENT_CONTACT.instagramUrl}
-              rel="noreferrer"
-              target="_blank"
-            >
-              Instagram @tl_auto_export
-              <ExternalLink size={13} aria-hidden="true" />
-            </a>
-            <a
-              className="inline-flex items-center gap-1.5 text-white/72 transition hover:text-white"
-              href={CLIENT_CONTACT.youtubeUrl}
-              rel="noreferrer"
-              target="_blank"
-            >
-              YouTube TL Auto
-              <ExternalLink size={13} aria-hidden="true" />
-            </a>
-            <a
-              className="inline-flex items-center gap-1.5 text-white/72 transition hover:text-white"
-              href={CLIENT_CONTACT.tiktokUrl}
-              rel="noreferrer"
-              target="_blank"
-            >
-              TikTok @tl_auto
-              <ExternalLink size={13} aria-hidden="true" />
-            </a>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a aria-label={`Telegram @${CLIENT_CONTACT.telegramUsername}`} title={`Telegram @${CLIENT_CONTACT.telegramUsername}`} className="grid size-11 place-items-center rounded-full bg-[#229ed9] text-white transition hover:scale-105" href={telegramContactUrl()} rel="noreferrer" target="_blank"><Send size={20} aria-hidden="true" /></a>
+            <a aria-label="MAX" title="MAX" className="grid size-11 place-items-center rounded-full bg-[linear-gradient(135deg,#5367f5,#8d37d8)] text-[11px] font-black tracking-[-0.08em] text-white transition hover:scale-105" href={CLIENT_CONTACT.maxUrl} rel="noreferrer" target="_blank">MAX</a>
+            <a aria-label={`WhatsApp — ${CLIENT_CONTACT.whatsappCarLabel}`} title={CLIENT_CONTACT.whatsappCarLabel} className="grid size-11 place-items-center rounded-full bg-[#25d366] text-white transition hover:scale-105" href={whatsappContactUrl()} rel="noreferrer" target="_blank"><MessageCircle size={21} aria-hidden="true" /></a>
+            <a aria-label={`WhatsApp — ${CLIENT_CONTACT.whatsappPowersportsLabel}`} title={CLIENT_CONTACT.whatsappPowersportsLabel} className="grid size-11 place-items-center rounded-full bg-[#25d366] text-white transition hover:scale-105" href={whatsappPowersportsContactUrl()} rel="noreferrer" target="_blank"><MessageCircle size={21} aria-hidden="true" /></a>
+            <a aria-label="Instagram TL Auto" title="Instagram TL Auto" className="grid size-11 place-items-center rounded-full bg-[linear-gradient(135deg,#f9ce34,#ee2a7b_55%,#6228d7)] text-white transition hover:scale-105" href={CLIENT_CONTACT.instagramUrl} rel="noreferrer" target="_blank"><svg aria-hidden="true" className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+            <a aria-label="YouTube TL Auto" title="YouTube TL Auto" className="grid size-11 place-items-center rounded-full bg-[#ff0000] text-white transition hover:scale-105" href={CLIENT_CONTACT.youtubeUrl} rel="noreferrer" target="_blank"><svg aria-hidden="true" className="size-5 fill-current" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg></a>
+            <a aria-label="TikTok TL Auto" title="TikTok TL Auto" className="grid size-11 place-items-center rounded-full bg-[#111827] text-white transition hover:scale-105" href={CLIENT_CONTACT.tiktokUrl} rel="noreferrer" target="_blank"><Music2 size={21} aria-hidden="true" /></a>
           </div>
         </div>
       </div>

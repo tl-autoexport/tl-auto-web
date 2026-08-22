@@ -151,7 +151,7 @@ export function SiteHeader() {
   };
 
   useEffect(() => {
-    if (pathname !== "/" || contactPromptWasShown()) return;
+    if (pathname !== "/" || contactPromptWasShown() || window.matchMedia("(max-width: 767px)").matches) return;
 
     let timer: number | undefined;
     const startTimer = () => {
