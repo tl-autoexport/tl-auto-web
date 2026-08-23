@@ -95,6 +95,8 @@ export type CatalogFilters = {
   offset?: number;
   source?: "encar";
   maxPowerHp?: number;
+  /** Free-text make/model search from the quick search control. */
+  search?: string;
   brand?: string;
   model?: string;
   fuelType?: string;
@@ -189,6 +191,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     offset = 0,
     source,
     maxPowerHp,
+    search,
     brand,
     model,
     fuelType,
@@ -228,8 +231,15 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
 
   if (source) query = query.eq("primary_source", source);
   if (maxPowerHp) query = query.lte("power_hp", maxPowerHp);
+  if (search) query = query.or(catalogSearchExpression(search));
   if (brand) query = query.eq("brand", brand);
-  if (model) query = query.eq("model", model);
+  if (model) {
+    // Keep old shared links with a combined `model=Kia K7` value working.
+    // A model selected in the advanced form remains an exact filter.
+    query = !brand && /\s/.test(model)
+      ? query.or(catalogSearchExpression(model))
+      : query.eq("model", model);
+  }
   if (fuelType) query = query.eq("fuel_type", fuelType);
   if (transmission) query = query.in("transmission", transmissionValues(transmission));
   if (minEngineCc) query = query.gte("engine_cc", minEngineCc);
@@ -287,8 +297,13 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
 
   if (filters.source) query = query.eq("primary_source", filters.source);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
+  if (filters.search) query = query.or(catalogSearchExpression(filters.search));
   if (filters.brand) query = query.eq("brand", filters.brand);
-  if (filters.model) query = query.eq("model", filters.model);
+  if (filters.model) {
+    query = !filters.brand && /\s/.test(filters.model)
+      ? query.or(catalogSearchExpression(filters.model))
+      : query.eq("model", filters.model);
+  }
   if (filters.fuelType) query = query.eq("fuel_type", filters.fuelType);
   if (filters.transmission) query = query.in("transmission", transmissionValues(filters.transmission));
   if (filters.minEngineCc) query = query.gte("engine_cc", filters.minEngineCc);
@@ -319,6 +334,39 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
     throw error;
   }
   return count ?? 0;
+}
+
+/**
+ * Build a safe PostgREST OR expression for free-text catalog search.
+ *
+ * The catalog stores make and model in separate columns, while users enter
+ * natural text such as "Kia K7". We try every token boundary as a possible
+ * make/model split and also support a model-only or trim search. Exact
+ * `brand`/`model` filters remain untouched and continue to be used by the
+ * advanced filter form.
+ */
+function catalogSearchExpression(value: string) {
+  const normalized = value
+    .trim()
+    .replace(/[(),*]/g, " ")
+    .replace(/\s+/g, " ");
+  if (!normalized) return "id.is.not.null";
+
+  const tokens = normalized.split(" ");
+  const clauses = new Set<string>();
+  const pattern = (term: string) => `*${term}*`;
+
+  clauses.add(`brand.ilike.${pattern(normalized)}`);
+  clauses.add(`model.ilike.${pattern(normalized)}`);
+  clauses.add(`trim.ilike.${pattern(normalized)}`);
+
+  for (let split = 1; split < tokens.length; split += 1) {
+    const brand = tokens.slice(0, split).join(" ");
+    const model = tokens.slice(split).join(" ");
+    clauses.add(`and(brand.ilike.${pattern(brand)},model.ilike.${pattern(model)})`);
+  }
+
+  return [...clauses].join(",");
 }
 
 export async function getPassoStagingCars(

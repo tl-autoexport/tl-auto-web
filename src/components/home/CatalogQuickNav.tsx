@@ -50,7 +50,10 @@ export function CatalogQuickNav() {
       window.location.assign("/catalog");
       return;
     }
-    const key = /^\d+$/.test(value) ? "number" : "model";
+    // Free-text input may contain both the make and model (for example,
+    // "Kia K7"). Keep it separate from the exact model filter used by the
+    // advanced form, where `model=K7` is intentionally a strict value.
+    const key = /^\d+$/.test(value) ? "number" : "search";
     window.location.assign(`/catalog?${key}=${encodeURIComponent(value)}`);
   };
 

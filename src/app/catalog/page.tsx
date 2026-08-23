@@ -98,6 +98,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const filters: CatalogFilters = {
     brand: value("brand") || undefined,
     model: value("model") || undefined,
+    search: value("search") || undefined,
     fuelType: value("fuel") || undefined,
     transmission: value("transmission") || undefined,
     minEngineCc: numberParam(value("engineMin")),
@@ -531,6 +532,7 @@ function catalogFilterHref(
 
 function catalogActiveFilterCount(rawParams: Record<string, string | string[] | undefined>) {
   const filterKeys = [
+    "search",
     "brand",
     "model",
     "fuel",
@@ -577,6 +579,7 @@ function buildActiveFilterChips(rawParams: Record<string, string | string[] | un
 
   if (value("brand")) add("brand", value("brand"), { brand: null, model: null, page: null });
   if (value("model")) add("model", value("model"));
+  if (value("search")) add("search", value("search"));
   if (value("fuel")) add("fuel", translateFuel(value("fuel")));
   if (value("transmission")) add("transmission", translateTransmission(value("transmission")));
   if (value("source")) add("source", sourceDisplayName(value("source")));

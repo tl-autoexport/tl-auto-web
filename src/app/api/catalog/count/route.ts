@@ -6,6 +6,7 @@ export async function GET(request: Request) {
   const under160 = params.get("under160") === "1";
 
   const filters: CatalogFilters = {
+    search: params.get("search") || undefined,
     brand: params.get("brand") || undefined,
     model: params.get("model") || undefined,
     fuelType: params.get("fuel") || undefined,
