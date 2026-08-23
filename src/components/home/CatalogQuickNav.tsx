@@ -13,6 +13,7 @@ import { useDestination } from "@/components/site/DestinationProvider";
 import { DESTINATIONS, type CountryCode } from "@/lib/destinations";
 
 type MenuName = "filters" | "country" | "transport" | "sort" | null;
+type MenuTrigger = "search" | "filters" | "country" | "transport" | "sort" | null;
 
 const sortOptions = [
   { value: "fresh", label: "Сначала свежие" },
@@ -24,11 +25,22 @@ const sortOptions = [
 
 export function CatalogQuickNav() {
   const [openMenu, setOpenMenu] = useState<MenuName>(null);
+  const [openTrigger, setOpenTrigger] = useState<MenuTrigger>(null);
   const [search, setSearch] = useState("");
   const { country, city, setDestination } = useDestination();
 
-  const toggleMenu = (menu: Exclude<MenuName, null>) => {
-    setOpenMenu((current) => (current === menu ? null : menu));
+  const toggleMenu = (
+    menu: Exclude<MenuName, null>,
+    trigger: Exclude<MenuTrigger, null>,
+  ) => {
+    const isCurrentTrigger = openMenu === menu && openTrigger === trigger;
+    setOpenMenu(isCurrentTrigger ? null : menu);
+    setOpenTrigger(isCurrentTrigger ? null : trigger);
+  };
+
+  const closeMenu = () => {
+    setOpenMenu(null);
+    setOpenTrigger(null);
   };
 
   const submitSearch = (event: FormEvent<HTMLFormElement>) => {
@@ -60,17 +72,17 @@ export function CatalogQuickNav() {
             />
           </form>
 
-          <QuickButton icon={Search} label="Поиск" mobileOnly onClick={() => toggleMenu("filters")} open={openMenu === "filters"} />
-          <QuickButton icon={SlidersHorizontal} label="Параметры" onClick={() => toggleMenu("filters")} open={openMenu === "filters"} />
-          <QuickButton label={city.label} onClick={() => toggleMenu("country")} open={openMenu === "country"} />
-          <QuickButton label="Авто" onClick={() => toggleMenu("transport")} open={openMenu === "transport"} />
-          <QuickButton icon={ListFilter} label="Сортировка" onClick={() => toggleMenu("sort")} open={openMenu === "sort"} />
+          <QuickButton icon={Search} label="Поиск" mobileOnly onClick={() => toggleMenu("filters", "search")} open={openMenu === "filters" && openTrigger === "search"} />
+          <QuickButton icon={SlidersHorizontal} label="Параметры" onClick={() => toggleMenu("filters", "filters")} open={openMenu === "filters" && openTrigger === "filters"} />
+          <QuickButton label={city.label} onClick={() => toggleMenu("country", "country")} open={openMenu === "country" && openTrigger === "country"} />
+          <QuickButton label="Авто" onClick={() => toggleMenu("transport", "transport")} open={openMenu === "transport" && openTrigger === "transport"} />
+          <QuickButton icon={ListFilter} label="Сортировка" onClick={() => toggleMenu("sort", "sort")} open={openMenu === "sort" && openTrigger === "sort"} />
         </div>
 
         {openMenu ? (
           <div className="relative">
             <div className="mt-2 rounded-2xl border border-[#dce2eb] bg-white p-4 shadow-[0_12px_30px_rgba(16,24,39,0.12)] sm:absolute sm:left-0 sm:top-0 sm:min-w-[360px]" role="dialog" aria-label="Настройки каталога">
-              <button aria-label="Закрыть" className="absolute right-3 top-3 rounded-full p-1 text-[#647084] hover:bg-[#f0f3f7]" onClick={() => setOpenMenu(null)} type="button"><X size={17} /></button>
+              <button aria-label="Закрыть" className="absolute right-3 top-3 rounded-full p-1 text-[#647084] hover:bg-[#f0f3f7]" onClick={closeMenu} type="button"><X size={17} /></button>
               {openMenu === "filters" ? <FilterPanel onSearch={submitSearch} search={search} setSearch={setSearch} /> : null}
               {openMenu === "country" ? <CountryPanel countryCode={country.countryCode} cityId={city.id} onSelect={setDestination} /> : null}
               {openMenu === "transport" ? <TransportPanel /> : null}
