@@ -96,9 +96,14 @@ export function CatalogQuickNav() {
   useEffect(() => {
     if (!panel) return;
     const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPanel(null);
+    };
     document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
     return () => {
       document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
     };
   }, [panel]);
 
@@ -132,24 +137,29 @@ export function CatalogQuickNav() {
   };
 
   return (
+    <>
     <nav aria-label="Быстрый подбор автомобиля" className="sticky top-[68px] z-40 isolate border-b border-[#dce2eb] bg-white/95 shadow-[0_5px_12px_rgba(15,31,49,0.06)] backdrop-blur sm:top-[74px] lg:top-[76px]">
-      <div className="mx-auto max-w-7xl px-4 py-2.5 sm:px-5">
-        <div className="scrollbar-none flex items-center gap-2 overflow-x-auto">
-          <form className="relative shrink-0" onSubmit={submitSearch}>
+      <div className="mx-auto max-w-7xl px-4 py-3 sm:px-5">
+        <div className="flex min-w-0 flex-col gap-2.5 md:flex-row md:items-center md:gap-3">
+          <form className="relative w-full md:w-[260px] md:shrink-0" onSubmit={submitSearch}>
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#69768a]" size={17} />
-            <input aria-label="Поиск по модели или номеру лота" className="h-10 w-[190px] rounded-full border border-[#d7dee8] bg-white py-2 pl-9 pr-3 text-sm text-[#101827] outline-none transition placeholder:text-[#7a8798] focus:border-[#956f2c] focus:ring-2 focus:ring-[#c7a55a]/20 sm:w-[230px]" onChange={(event) => setSearch(event.target.value)} placeholder="Поиск" value={search} />
+            <input aria-label="Поиск по модели или номеру лота" className="h-11 w-full rounded-2xl border border-[#d7dee8] bg-white py-2 pl-10 pr-4 text-sm text-[#101827] outline-none transition placeholder:text-[#7a8798] focus:border-[#956f2c] focus:ring-2 focus:ring-[#c7a55a]/20 md:h-10 md:rounded-full" onChange={(event) => setSearch(event.target.value)} placeholder="Поиск по марке или модели" value={search} />
           </form>
-          <QuickButton icon={SlidersHorizontal} label="Параметры" mobileLabel="Параметры" onClick={() => setPanel(panel === "parameters" ? null : "parameters")} open={panel === "parameters"} />
-          <QuickButton label="Марка и модель" mobileLabel="Марка" onClick={() => setPanel(panel === "brandModel" ? null : "brandModel")} open={panel === "brandModel"} />
-          <QuickButton label={city.label} onClick={() => setPanel(panel === "region" ? null : "region")} open={panel === "region"} />
-          <QuickButton label="Авто" onClick={() => setPanel(panel === "transport" ? null : "transport")} open={panel === "transport"} />
-          <QuickButton icon={ListFilter} label="Сортировка" mobileLabel="Сортировка" onClick={() => setPanel(panel === "sort" ? null : "sort")} open={panel === "sort"} />
+          <div className="scrollbar-none flex w-full min-w-0 items-center gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none]">
+            <QuickButton icon={SlidersHorizontal} label="Параметры" mobileLabel="Параметры" onClick={() => setPanel(panel === "parameters" ? null : "parameters")} open={panel === "parameters"} />
+            <QuickButton label="Марка и модель" mobileLabel="Марка, модель" onClick={() => setPanel(panel === "brandModel" ? null : "brandModel")} open={panel === "brandModel"} />
+            <QuickButton label={city.label} onClick={() => setPanel(panel === "region" ? null : "region")} open={panel === "region"} />
+            <QuickButton label="Авто" onClick={() => setPanel(panel === "transport" ? null : "transport")} open={panel === "transport"} />
+            <QuickButton icon={ListFilter} label="Сортировка" mobileLabel="Сортировка" onClick={() => setPanel(panel === "sort" ? null : "sort")} open={panel === "sort"} />
+          </div>
         </div>
       </div>
 
+    </nav>
+
       {panel ? (
-        <div className="fixed inset-0 z-50 bg-[#101827]/25 p-0 sm:absolute sm:inset-auto sm:left-1/2 sm:top-full sm:w-[min(560px,calc(100vw-32px))] sm:-translate-x-1/2 sm:bg-transparent sm:p-0">
-          <div className="flex h-full flex-col overflow-hidden bg-white shadow-[0_18px_45px_rgba(16,24,39,0.18)] sm:mt-2 sm:max-h-[min(760px,calc(100vh-120px))] sm:rounded-3xl sm:border sm:border-[#dce2eb]">
+        <div className="fixed inset-0 z-[70] bg-[#101827]/25 p-0 sm:flex sm:items-start sm:justify-center sm:p-4 sm:pt-[132px]">
+          <div className="flex h-full w-full flex-col overflow-hidden bg-white shadow-[0_18px_45px_rgba(16,24,39,0.18)] sm:h-auto sm:max-h-[calc(100vh-148px)] sm:w-[min(560px,calc(100vw-32px))] sm:rounded-3xl sm:border sm:border-[#dce2eb]">
             <PanelHeader panel={panel} onClose={() => setPanel(null)} onReset={panel === "parameters" ? resetParameters : undefined} />
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-4 sm:px-5">
               {panel === "parameters" ? <ParametersPanel parameters={parameters} setParameters={setParameters} count={resultCount} loading={countLoading} /> : null}
@@ -162,7 +172,7 @@ export function CatalogQuickNav() {
           </div>
         </div>
       ) : null}
-    </nav>
+    </>
   );
 }
 
