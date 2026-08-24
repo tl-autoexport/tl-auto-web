@@ -143,7 +143,7 @@ export function CatalogQuickNav() {
         <div className="flex min-w-0 flex-col gap-2.5 md:flex-row md:items-center md:gap-3">
           <form className="relative w-full md:w-[260px] md:shrink-0" onSubmit={submitSearch}>
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#69768a]" size={17} />
-            <input aria-label="Поиск по модели или номеру лота" className="h-11 w-full rounded-2xl border border-[#d7dee8] bg-white py-2 pl-10 pr-4 text-sm text-[#101827] outline-none transition placeholder:text-[#7a8798] focus:border-[#956f2c] focus:ring-2 focus:ring-[#c7a55a]/20 md:h-10 md:rounded-full" onChange={(event) => setSearch(event.target.value)} placeholder="Поиск по марке или модели" value={search} />
+            <input aria-label="Поиск по модели или номеру лота" className="h-11 w-full rounded-2xl border border-[#d7dee8] bg-white py-2 pl-10 pr-4 text-base text-[#101827] outline-none transition placeholder:text-[#7a8798] focus:border-[#956f2c] focus:ring-2 focus:ring-[#c7a55a]/20 md:h-10 md:rounded-full md:text-sm" enterKeyHint="search" inputMode="search" onChange={(event) => setSearch(event.target.value)} placeholder="Поиск по марке или модели" value={search} />
           </form>
           <div className="scrollbar-none flex w-full min-w-0 items-center gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none]">
             <QuickButton icon={SlidersHorizontal} label="Параметры" mobileLabel="Параметры" onClick={() => setPanel(panel === "parameters" ? null : "parameters")} open={panel === "parameters"} />
