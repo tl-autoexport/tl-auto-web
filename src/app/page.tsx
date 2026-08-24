@@ -318,11 +318,11 @@ function DodoStoryCard({
   return (
     <Link
       href={href}
-      className="group relative aspect-[0.78] w-[132px] shrink-0 overflow-hidden rounded-[24px] bg-[#edf0f4] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg sm:w-[200px] sm:rounded-[30px] lg:w-[230px]"
+      className="group relative aspect-[0.78] w-[166px] shrink-0 overflow-hidden rounded-[24px] bg-[#edf0f4] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg sm:w-[200px] sm:rounded-[30px] lg:w-[230px]"
     >
-      <Image src={image} alt="" fill sizes="(min-width: 1024px) 230px, (min-width: 640px) 200px, 132px" className={`object-cover transition duration-500 group-hover:scale-105 ${position}`} />
+      <Image src={image} alt="" fill sizes="(min-width: 1024px) 230px, (min-width: 640px) 200px, 166px" className={`object-cover transition duration-500 group-hover:scale-105 ${position}`} />
       <span className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-      <span className="absolute inset-x-3 bottom-3 text-sm font-bold leading-tight text-white drop-shadow-sm sm:inset-x-4 sm:bottom-4 sm:text-lg">{title}</span>
+      <span className="absolute inset-x-3 bottom-3 max-w-[calc(100%-24px)] break-words text-[13px] font-bold leading-tight text-white drop-shadow-sm sm:inset-x-4 sm:bottom-4 sm:max-w-none sm:text-lg">{title}</span>
     </Link>
   );
 }
