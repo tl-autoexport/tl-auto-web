@@ -226,8 +226,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     .eq("is_available", true)
     .eq("primary_source", "encar")
     .in("fuel_type", ["gasoline", "diesel", "electric"])
-    .not("price_rub", "is", null)
-    .not("power_hp", "is", null);
+    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (source) query = query.eq("primary_source", source);
   if (maxPowerHp) query = query.lte("power_hp", maxPowerHp);
@@ -292,8 +291,7 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
     .eq("is_available", true)
     .eq("primary_source", "encar")
     .in("fuel_type", ["gasoline", "diesel", "electric"])
-    .not("price_rub", "is", null)
-    .not("power_hp", "is", null);
+    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (filters.source) query = query.eq("primary_source", filters.source);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
@@ -549,8 +547,7 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
       .eq("is_available", true)
       .eq("primary_source", "encar")
       .in("fuel_type", ["gasoline", "diesel", "electric"])
-      .not("price_rub", "is", null)
-      .not("power_hp", "is", null)
+      .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
 
@@ -590,9 +587,8 @@ export async function getSitemapCars(): Promise<SitemapCar[]> {
       .select("primary_source, source_id, source_updated_at")
       .eq("is_available", true)
       .eq("primary_source", "encar")
-      .in("fuel_type", ["gasoline", "diesel"])
-      .not("price_rub", "is", null)
-      .not("power_hp", "is", null)
+      .in("fuel_type", ["gasoline", "diesel", "electric"])
+      .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
 
@@ -618,9 +614,8 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
     .select(`${CATALOG_CAR_SELECT}, car_options(category, source_code, name_original, name_ru, value_original, value_ru, description_original, description_ru, is_present, sort_order), car_condition_reports(source, report_type, summary, items)`)
     .eq("primary_source", "encar")
     .eq("source_id", sourceId)
-    .in("fuel_type", ["gasoline", "diesel"])
-    .not("price_rub", "is", null)
-    .not("power_hp", "is", null)
+    .in("fuel_type", ["gasoline", "diesel", "electric"])
+    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
     .order("sort_order", { foreignTable: "car_media", ascending: true })
     .order("sort_order", { foreignTable: "car_options", ascending: true })
     .maybeSingle();

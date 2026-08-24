@@ -954,6 +954,61 @@ const VERIFIED_MODEL_POWER_MAP: Record<string, number> = {
   peugeot_2008_1560: 99,
 };
 
+// Encar sometimes omits displacement from the list payload. These are the
+// conservative, source-backed defaults used by the previous Autoexport
+// catalog when a trim does not expose a separate engine size. They are only a
+// last resort; an explicit displacement or a badge value always wins.
+const VERIFIED_MODEL_ENGINE_MAP: Record<string, number> = {
+  hyundai_casper: 998,
+  hyundai_ray: 998,
+  chevrolet_spark: 999,
+  kia_k3: 1591,
+  kia_k5: 1999,
+  kia_k7: 2497,
+  kia_k8: 2497,
+  kia_k9: 3470,
+  kia_seltos: 1598,
+  kia_sportage: 1598,
+  kia_sorento: 2497,
+  kia_mohave: 2959,
+  kia_carnival: 2151,
+  hyundai_sonata: 1999,
+  hyundai_elantra: 1598,
+  hyundai_grandeur: 2497,
+  hyundai_tucson: 1598,
+  hyundai_santafe: 2497,
+  hyundai_palisade: 2199,
+  hyundai_venue: 1598,
+  hyundai_kona: 1598,
+  hyundai_staria: 2199,
+  hyundai_starex: 2497,
+  genesis_g70: 1998,
+  genesis_g80: 2497,
+  genesis_g90: 3470,
+  genesis_gv70: 2497,
+  genesis_gv80: 2497,
+  bmw_3series: 1998,
+  bmw_5series: 1998,
+  bmw_7series: 2998,
+  bmw_x7: 2998,
+  "mercedesbenz_eclass": 1999,
+  "mercedesbenz_cclass": 1999,
+  "mercedesbenz_sclass": 2999,
+  mercedesbenz_glc: 1991,
+  mercedesbenz_gle: 1993,
+  audi_a6: 1984,
+  volkswagen_tiguan: 1968,
+  landrover_discoverysport: 1999,
+  landrover_rangerovervelar: 2996,
+  maserati_levante: 1998,
+  kia_morning: 998,
+  kia_stinger: 3342,
+  lincoln_navigator: 3496,
+  mini_cooper: 1499,
+  mini_countryman: 1998,
+  peugeot_2008: 1560,
+};
+
 export function normalizeText(value: unknown) {
   return String(value ?? "")
     .toLowerCase()
@@ -997,6 +1052,47 @@ function modelPowerKey(brand: string, model: string, engineCc: number) {
   return `${brandKey}_${modelKey}_${engineCc}`;
 }
 
+function modelEngineKey(brand: string, model: string) {
+  const brandKey = normalizeText(brand).replace(/\s+/g, "").replace(/-/g, "");
+  const modelKey = normalizeText(model)
+    .replace(/\([^)]*\)/g, "")
+    .replace(/\s+/g, "")
+    .replace(/[^a-z0-9]/g, "");
+  return `${brandKey}_${modelKey}`;
+}
+
+export function resolveEngineCc(input: VehicleIdentityInput) {
+  const explicit = Number(input.engineCc) || 0;
+  if (explicit > 0) return explicit;
+  if (normalizeFuel(input.fuelType) === "electric") return null;
+
+  const brand = normalizeBrand(input.brand);
+  const model = normalizeModel(input.model);
+  if (!brand || !model) return null;
+
+  const badgeText = [input.badgeDetail, input.badge]
+    .filter(Boolean)
+    .join(" ");
+  const ccMatch = badgeText.match(/(\d{3,4})\s*(?:cc|㎤|시시)/i);
+  if (ccMatch) return Number(ccMatch[1]);
+  const litreMatch = badgeText.match(/(?:^|\s)(\d(?:[.,]\d{1,2})?)(?=\s*(?:T|터보|HEV|하이브리드|AWD|FWD|2WD|4WD|L|GDI|TFSI|TSI|GT|D\d{2,3}|$))/i);
+  if (litreMatch) {
+    const litres = Number(litreMatch[1].replace(",", "."));
+    if (litres >= 0.6 && litres <= 8) return Math.round(litres * 1000);
+  }
+
+  const matchingSpecs = VERIFIED_SPECS.filter((item) => {
+    if (normalizeText(item.brand) !== normalizeText(brand)) return false;
+    if (normalizeText(item.model) !== normalizeText(model)) return false;
+    const fuel = normalizeFuel(input.fuelType);
+    return !item.fuelType || !fuel || normalizeFuel(item.fuelType) === fuel;
+  });
+  const distinctEngines = [...new Set(matchingSpecs.map((item) => item.engineCc))];
+  if (distinctEngines.length === 1) return distinctEngines[0];
+
+  return VERIFIED_MODEL_ENGINE_MAP[modelEngineKey(brand, model)] ?? null;
+}
+
 export function normalizeColor(value: unknown) {
   const raw = String(value ?? "").trim();
   if (!raw) return null;
@@ -1018,6 +1114,18 @@ export function normalizeColor(value: unknown) {
 export function normalizeFuel(value: unknown) {
   const text = normalizeText(value);
   if (!text) return null;
+  const hasElectric = text.includes("전기") || text.includes("electric");
+  const hasCombustion =
+    text.includes("가솔린") ||
+    text.includes("휘발유") ||
+    text.includes("gasoline") ||
+    text.includes("petrol") ||
+    text.includes("디젤") ||
+    text.includes("경유") ||
+    text.includes("diesel");
+
+  // Encar can describe hybrids as "가솔린+전기" without saying "hybrid".
+  if (hasElectric && hasCombustion) return "hybrid";
   if (text.includes("디젤") || text.includes("diesel") || text.includes("경유"))
     return "diesel";
   if (text.includes("lpg") || text.includes("lpi") || text.includes("lpe"))

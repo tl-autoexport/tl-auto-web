@@ -76,6 +76,8 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
   ].filter((value): value is string => Boolean(value));
   const saleDays = daysOnSale(car);
   const isVladivostokPrice = country.countryCode === "RU" && city.id === "vladivostok";
+  const hasExactVladivostokPrice = isVladivostokPrice && car.price_rub != null;
+  const isElectricPending = car.fuel_type === "electric" && car.price_rub == null;
   const pendingPriceLabel = country.countryCode === "KZ" && city.id === "almaty"
     ? "Расчёт до Алматы уточняется"
     : `Расчёт до ${city.label} уточняется`;
@@ -112,15 +114,15 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
 
       <div className="pointer-events-none relative z-10 flex-1 p-2.5 sm:p-4">
         <div>
-          {isVladivostokPrice ? (
+          {hasExactVladivostokPrice ? (
             <>
-              <p className="text-xl font-bold tabular-nums text-[#101827] sm:text-2xl">{rub.format(car.price_rub ?? 0)} ₽</p>
+              <p className="text-xl font-bold tabular-nums text-[#101827] sm:text-2xl">{rub.format(car.price_rub!)} ₽</p>
               <p className="mt-0.5 text-xs text-[#647084] sm:mt-1 sm:text-sm">Цена под ключ до Владивостока</p>
             </>
           ) : (
             <>
-              <p className="text-base font-bold leading-tight text-[#101827] sm:text-lg">{pendingPriceLabel}</p>
-              <p className="mt-0.5 text-xs text-[#647084] sm:mt-1 sm:text-sm">{pendingPriceMeta}</p>
+              <p className="text-base font-bold leading-tight text-[#101827] sm:text-lg">{isElectricPending ? "Расчёт электромобиля уточняется" : pendingPriceLabel}</p>
+              <p className="mt-0.5 text-xs text-[#647084] sm:mt-1 sm:text-sm">{isElectricPending ? "Стоимость зависит от действующих правил ввоза" : pendingPriceMeta}</p>
             </>
           )}
         </div>

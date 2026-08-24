@@ -45,6 +45,8 @@
     "backfill:encar:seats:write": "ENCAR_SEATS_DRY_RUN=false tsx scripts/backfill-encar-seats.ts",
     "refresh:encar": "tsx scripts/refresh-encar-catalog.ts",
     "refresh:encar:write": "ENCAR_DRY_RUN=false tsx scripts/refresh-encar-catalog.ts",
+    "verify:encar:stale": "tsx scripts/verify-stale-encar.ts",
+    "verify:encar:stale:write": "ENCAR_STALE_DRY_RUN=false tsx scripts/verify-stale-encar.ts",
     "recalculate:catalog": "tsx scripts/recalculate-active-catalog.ts",
     "recalculate:catalog:write": "RECALCULATE_DRY_RUN=false tsx scripts/recalculate-active-catalog.ts",
     "rates:refresh": "tsx scripts/refresh-calculation-rates.ts",

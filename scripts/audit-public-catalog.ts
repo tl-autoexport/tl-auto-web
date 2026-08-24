@@ -7,9 +7,13 @@ config({ path: ".env", quiet: true });
 type PublicAuditCar = {
   primary_source: string;
   brand: string | null;
+  fuel_type: string | null;
+  price_rub: number | null;
+  power_hp: number | null;
   source_url: string | null;
   source_updated_at: string | null;
   has_360_interior: boolean;
+  vehicle_specs: Record<string, unknown> | null;
 };
 
 async function main() {
@@ -24,13 +28,11 @@ async function main() {
     const { data, error } = await supabase
       .from("cars")
       .select(
-        "primary_source, brand, source_url, source_updated_at, has_360_interior",
+        "primary_source, brand, fuel_type, price_rub, power_hp, source_url, source_updated_at, has_360_interior, vehicle_specs",
       )
       .eq("is_available", true)
       .eq("primary_source", "encar")
-      .in("fuel_type", ["gasoline", "diesel"])
-      .not("price_rub", "is", null)
-      .not("power_hp", "is", null)
+      .in("fuel_type", ["gasoline", "diesel", "electric"])
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
 
@@ -49,6 +51,19 @@ async function main() {
     return !Number.isFinite(timestamp) || timestamp < freshnessThreshold;
   }).length;
   const missingSourceLink = cars.filter((car) => !car.source_url).length;
+  const electric = cars.filter((car) => car.fuel_type === "electric");
+  const combustion = cars.filter((car) => car.fuel_type !== "electric");
+  const incompleteCombustion = combustion.filter(
+    (car) => car.price_rub == null || car.power_hp == null,
+  ).length;
+  const electricWithInventedPrice = electric.filter(
+    (car) => car.price_rub != null,
+  ).length;
+  const electricPendingCalculation = electric.filter(
+    (car) =>
+      car.vehicle_specs?.calculation_status ===
+      "pending_official_ev_tariff",
+  ).length;
 
   const report = {
     total: cars.length,
@@ -61,6 +76,15 @@ async function main() {
       audi: brandCount("Audi"),
     },
     withInterior360: cars.filter((car) => car.has_360_interior).length,
+    fuel: {
+      combustion: combustion.length,
+      electric: electric.length,
+    },
+    calculationCoverage: {
+      incompleteCombustion,
+      electricPendingCalculation,
+      electricWithInventedPrice,
+    },
     staleBeyondDays: { days: freshnessDays, count: stale },
     missingSourceLink,
   };
@@ -85,6 +109,15 @@ async function main() {
   }
   if (missingSourceLink) {
     blockers.push(`${missingSourceLink} cars do not have a source link`);
+  }
+  if (incompleteCombustion) {
+    blockers.push(`${incompleteCombustion} combustion cars have an incomplete calculation`);
+  }
+  if (electricWithInventedPrice) {
+    blockers.push(`${electricWithInventedPrice} electric cars expose an unapproved landed price`);
+  }
+  if (electric.length && electricPendingCalculation !== electric.length) {
+    blockers.push("some electric cars do not carry the pending calculation marker");
   }
 
   if (blockers.length) {

@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import { createSupabaseAdmin } from "@/server/supabase/admin";
 import { calculateRuVladivostok } from "@/server/calc/ru";
 import { getCbrCalcRates, type CalcRateSnapshot } from "@/server/calc/rates";
@@ -10,6 +11,7 @@ import {
   isElectrifiedConfiguration,
   normalizeModel,
   normalizePlate,
+  resolveEngineCc,
   resolvePower,
 } from "@/server/normalization/vehicles";
 import {
@@ -82,6 +84,7 @@ type EncarListCar = {
 
 type EncarDetail = {
   displacement: number | null;
+  fuelName: string | null;
   color: string | null;
   seats: number | null;
   bodyTypeKr: string | null;
@@ -90,6 +93,8 @@ type EncarDetail = {
   manufacturerEnglish: string | null;
   modelEnglish: string | null;
   registeredAt: string | null;
+  firstAdvertisedAt: string | null;
+  modifiedAt: string | null;
   vehicleNo: string | null;
   vin: string | null;
   transmission: string | null;
@@ -109,13 +114,18 @@ type EncarDetailPayload = {
   vin?: string;
   spec?: {
     displacement?: number;
+    fuelName?: string;
     colorName?: string;
     seatCount?: number;
     bodyName?: string;
     vin?: string;
     transmissionName?: string;
   };
-  manage?: { registDateTime?: string };
+  manage?: {
+    registDateTime?: string;
+    firstAdvertisedDateTime?: string;
+    modifyDateTime?: string;
+  };
   category?: {
     gradeEnglishName?: string;
     gradeDetailEnglishName?: string;
@@ -264,12 +274,24 @@ function compactOptionRow(option: EncarOptionRow) {
 type ImportOptions = {
   target?: number;
   maxPages?: number;
+  electricTarget?: number;
+  electricPages?: number;
+  onlyNew?: boolean;
+  fastMode?: boolean;
   dryRun?: boolean;
   replaceCatalog?: boolean;
   maxListingAgeDays?: number;
   brandMinimums?: Record<string, number>;
   modelMinimums?: Record<string, number>;
   priorityBrandPages?: Record<string, number>;
+};
+
+type EncarFilterBounds = {
+  minYear: number;
+  maxYear: number;
+  maxMileage: number;
+  minPrice: number;
+  maxPrice: number;
 };
 
 function positiveInt(value: string | undefined, fallback: number): number {
@@ -294,15 +316,39 @@ function hashPayload(payload: unknown): string {
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 }
 
-export function buildFilter(manufacturer?: string) {
+export function buildFilter(
+  manufacturer?: string,
+  fuelType?: "electric",
+  bounds: EncarFilterBounds = getEncarFilterBounds(),
+) {
   const manufacturerFilter = manufacturer
     ? `_.Manufacturer.${manufacturer}.`
     : "";
-  return `(And.Hidden.N.${manufacturerFilter}_.Year.range(202100..202700)._.Mileage.range(..120000)._.Price.range(700..15000).)`;
+  const fuelFilter = fuelType === "electric" ? "_.FuelType.전기." : "";
+  return `(And.Hidden.N.${manufacturerFilter}${fuelFilter}_.Year.range(${bounds.minYear}..${bounds.maxYear})._.Mileage.range(..${bounds.maxMileage})._.Price.range(${bounds.minPrice}..${bounds.maxPrice}).)`;
 }
 
-function buildListUrl(offset: number, manufacturer?: string) {
-  const query = encodeURIComponent(buildFilter(manufacturer));
+function nonNegativeInt(value: string | undefined, fallback: number) {
+  const parsed = Number.parseInt(String(value ?? ""), 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function getEncarFilterBounds(): EncarFilterBounds {
+  return {
+    minYear: nonNegativeInt(process.env.ENCAR_MIN_YEAR, 202100),
+    maxYear: nonNegativeInt(process.env.ENCAR_MAX_YEAR, 202700),
+    maxMileage: nonNegativeInt(process.env.ENCAR_MAX_MILEAGE, 120000),
+    minPrice: nonNegativeInt(process.env.ENCAR_MIN_PRICE, 700),
+    maxPrice: nonNegativeInt(process.env.ENCAR_MAX_PRICE, 15000),
+  };
+}
+
+function buildListUrl(
+  offset: number,
+  manufacturer?: string,
+  fuelType?: "electric",
+) {
+  const query = encodeURIComponent(buildFilter(manufacturer, fuelType));
   const sort = encodeURIComponent(`|ModifiedDate|${offset}|${ENCAR_PAGE_SIZE}`);
   return `${ENCAR_BASE_URL}?count=true&q=${query}&sr=${sort}`;
 }
@@ -328,6 +374,25 @@ function buildPhotos(car: EncarListCar): EncarPhoto[] {
     ];
   }
   return [];
+}
+
+function inferEngineCcFromBadge(
+  listCar: EncarListCar,
+  detail: EncarDetail | null,
+) {
+  if (detail?.displacement) return detail.displacement;
+  if (listCar.Displacement) return listCar.Displacement;
+
+  const badge = [listCar.Badge, listCar.BadgeDetail].filter(Boolean).join(" ");
+  const ccMatch = badge.match(/(\d{3,4})\s*(?:cc|㎤|시시)/i);
+  if (ccMatch) return Number(ccMatch[1]);
+
+  const litreMatch = badge.match(
+    /(?:^|\s)(\d(?:[.,]\d{1,2})?)(?=\s*(?:T|터보|하이브리드|HEV|AWD|FWD|2WD|4WD|$))/i,
+  );
+  if (!litreMatch) return null;
+  const litres = Number(litreMatch[1].replace(",", "."));
+  return litres >= 0.6 && litres <= 8 ? Math.round(litres * 1000) : null;
 }
 
 function normalizeEncarPhotos(
@@ -451,6 +516,7 @@ async function fetchDetail(vehicleId: string): Promise<EncarDetail> {
 
   return {
     displacement: spec.displacement ?? null,
+    fuelName: spec.fuelName ?? null,
     color: normalizeColor(spec.colorName),
     seats: spec.seatCount ?? null,
     bodyTypeKr: spec.bodyName ?? null,
@@ -459,6 +525,8 @@ async function fetchDetail(vehicleId: string): Promise<EncarDetail> {
     manufacturerEnglish: data.category?.manufacturerEnglishName ?? null,
     modelEnglish: data.category?.modelGroupEnglishName ?? null,
     registeredAt: data.manage?.registDateTime ?? null,
+    firstAdvertisedAt: data.manage?.firstAdvertisedDateTime ?? null,
+    modifiedAt: data.manage?.modifyDateTime ?? null,
     vehicleNo: data.vehicleNo ?? null,
     vin: spec.vin ?? data.vin ?? null,
     transmission: spec.transmissionName ?? null,
@@ -467,6 +535,22 @@ async function fetchDetail(vehicleId: string): Promise<EncarDetail> {
     photos: normalizeEncarPhotos(data.photos ?? []),
     raw: data,
   };
+}
+
+let listFixturePromise: Promise<EncarListCar[] | null> | null = null;
+
+async function readListFixture() {
+  const fixturePath = process.env.ENCAR_LIST_FIXTURE_FILE?.trim();
+  if (!fixturePath) return null;
+  if (!listFixturePromise) {
+    listFixturePromise = readFile(fixturePath, "utf8").then((raw) => {
+      const parsed = JSON.parse(raw) as
+        | EncarListCar[]
+        | { SearchResults?: EncarListCar[] };
+      return Array.isArray(parsed) ? parsed : parsed.SearchResults ?? [];
+    });
+  }
+  return listFixturePromise;
 }
 
 async function fetchStandardOptionCatalog() {
@@ -787,9 +871,23 @@ async function fetchEnrichment(
   };
 }
 
-async function fetchListPage(offset: number, manufacturer?: string) {
+async function fetchListPage(
+  offset: number,
+  manufacturer?: string,
+  fuelType?: "electric",
+) {
+  const fixture = await readListFixture();
+  if (fixture) {
+    return fixture
+      .filter((item) => !manufacturer || item.Manufacturer === manufacturer)
+      .filter(
+        (item) =>
+          fuelType !== "electric" || normalizeFuel(item.FuelType) === "electric",
+      )
+      .slice(offset, offset + ENCAR_PAGE_SIZE);
+  }
   const data = await fetchJson<{ SearchResults?: EncarListCar[] }>(
-    buildListUrl(offset, manufacturer),
+    buildListUrl(offset, manufacturer, fuelType),
     6,
   );
   return data.SearchResults ?? [];
@@ -800,19 +898,35 @@ async function mapCar(
   optionCatalog: EncarOptionCatalog,
   rateSnapshot: CalcRateSnapshot,
   onReject?: (reason: string) => void,
+  fastMode = false,
 ) {
   const sourceId = String(listCar.Id);
-  const detail = await fetchDetail(sourceId).catch(() => null);
-  await sleep(120);
+  const detail = fastMode ? null : await fetchDetail(sourceId).catch(() => null);
+  if (!fastMode) await sleep(120);
   const photos = detail?.photos.length ? detail.photos : buildPhotos(listCar);
   const brand = normalizeBrand(
     detail?.manufacturerEnglish ?? listCar.Manufacturer,
   );
   const model = normalizeModel(detail?.modelEnglish ?? listCar.Model);
   const { year, month } = normalizeYear(listCar.Year);
-  const engineCc = detail?.displacement ?? listCar.Displacement ?? null;
-  const fuelType = normalizeFuel(listCar.FuelType);
+  const fuelType = normalizeFuel(detail?.fuelName ?? listCar.FuelType);
+  const isPureElectric = fuelType === "electric";
+  const listedEngineCc = isPureElectric
+    ? null
+    : inferEngineCcFromBadge(listCar, detail);
+  const engineCc = isPureElectric
+    ? null
+    : resolveEngineCc({
+        brand,
+        model,
+        badge: listCar.Badge,
+        badgeDetail: detail?.gradeEnglish ?? listCar.BadgeDetail,
+        fuelType,
+        engineCc: listedEngineCc,
+        year,
+      });
   if (
+    !isPureElectric &&
     isElectrifiedConfiguration({
       brand,
       model,
@@ -837,26 +951,39 @@ async function mapCar(
     engineCc,
     year,
   });
-  if (!power || power.source === "engine_fallback") {
+  if (!isPureElectric && !power) {
     onReject?.(
       `power:${brand ?? "unknown"}:${model ?? "unknown"}:${detail?.gradeEnglish ?? listCar.Badge ?? "unknown"}:${engineCc ?? "unknown"}`,
     );
     return null;
   }
+  // Keep the displacement-based fallback used by Autoexport when Encar does
+  // not expose a verified trim power; the warning below preserves provenance.
   const powerHp = power?.powerHp ?? null;
   const [enrichment, historyResult] = await Promise.all([
-    fetchEnrichment(
-      sourceId,
-      detail,
-      optionCatalog,
-      Boolean(listCar.Condition?.includes("Inspection")),
-    ),
-    detail?.vehicleNo
-      ? fetchEncarHistory(detail.vehicleNo)
-      : Promise.resolve<EncarHistoryResult>({
+    fastMode
+      ? Promise.resolve({
+          options: [] as EncarOptionRow[],
+          reports: [] as EncarConditionReport[],
+          reportMedia: [],
+        })
+      : fetchEnrichment(
+          sourceId,
+          detail,
+          optionCatalog,
+          Boolean(listCar.Condition?.includes("Inspection")),
+        ),
+    fastMode
+      ? Promise.resolve<EncarHistoryResult>({
           status: "unavailable",
-          reason: "vehicle_number_missing",
-        }),
+          reason: "bulk_fast_import",
+        })
+      : detail?.vehicleNo
+        ? fetchEncarHistory(detail.vehicleNo)
+        : Promise.resolve<EncarHistoryResult>({
+            status: "unavailable",
+            reason: "vehicle_number_missing",
+          }),
   ]);
   const { options, reports, reportMedia } = enrichment;
   const historyReport =
@@ -873,9 +1000,9 @@ async function mapCar(
     | undefined;
   const priceKrw = Number(listCar.Price ?? 0) * 10000;
   const sourceUpdatedAt =
-    listCar.Photos?.[0]?.updatedDate ?? detail?.registeredAt ?? null;
+    detail?.modifiedAt ?? listCar.Photos?.[0]?.updatedDate ?? detail?.registeredAt ?? null;
   const calc =
-    year && engineCc && powerHp && priceKrw
+    !isPureElectric && year && engineCc && powerHp && priceKrw
       ? calculateRuVladivostok({
           priceKrw,
           year,
@@ -890,7 +1017,7 @@ async function mapCar(
         })
       : null;
   if (
-    !calc ||
+    (!isPureElectric && !calc) ||
     !photos.some(
       (photo) => photo.category === "outer" || photo.category === "thumbnail",
     )
@@ -909,7 +1036,15 @@ async function mapCar(
   return {
     car: {
       vehicle_type: "car",
-      vehicle_specs: { seats: detail?.seats ?? null },
+      vehicle_specs: {
+        seats: detail?.seats ?? null,
+        ...(listedEngineCc == null && engineCc
+          ? { engine_cc_source: "verified_model_fallback" }
+          : {}),
+        ...(isPureElectric
+          ? { calculation_status: "pending_official_ev_tariff" }
+          : {}),
+      },
       primary_source: "encar",
       source_kind: "encar",
       source_id: sourceId,
@@ -917,7 +1052,7 @@ async function mapCar(
       enrichment_status: "source_only",
       is_available: true,
       sale_status: null,
-      published_at: null,
+      published_at: detail?.firstAdvertisedAt ?? null,
       source_updated_at: sourceUpdatedAt,
       last_seen_at: new Date().toISOString(),
       brand,
@@ -933,7 +1068,7 @@ async function mapCar(
       registration_date: null,
       mileage_km: listCar.Mileage ?? null,
       price_krw: priceKrw || null,
-      price_rub: calc?.totalRub ?? null,
+      price_rub: calc ? Math.round(calc.totalRub) : null,
       engine_cc: engineCc,
       power_hp: powerHp,
       power_source: power?.source ?? null,
@@ -959,13 +1094,23 @@ async function mapCar(
       has_underbody_photo: false,
       has_thermal_images: false,
       data_confidence:
-        detail && powerHp && historyReport
+        detail && (powerHp || isPureElectric) && historyReport
           ? 0.86
-          : detail && powerHp
+          : detail && powerHp && power?.source !== "engine_fallback"
             ? 0.76
+            : power?.source === "engine_fallback"
+              ? 0.62
             : 0.58,
       data_warnings: [
-        ...(!powerHp ? ["power_missing", "calc_deferred"] : []),
+        ...(!powerHp ? ["power_missing"] : []),
+        ...(power?.source === "engine_fallback"
+          ? ["power_normalized_from_engine"]
+          : []),
+        ...(listedEngineCc == null && engineCc
+          ? ["engine_cc_normalized_from_verified_model"]
+          : []),
+        ...(isPureElectric ? ["ev_calculation_pending"] : []),
+        ...(!isPureElectric && !calc ? ["calc_deferred"] : []),
         ...(historyResult.status === "unavailable"
           ? [historyResult.reason]
           : []),
@@ -982,7 +1127,7 @@ async function mapCar(
       source_url: `https://fem.encar.com/cars/detail/${sourceId}`,
       payload: snapshotPayload,
       payload_hash: hashPayload(snapshotPayload),
-      parser_version: "encar-media-semantic-2026-07-26",
+      parser_version: "encar-electric-safe-2026-08-24",
       status: "ok",
     },
   };
@@ -992,6 +1137,16 @@ export async function importEncar(options: ImportOptions = {}) {
   const target = options.target ?? positiveInt(process.env.ENCAR_TARGET, 20);
   const maxPages =
     options.maxPages ?? positiveInt(process.env.ENCAR_MAX_PAGES, 2);
+  const electricTarget = Math.min(
+    target,
+    options.electricTarget ?? positiveInt(process.env.ENCAR_ELECTRIC_TARGET, 4),
+  );
+  const electricPages =
+    options.electricPages ?? positiveInt(process.env.ENCAR_ELECTRIC_PAGES, 3);
+  const onlyNew =
+    options.onlyNew ?? process.env.ENCAR_ONLY_NEW === "true";
+  const fastMode =
+    options.fastMode ?? process.env.ENCAR_FAST_MODE === "true";
   const dryRun = options.dryRun ?? process.env.ENCAR_DRY_RUN !== "false";
   const replaceCatalog =
     options.replaceCatalog ?? process.env.ENCAR_REPLACE_CATALOG === "true";
@@ -1038,7 +1193,9 @@ export async function importEncar(options: ImportOptions = {}) {
   }
   const rateSnapshot = await getCbrCalcRates();
   const mapped: NonNullable<Awaited<ReturnType<typeof mapCar>>>[] = [];
-  const optionCatalog = await fetchStandardOptionCatalog();
+  const optionCatalog = fastMode
+    ? { options: [] as EncarOptionDefinition[] }
+    : await fetchStandardOptionCatalog();
   const identities = new Set<string>();
 
   const candidates: EncarListCar[] = [];
@@ -1093,16 +1250,54 @@ export async function importEncar(options: ImportOptions = {}) {
     if (!list.length) break;
     candidates.push(...list);
   }
+  for (let page = 0; page < electricPages; page += 1) {
+    try {
+      const list = await fetchListPage(
+        page * ENCAR_PAGE_SIZE,
+        undefined,
+        "electric",
+      );
+      if (!list.length) break;
+      candidates.push(...list);
+    } catch (error) {
+      listPageErrors.push({
+        page: page + 1,
+        brand: "electric",
+        message: error instanceof Error ? error.message : String(error),
+      });
+      break;
+    }
+  }
 
-  const freshCandidates = [
+  const uniqueCandidates = [
     ...new Map(candidates.map((item) => [String(item.Id), item])).values(),
-  ]
+  ];
+  let existingSourceIds = new Set<string>();
+  if (onlyNew && uniqueCandidates.length) {
+    const supabase = createSupabaseAdmin();
+    const candidateIds = uniqueCandidates.map((item) => String(item.Id));
+    for (let index = 0; index < candidateIds.length; index += 200) {
+      const chunk = candidateIds.slice(index, index + 200);
+      const { data, error } = await supabase
+        .from("cars")
+        .select("source_id")
+        .eq("primary_source", "encar")
+        .in("source_id", chunk);
+      if (error) throw error;
+      for (const row of data ?? []) {
+        if (row.source_id) existingSourceIds.add(String(row.source_id));
+      }
+    }
+  }
+
+  const freshCandidates = uniqueCandidates
+    .filter((item) => !onlyNew || !existingSourceIds.has(String(item.Id)))
     .filter((item) =>
       isFreshListing(item.Photos?.[0]?.updatedDate, maxListingAgeDays),
     )
     .filter((item) => {
       const fuel = normalizeFuel(item.FuelType);
-      return fuel === "gasoline" || fuel === "diesel";
+      return fuel === "gasoline" || fuel === "diesel" || fuel === "electric";
     })
     .sort((left, right) => Number(right.Id) - Number(left.Id));
 
@@ -1133,6 +1328,7 @@ export async function importEncar(options: ImportOptions = {}) {
           quotaRejections.push({ sourceId, brand: candidateBrand, reason });
         }
       },
+      fastMode,
     );
     if (mappedCar) {
       const identity =
@@ -1154,8 +1350,23 @@ export async function importEncar(options: ImportOptions = {}) {
         }
       }
     }
-    await sleep(180);
+    if (!fastMode) await sleep(180);
   };
+
+  const electricCandidates = freshCandidates
+    .filter((item) => normalizeFuel(item.FuelType) === "electric")
+    .sort((left, right) => {
+      const preferred = new Set(["Hyundai", "Kia", "Genesis"]);
+      return Number(preferred.has(normalizeBrand(right.Manufacturer) ?? "")) -
+        Number(preferred.has(normalizeBrand(left.Manufacturer) ?? ""));
+    });
+  for (const item of electricCandidates) {
+    const electricCount = mapped.filter(
+      (entry) => entry.car.fuel_type === "electric",
+    ).length;
+    if (electricCount >= electricTarget || mapped.length >= target) break;
+    await tryMapCandidate(item);
+  }
 
   for (const [requiredIdentity, minimum] of Object.entries(modelMinimums)) {
     const [requiredBrand, requiredModel] = requiredIdentity.split(":", 2);
@@ -1180,7 +1391,11 @@ export async function importEncar(options: ImportOptions = {}) {
     }
   }
 
-  for (const item of freshCandidates) {
+  const combustionCandidates = freshCandidates.filter((item) => {
+    const fuel = normalizeFuel(item.FuelType);
+    return fuel === "gasoline" || fuel === "diesel";
+  });
+  for (const item of combustionCandidates) {
     if (mapped.length >= target) break;
     await tryMapCandidate(item);
   }
@@ -1190,13 +1405,26 @@ export async function importEncar(options: ImportOptions = {}) {
   const modelMinimumsSatisfied = Object.entries(modelMinimums).every(
     ([identity, minimum]) => (mappedModelCounts[identity] ?? 0) >= minimum,
   );
+  const quotaRejectionCounts = quotaRejections.reduce<Record<string, number>>(
+    (counts, rejection) => {
+      const key = rejection.reason.split(":", 1)[0] || rejection.reason;
+      counts[key] = (counts[key] ?? 0) + 1;
+      return counts;
+    },
+    {},
+  );
 
   if (dryRun) {
     return {
       dryRun,
       candidates: candidates.length,
+      uniqueCandidates: uniqueCandidates.length,
+      onlyNew,
+      existingCandidates: existingSourceIds.size,
       listPageErrors,
       freshCandidates: freshCandidates.length,
+      electricTarget,
+      electricSeen: mapped.filter((item) => item.car.fuel_type === "electric").length,
       seen: mapped.length,
       written: 0,
       brandMinimums,
@@ -1206,6 +1434,7 @@ export async function importEncar(options: ImportOptions = {}) {
       modelCounts: mappedModelCounts,
       modelMinimumsSatisfied,
       quotaRejectionCount: quotaRejections.length,
+      quotaRejectionCounts,
       quotaRejections: quotaRejections.slice(0, 10),
       sample: mapped.slice(0, 3).map((item) => ({
         car: item.car,
@@ -1228,7 +1457,11 @@ export async function importEncar(options: ImportOptions = {}) {
       meta: {
         target,
         maxPages,
-        replaceCatalog,
+        electricTarget,
+      electricPages,
+      onlyNew,
+      fastMode,
+      replaceCatalog,
         brandMinimums,
         modelMinimums,
         priorityBrandPages,
@@ -1240,10 +1473,19 @@ export async function importEncar(options: ImportOptions = {}) {
 
   let written = 0;
   let deactivated = 0;
-  const errors: unknown[] = [];
+  const errors: Array<{ sourceId: string; error: unknown }> = [];
 
-  for (const item of mapped) {
-    try {
+  // Fast bulk imports contain only fresh rows, without enrichment/options or
+  // reports.  Keep the full write sequence for normal imports, but allow a
+  // small bounded concurrency for bulk inserts so a 500-item refresh does not
+  // spend several minutes doing independent network round trips in series.
+  let writeCursor = 0;
+  const writeWorker = async () => {
+    while (writeCursor < mapped.length) {
+      const item = mapped[writeCursor];
+      writeCursor += 1;
+      if (!item) continue;
+      try {
       const { data: savedCar, error: carError } = await supabase
         .from("cars")
         .upsert(item.car, { onConflict: "primary_source,source_id" })
@@ -1341,25 +1583,33 @@ export async function importEncar(options: ImportOptions = {}) {
             inputs: item.car,
             rates: { ...item.calc.rates, details: item.calc.rateDetails },
             result: item.calc,
-            car_price_rub: item.calc.carPriceRub,
-            duty_rub: item.calc.dutyRub,
-            fees_rub: item.calc.feesRub,
-            util_rub: item.calc.utilRub,
-            freight_rub: item.calc.freightRub,
-            broker_rub: item.calc.brokerRub,
-            total_rub: item.calc.totalRub,
+            car_price_rub: Math.round(item.calc.carPriceRub),
+            duty_rub: Math.round(item.calc.dutyRub),
+            fees_rub: Math.round(item.calc.feesRub),
+            util_rub: Math.round(item.calc.utilRub),
+            freight_rub: Math.round(item.calc.freightRub),
+            broker_rub: Math.round(item.calc.brokerRub),
+            total_rub: Math.round(item.calc.totalRub),
           }),
         );
       }
 
       written += 1;
-    } catch (error) {
-      errors.push(error);
+      } catch (error) {
+        errors.push({ sourceId: item.car.source_id, error });
+      }
     }
-  }
+  };
+  const writeConcurrency = fastMode && onlyNew ? 8 : 1;
+  await Promise.all(
+    Array.from({ length: Math.min(writeConcurrency, mapped.length) }, () =>
+      writeWorker(),
+    ),
+  );
 
   if (
     replaceCatalog &&
+    process.env.ENCAR_AUTHORITATIVE_REPLACE === "true" &&
     brandMinimumsSatisfied &&
     modelMinimumsSatisfied &&
     errors.length === 0 &&
@@ -1373,7 +1623,7 @@ export async function importEncar(options: ImportOptions = {}) {
       .eq("primary_source", "encar")
       .eq("is_available", true);
     if (currentCarsError) {
-      errors.push(currentCarsError);
+      errors.push({ sourceId: "catalog-replacement", error: currentCarsError });
     } else {
       const staleIds = (currentCars ?? [])
         .filter((car) => !activeSourceIds.has(String(car.source_id)))
@@ -1386,7 +1636,7 @@ export async function importEncar(options: ImportOptions = {}) {
         try {
           await purgeRetiredEncarRelations(supabase, staleIds, staleSourceIds);
         } catch (error) {
-          errors.push(error);
+          errors.push({ sourceId: "catalog-replacement", error });
           relationsPurged = false;
         }
         if (relationsPurged) {
@@ -1394,7 +1644,9 @@ export async function importEncar(options: ImportOptions = {}) {
             .from("cars")
             .update({ is_available: false })
             .in("id", staleIds);
-          if (retireError) errors.push(retireError);
+          if (retireError) {
+            errors.push({ sourceId: "catalog-replacement", error: retireError });
+          }
           else deactivated = staleIds.length;
         }
       }
@@ -1416,8 +1668,13 @@ export async function importEncar(options: ImportOptions = {}) {
   return {
     dryRun,
     candidates: candidates.length,
+    uniqueCandidates: uniqueCandidates.length,
+    onlyNew,
+    existingCandidates: existingSourceIds.size,
     listPageErrors,
     freshCandidates: freshCandidates.length,
+    electricTarget,
+    electricSeen: mapped.filter((item) => item.car.fuel_type === "electric").length,
     seen: mapped.length,
     written,
     deactivated,
@@ -1429,6 +1686,7 @@ export async function importEncar(options: ImportOptions = {}) {
     modelCounts: mappedModelCounts,
     modelMinimumsSatisfied,
     quotaRejectionCount: quotaRejections.length,
+    quotaRejectionCounts,
     quotaRejections: quotaRejections.slice(0, 10),
   };
 }
