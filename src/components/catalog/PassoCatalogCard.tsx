@@ -52,44 +52,36 @@ export function PassoCatalogCard({ car, calculationRates }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewerOpen, selected, images.length]);
 
-  const onMobileRailScroll = (scrollLeft: number, firstSlide: HTMLElement | null) => {
-    if (!firstSlide || images.length < 2) return;
-    const index = Math.round(scrollLeft / (firstSlide.offsetWidth + 8));
-    setSelected(Math.max(0, Math.min(images.length - 1, index)));
-  };
-
-  const openFromMobileRail = () => {
-    if (suppressPhotoClick.current) return;
-    setViewerOpen(true);
-  };
-
   return (
     <article className="flex w-[calc(100vw-42px)] shrink-0 snap-start flex-col overflow-hidden rounded-[24px] bg-white shadow-[0_12px_30px_rgba(31,43,65,0.09)] ring-1 ring-[#d8dde6] md:w-auto md:rounded-[20px]">
       <div className="bg-[#eef1f5] p-1.5 sm:hidden">
         {images.length ? (
-          <div
-            aria-label={`Лента фотографий: ${title}`}
-            className="scrollbar-none flex snap-x snap-mandatory gap-2 overflow-x-auto touch-pan-x"
-            onClick={openFromMobileRail}
-            onScroll={(event) => onMobileRailScroll(event.currentTarget.scrollLeft, event.currentTarget.firstElementChild as HTMLElement | null)}
+          <button
+            aria-label={`Открыть фотогалерею: ${title}`}
+            className="relative block aspect-[16/10] w-full overflow-hidden rounded-[19px] bg-[#dfe4ec] touch-pan-y"
+            onClick={() => {
+              if (!suppressPhotoClick.current) setViewerOpen(true);
+            }}
             onTouchEnd={(event) => {
               const start = touchStartX.current;
               touchStartX.current = null;
-              if (start !== null && Math.abs(event.changedTouches[0]?.clientX - start) > 10) {
-                suppressPhotoClick.current = true;
-                window.setTimeout(() => { suppressPhotoClick.current = false; }, 0);
-              }
+              const end = event.changedTouches[0]?.clientX;
+              if (start === null || end == null || Math.abs(end - start) < 35) return;
+              suppressPhotoClick.current = true;
+              if (end > start) previous(); else next();
+              window.setTimeout(() => { suppressPhotoClick.current = false; }, 220);
             }}
             onTouchStart={(event) => { touchStartX.current = event.touches[0]?.clientX ?? null; }}
-            role="button"
-            tabIndex={0}
+            type="button"
           >
-            {images.map((url, index) => (
-              <div className="relative aspect-[16/10] w-[calc(100%-32px)] shrink-0 snap-start overflow-hidden rounded-[19px] bg-[#dfe4ec]" key={url}>
-                <RemoteImage alt={`${title}, фото ${index + 1}`} className="object-cover" fill loading={index === 0 ? "eager" : "lazy"} sizes="calc(100vw - 54px)" src={passoImageProxyUrl(url)} fallback={<ImageIcon size={32} />} />
-              </div>
-            ))}
-          </div>
+            <span className="flex h-full w-full transition-transform duration-300 ease-out" style={{ transform: `translateX(-${selected * 100}%)` }}>
+              {images.map((url, index) => (
+                <span className="relative h-full w-full shrink-0" key={url}>
+                  <RemoteImage alt={`${title}, фото ${index + 1}`} className="object-cover" fill loading={index === 0 ? "eager" : "lazy"} sizes="calc(100vw - 54px)" src={passoImageProxyUrl(url)} fallback={<ImageIcon size={32} />} />
+                </span>
+              ))}
+            </span>
+          </button>
         ) : <PhotoFallback />}
         {images.length > 1 ? <PhotoCounter current={selected} total={images.length} /> : null}
       </div>
@@ -138,12 +130,21 @@ export function PassoCatalogCard({ car, calculationRates }: Props) {
 
 function FullscreenViewer({ close, closeRef, dialogRef, images, selected, setSelected, title }: { close: () => void; closeRef: RefObject<HTMLButtonElement | null>; dialogRef: RefObject<HTMLDivElement | null>; images: string[]; selected: number; setSelected: (value: number) => void; title: string }) {
   const touchStartX = useRef<number | null>(null);
+  const mobileViewerRailRef = useRef<HTMLDivElement>(null);
   const move = (direction: -1 | 1) => setSelected((selected + direction + images.length) % images.length);
+
+  useEffect(() => {
+    const rail = mobileViewerRailRef.current;
+    if (!rail || selected === 0) return;
+    rail.scrollLeft = rail.clientWidth * selected;
+    // Position the viewer on the photo that was selected in the card.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return <div aria-label={`Фотогалерея ${title}`} aria-modal="true" className="fixed inset-0 z-[100] flex flex-col bg-[#07101c]/95 text-white" ref={dialogRef} role="dialog" tabIndex={-1}>
     <div className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-white/10 px-4 sm:px-6"><div className="min-w-0"><p className="truncate text-sm font-semibold">{title}</p><p className="text-xs text-white/60">{selected + 1} из {images.length}</p></div><button aria-label="Закрыть фотогалерею" className="grid size-10 place-items-center rounded-full bg-white/10 transition hover:bg-white/20" onClick={close} ref={closeRef} type="button"><X size={22} /></button></div>
     <div className="relative min-h-0 flex-1 p-3 sm:p-8">
-      <div className="scrollbar-none flex h-full snap-x snap-mandatory gap-3 overflow-x-auto sm:hidden" onScroll={(event) => { const slide = event.currentTarget.firstElementChild as HTMLElement | null; if (slide) setSelected(Math.max(0, Math.min(images.length - 1, Math.round(event.currentTarget.scrollLeft / (slide.offsetWidth + 12))))); }} onTouchStart={(event) => { touchStartX.current = event.touches[0]?.clientX ?? null; }} onTouchEnd={(event) => { const start = touchStartX.current; touchStartX.current = null; if (start !== null && Math.abs(event.changedTouches[0]?.clientX - start) > 25) return; }}>
+      <div className="scrollbar-none flex h-full snap-x snap-mandatory gap-3 overflow-x-auto sm:hidden" ref={mobileViewerRailRef} onScroll={(event) => { const slide = event.currentTarget.firstElementChild as HTMLElement | null; if (slide) setSelected(Math.max(0, Math.min(images.length - 1, Math.round(event.currentTarget.scrollLeft / (slide.offsetWidth + 12))))); }} onTouchStart={(event) => { touchStartX.current = event.touches[0]?.clientX ?? null; }} onTouchEnd={(event) => { const start = touchStartX.current; touchStartX.current = null; if (start !== null && Math.abs(event.changedTouches[0]?.clientX - start) > 25) return; }}>
         {images.map((url, index) => <div className="relative h-full w-full shrink-0 snap-center" key={url}><RemoteImage alt={`${title}, фото ${index + 1}`} className="object-contain" fill priority={index === selected} sizes="100vw" src={passoImageProxyUrl(url)} fallback="Фото временно недоступно" /></div>)}
       </div>
       <div className="relative hidden h-full sm:block"><RemoteImage alt={`${title}, фото ${selected + 1}`} className="object-contain" fill priority sizes="100vw" src={passoImageProxyUrl(images[selected])} fallback="Фото временно недоступно" />{images.length > 1 ? <><button aria-label="Предыдущее фото" className="absolute left-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-black/55 transition hover:bg-black/80" onClick={() => move(-1)} type="button"><ChevronLeft size={24} /></button><button aria-label="Следующее фото" className="absolute right-3 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-black/55 transition hover:bg-black/80" onClick={() => move(1)} type="button"><ChevronRight size={24} /></button></> : null}</div>
