@@ -272,9 +272,9 @@ async function StagingCatalogPage({ category, page }: { category: StagingCatalog
   });
   const calculationRates = rateSnapshot?.rates ?? null;
   const labels = {
-    motorcycle: { eyebrow: "Passo Bike", title: "Мототехника из Кореи", description: "Свежие объявления мотоциклов и скутеров с характеристиками и фотографиями из Passo." },
-    scooter: { eyebrow: "Passo Bike", title: "Скутеры из Кореи", description: "Свежие объявления скутеров с характеристиками и фотографиями из Passo." },
-    jetski: { eyebrow: "Passo Boat", title: "Гидроциклы из Кореи", description: "Только гидроциклы из раздела Passo. Лодки и яхты исключены." },
+    motorcycle: { title: "Мототехника из Кореи" },
+    scooter: { title: "Скутеры из Кореи" },
+    jetski: { title: "Гидроциклы из Кореи" },
   }[category];
   return (
     <main className="min-h-screen bg-[#f5f6f8] text-[#101827]">
@@ -282,9 +282,8 @@ async function StagingCatalogPage({ category, page }: { category: StagingCatalog
       <CatalogCategoryTabs active={category} />
       <section className="border-b border-[#dce2eb] bg-white">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-5 md:py-10">
-          <p className="text-xs font-semibold text-[#956f2c] sm:text-sm">{labels.eyebrow}</p>
           <div className="mt-1.5 flex flex-col gap-4">
-            <div><h1 className="text-[32px] font-semibold leading-tight sm:text-4xl">{labels.title}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-[#647084]">{labels.description}</p></div>
+            <div><h1 className="text-[32px] font-semibold leading-tight sm:text-4xl">{labels.title}</h1></div>
           </div>
         </div>
       </section>
