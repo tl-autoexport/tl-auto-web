@@ -283,9 +283,8 @@ async function StagingCatalogPage({ category, page }: { category: StagingCatalog
       <section className="border-b border-[#dce2eb] bg-white">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-5 md:py-10">
           <p className="text-xs font-semibold text-[#956f2c] sm:text-sm">{labels.eyebrow}</p>
-          <div className="mt-1.5 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <div className="mt-1.5 flex flex-col gap-4">
             <div><h1 className="text-[32px] font-semibold leading-tight sm:text-4xl">{labels.title}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-[#647084]">{labels.description}</p></div>
-            <div className="rounded-full bg-[#f5f0e4] px-4 py-2 text-sm text-[#7b5a22]"><strong className="mr-1 text-xl text-[#101827]">{totalCars}</strong> объявлений</div>
           </div>
         </div>
       </section>
@@ -295,7 +294,7 @@ async function StagingCatalogPage({ category, page }: { category: StagingCatalog
           <span>Сначала свежие объявления</span>
         </div>
         {shownCars.length ? <>
-          <div className="-mx-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-3 md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0 md:pb-0 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {shownCars.map((car) => <PassoCatalogCard key={car.id} car={car} calculationRates={calculationRates} />)}
           </div>
           {totalPages > 1 ? <Pagination currentPage={currentPage} rawParams={{ category }} totalPages={totalPages} /> : null}

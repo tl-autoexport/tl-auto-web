@@ -53,7 +53,7 @@ export function PassoCatalogCard({ car, calculationRates }: Props) {
   }, [viewerOpen, selected, images.length]);
 
   return (
-    <article className="flex w-[calc(100vw-42px)] shrink-0 snap-start flex-col overflow-hidden rounded-[24px] bg-white shadow-[0_12px_30px_rgba(31,43,65,0.09)] ring-1 ring-[#d8dde6] md:w-auto md:rounded-[20px]">
+    <article className="flex w-full flex-col overflow-hidden rounded-[22px] bg-white shadow-[0_12px_30px_rgba(31,43,65,0.09)] ring-1 ring-[#d8dde6] md:rounded-[20px]">
       <div className="bg-[#eef1f5] p-1.5 sm:hidden">
         {images.length ? (
           <button
@@ -103,17 +103,17 @@ export function PassoCatalogCard({ car, calculationRates }: Props) {
         <div className="flex items-start justify-between gap-3">
           <div>
             <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${isJetski ? "bg-[#e3f3f5] text-[#126f79]" : "bg-[#eef0f7] text-[#445276]"}`}>{typeLabel(car.vehicle_type)}</span>
-            <Link className="mt-2 block" href={detailsHref}><h2 className="line-clamp-2 text-xl font-semibold leading-tight text-[#101827] transition hover:text-[#8a6828]">{title}</h2></Link>
+            <Link className="mt-2 block" href={detailsHref}><h2 className="line-clamp-2 text-[21px] font-semibold leading-tight text-[#101827] transition hover:text-[#8a6828] sm:text-xl">{title}</h2></Link>
           </div>
           {car.year ? <span className="shrink-0 rounded-full border border-[#d3dae5] px-2.5 py-1 text-sm font-medium text-[#536176]">{car.year}</span> : null}
         </div>
-        <p className="mt-3 text-sm leading-6 text-[#536176]">{facts.primary.join(" · ") || "Характеристики уточняются"}</p>
-        {facts.secondary.length ? <p className="mt-1.5 min-h-11 text-sm leading-6 text-[#536176]">{facts.secondary.join(" · ")}</p> : <div className="min-h-11" />}
-        <p className="mt-2 text-xs font-medium text-[#7a8798]">Южная Корея · доставка до Москвы</p>
-        <div className="mt-5 border-t border-[#e9edf2] pt-4">
+        <p className="mt-2.5 text-sm leading-5 text-[#536176]">{facts.primary.join(" · ") || "Характеристики уточняются"}</p>
+        {facts.secondary.length ? <p className="mt-1 min-h-10 text-sm leading-5 text-[#536176]">{facts.secondary.join(" · ")}</p> : <div className="min-h-10" />}
+        <p className="mt-1.5 text-xs font-medium text-[#7a8798]">Южная Корея · доставка до Москвы</p>
+        <div className="mt-3.5 border-t border-[#e9edf2] pt-3">
           <p className="text-xs text-[#7a8798]">Ориентировочная цена до Москвы</p>
           <p className="mt-1 text-2xl font-semibold tracking-tight text-[#101827]">{calculation.totalRub != null ? `${number.format(calculation.totalRub)} ₽` : "Расчёт уточняется"}</p>
-          {car.price_krw != null ? <p className="mt-1 text-xs text-[#7a8798]">Цена в Корее: {number.format(car.price_krw)} ₩</p> : null}
+          {car.price_krw != null ? <p className="mt-0.5 text-xs text-[#7a8798]">Цена в Корее: {number.format(car.price_krw)} ₩</p> : null}
         </div>
       </div>
 
