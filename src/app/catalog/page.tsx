@@ -31,6 +31,7 @@ import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import { PassoCatalogCard } from "@/components/catalog/PassoCatalogCard";
 import { sourceDisplayName } from "@/lib/source-url";
+import { CatalogSearchBar } from "./CatalogSearchBar";
 
 const pageSize = 24;
 
@@ -145,6 +146,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const drives = unique(optionCars.map((car) => car.drive_type));
   const colors = unique(optionCars.map((car) => car.color));
   const popularBrands = brands.slice(0, 12);
+  const searchableModels = Object.entries(modelsByBrand).flatMap(([brand, modelNames]) => modelNames.map((model) => ({ brand, model })));
   const brandCounts = optionCars.reduce<Record<string, number>>((counts, car) => {
     if (car.brand) counts[car.brand] = (counts[car.brand] ?? 0) + 1;
     return counts;
@@ -172,6 +174,8 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   return (
     <main className="min-h-screen bg-[#f5f6f8] text-[#101827]">
       <SiteHeader />
+
+      <CatalogSearchBar brands={brands} initialValue={value("search")} models={searchableModels} />
 
       <CatalogCategoryTabs active="car" />
 
@@ -215,7 +219,8 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         </div>
       </section>
 
-      <section id="filters" className="mx-auto max-w-7xl px-3 py-4 sm:px-5 md:py-7">
+      <div className="mx-auto max-w-7xl md:grid md:grid-cols-[280px_minmax(0,1fr)] md:items-start md:gap-7 md:px-5">
+      <section id="filters" className="px-3 py-4 sm:px-0 md:sticky md:top-24 md:px-0 md:py-7">
         <div className="md:hidden">
           <MobileCatalogFilters
             activeCount={activeCount}
@@ -232,7 +237,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         </div>
       </section>
 
-      <section id="catalog-results" className="mx-auto max-w-7xl scroll-mt-4 px-3 pb-12 sm:px-5">
+      <section id="catalog-results" className="scroll-mt-4 px-3 pb-12 sm:px-0 md:pb-12">
         {activeChips.length ? (
           <div className="scrollbar-none mb-4 flex gap-2 overflow-x-auto">
             {activeChips.map((chip) => (
@@ -254,6 +259,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           {totalPages > 1 ? <Pagination currentPage={currentPage} rawParams={rawParams} totalPages={totalPages} /> : null}
         </> : <EmptyState />}
       </section>
+      </div>
     </main>
   );
 }
@@ -375,11 +381,11 @@ function CatalogFilterForm({
   );
 
   return (
-    <form action="/catalog" className={mobile ? "min-h-full bg-[#f4f6f9] pb-24" : "rounded-md border border-[#dce2eb] bg-white p-5 shadow-sm"}>
+    <form action="/catalog" className={mobile ? "min-h-full bg-[#f4f6f9] pb-24" : "rounded-md border border-[#dce2eb] bg-white p-4 shadow-sm"}>
       {mobile ? <input name="sort" type="hidden" value={sort} /> : null}
-      <div className={mobile ? "grid gap-4 p-4" : "grid gap-4 md:grid-cols-2 xl:grid-cols-4"}>
+      <div className={mobile ? "grid gap-4 p-4" : "grid gap-4 md:grid-cols-1"}>
         {!mobile ? (
-          <div className="flex items-center gap-3 md:col-span-2 xl:col-span-4">
+          <div className="flex items-center gap-3">
             <Filter className="text-[#956f2c]" size={20} />
             <div>
               <h2 className="font-semibold">Подбор автомобиля</h2>
@@ -398,14 +404,14 @@ function CatalogFilterForm({
             <div className="grid gap-4 pb-2 pt-3">{additionalFields}</div>
           </details>
         ) : additionalFields}
-        <div className={mobile ? "grid grid-cols-2 gap-2 border-t border-[#dce2eb] pt-4" : "flex flex-wrap gap-x-5 gap-y-3 md:col-span-2 xl:col-span-4"}>
+        <div className={mobile ? "grid grid-cols-2 gap-2 border-t border-[#dce2eb] pt-4" : "grid gap-2"}>
           <FilterCheck checked={under160} label="До 160 л.с." name="under160" value="1" />
           <FilterCheck checked={passable} label="Проходные 3–5 лет" name="passable" value="1" />
           <FilterCheck checked={clean} label="Без ДТП" name="clean" value="1" />
           <FilterCheck checked={value("noInsurance") === "1"} label="Без страховых выплат" name="noInsurance" value="1" />
         </div>
         {!mobile ? (
-          <div className="flex items-end gap-3 md:col-span-2 xl:col-span-4">
+          <div className="grid gap-3">
             <label className="grid min-w-64 gap-1.5 text-sm text-[#647084]">
               <span>Сортировка</span>
               <span className="relative">
