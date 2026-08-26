@@ -52,7 +52,11 @@ const emptyParameters: ParameterState = {
   transmission: "",
 };
 
-export function CatalogQuickNav() {
+function normalizeSearch(value: string) {
+  return value.toLocaleLowerCase("ru-RU").replace(/ё/g, "е").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+
+export function CatalogQuickNav({ brands = [], models = [] }: { brands?: string[]; models?: Array<{ brand: string; model: string }> }) {
   const [panel, setPanel] = useState<PanelName>(null);
   const [search, setSearch] = useState("");
   const [brand, setBrand] = useState("");
@@ -61,6 +65,13 @@ export function CatalogQuickNav() {
   const [resultCount, setResultCount] = useState<number | null>(null);
   const [countLoading, setCountLoading] = useState(false);
   const { country, city, setDestination } = useDestination();
+  const suggestions = useMemo(() => {
+    const query = normalizeSearch(search);
+    if (query.length < 2) return [];
+    return [...brands.map((brand) => ({ label: brand, query: brand })), ...models.map(({ brand, model }) => ({ label: `${brand} ${model}`, query: `${brand} ${model}` }))]
+      .filter((item, index, items) => items.findIndex((candidate) => normalizeSearch(candidate.label) === normalizeSearch(item.label)) === index)
+      .filter((item) => normalizeSearch(item.label).includes(query)).slice(0, 8);
+  }, [brands, models, search]);
 
   const parameterQuery = useMemo(() => {
     const query = new URLSearchParams();
@@ -107,9 +118,9 @@ export function CatalogQuickNav() {
     };
   }, [panel]);
 
-  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
+  const submitSearch = (event: FormEvent<HTMLFormElement>, nextSearch = search) => {
     event.preventDefault();
-    const value = search.trim();
+    const value = nextSearch.trim();
     const key = /^\d+$/.test(value) ? "number" : "search";
     window.location.assign(value ? `/catalog?${key}=${encodeURIComponent(value)}` : "/catalog");
   };
@@ -144,6 +155,7 @@ export function CatalogQuickNav() {
           <form className="relative w-full md:w-[260px] md:shrink-0" onSubmit={submitSearch}>
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#69768a]" size={17} />
             <input aria-label="Поиск по модели или номеру лота" className="h-11 w-full rounded-2xl border border-[#d7dee8] bg-white py-2 pl-10 pr-4 text-base text-[#101827] outline-none transition placeholder:text-[#7a8798] focus:border-[#956f2c] focus:ring-2 focus:ring-[#c7a55a]/20 md:h-10 md:rounded-full md:text-sm" enterKeyHint="search" inputMode="search" onChange={(event) => setSearch(event.target.value)} placeholder="Поиск по марке или модели" value={search} />
+            {suggestions.length ? <div className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-[#dce2eb] bg-white shadow-[0_12px_30px_rgba(16,24,39,0.14)]">{suggestions.map((item) => <button className="block w-full px-4 py-2.5 text-left text-sm hover:bg-[#f7f8fa]" key={item.query} onClick={() => { setSearch(item.query); window.location.assign(`/catalog?search=${encodeURIComponent(item.query)}`); }} type="button">{item.label}</button>)}</div> : null}
           </form>
           <div className="scrollbar-none flex w-full min-w-0 items-center gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none]">
             <QuickButton icon={SlidersHorizontal} label="Параметры" mobileLabel="Параметры" onClick={() => setPanel(panel === "parameters" ? null : "parameters")} open={panel === "parameters"} />

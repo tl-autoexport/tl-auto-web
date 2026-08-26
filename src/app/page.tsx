@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import {
   getCatalogCars,
+  getCatalogFacetCars,
   getHomeCatalogData,
   type CatalogCar,
 } from "@/server/cars/repository";
@@ -29,9 +30,10 @@ export const revalidate = 60;
 const prototypeSourceId = "42554713";
 
 export default async function Home() {
-  const [homeDataResult, prototypeResult] = await Promise.allSettled([
+  const [homeDataResult, prototypeResult, facetResult] = await Promise.allSettled([
     getHomeCatalogData(),
     getCatalogCars({ sourceId: prototypeSourceId, limit: 1 }),
+    getCatalogFacetCars(),
   ]);
   const { cars, under160Cars, electricCars } =
     homeDataResult.status === "fulfilled"
@@ -42,6 +44,7 @@ export default async function Home() {
   const electric = selectShelfCars(electricCars, usedCarIds);
   const newArrivals = selectShelfCars(cars, usedCarIds);
   const prototypeCar = prototypeResult.status === "fulfilled" ? prototypeResult.value[0] : undefined;
+  const facetCars = facetResult.status === "fulfilled" ? facetResult.value : [];
   const newArrivalCards = prototypeCar
     ? [prototypeCar, ...newArrivals.filter((car) => car.id !== prototypeCar.id).slice(0, 3)]
     : newArrivals;
@@ -81,7 +84,10 @@ export default async function Home() {
         </div>
       </section>
 
-      <CatalogQuickNav />
+      <CatalogQuickNav
+        brands={[...new Set(facetCars.map((car) => car.brand).filter(Boolean))] as string[]}
+        models={[...new Map(facetCars.filter((car) => car.brand && car.model).map((car) => [`${car.brand}:${car.model}`, { brand: car.brand!, model: car.model! }])).values()]}
+      />
 
       <div className="bg-[#f5f6f8]">
       <VehicleShelf
