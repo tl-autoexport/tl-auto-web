@@ -177,8 +177,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
       <CatalogSearchBar brands={brands} initialValue={value("search")} models={searchableModels} />
 
-      <CatalogCategoryTabs active="car" />
-
       <section className="border-b border-[#dce2eb] bg-white">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-5 md:py-10">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end md:gap-5">
@@ -285,7 +283,6 @@ async function StagingCatalogPage({ category, page }: { category: StagingCatalog
   return (
     <main className="min-h-screen bg-[#f5f6f8] text-[#101827]">
       <SiteHeader />
-      <CatalogCategoryTabs active={category} />
       <section className="border-b border-[#dce2eb] bg-white">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-5 md:py-10">
           <div className="mt-1.5 flex flex-col gap-4">
@@ -307,11 +304,6 @@ async function StagingCatalogPage({ category, page }: { category: StagingCatalog
       </section>
     </main>
   );
-}
-
-function CatalogCategoryTabs({ active }: { active: "car" | StagingCatalogType }) {
-  const tabs = [{ key: "car", label: "Автомобили", href: "/catalog" }, { key: "motorcycle", label: "Мототехника", href: "/catalog?category=motorcycle" }, { key: "jetski", label: "Гидроциклы", href: "/catalog?category=jetski" }] as const;
-  return <nav aria-label="Категории техники" className="border-b border-[#dce2eb] bg-white"><div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 sm:px-5">{tabs.map((tab) => <Link key={tab.key} href={tab.href} className={`relative whitespace-nowrap px-4 py-4 text-sm font-semibold transition ${active === tab.key ? "text-[#956f2c]" : "text-[#647084] hover:text-[#956f2c]"}`}>{tab.label}{active === tab.key ? <span className="absolute inset-x-4 bottom-0 h-0.5 bg-[#956f2c]" /> : null}</Link>)}</div></nav>;
 }
 
 type CatalogFilterFormProps = {
