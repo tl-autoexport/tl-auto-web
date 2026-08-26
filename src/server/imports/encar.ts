@@ -881,8 +881,14 @@ async function mapCar(
 ) {
   const sourceId = String(listCar.Id);
   const detail = fastMode ? null : await fetchDetail(sourceId).catch(() => null);
+  // List responses may contain only a four-image preview. Always enrich the
+  // photo set during fast imports so new catalog cards do not persist that
+  // truncated preview as their complete gallery.
+  const photoDetail = fastMode
+    ? await fetchDetail(sourceId).catch(() => null)
+    : detail;
   if (!fastMode) await sleep(120);
-  const photos = detail?.photos.length ? detail.photos : buildPhotos(listCar);
+  const photos = photoDetail?.photos.length ? photoDetail.photos : buildPhotos(listCar);
   const brand = normalizeBrand(
     detail?.manufacturerEnglish ?? listCar.Manufacturer,
   );
@@ -1251,7 +1257,7 @@ export async function importEncar(options: ImportOptions = {}) {
   const uniqueCandidates = [
     ...new Map(candidates.map((item) => [String(item.Id), item])).values(),
   ];
-  let existingSourceIds = new Set<string>();
+  const existingSourceIds = new Set<string>();
   if (onlyNew && uniqueCandidates.length) {
     const supabase = createSupabaseAdmin();
     const candidateIds = uniqueCandidates.map((item) => String(item.Id));
