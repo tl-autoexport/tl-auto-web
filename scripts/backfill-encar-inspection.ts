@@ -1,16 +1,9 @@
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
+import { encarClient } from "../src/server/imports/encar-client";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
-
-const baseHeaders = {
-  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/140 Safari/537.36",
-  Accept: "application/json, text/plain, */*",
-  "Accept-Language": "ko-KR,ko;q=0.8,en;q=0.6",
-  Referer: "https://www.encar.com/",
-  Origin: "https://www.encar.com",
-};
 
 type JsonRecord = Record<string, unknown>;
 
@@ -28,9 +21,7 @@ function identifier(value: unknown) {
 }
 
 async function getJson(url: string) {
-  const response = await fetch(url, { headers: baseHeaders, signal: AbortSignal.timeout(20_000) });
-  if (!response.ok) throw new Error(`${response.status} ${url}`);
-  return response.json() as Promise<unknown>;
+  return encarClient.request<unknown>(url, { signal: AbortSignal.timeout(20_000) }, 1);
 }
 
 function imageUrl(path: string) {

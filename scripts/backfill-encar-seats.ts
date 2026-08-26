@@ -1,19 +1,11 @@
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
+import { encarClient } from "../src/server/imports/encar-client";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
 const ENCAR_DETAIL_URL = "https://api.encar.com/v1/readside/vehicle";
-const headers = {
-  "User-Agent":
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/140 Safari/537.36",
-  Accept: "application/json, text/plain, */*",
-  "Accept-Language": "ko-KR,ko;q=0.8,en;q=0.6",
-  Referer: "https://www.encar.com/",
-  Origin: "https://www.encar.com",
-};
-
 type CarRow = {
   id: string;
   source_id: string;
@@ -25,12 +17,7 @@ type EncarDetail = {
 };
 
 async function fetchSeats(sourceId: string) {
-  const response = await fetch(`${ENCAR_DETAIL_URL}/${sourceId}`, {
-    headers,
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!response.ok) throw new Error(`Encar HTTP ${response.status}`);
-  const payload = (await response.json()) as EncarDetail;
+  const payload = await encarClient.request<EncarDetail>(`${ENCAR_DETAIL_URL}/${sourceId}`, {}, 1);
   const seats = payload.spec?.seatCount;
   return typeof seats === "number" && Number.isInteger(seats) && seats > 0
     ? seats

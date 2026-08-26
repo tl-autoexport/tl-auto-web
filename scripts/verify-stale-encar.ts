@@ -1,18 +1,11 @@
 import { config } from "dotenv";
 import { createSupabaseAdmin } from "../src/server/supabase/admin";
+import { encarClient } from "../src/server/imports/encar-client";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
 const ENCAR_DETAIL_URL = "https://api.encar.com/v1/readside/vehicle";
-const headers = {
-  Accept: "application/json, text/plain, */*",
-  "Accept-Language": "ko-KR,ko;q=0.8,en;q=0.6",
-  "User-Agent":
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/140 Safari/537.36",
-  Referer: "https://www.encar.com/",
-};
-
 type StaleCar = {
   id: string;
   source_id: string;
@@ -64,10 +57,7 @@ async function main() {
 
   for (const car of candidates) {
     try {
-      const response = await fetch(`${ENCAR_DETAIL_URL}/${car.source_id}`, {
-        headers,
-        signal: AbortSignal.timeout(15_000),
-      });
+      const response = await encarClient.response(`${ENCAR_DETAIL_URL}/${car.source_id}`, {}, 1);
       if (response.status === 404 || response.status === 410) {
         confirmedUnavailable.push(car);
       } else if (response.ok) {

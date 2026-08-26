@@ -20,6 +20,7 @@ import {
   translateOption,
   translateTransmission,
 } from "@/server/normalization/display";
+import { encarClient } from "@/server/imports/encar-client";
 
 const ENCAR_BASE_URL = "https://api.encar.com/search/car/list/general";
 const ENCAR_PAGE_SIZE = 50;
@@ -28,15 +29,6 @@ const ENCAR_PAGE_SIZE = 50;
 const ENCAR_HISTORY_ACCESS_TOKEN =
   process.env.ENCAR_HISTORY_ACCESS_TOKEN?.trim() ||
   "WqtHVjmpGX7lWsf63vwCGVPrF1BzYk";
-const ENCAR_HEADERS = {
-  "User-Agent":
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-  Accept: "application/json, text/plain, */*",
-  "Accept-Language": "ko-KR,ko;q=0.9,en;q=0.8",
-  Referer: "https://www.encar.com/",
-  Origin: "https://www.encar.com",
-};
-
 const ENCAR_BODY_TYPE_MAP: Record<string, string> = {
   경차: "Микроавтомобиль",
   소형차: "Компактный автомобиль",
@@ -452,15 +444,7 @@ async function fetchJson<T>(url: string, attempts = 3): Promise<T> {
   let lastError: unknown;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      const response = await fetch(url, {
-        headers: ENCAR_HEADERS,
-        signal: AbortSignal.timeout(15_000),
-      });
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Encar HTTP ${response.status}: ${text.slice(0, 180)}`);
-      }
-      return response.json() as Promise<T>;
+      return await encarClient.request<T>(url, {}, 1);
     } catch (error) {
       lastError = error;
       if (attempt < attempts) await sleep(750 * attempt);
@@ -478,14 +462,11 @@ async function fetchEncarHistory(
   let lastError: unknown;
   for (let attempt = 1; attempt <= 2; attempt += 1) {
     try {
-      const response = await fetch(url, {
-        headers: {
-          ...ENCAR_HEADERS,
-          Authorization: `Bearer ${ENCAR_HISTORY_ACCESS_TOKEN}`,
-        },
-        signal: AbortSignal.timeout(10_000),
-      });
+      const response = await encarClient.response(url.toString(), {
+        headers: { Authorization: `Bearer ${ENCAR_HISTORY_ACCESS_TOKEN}` },
+      }, 1);
       if (response.status === 400 || response.status === 404) {
+        await response.arrayBuffer();
         return {
           status: "unavailable",
           reason: `encar_history_http_${response.status}`,
@@ -497,10 +478,8 @@ async function fetchEncarHistory(
           `Encar history HTTP ${response.status}: ${text.slice(0, 180)}`,
         );
       }
-      return {
-        status: "available",
-        payload: (await response.json()) as EncarHistoryPayload,
-      };
+      const payload = (await response.json()) as EncarHistoryPayload;
+      return { status: "available", payload };
     } catch (error) {
       lastError = error;
       if (attempt < 2) await sleep(500 * attempt);
