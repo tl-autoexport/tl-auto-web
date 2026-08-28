@@ -66,9 +66,19 @@ function getUtilCoeff(powerHp: number, engineCc: number, isNew: boolean) {
       if (powerHp <= 270) return 126; if (powerHp <= 309) return 131.04; if (powerHp <= 350) return 136.32;
       if (powerHp <= 400) return 147.48; return 159.48;
     }
-    if (powerHp <= 160) return 129.2; if (powerHp <= 180) return 131.76; if (powerHp <= 200) return 134.4;
-    if (powerHp <= 250) return 137.16; if (powerHp <= 270) return 140.52; if (powerHp <= 300) return 144;
-    if (powerHp <= 370) return 160.32; if (powerHp <= 400) return 169.2; return 229.08;
+    // TKS/PP-1291 table for new cars with engine volume 3000–3500 cm³.
+    // Boundaries are verified against TKS HAR fixtures (220/221 ... 370/371).
+    if (powerHp <= 160) return 129.2;
+    if (powerHp <= 190) return 131.76;
+    if (powerHp <= 220) return 134.4;
+    if (powerHp <= 250) return 137.16;
+    if (powerHp <= 280) return 140.52;
+    if (powerHp <= 310) return 144;
+    if (powerHp <= 340) return 151.92;
+    if (powerHp <= 370) return 160.32;
+    if (powerHp <= 400) return 169.2;
+    if (powerHp <= 430) return 178.44;
+    return 229.08;
   }
   if (smallCc) {
     if (powerHp <= 160) return 0.26; if (powerHp <= 190) return 74.64; if (powerHp <= 220) return 79.2;

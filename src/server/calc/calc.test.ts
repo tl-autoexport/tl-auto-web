@@ -28,6 +28,23 @@ const genesisLargeNewBoundary = calculateRuVladivostok({
 });
 assert.equal(genesisLargeNewBoundary.util.coefficient, 169.2);
 
+const largeNewUtilCoefficient = (powerHp: number) => calculateRuVladivostok({
+  priceKrw: 38_000_000, year: 2024, month: 7, engineCc: 3342, powerHp,
+  calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+  rates: { krwRub: 0.06407, usdRub: 87.84204, eurRub: 100, kztRub: 0.14 },
+}).util.coefficient;
+
+for (const [power, coefficient] of [
+  [160, 129.2], [161, 131.76], [190, 131.76], [191, 134.4],
+  [220, 134.4], [221, 137.16], [250, 137.16], [251, 140.52],
+  [270, 140.52], [271, 140.52], [280, 140.52], [281, 144], [300, 144], [301, 144],
+  [309, 144], [310, 144], [311, 151.92], [340, 151.92],
+  [341, 160.32], [350, 160.32], [369, 160.32], [370, 160.32],
+  [371, 169.2], [400, 169.2], [401, 178.44],
+] as const) {
+  assert.equal(largeNewUtilCoefficient(power), coefficient, `TKS util coefficient at ${power} hp`);
+}
+
 const ageBoundary = calculateRuVladivostok({
   priceKrw: 10_000_000, year: 2021, month: 8, engineCc: 998, powerHp: 76,
   calculationDate: "2026-07-26T00:00:00.000Z",
