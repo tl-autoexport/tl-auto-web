@@ -108,6 +108,20 @@ assert.equal(hybridUsesIndividualRegime.vatRub, 0);
 assert.equal(hybridUsesIndividualRegime.dutyRub, 1_048_489.4);
 assert.equal(hybridUsesIndividualRegime.utilRub, 5_200);
 
+const olderSmallUtilCoefficient = (powerHp: number) => calculateRuVladivostok({
+  priceKrw: 38_000_000, year: 2021, month: 7, engineCc: 2000, powerHp,
+  calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+  rates: { krwRub: 0.06407, usdRub: 87.84204, eurRub: 100, kztRub: 0.14 },
+}).util.coefficient;
+
+for (const [power, coefficient] of [
+  [160, 0.26], [161, 74.64], [310, 100.56], [311, 110.16],
+  [340, 110.16], [341, 120.6], [370, 120.6], [371, 132],
+  [400, 132], [401, 144.6],
+] as const) {
+  assert.equal(olderSmallUtilCoefficient(power), coefficient, `TKS older utility coefficient at 2000 cm³/${power} hp`);
+}
+
 const feeBoundary = (carPriceRub: number) => calculateRuVladivostok({
   priceKrw: carPriceRub, year: 2022, month: 1, engineCc: 1000, powerHp: 100,
   calculationDate: "2026-07-26T00:00:00.000Z", rates: { krwRub: 1, usdRub: 1, eurRub: 1, kztRub: 1 },
