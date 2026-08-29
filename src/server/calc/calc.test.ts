@@ -75,6 +75,19 @@ for (const [power, coefficient] of [
   assert.equal(midNewUtilCoefficient(power), coefficient, `TKS util coefficient at 3000 cm³/${power} hp`);
 }
 
+const smallNewUtilCoefficient = (powerHp: number) => calculateRuVladivostok({
+  priceKrw: 38_000_000, year: 2024, month: 7, engineCc: 2000, powerHp,
+  calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+  rates: { krwRub: 0.06407, usdRub: 87.84204, eurRub: 100, kztRub: 0.14 },
+}).util.coefficient;
+
+for (const [power, coefficient] of [
+  [300, 64.56], [310, 64.56], [311, 72.96], [340, 72.96],
+  [341, 83.16], [370, 83.16], [371, 94.8], [400, 94.8], [401, 108],
+] as const) {
+  assert.equal(smallNewUtilCoefficient(power), coefficient, `TKS util coefficient at 2000 cm³/${power} hp`);
+}
+
 const ageBoundary = calculateRuVladivostok({
   priceKrw: 10_000_000, year: 2021, month: 8, engineCc: 998, powerHp: 76,
   calculationDate: "2026-07-26T00:00:00.000Z",

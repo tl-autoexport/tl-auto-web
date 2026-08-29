@@ -58,8 +58,8 @@ function getUtilCoeff(powerHp: number, engineCc: number, isNew: boolean) {
   if (isNew) {
     if (smallCc) {
       if (powerHp <= 160) return 0.17; if (powerHp <= 200) return 45; if (powerHp <= 220) return 47.64;
-      if (powerHp <= 250) return 50.52; if (powerHp <= 270) return 57.12; if (powerHp <= 300) return 64.56;
-      if (powerHp <= 350) return 83.16; if (powerHp <= 400) return 94.8; return 108;
+      if (powerHp <= 250) return 50.52; if (powerHp <= 270) return 57.12; if (powerHp <= 310) return 64.56;
+      if (powerHp <= 340) return 72.96; if (powerHp <= 370) return 83.16; if (powerHp <= 400) return 94.8; return 108;
     }
     if (midCc) {
       // TKS-confirmed bands for new cars with engine volume up to 3000 cm³.
