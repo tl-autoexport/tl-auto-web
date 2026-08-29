@@ -78,7 +78,9 @@ function getUtilCoeff(powerHp: number, engineCc: number, isNew: boolean) {
     if (powerHp <= 370) return 160.32;
     if (powerHp <= 400) return 169.2;
     if (powerHp <= 430) return 178.44;
-    return 229.08;
+    if (powerHp <= 460) return 188.28;
+    if (powerHp <= 500) return 198.6;
+    return 209.52;
   }
   if (smallCc) {
     if (powerHp <= 160) return 0.26; if (powerHp <= 190) return 74.64; if (powerHp <= 220) return 79.2;
@@ -100,10 +102,12 @@ function getCustomsFeeRub(customsValueRub: number) {
   if (customsValueRub <= 450_000) return 2_462;
   if (customsValueRub <= 1_200_000) return 4_924;
   if (customsValueRub <= 2_700_000) return 13_541;
-  if (customsValueRub <= 4_200_000) return 21_344;
-  if (customsValueRub <= 5_500_000) return 27_540;
+  if (customsValueRub <= 4_200_000) return 18_465;
+  if (customsValueRub <= 5_500_000) return 21_344;
   if (customsValueRub <= 10_000_000) return 49_240;
-  return 73_860;
+  // TKS HAR keeps 49,240 ₽ at 10,000,001 ₽; keep this fallback until the
+  // next threshold is captured from TKS rather than introducing an unverified jump.
+  return 49_240;
 }
 
 export function calculateRuVladivostok(input: CalcInput): CalcResult {

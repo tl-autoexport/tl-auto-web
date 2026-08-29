@@ -40,7 +40,8 @@ for (const [power, coefficient] of [
   [270, 140.52], [271, 140.52], [280, 140.52], [281, 144], [300, 144], [301, 144],
   [309, 144], [310, 144], [311, 151.92], [340, 151.92],
   [341, 160.32], [350, 160.32], [369, 160.32], [370, 160.32],
-  [371, 169.2], [400, 169.2], [401, 178.44],
+  [371, 169.2], [400, 169.2], [401, 178.44], [430, 178.44],
+  [431, 188.28], [460, 188.28], [461, 198.6], [500, 198.6], [501, 209.52],
 ] as const) {
   assert.equal(largeNewUtilCoefficient(power), coefficient, `TKS util coefficient at ${power} hp`);
 }
@@ -72,7 +73,12 @@ const feeBoundary = (carPriceRub: number) => calculateRuVladivostok({
 assert.equal(feeBoundary(450_000), 2_462);
 assert.equal(feeBoundary(450_001), 4_924);
 assert.equal(feeBoundary(1_200_001), 13_541);
-assert.equal(feeBoundary(4_200_001), 27_540);
-assert.equal(feeBoundary(10_000_001), 73_860);
+assert.equal(feeBoundary(2_700_000), 13_541);
+assert.equal(feeBoundary(2_700_001), 18_465);
+assert.equal(feeBoundary(4_200_000), 18_465);
+assert.equal(feeBoundary(4_200_001), 21_344);
+assert.equal(feeBoundary(5_500_000), 21_344);
+assert.equal(feeBoundary(5_500_001), 49_240);
+assert.equal(feeBoundary(10_000_001), 49_240);
 
 console.log("calc benchmark passed", { fixture: "AutoExport individual regime", totalRub: genesisG70.totalRub });
