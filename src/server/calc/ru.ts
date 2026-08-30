@@ -116,8 +116,9 @@ function getUtilCoeff(powerHp: number, engineCc: number, isNew: boolean) {
   }
   if (midCc) {
     if (powerHp <= 160) return 0.26; if (powerHp <= 190) return 172.8; if (powerHp <= 220) return 175.08;
-    if (powerHp <= 250) return 177.6; if (powerHp <= 270) return 183; if (powerHp <= 309) return 188.52;
-    if (powerHp <= 340) return 193.68; if (powerHp <= 369) return 199.08; if (powerHp <= 400) return 204.72; return 216.36;
+    if (powerHp <= 250) return 177.6; if (powerHp <= 270) return 183; if (powerHp <= 310) return 188.52;
+    if (powerHp <= 340) return 193.68; if (powerHp <= 370) return 199.08; if (powerHp <= 400) return 204.72;
+    if (powerHp <= 430) return 210.48; if (powerHp <= 460) return 216.36; if (powerHp <= 500) return 222.36; return 228.6;
   }
   if (powerHp <= 160) return 197.81; if (powerHp <= 180) return 200.04; if (powerHp <= 200) return 202.2;
   if (powerHp <= 250) return 204.36; if (powerHp <= 270) return 207.24; if (powerHp <= 300) return 212.4;
