@@ -119,6 +119,18 @@ for (const above30Min of [true, false]) {
   assert.equal(tksHybrid.util.coefficient, 188.52, `TKS hybrid utility coefficient (mdvs_gt_m30ed=${above30Min})`);
 }
 
+for (const [power, coefficient] of [[160, 111.36], [161, 129.72]] as const) {
+  for (const year of [2019, 2021, 2023]) {
+    const sequentialHybrid = calculateRuVladivostok({
+      priceKrw: 38_000_000, year, month: 7, engineCc: 2001,
+      powerHp: power, fuelType: "petrol_electric", hybridSequential: true,
+      calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+      rates: { krwRub: 0.06407, usdRub: 87.84204, eurRub: 100, kztRub: 0.14 },
+    });
+    assert.equal(sequentialHybrid.util.coefficient, coefficient, `TKS sequential hybrid coefficient at ${power} hp`);
+  }
+}
+
 const olderSmallUtilCoefficient = (powerHp: number) => calculateRuVladivostok({
   priceKrw: 38_000_000, year: 2021, month: 7, engineCc: 2000, powerHp,
   calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,

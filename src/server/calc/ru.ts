@@ -53,7 +53,14 @@ function getIndividualDutyRub({
   };
 }
 
-function getUtilCoeff(powerHp: number, engineCc: number, isNew: boolean) {
+function getUtilCoeff(powerHp: number, engineCc: number, isNew: boolean, sequentialHybrid = false) {
+  if (sequentialHybrid) {
+    // TKS HAR-confirmed sequential petrol-electric hybrid boundary (2001 cm³).
+    if (powerHp <= 160) return 111.36;
+    if (powerHp <= 161) return 129.72;
+    // Keep the established table as an explicit fallback until higher-power
+    // sequential-hybrid boundaries are captured from TKS.
+  }
   const smallCc = engineCc <= 2000;
   const midCc = engineCc <= 3000;
   if (isNew) {
@@ -177,7 +184,7 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
   const koreaExpensesRub = Math.round(KOREA_EXPENSES_KRW * rates.krwRub);
   const brokerRub = BROKER_RUB;
   const feesRub = getCustomsFeeRub(customsValueRub);
-  const utilCoefficient = getUtilCoeff(powerHp, input.engineCc, carAgeYears < 3);
+  const utilCoefficient = getUtilCoeff(powerHp, input.engineCc, carAgeYears < 3, input.hybridSequential === true);
   const utilRub = Math.round(UTIL_BASE_RUB * utilCoefficient);
   const totalRub = roundRub(customsValueRub + freightRub + koreaExpensesRub + brokerRub + customs.dutyRub + feesRub + utilRub);
   return {
