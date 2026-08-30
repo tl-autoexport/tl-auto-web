@@ -120,9 +120,24 @@ function getUtilCoeff(powerHp: number, engineCc: number, isNew: boolean) {
     if (powerHp <= 340) return 193.68; if (powerHp <= 370) return 199.08; if (powerHp <= 400) return 204.72;
     if (powerHp <= 430) return 210.48; if (powerHp <= 460) return 216.36; if (powerHp <= 500) return 222.36; return 228.6;
   }
+  if (engineCc > 3500) {
+    // TKS-confirmed bands for older cars with engine volume above 3500 cm³.
+    if (powerHp <= 160) return 0.26;
+    if (powerHp <= 300) return 219.48;
+    if (powerHp <= 310) return 236.64;
+    if (powerHp <= 340) return 249.6;
+    if (powerHp <= 370) return 263.4;
+    if (powerHp <= 400) return 277.92;
+    if (powerHp <= 430) return 293.16;
+    if (powerHp <= 460) return 309.36;
+    if (powerHp <= 500) return 326.4;
+    return 344.28;
+  }
+  // TKS-confirmed bands for older cars with engine volume 3001–3500 cm³.
   if (powerHp <= 160) return 197.81; if (powerHp <= 180) return 200.04; if (powerHp <= 200) return 202.2;
-  if (powerHp <= 250) return 204.36; if (powerHp <= 270) return 207.24; if (powerHp <= 300) return 212.4;
-  if (powerHp <= 350) return 224.28; if (powerHp <= 400) return 231; return 344.28;
+  if (powerHp <= 250) return 204.36; if (powerHp <= 270) return 207.24; if (powerHp <= 310) return 212.4;
+  if (powerHp <= 340) return 217.8; if (powerHp <= 370) return 224.28; if (powerHp <= 400) return 231;
+  if (powerHp <= 430) return 237.96; if (powerHp <= 460) return 245.04; if (powerHp <= 500) return 252.48; return 260.04;
 }
 
 function getCustomsFeeRub(customsValueRub: number) {

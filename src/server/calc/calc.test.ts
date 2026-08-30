@@ -137,6 +137,30 @@ for (const [power, coefficient] of [
   assert.equal(olderMidUtilCoefficient(power), coefficient, `TKS older utility coefficient at 2001 cm³/${power} hp`);
 }
 
+const olderLargeUtilCoefficient = (engineCc: number, powerHp: number) => calculateRuVladivostok({
+  priceKrw: 38_000_000, year: 2021, month: 7, engineCc, powerHp,
+  calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+  rates: { krwRub: 0.06407, usdRub: 87.84204, eurRub: 100, kztRub: 0.14 },
+}).util.coefficient;
+
+for (const [power, coefficient] of [
+  [160, 197.81], [161, 200.04], [310, 212.4], [311, 217.8],
+  [340, 217.8], [341, 224.28], [370, 224.28], [371, 231],
+  [400, 231], [401, 237.96], [430, 237.96], [431, 245.04],
+  [460, 245.04], [461, 252.48], [500, 252.48], [501, 260.04],
+] as const) {
+  assert.equal(olderLargeUtilCoefficient(3001, power), coefficient, `TKS older utility coefficient at 3001 cm³/${power} hp`);
+}
+
+for (const [power, coefficient] of [
+  [160, 0.26], [161, 219.48], [310, 236.64], [311, 249.6],
+  [340, 249.6], [341, 263.4], [370, 263.4], [371, 277.92],
+  [400, 277.92], [401, 293.16], [430, 293.16], [431, 309.36],
+  [460, 309.36], [461, 326.4], [500, 326.4], [501, 344.28],
+] as const) {
+  assert.equal(olderLargeUtilCoefficient(3501, power), coefficient, `TKS older utility coefficient at 3501 cm³/${power} hp`);
+}
+
 const feeBoundary = (carPriceRub: number) => calculateRuVladivostok({
   priceKrw: carPriceRub, year: 2022, month: 1, engineCc: 1000, powerHp: 100,
   calculationDate: "2026-07-26T00:00:00.000Z", rates: { krwRub: 1, usdRub: 1, eurRub: 1, kztRub: 1 },
