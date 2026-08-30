@@ -108,6 +108,17 @@ assert.equal(hybridUsesIndividualRegime.vatRub, 0);
 assert.equal(hybridUsesIndividualRegime.dutyRub, 1_048_489.4);
 assert.equal(hybridUsesIndividualRegime.utilRub, 5_200);
 
+for (const above30Min of [true, false]) {
+  const tksHybrid = calculateRuVladivostok({
+    priceKrw: 38_000_000, year: 2021, month: 7, engineCc: 2001,
+    hybridDvsPowerHp: 161, hybridElectricPowerKw: 100,
+    hybridDvsAboveElectric30Min: above30Min, hybridSequential: false,
+    fuelType: "petrol_electric", calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+    rates: { krwRub: 0.06407, usdRub: 87.84204, eurRub: 100, kztRub: 0.14 },
+  });
+  assert.equal(tksHybrid.util.coefficient, 188.52, `TKS hybrid utility coefficient (mdvs_gt_m30ed=${above30Min})`);
+}
+
 const olderSmallUtilCoefficient = (powerHp: number) => calculateRuVladivostok({
   priceKrw: 38_000_000, year: 2021, month: 7, engineCc: 2000, powerHp,
   calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,

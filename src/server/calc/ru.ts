@@ -8,6 +8,7 @@ const BROKER_RUB = 90_000;
 const FREIGHT_USD = 1_200;
 const KOREA_EXPENSES_KRW = 2_100_000;
 const UTIL_BASE_RUB = 20_000;
+const KW_TO_HP = 1.3596216173;
 
 function roundRub(value: number) { return Math.round(value * 100) / 100; }
 
@@ -154,6 +155,10 @@ function getCustomsFeeRub(customsValueRub: number) {
 }
 
 export function calculateRuVladivostok(input: CalcInput): CalcResult {
+  const powerHp = input.hybridDvsPowerHp != null
+    ? input.hybridDvsPowerHp + (input.hybridElectricPowerKw ?? 0) * KW_TO_HP
+    : input.powerHp;
+  if (powerHp == null || !Number.isFinite(powerHp)) throw new Error("Engine power is required");
   const rates: CalcRates = {
     krwRub: input.rates?.krwRub ?? DEFAULT_RATES.krwRub,
     eurRub: input.rates?.eurRub ?? DEFAULT_RATES.eurRub,
@@ -172,7 +177,7 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
   const koreaExpensesRub = Math.round(KOREA_EXPENSES_KRW * rates.krwRub);
   const brokerRub = BROKER_RUB;
   const feesRub = getCustomsFeeRub(customsValueRub);
-  const utilCoefficient = getUtilCoeff(input.powerHp, input.engineCc, carAgeYears < 3);
+  const utilCoefficient = getUtilCoeff(powerHp, input.engineCc, carAgeYears < 3);
   const utilRub = Math.round(UTIL_BASE_RUB * utilCoefficient);
   const totalRub = roundRub(customsValueRub + freightRub + koreaExpensesRub + brokerRub + customs.dutyRub + feesRub + utilRub);
   return {

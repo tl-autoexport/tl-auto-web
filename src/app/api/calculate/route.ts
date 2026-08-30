@@ -19,10 +19,16 @@ const calcSchema = z.object({
   year: z.coerce.number().int().min(1990).max(2100),
   month: z.coerce.number().int().min(1).max(12).default(6),
   engineCc: z.coerce.number().int().positive(),
-  powerHp: z.coerce.number().int().positive(),
+  powerHp: z.coerce.number().int().positive().optional(),
+  hybridDvsPowerHp: z.coerce.number().int().positive().optional(),
+  hybridElectricPowerKw: z.coerce.number().positive().optional(),
+  hybridDvsAboveElectric30Min: z.coerce.boolean().optional(),
+  hybridSequential: z.coerce.boolean().optional(),
   fuelType: z.string().optional(),
   countryCode: z.enum(["RU", "KZ", "BY", "UZ", "KG", "DE", "SE", "IT", "NL", "AE"]).default("RU"),
   destinationCity: z.string().default("Владивосток"),
+}).refine((value) => value.powerHp != null || value.hybridDvsPowerHp != null, {
+  message: "Укажите мощность автомобиля или мощность ДВС гибрида.",
 });
 
 export async function POST(request: Request) {

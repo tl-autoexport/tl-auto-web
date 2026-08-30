@@ -3,7 +3,12 @@ export interface CalcInput {
   year: number;
   month: number;
   engineCc: number;
-  powerHp: number;
+  powerHp?: number;
+  /** Hybrid input fields mirror TKS: engine power is the value used for utility bands. */
+  hybridDvsPowerHp?: number;
+  hybridElectricPowerKw?: number;
+  hybridDvsAboveElectric30Min?: boolean;
+  hybridSequential?: boolean;
   fuelType?: string;
   countryCode?: "RU" | "KZ" | "BY" | "UZ" | "KG" | "DE" | "SE" | "IT" | "NL" | "AE";
   destinationCity?: string;
