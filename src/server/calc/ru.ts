@@ -55,9 +55,11 @@ function getIndividualDutyRub({
 
 function getUtilCoeff(powerHp: number, engineCc: number, isNew: boolean, sequentialHybrid = false) {
   if (sequentialHybrid) {
-    // TKS HAR-confirmed sequential petrol-electric hybrid boundary (2001 cm³).
+    // TKS HAR-confirmed sequential petrol-electric hybrid boundaries (2001 cm³).
     if (powerHp <= 160) return 111.36;
-    if (powerHp <= 161) return 129.72;
+    if (powerHp <= 190) return 129.72;
+    if (powerHp <= 191) return 151.2;
+    if (powerHp <= 401) return 239.04;
     // Keep the established table as an explicit fallback until higher-power
     // sequential-hybrid boundaries are captured from TKS.
   }
