@@ -19,6 +19,10 @@ type CatalogCar = {
   engine_cc: number | null;
   power_hp: number | null;
   fuel_type: string | null;
+  hybrid_dvs_power_hp: number | null;
+  hybrid_electric_power_kw: number | null;
+  hybrid_dvs_above_electric_30min: boolean | null;
+  hybrid_sequential: boolean | null;
 };
 
 async function main() {
@@ -30,7 +34,7 @@ async function main() {
     const { data: page, error } = await supabase
       .from("cars")
       .select(
-        "id,primary_source,source_id,brand,model,year,registration_month,price_krw,price_rub,engine_cc,power_hp,fuel_type",
+        "id,primary_source,source_id,brand,model,year,registration_month,price_krw,price_rub,engine_cc,power_hp,fuel_type,hybrid_dvs_power_hp,hybrid_electric_power_kw,hybrid_dvs_above_electric_30min,hybrid_sequential",
       )
       .eq("is_available", true)
       .order("primary_source")
@@ -61,7 +65,7 @@ async function main() {
       !car.price_krw ||
       !car.year ||
       !car.engine_cc ||
-      !car.power_hp
+      (!car.power_hp && !car.hybrid_dvs_power_hp)
     ) {
       return null;
     }
@@ -71,7 +75,11 @@ async function main() {
       year: car.year,
       month: car.registration_month ?? 6,
       engineCc: car.engine_cc,
-      powerHp: car.power_hp,
+      powerHp: car.power_hp ?? undefined,
+      hybridDvsPowerHp: car.hybrid_dvs_power_hp ?? undefined,
+      hybridElectricPowerKw: car.hybrid_electric_power_kw ?? undefined,
+      hybridDvsAboveElectric30Min: car.hybrid_dvs_above_electric_30min ?? undefined,
+      hybridSequential: car.hybrid_sequential ?? undefined,
       fuelType: car.fuel_type ?? undefined,
       rates: rateSnapshot.rates,
       ratesAsOf: rateSnapshot.asOf,
