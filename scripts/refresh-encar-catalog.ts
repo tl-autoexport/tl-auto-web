@@ -9,6 +9,8 @@ async function main() {
   const maxPages = Number.parseInt(process.env.ENCAR_MAX_PAGES ?? "3", 10);
   const electricTarget = Number.parseInt(process.env.ENCAR_ELECTRIC_TARGET ?? "4", 10);
   const electricPages = Number.parseInt(process.env.ENCAR_ELECTRIC_PAGES ?? "3", 10);
+  const hybridTarget = Number.parseInt(process.env.ENCAR_HYBRID_TARGET ?? "6", 10);
+  const hybridPages = Number.parseInt(process.env.ENCAR_HYBRID_PAGES ?? "3", 10);
   const onlyNew = process.env.ENCAR_ONLY_NEW === "true";
   const fastMode = process.env.ENCAR_FAST_MODE === "true";
   const maxListingAgeDays = Number.parseInt(
@@ -21,6 +23,8 @@ async function main() {
     maxPages,
     electricTarget,
     electricPages,
+    hybridTarget,
+    hybridPages,
     onlyNew,
     fastMode,
     maxListingAgeDays,

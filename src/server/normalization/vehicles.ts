@@ -4,6 +4,12 @@ export type PowerResolution = {
   note?: string;
 };
 
+export type HybridPowerResolution = PowerResolution & {
+  electricPowerKw: number;
+  dvsAboveElectric30Min: boolean;
+  sequential: boolean;
+};
+
 export type VehicleIdentityInput = {
   brand?: string | null;
   model?: string | null;
@@ -23,6 +29,13 @@ type VerifiedSpec = {
   engineCc: number;
   driveType?: string | null;
   powerHp: number;
+  hybrid?: {
+    electricPowerKw: number;
+    dvsAboveElectric30Min: boolean;
+    sequential: boolean;
+  };
+  minYear?: number;
+  maxYear?: number;
   source?: string;
 };
 
@@ -91,6 +104,8 @@ const MODEL_MAP: Record<string, string> = {
   기블리: "Ghibli",
   타이칸: "Taycan",
   "디 올 뉴 니로 EV": "Niro EV",
+  니로: "Niro",
+  Niro: "Niro",
   "니로 플러스": "Niro Plus",
   "니로 EV": "Niro EV",
   아이오닉6: "Ioniq 6",
@@ -480,6 +495,13 @@ const VERIFIED_SPECS: VerifiedSpec[] = [
     fuelType: "hybrid",
     engineCc: 1598,
     powerHp: 180,
+    minYear: 2022,
+    maxYear: 2024,
+    hybrid: {
+      electricPowerKw: 44.2,
+      dvsAboveElectric30Min: true,
+      sequential: false,
+    },
     source: "verified_specs",
   },
   {
@@ -490,6 +512,22 @@ const VERIFIED_SPECS: VerifiedSpec[] = [
     engineCc: 1999,
     powerHp: 160,
     source: "verified_specs",
+  },
+  {
+    brand: "Hyundai",
+    model: "Sonata",
+    badgeDetail: "HEV",
+    fuelType: "hybrid",
+    engineCc: 1999,
+    powerHp: 152,
+    minYear: 2020,
+    maxYear: 2025,
+    hybrid: {
+      electricPowerKw: 38.6,
+      dvsAboveElectric30Min: true,
+      sequential: false,
+    },
+    source: "official_hyundai_sonata_hev_specs",
   },
   {
     brand: "Hyundai",
@@ -517,6 +555,22 @@ const VERIFIED_SPECS: VerifiedSpec[] = [
     engineCc: 1998,
     powerHp: 280,
     source: "verified_specs",
+  },
+  {
+    brand: "Hyundai",
+    model: "Kona",
+    badgeDetail: "HEV",
+    fuelType: "hybrid",
+    engineCc: 1580,
+    powerHp: 105,
+    minYear: 2023,
+    maxYear: 2026,
+    hybrid: {
+      electricPowerKw: 32,
+      dvsAboveElectric30Min: true,
+      sequential: false,
+    },
+    source: "official_hyundai_kona_hev_specs",
   },
   {
     brand: "Hyundai",
@@ -614,6 +668,13 @@ const VERIFIED_SPECS: VerifiedSpec[] = [
     fuelType: "hybrid",
     engineCc: 1598,
     powerHp: 180,
+    minYear: 2021,
+    maxYear: 2024,
+    hybrid: {
+      electricPowerKw: 44.2,
+      dvsAboveElectric30Min: true,
+      sequential: false,
+    },
     source: "verified_specs",
   },
   {
@@ -651,7 +712,48 @@ const VERIFIED_SPECS: VerifiedSpec[] = [
     fuelType: "hybrid",
     engineCc: 1999,
     powerHp: 152,
+    minYear: 2020,
+    hybrid: {
+      electricPowerKw: 38.6,
+      dvsAboveElectric30Min: true,
+      sequential: false,
+    },
     source: "verified_specs",
+  },
+  {
+    brand: "Kia",
+    model: "Niro",
+    badgeDetail: "HEV",
+    fuelType: "hybrid",
+    engineCc: 1580,
+    powerHp: 105,
+    minYear: 2022,
+    maxYear: 2027,
+    hybrid: {
+      electricPowerKw: 32,
+      dvsAboveElectric30Min: true,
+      sequential: false,
+    },
+    source: "official_kia_niro_hev_specs",
+  },
+  // Encar reports the same second-generation Niro HEV as 1598 cc on some
+  // listings; retain the alias so those cards resolve to the same verified
+  // TKS power inputs instead of being rejected.
+  {
+    brand: "Kia",
+    model: "Niro",
+    badgeDetail: "HEV",
+    fuelType: "hybrid",
+    engineCc: 1598,
+    powerHp: 105,
+    minYear: 2022,
+    maxYear: 2027,
+    hybrid: {
+      electricPowerKw: 32,
+      dvsAboveElectric30Min: true,
+      sequential: false,
+    },
+    source: "official_kia_niro_hev_specs_encar_1598_alias",
   },
   {
     brand: "Kia",
@@ -716,6 +818,22 @@ const VERIFIED_SPECS: VerifiedSpec[] = [
   {
     brand: "Kia",
     model: "Sportage",
+    badgeDetail: "HEV",
+    fuelType: "hybrid",
+    engineCc: 1598,
+    powerHp: 180,
+    minYear: 2022,
+    maxYear: 2026,
+    hybrid: {
+      electricPowerKw: 44.2,
+      dvsAboveElectric30Min: true,
+      sequential: false,
+    },
+    source: "official_kia_sportage_hev_specs",
+  },
+  {
+    brand: "Kia",
+    model: "Sportage",
     badgeDetail: "Diesel 2.0 2WD",
     fuelType: "diesel",
     engineCc: 1995,
@@ -768,6 +886,12 @@ const VERIFIED_SPECS: VerifiedSpec[] = [
     fuelType: "hybrid",
     engineCc: 1598,
     powerHp: 180,
+    minYear: 2024,
+    hybrid: {
+      electricPowerKw: 54,
+      dvsAboveElectric30Min: true,
+      sequential: false,
+    },
     source: "verified_specs",
   },
   {
@@ -1246,27 +1370,59 @@ function badgeMatches(inputBadge: string, specBadge: string) {
   );
 }
 
+function findVerifiedSpec(input: VehicleIdentityInput) {
+  const brand = normalizeBrand(input.brand);
+  const model = normalizeModel(input.model);
+  const fuelType = normalizeFuel(input.fuelType);
+  const driveType = normalizeDrive(input.driveType);
+  const engineCc = Number(input.engineCc) || 0;
+  const year = Number(input.year) || null;
+  const badgeText = [input.badgeDetail, input.badge].filter(Boolean).join(" ");
+
+  if (!brand || !model || !engineCc) return null;
+  return (
+    VERIFIED_SPECS.find((item) => {
+      if (normalizeText(item.brand) !== normalizeText(brand)) return false;
+      if (normalizeText(item.model) !== normalizeText(model)) return false;
+      if (item.engineCc !== engineCc) return false;
+      if (item.fuelType && fuelType && item.fuelType !== fuelType) return false;
+      if (item.driveType && driveType && item.driveType !== driveType)
+        return false;
+      if (year && item.minYear && year < item.minYear) return false;
+      if (year && item.maxYear && year > item.maxYear) return false;
+      return badgeMatches(badgeText, item.badgeDetail);
+    }) ?? null
+  );
+}
+
+export function resolveHybridPower(
+  input: VehicleIdentityInput,
+): HybridPowerResolution | null {
+  if (normalizeFuel(input.fuelType) !== "hybrid") return null;
+  const spec = findVerifiedSpec(input);
+  if (!spec?.hybrid) return null;
+  return {
+    powerHp: spec.powerHp,
+    electricPowerKw: spec.hybrid.electricPowerKw,
+    dvsAboveElectric30Min: spec.hybrid.dvsAboveElectric30Min,
+    sequential: spec.hybrid.sequential,
+    source: spec.source ?? "verified_hybrid_specs",
+    note: `${spec.brand} ${spec.model} ${spec.badgeDetail} ${spec.engineCc}`,
+  };
+}
+
 export function resolvePower(
   input: VehicleIdentityInput,
 ): PowerResolution | null {
   const brand = normalizeBrand(input.brand);
   const model = normalizeModel(input.model);
   const fuelType = normalizeFuel(input.fuelType);
-  const driveType = normalizeDrive(input.driveType);
   const engineCc = Number(input.engineCc) || 0;
   const badgeText = [input.badgeDetail, input.badge].filter(Boolean).join(" ");
 
   if (!brand || !model || !engineCc || fuelType === "electric") return null;
 
-  const spec = VERIFIED_SPECS.find((item) => {
-    if (normalizeText(item.brand) !== normalizeText(brand)) return false;
-    if (normalizeText(item.model) !== normalizeText(model)) return false;
-    if (item.engineCc !== engineCc) return false;
-    if (item.fuelType && fuelType && item.fuelType !== fuelType) return false;
-    if (item.driveType && driveType && item.driveType !== driveType)
-      return false;
-    return badgeMatches(badgeText, item.badgeDetail);
-  });
+  const spec = findVerifiedSpec(input);
 
   if (spec) {
     return {

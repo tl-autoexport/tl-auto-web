@@ -32,7 +32,7 @@ async function main() {
       )
       .eq("is_available", true)
       .eq("primary_source", "encar")
-      .in("fuel_type", ["gasoline", "diesel", "electric"])
+      .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
 
@@ -52,7 +52,10 @@ async function main() {
   }).length;
   const missingSourceLink = cars.filter((car) => !car.source_url).length;
   const electric = cars.filter((car) => car.fuel_type === "electric");
-  const combustion = cars.filter((car) => car.fuel_type !== "electric");
+  const hybrid = cars.filter((car) => car.fuel_type === "hybrid");
+  const combustion = cars.filter(
+    (car) => car.fuel_type !== "electric" && car.fuel_type !== "hybrid",
+  );
   const incompleteCombustion = combustion.filter(
     (car) => car.price_rub == null || car.power_hp == null,
   ).length;
@@ -78,6 +81,7 @@ async function main() {
     withInterior360: cars.filter((car) => car.has_360_interior).length,
     fuel: {
       combustion: combustion.length,
+      hybrid: hybrid.length,
       electric: electric.length,
     },
     calculationCoverage: {

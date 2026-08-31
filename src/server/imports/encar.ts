@@ -11,6 +11,7 @@ import {
   isElectrifiedConfiguration,
   normalizeModel,
   normalizePlate,
+  resolveHybridPower,
   resolveEngineCc,
   resolvePower,
 } from "@/server/normalization/vehicles";
@@ -268,6 +269,8 @@ type ImportOptions = {
   maxPages?: number;
   electricTarget?: number;
   electricPages?: number;
+  hybridTarget?: number;
+  hybridPages?: number;
   onlyNew?: boolean;
   fastMode?: boolean;
   dryRun?: boolean;
@@ -310,13 +313,18 @@ function hashPayload(payload: unknown): string {
 
 export function buildFilter(
   manufacturer?: string,
-  fuelType?: "electric",
+  fuelType?: "electric" | "hybrid",
   bounds: EncarFilterBounds = getEncarFilterBounds(),
 ) {
   const manufacturerFilter = manufacturer
     ? `_.Manufacturer.${manufacturer}.`
     : "";
-  const fuelFilter = fuelType === "electric" ? "_.FuelType.전기." : "";
+  const fuelFilter =
+    fuelType === "electric"
+      ? "_.FuelType.전기."
+      : fuelType === "hybrid"
+        ? "_.FuelType.가솔린+전기."
+        : "";
   return `(And.Hidden.N.${manufacturerFilter}${fuelFilter}_.Year.range(${bounds.minYear}..${bounds.maxYear})._.Mileage.range(..${bounds.maxMileage})._.Price.range(${bounds.minPrice}..${bounds.maxPrice}).)`;
 }
 
@@ -338,7 +346,7 @@ function getEncarFilterBounds(): EncarFilterBounds {
 function buildListUrl(
   offset: number,
   manufacturer?: string,
-  fuelType?: "electric",
+  fuelType?: "electric" | "hybrid",
 ) {
   const query = encodeURIComponent(buildFilter(manufacturer, fuelType));
   const sort = encodeURIComponent(`|ModifiedDate|${offset}|${ENCAR_PAGE_SIZE}`);
@@ -853,7 +861,7 @@ async function fetchEnrichment(
 async function fetchListPage(
   offset: number,
   manufacturer?: string,
-  fuelType?: "electric",
+  fuelType?: "electric" | "hybrid",
 ) {
   const fixture = await readListFixture();
   if (fixture) {
@@ -861,7 +869,7 @@ async function fetchListPage(
       .filter((item) => !manufacturer || item.Manufacturer === manufacturer)
       .filter(
         (item) =>
-          fuelType !== "electric" || normalizeFuel(item.FuelType) === "electric",
+          !fuelType || normalizeFuel(item.FuelType) === fuelType,
       )
       .slice(offset, offset + ENCAR_PAGE_SIZE);
   }
@@ -896,6 +904,7 @@ async function mapCar(
   const { year, month } = normalizeYear(listCar.Year);
   const fuelType = normalizeFuel(detail?.fuelName ?? listCar.FuelType);
   const isPureElectric = fuelType === "electric";
+  const isHybrid = fuelType === "hybrid";
   const listedEngineCc = isPureElectric
     ? null
     : inferEngineCcFromBadge(listCar, detail);
@@ -912,6 +921,7 @@ async function mapCar(
       });
   if (
     !isPureElectric &&
+    !isHybrid &&
     isElectrifiedConfiguration({
       brand,
       model,
@@ -926,7 +936,7 @@ async function mapCar(
   const driveType = normalizeDrive(
     [listCar.Badge, listCar.BadgeDetail].filter(Boolean).join(" "),
   );
-  const power = resolvePower({
+  const powerInput = {
     brand,
     model,
     badge: listCar.Badge,
@@ -935,7 +945,15 @@ async function mapCar(
     driveType,
     engineCc,
     year,
-  });
+  };
+  const hybridPower = isHybrid ? resolveHybridPower(powerInput) : null;
+  const power = hybridPower ?? resolvePower(powerInput);
+  if (isHybrid && !hybridPower) {
+    onReject?.(
+      `hybrid_specs:${brand ?? "unknown"}:${model ?? "unknown"}:${detail?.gradeEnglish ?? listCar.Badge ?? "unknown"}:${engineCc ?? "unknown"}`,
+    );
+    return null;
+  }
   if (!isPureElectric && !power) {
     onReject?.(
       `power:${brand ?? "unknown"}:${model ?? "unknown"}:${detail?.gradeEnglish ?? listCar.Badge ?? "unknown"}:${engineCc ?? "unknown"}`,
@@ -994,6 +1012,11 @@ async function mapCar(
           month: month ?? 6,
           engineCc,
           powerHp,
+          hybridDvsPowerHp: hybridPower?.powerHp,
+          hybridElectricPowerKw: hybridPower?.electricPowerKw,
+          hybridDvsAboveElectric30Min:
+            hybridPower?.dvsAboveElectric30Min,
+          hybridSequential: hybridPower?.sequential,
           fuelType: fuelType ?? undefined,
           rates: rateSnapshot.rates,
           ratesAsOf: rateSnapshot.asOf,
@@ -1029,6 +1052,18 @@ async function mapCar(
         ...(isPureElectric
           ? { calculation_status: "pending_official_ev_tariff" }
           : {}),
+        ...(hybridPower
+          ? {
+              hybrid_calculation: {
+                dvs_power_hp: hybridPower.powerHp,
+                electric_power_kw: hybridPower.electricPowerKw,
+                dvs_above_electric_30min:
+                  hybridPower.dvsAboveElectric30Min,
+                sequential: hybridPower.sequential,
+                source: hybridPower.source,
+              },
+            }
+          : {}),
       },
       primary_source: "encar",
       source_kind: "encar",
@@ -1058,6 +1093,11 @@ async function mapCar(
       power_hp: powerHp,
       power_source: power?.source ?? null,
       fuel_type: fuelType,
+      hybrid_dvs_power_hp: hybridPower?.powerHp ?? null,
+      hybrid_electric_power_kw: hybridPower?.electricPowerKw ?? null,
+      hybrid_dvs_above_electric_30min:
+        hybridPower?.dvsAboveElectric30Min ?? null,
+      hybrid_sequential: hybridPower?.sequential ?? null,
       transmission: translateTransmission(
         detail?.transmission ?? listCar.Transmission,
       ),
@@ -1095,6 +1135,7 @@ async function mapCar(
           ? ["engine_cc_normalized_from_verified_model"]
           : []),
         ...(isPureElectric ? ["ev_calculation_pending"] : []),
+        ...(isHybrid ? ["hybrid_calculation_verified"] : []),
         ...(!isPureElectric && !calc ? ["calc_deferred"] : []),
         ...(historyResult.status === "unavailable"
           ? [historyResult.reason]
@@ -1128,6 +1169,12 @@ export async function importEncar(options: ImportOptions = {}) {
   );
   const electricPages =
     options.electricPages ?? positiveInt(process.env.ENCAR_ELECTRIC_PAGES, 3);
+  const hybridTarget = Math.min(
+    target,
+    options.hybridTarget ?? positiveInt(process.env.ENCAR_HYBRID_TARGET, 6),
+  );
+  const hybridPages =
+    options.hybridPages ?? positiveInt(process.env.ENCAR_HYBRID_PAGES, 3);
   const onlyNew =
     options.onlyNew ?? process.env.ENCAR_ONLY_NEW === "true";
   const fastMode =
@@ -1253,6 +1300,24 @@ export async function importEncar(options: ImportOptions = {}) {
       break;
     }
   }
+  for (let page = 0; page < hybridPages; page += 1) {
+    try {
+      const list = await fetchListPage(
+        page * ENCAR_PAGE_SIZE,
+        undefined,
+        "hybrid",
+      );
+      if (!list.length) break;
+      candidates.push(...list);
+    } catch (error) {
+      listPageErrors.push({
+        page: page + 1,
+        brand: "hybrid",
+        message: error instanceof Error ? error.message : String(error),
+      });
+      break;
+    }
+  }
 
   const uniqueCandidates = [
     ...new Map(candidates.map((item) => [String(item.Id), item])).values(),
@@ -1282,7 +1347,12 @@ export async function importEncar(options: ImportOptions = {}) {
     )
     .filter((item) => {
       const fuel = normalizeFuel(item.FuelType);
-      return fuel === "gasoline" || fuel === "diesel" || fuel === "electric";
+      return (
+        fuel === "gasoline" ||
+        fuel === "diesel" ||
+        fuel === "electric" ||
+        fuel === "hybrid"
+      );
     })
     .sort((left, right) => Number(right.Id) - Number(left.Id));
 
@@ -1353,6 +1423,21 @@ export async function importEncar(options: ImportOptions = {}) {
     await tryMapCandidate(item);
   }
 
+  const hybridCandidates = freshCandidates
+    .filter((item) => normalizeFuel(item.FuelType) === "hybrid")
+    .sort((left, right) => {
+      const preferred = new Set(["Hyundai", "Kia"]);
+      return Number(preferred.has(normalizeBrand(right.Manufacturer) ?? "")) -
+        Number(preferred.has(normalizeBrand(left.Manufacturer) ?? ""));
+    });
+  for (const item of hybridCandidates) {
+    const hybridCount = mapped.filter(
+      (entry) => entry.car.fuel_type === "hybrid",
+    ).length;
+    if (hybridCount >= hybridTarget || mapped.length >= target) break;
+    await tryMapCandidate(item);
+  }
+
   for (const [requiredIdentity, minimum] of Object.entries(modelMinimums)) {
     const [requiredBrand, requiredModel] = requiredIdentity.split(":", 2);
     const modelCandidates = freshCandidates.filter(
@@ -1410,6 +1495,8 @@ export async function importEncar(options: ImportOptions = {}) {
       freshCandidates: freshCandidates.length,
       electricTarget,
       electricSeen: mapped.filter((item) => item.car.fuel_type === "electric").length,
+      hybridTarget,
+      hybridSeen: mapped.filter((item) => item.car.fuel_type === "hybrid").length,
       seen: mapped.length,
       written: 0,
       brandMinimums,
@@ -1443,7 +1530,9 @@ export async function importEncar(options: ImportOptions = {}) {
         target,
         maxPages,
         electricTarget,
-      electricPages,
+        electricPages,
+        hybridTarget,
+        hybridPages,
       onlyNew,
       fastMode,
       replaceCatalog,
@@ -1660,6 +1749,8 @@ export async function importEncar(options: ImportOptions = {}) {
     freshCandidates: freshCandidates.length,
     electricTarget,
     electricSeen: mapped.filter((item) => item.car.fuel_type === "electric").length,
+    hybridTarget,
+    hybridSeen: mapped.filter((item) => item.car.fuel_type === "hybrid").length,
     seen: mapped.length,
     written,
     deactivated,
