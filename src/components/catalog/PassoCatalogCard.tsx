@@ -101,7 +101,7 @@ export function PassoCatalogCard({ car, calculationRates }: Props) {
 
       <div className="flex items-center gap-2 border-t border-[#e5ebe8] bg-[#f8fbf9] px-3 py-3">
         <Link className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-full bg-[#21864a] px-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#176f3b]" href={detailsHref}><MessageCircle size={18} /> Консультация</Link>
-        <button aria-label="Поделиться объявлением" className="grid size-10 shrink-0 place-items-center rounded-full border border-[#d7e5dc] bg-white text-[#258149] transition hover:bg-[#edf7f0]" onClick={() => shareListing(title, detailsHref)} type="button"><Share2 size={18} /></button>
+        <button aria-label="Поделиться объявлением" className="grid h-10 w-16 shrink-0 place-items-center rounded-full border border-[#d7e5dc] bg-white text-[#258149] transition hover:bg-[#edf7f0] sm:h-11 sm:w-20" onClick={() => shareListing(title, detailsHref)} type="button"><Share2 size={18} /></button>
       </div>
     </article>
   );
