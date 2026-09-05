@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { useDestination } from "@/components/site/DestinationProvider";
-import { DESTINATIONS, type CountryCode } from "@/lib/destinations";
+import { VISIBLE_DESTINATIONS, type CountryCode } from "@/lib/destinations";
 
 type PanelName = "parameters" | "brandModel" | "region" | "transport" | "sort" | null;
 const sortOptions = [
@@ -26,7 +26,7 @@ const sortOptions = [
 ] as const;
 
 const popularBrands = ["Kia", "Hyundai", "Genesis", "BMW", "Mercedes-Benz", "Toyota", "Audi"];
-const countries = DESTINATIONS;
+const countries = VISIBLE_DESTINATIONS;
 
 type ParameterState = {
   priceMin: string;

@@ -18,7 +18,7 @@ import { FloatingMessengerWidget } from "@/components/site/FloatingMessengerWidg
 import { TlAutoLogo } from "@/components/brand/TlAutoLogo";
 import { CLIENT_CONTACT } from "@/lib/contact";
 import { useDestination } from "@/components/site/DestinationProvider";
-import { DESTINATIONS, type CountryCode } from "@/lib/destinations";
+import { DESTINATIONS, VISIBLE_DESTINATIONS, type CountryCode } from "@/lib/destinations";
 
 const utilityLinks = [
   { label: "О сервисе", href: "/#about", pending: false },
@@ -378,12 +378,12 @@ function DestinationDialog({ cityId, countryCode, onClose, onSelect, open }: { c
           <button aria-label="Закрыть" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f0f3f7] text-[#263247] transition hover:bg-[#e3e8ef]" onClick={onClose} type="button"><X size={18} /></button>
         </div>
         <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {DESTINATIONS.map((item) => <button className={`rounded-xl border px-3 py-3 text-left text-sm font-semibold transition ${item.countryCode === countryCode ? "border-[#07528b] bg-[#07528b] text-white" : "border-[#dce2eb] hover:border-[#07528b]/50 hover:bg-[#f5f8fb]"}`} key={item.countryCode} onClick={() => onSelect(item.countryCode)} type="button">{item.countryLabel}<span className={`mt-0.5 block text-xs font-normal ${item.countryCode === countryCode ? "text-white/75" : "text-[#7a8798]"}`}>{item.currencyCode} · {item.currencySymbol}</span></button>)}
+          {VISIBLE_DESTINATIONS.map((item) => <button className={`rounded-xl border px-3 py-3 text-left text-sm font-semibold transition ${item.countryCode === countryCode ? "border-[#07528b] bg-[#07528b] text-white" : "border-[#dce2eb] hover:border-[#07528b]/50 hover:bg-[#f5f8fb]"}`} key={item.countryCode} onClick={() => onSelect(item.countryCode)} type="button">{item.countryLabel}<span className={`mt-0.5 block text-xs font-normal ${item.countryCode === countryCode ? "text-white/75" : "text-[#7a8798]"}`}>{item.currencyCode} · {item.currencySymbol}</span></button>)}
         </div>
         <div className="mt-5 border-t border-[#edf0f4] pt-5">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#7b8798]">Город доставки</p>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {selectedCountry.cities.map((item) => <button className={`rounded-xl border px-3 py-3 text-left text-sm font-medium transition ${item.id === cityId ? "border-[#c7a55a] bg-[#f8f2e5] text-[#5c4317]" : "border-[#dce2eb] hover:border-[#956f2c]"}`} key={item.id} onClick={() => onSelect(countryCode, item.id)} type="button">{item.label}{item.id === cityId ? <span className="mt-0.5 block text-xs font-normal">Выбрано</span> : null}</button>)}
+            {(VISIBLE_DESTINATIONS.find((item) => item.countryCode === countryCode)?.cities ?? selectedCountry.cities).map((item) => <button className={`rounded-xl border px-3 py-3 text-left text-sm font-medium transition ${item.id === cityId ? "border-[#c7a55a] bg-[#f8f2e5] text-[#5c4317]" : "border-[#dce2eb] hover:border-[#956f2c]"}`} key={item.id} onClick={() => onSelect(countryCode, item.id)} type="button">{item.label}{item.id === cityId ? <span className="mt-0.5 block text-xs font-normal">Выбрано</span> : null}</button>)}
           </div>
         </div>
       </div>

@@ -9,6 +9,11 @@ export type Destination = {
   cities: readonly { id: string; label: string }[];
 };
 
+/**
+ * Full destination catalogue. Keep every destination here so the calculation
+ * and URL/state compatibility can be restored when those directions are
+ * enabled again.
+ */
 export const DESTINATIONS: readonly Destination[] = [
   { countryCode: "RU", countryLabel: "Россия", currencyCode: "RUB", currencySymbol: "₽", locale: "ru-RU", cities: [{ id: "vladivostok", label: "Владивосток" }, { id: "ussuriysk", label: "Уссурийск" }, { id: "volgograd", label: "Волгоград" }, { id: "moscow", label: "Москва" }, { id: "saint-petersburg", label: "Санкт-Петербург" }, { id: "krasnodar", label: "Краснодар" }, { id: "kazan", label: "Казань" }] },
   { countryCode: "KZ", countryLabel: "Казахстан", currencyCode: "KZT", currencySymbol: "₸", locale: "ru-KZ", cities: [{ id: "almaty", label: "Алматы" }] },
@@ -20,6 +25,14 @@ export const DESTINATIONS: readonly Destination[] = [
   { countryCode: "IT", countryLabel: "Италия", currencyCode: "EUR", currencySymbol: "€", locale: "it-IT", cities: [{ id: "genova", label: "Генуя" }] },
   { countryCode: "NL", countryLabel: "Нидерланды", currencyCode: "EUR", currencySymbol: "€", locale: "nl-NL", cities: [{ id: "rotterdam", label: "Роттердам" }] },
   { countryCode: "AE", countryLabel: "ОАЭ", currencyCode: "AED", currencySymbol: "د.إ", locale: "ar-AE", cities: [{ id: "dubai", label: "Дубай" }, { id: "jebel-ali", label: "Джебель-Али" }] },
+];
+
+/** Destinations currently exposed in the public picker. */
+export const VISIBLE_DESTINATIONS: readonly Destination[] = [
+  {
+    ...DESTINATIONS[0],
+    cities: DESTINATIONS[0].cities.filter((city) => city.id === "vladivostok" || city.id === "ussuriysk"),
+  },
 ];
 
 export const DEFAULT_DESTINATION = { countryCode: "RU" as const, cityId: "vladivostok" };

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
-  Heart,
   MessageCircle,
   Share2,
 } from "lucide-react";
@@ -52,7 +51,6 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
       .sort((left, right) => Number(right.is_primary) - Number(left.is_primary) || left.sort_order - right.sort_order),
     [car.car_media],
   );
-  const [favorite, setFavorite] = useState(false);
   const [shareNotice, setShareNotice] = useState("");
   const title = [car.brand, car.model].filter(Boolean).join(" ") || "Автомобиль из Кореи";
   const detailsHref = `/cars/${car.primary_source}/${car.source_id}`;
@@ -145,7 +143,6 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
 
       <div className="relative z-10 flex items-center gap-2 border-t border-[#e4e9e7] bg-white px-2.5 py-2.5 text-[#207a45] sm:px-4">
         <a aria-label={`Получить консультацию по автомобилю ${title}`} className="inline-flex h-10 min-w-0 items-center justify-center gap-2 rounded-xl bg-[#207a45] px-4 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(32,122,69,0.24)] transition hover:bg-[#176136] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#207a45] focus-visible:ring-offset-2 sm:h-11 sm:px-5" href={whatsappContactUrl(message)} onClick={(event) => event.stopPropagation()} rel="noreferrer" target="_blank"><MessageCircle size={17} /><span className="truncate">Консультация</span></a>
-        <button aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"} className="grid size-10 shrink-0 place-items-center rounded-xl border border-[#dce5df] bg-white transition hover:border-[#207a45] hover:bg-[#f4faf6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#207a45] focus-visible:ring-offset-2 sm:size-11" onClick={(event) => { event.stopPropagation(); setFavorite((current) => !current); }} title={favorite ? "Убрать из избранного" : "Добавить в избранное"} type="button"><Heart fill={favorite ? "currentColor" : "none"} size={18} /><span className="sr-only">{favorite ? "Убрать из избранного" : "Добавить в избранное"}</span></button>
         <button aria-label="Поделиться объявлением" className="grid size-10 shrink-0 place-items-center rounded-xl border border-[#dce5df] bg-white transition hover:border-[#207a45] hover:bg-[#f4faf6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#207a45] focus-visible:ring-offset-2 sm:size-11" onClick={(event) => { event.stopPropagation(); void share(); }} title="Поделиться объявлением" type="button"><Share2 size={18} /><span className="sr-only">Поделиться объявлением</span></button>
       </div>
 
