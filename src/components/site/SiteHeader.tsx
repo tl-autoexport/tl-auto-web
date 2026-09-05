@@ -374,7 +374,7 @@ function DestinationDialog({ cityId, countryCode, onClose, onSelect, open }: { c
     <div aria-label="Выбор страны и города доставки" aria-modal="true" className="fixed inset-0 z-[90] flex items-start justify-center bg-[#0b1524]/45 px-4 pt-16 backdrop-blur-[2px] sm:pt-20" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose(); }} role="dialog">
       <div className="max-h-[calc(100dvh-5rem)] w-full max-w-[640px] overflow-y-auto rounded-2xl border border-[#dce2eb] bg-white p-5 text-[#111827] shadow-[0_24px_70px_rgba(11,21,36,0.25)] sm:p-6">
         <div className="flex items-start justify-between gap-4">
-          <div><p className="text-lg font-bold">Страна и город доставки</p><p className="mt-1 text-sm text-[#647084]">Выбор сохраняется для каталога и расчётов. Геолокация не используется.</p></div>
+          <div><p className="text-lg font-bold">Страна и город доставки</p></div>
           <button aria-label="Закрыть" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f0f3f7] text-[#263247] transition hover:bg-[#e3e8ef]" onClick={onClose} type="button"><X size={18} /></button>
         </div>
         <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
