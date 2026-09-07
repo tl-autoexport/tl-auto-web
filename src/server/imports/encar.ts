@@ -963,6 +963,12 @@ async function mapCar(
   // Keep the displacement-based fallback used by Autoexport when Encar does
   // not expose a verified trim power; the warning below preserves provenance.
   const powerHp = power?.powerHp ?? null;
+  // TKS returns pure EVs and sequential hybrids through СТП (duty + excise +
+  // VAT), which is a separate tariff regime from the verified ЕТС tables.
+  // Sequential hybrids can use the SТП branch once a verified 30-minute
+  // electric-power value is available. Pure EVs stay pending until Encar
+  // provides an approved 30-minute-power value for the specific trim.
+  const usesStandardTksPayments = isPureElectric;
   const [enrichment, historyResult] = await Promise.all([
     fastMode
       ? Promise.resolve({
@@ -1005,13 +1011,14 @@ async function mapCar(
   const sourceUpdatedAt =
     detail?.modifiedAt ?? listCar.Photos?.[0]?.updatedDate ?? detail?.registeredAt ?? null;
   const calc =
-    !isPureElectric && year && engineCc && powerHp && priceKrw
+    year && priceKrw && (powerHp || hybridPower?.electricPowerKw) &&
+    (engineCc != null || isPureElectric)
       ? calculateRuVladivostok({
           priceKrw,
           year,
           month: month ?? 6,
-          engineCc,
-          powerHp,
+          engineCc: engineCc ?? 0,
+          powerHp: powerHp ?? undefined,
           hybridDvsPowerHp: hybridPower?.powerHp,
           hybridElectricPowerKw: hybridPower?.electricPowerKw,
           hybridDvsAboveElectric30Min:
@@ -1025,7 +1032,7 @@ async function mapCar(
         })
       : null;
   if (
-    (!isPureElectric && !calc) ||
+    (!usesStandardTksPayments && !calc) ||
     !photos.some(
       (photo) => photo.category === "outer" || photo.category === "thumbnail",
     )
@@ -1049,8 +1056,12 @@ async function mapCar(
         ...(listedEngineCc == null && engineCc
           ? { engine_cc_source: "verified_model_fallback" }
           : {}),
-        ...(isPureElectric
-          ? { calculation_status: "pending_official_ev_tariff" }
+        ...(usesStandardTksPayments && !calc
+          ? {
+              calculation_status: isPureElectric
+                ? "pending_official_ev_tariff"
+                : "pending_tks_stp_tariff",
+            }
           : {}),
         ...(hybridPower
           ? {

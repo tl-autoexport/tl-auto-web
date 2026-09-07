@@ -2,10 +2,14 @@ export interface CalcInput {
   priceKrw: number;
   year: number;
   month: number;
-  engineCc: number;
+  /** EVs have no combustion displacement; use null for a pure EV. */
+  engineCc: number | null;
   powerHp?: number;
+  /** Exact TKS input in kW. Use this when the source provides kW; no display rounding is applied. */
+  powerKw?: number;
   /** Hybrid input fields mirror TKS: engine power is the value used for utility bands. */
   hybridDvsPowerHp?: number;
+  hybridDvsPowerKw?: number;
   hybridElectricPowerKw?: number;
   hybridDvsAboveElectric30Min?: boolean;
   hybridSequential?: boolean;
@@ -63,7 +67,7 @@ export interface CalcResult {
   customs: {
     eurPerCc: number;
     percentRate: number;
-    mode: "volume" | "value" | "hybrid";
+    mode: "volume" | "value" | "hybrid" | "stp";
     excisePerHp: number;
     vatRate: number;
   };

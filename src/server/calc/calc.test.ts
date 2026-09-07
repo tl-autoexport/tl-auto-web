@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { calculateRuVladivostok } from "./ru";
+import { tksStpExciseRub } from "./tks-rules";
 
 const genesisG70 = calculateRuVladivostok({
   priceKrw: 26_690_000, year: 2021, month: 10, engineCc: 1998, powerHp: 252,
@@ -191,13 +192,65 @@ for (const [power, coefficient] of [
 }
 
 for (const [power, coefficient] of [
-  [160, 0.26], [161, 219.48], [310, 236.64], [311, 249.6],
+  [160, 216.29], [161, 219.48], [310, 236.64], [311, 249.6],
   [340, 249.6], [341, 263.4], [370, 263.4], [371, 277.92],
   [400, 277.92], [401, 293.16], [430, 293.16], [431, 309.36],
   [460, 309.36], [461, 326.4], [500, 326.4], [501, 344.28],
 ] as const) {
   assert.equal(olderLargeUtilCoefficient(3501, power), coefficient, `TKS older utility coefficient at 3501 cm³/${power} hp`);
 }
+
+const kwBoundary = (engineCc: number, powerKw: number, year = 2024) => calculateRuVladivostok({
+  priceKrw: 38_000_000, year, month: 7, engineCc, powerKw,
+  calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+  rates: { krwRub: 0.06407, usdRub: 87.84204, eurRub: 100, kztRub: 0.14 },
+}).util.coefficient;
+assert.equal(kwBoundary(3001, 117.68), 129.2);
+assert.equal(kwBoundary(3001, 117.69), 131.76);
+assert.equal(kwBoundary(3501, 367.75, 2021), 326.4);
+assert.equal(kwBoundary(3501, 367.76, 2021), 344.28);
+assert.equal(kwBoundary(2000, 228), 64.56);
+assert.equal(kwBoundary(2000, 228.01), 72.96);
+assert.equal(kwBoundary(2000, 139.75, 2021), 74.64);
+assert.equal(kwBoundary(2000, 139.76, 2021), 79.2);
+
+const evKwBoundary = (powerKw: number, year = 2024) => calculateRuVladivostok({
+  priceKrw: 38_000_000, year, month: 7, engineCc: 0, powerKw, fuelType: "electric",
+  calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+  rates: { krwRub: 0.06407, usdRub: 87.84204, eurRub: 100, kztRub: 0.14 },
+}).util.coefficient;
+assert.equal(evKwBoundary(73.55, 2025), 49.56);
+assert.equal(evKwBoundary(73.56, 2025), 65.88);
+assert.equal(evKwBoundary(139.75, 2025), 92.4);
+assert.equal(evKwBoundary(139.76, 2025), 109.68);
+
+for (const [powerKw, rateRubPer075Kw] of [
+  [67.5, 0], [67.51, 64], [112.5, 64], [112.51, 613],
+  [150, 613], [150.01, 1004], [225, 1004], [225.01, 1711],
+  [300, 1711], [300.01, 1771], [375, 1771], [375.01, 1829],
+] as const) {
+  assert.ok(Math.abs(tksStpExciseRub(powerKw) - rateRubPer075Kw * powerKw / 0.75) < 1e-7, `TKS STP excise at ${powerKw} kW`);
+}
+
+const evStp = calculateRuVladivostok({
+  priceKrw: 38_000_000, year: 2024, month: 7, engineCc: null, powerKw: 150,
+  fuelType: "electric", calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+  rates: { krwRub: 0.06407, usdRub: 87.84204, eurRub: 100, kztRub: 0.14 },
+});
+assert.equal(evStp.customs.mode, "stp");
+assert.equal(evStp.dutyRub, 365_199);
+assert.equal(evStp.exciseRub, 122_600);
+assert.equal(evStp.vatRub, 642_940.98);
+assert.equal(evStp.customs.vatRate, 0.22);
+
+const sequentialStp = calculateRuVladivostok({
+  priceKrw: 38_000_000, year: 2024, month: 7, engineCc: 2001, powerKw: 225,
+  hybridElectricPowerKw: 225, hybridSequential: true, fuelType: "petrol_electric",
+  calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+  rates: { krwRub: 0.06407, usdRub: 87.84204, eurRub: 100, kztRub: 0.14 },
+});
+assert.equal(sequentialStp.customs.mode, "stp");
+assert.equal(sequentialStp.exciseRub, 301_200);
 
 const feeBoundary = (carPriceRub: number) => calculateRuVladivostok({
   priceKrw: carPriceRub, year: 2022, month: 1, engineCc: 1000, powerHp: 100,

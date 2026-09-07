@@ -57,28 +57,40 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-5 sm:py-6">
           <div className="scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
             <DodoStoryCard
-              title="Спецпредложения"
-              href="/catalog"
-              image="/assets/stories/special-offers-v2.png"
+              title="Новая Avanta до 160 л.с."
+              href="/catalog?search=Avante&powerMax=160&yearMin=2025&sort=fresh"
+              image="/assets/stories/avante.png"
               position="object-center"
             />
             <DodoStoryCard
-              title="Новое поступление"
-              href="/catalog"
-              image="/assets/stories/new-arrivals.png"
+              title="Новая линейка гидроциклов Sea-Doo"
+              image="/assets/stories/sea-doo.png"
               position="object-center"
+              status="Скоро"
             />
             <DodoStoryCard
-              title="Проверка до покупки"
-              href="/catalog"
+              title="Как заказать"
+              href="/#delivery"
               image="/assets/stories/inspection-v2.png"
               position="object-center"
             />
             <DodoStoryCard
-              title="Доставка из Кореи"
-              href="/#delivery"
-              image="/assets/stories/delivery.png"
+              title="Мы в соцсетях"
+              href="/#contacts"
+              image="/assets/stories/social-v2.png"
               position="object-center"
+            />
+            <DodoStoryCard
+              title="Стань партнёром"
+              href="/#contacts"
+              image="/assets/stories/partner.png"
+              position="object-center"
+            />
+            <DodoStoryCard
+              title="Кредитование"
+              image="/assets/stories/financing.png"
+              position="object-center"
+              status="Скоро"
             />
           </div>
         </div>
@@ -315,22 +327,24 @@ function DodoStoryCard({
   position,
   title,
   href,
+  status,
 }: {
   image: string;
   position: string;
   title: string;
-  href: string;
+  href?: string;
+  status?: string;
 }) {
-  return (
-    <Link
-      href={href}
-      className="group relative aspect-[0.78] w-[166px] shrink-0 overflow-hidden rounded-[24px] bg-[#edf0f4] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg sm:w-[200px] sm:rounded-[30px] lg:w-[230px]"
-    >
+  const content = (
+    <>
       <Image src={image} alt="" fill sizes="(min-width: 1024px) 230px, (min-width: 640px) 200px, 166px" className={`object-cover transition duration-500 group-hover:scale-105 ${position}`} />
       <span className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
       <span className="absolute inset-x-3 bottom-3 max-w-[calc(100%-24px)] break-words text-[13px] font-bold leading-tight text-white drop-shadow-sm sm:inset-x-4 sm:bottom-4 sm:max-w-none sm:text-lg">{title}</span>
-    </Link>
+      {status ? <span className="absolute right-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">{status}</span> : null}
+    </>
   );
+  const className = "group relative aspect-[0.78] w-[166px] shrink-0 overflow-hidden rounded-[24px] bg-[#edf0f4] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg sm:w-[200px] sm:rounded-[30px] lg:w-[230px]";
+  return href ? <Link href={href} className={className}>{content}</Link> : <div className={className} aria-disabled="true">{content}</div>;
 }
 
 function VehicleShelf({
