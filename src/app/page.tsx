@@ -239,28 +239,20 @@ export default async function Home() {
         className="scroll-mt-28 border-b border-[#dce2eb] bg-white"
       >
         <div className="mx-auto max-w-7xl px-5 py-14 md:py-18">
-          <div className="grid gap-6 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
-            <div>
-              <p className="text-sm font-semibold text-[#956f2c]">
-                Отзывы и истории
-              </p>
-              <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-4xl">
-                Место для реального опыта клиентов
-              </h2>
-            </div>
-            <p className="max-w-2xl text-sm leading-6 text-[#647084] lg:justify-self-end">
-              Раздел подготовлен для презентации. Имена, цитаты, фотографии и
-              видео появятся только после получения подтверждённых материалов и
-              согласия на публикацию.
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm font-semibold text-[#956f2c]">
+              Отзывы и истории
             </p>
+            <Link href="#reviews" className="hidden shrink-0 items-center gap-2 text-sm font-semibold text-[#101827] sm:inline-flex">
+              Смотреть все <ArrowRight size={16} />
+            </Link>
           </div>
 
-          <div className="mt-9 grid gap-4 lg:grid-cols-[1.25fr_0.875fr_0.875fr]">
+          <div className="scrollbar-none -mr-5 mt-9 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 pr-5 sm:mr-0 sm:pr-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0">
             <ReviewPlaceholder
               icon={PlayCircle}
               index="01"
               title="Видео после получения автомобиля"
-              text="Здесь будет личный рассказ клиента о выборе, расчёте и результате доставки."
               tone="navy"
               featured
             />
@@ -268,30 +260,22 @@ export default async function Home() {
               icon={MessageSquareQuote}
               index="02"
               title="История подбора"
-              text="Критерии поиска, выбранный автомобиль и подтверждённый отзыв без рекламного пересказа."
               tone="red"
             />
             <ReviewPlaceholder
               icon={Images}
               index="03"
               title="Фото выдачи"
-              text="Фотографии автомобиля и короткий комментарий владельца после получения."
               tone="light"
+            />
+            <ReviewPlaceholder
+              icon={MessageSquareQuote}
+              index="04"
+              title="Отзыв о сопровождении"
+              tone="navy"
             />
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-[#dce2eb] pt-6">
-            <p className="inline-flex items-center gap-2 text-sm text-[#647084]">
-              <ShieldCheck size={17} className="text-[#a98239]" />{" "}
-              Неподтверждённые отзывы публиковаться не будут
-            </p>
-            <Link
-              href="/catalog"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#956f2c]"
-            >
-              Выбрать автомобиль <ArrowRight size={16} />
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -477,45 +461,48 @@ function ReviewPlaceholder({
   featured = false,
   icon: Icon,
   index,
-  text,
   title,
   tone,
 }: {
   featured?: boolean;
   icon: typeof PlayCircle;
   index: string;
-  text: string;
   title: string;
   tone: "navy" | "red" | "light";
 }) {
   const tones = {
-    navy: "bg-[#11151d] text-white border-[#11151d]",
-    red: "bg-[#c7a55a] text-[#15130f] border-[#c7a55a]",
-    light: "bg-[#eef1f5] text-[#101827] border-[#dce2eb]",
+    navy: "bg-[#11151d] text-white",
+    red: "bg-[#c7a55a] text-[#15130f]",
+    light: "bg-[#eef1f5] text-[#101827]",
   };
   const muted = tone === "light" ? "text-[#647084]" : "text-white/70";
-  const line = tone === "light" ? "border-[#cfd6e0]" : "border-white/18";
 
   return (
     <article
-      className={`flex min-h-72 flex-col overflow-hidden rounded-md border p-6 md:p-7 ${featured ? "lg:min-h-[340px]" : ""} ${tones[tone]}`}
+      className="w-[calc(100%-44px)] shrink-0 snap-start overflow-hidden rounded-[24px] border border-[#dce2eb] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg sm:w-[360px] lg:w-auto lg:shrink"
     >
       <div
-        className={`flex items-center justify-between border-b pb-5 ${line}`}
+        className={`relative flex aspect-[1.55] items-center justify-between overflow-hidden p-5 md:p-6 ${tones[tone]}`}
       >
-        <span className={`text-xs font-bold ${muted}`}>{index}</span>
-        <Icon size={featured ? 30 : 24} strokeWidth={1.7} aria-hidden="true" />
+        <span className={`absolute left-5 top-5 text-xs font-bold ${muted}`}>{index}</span>
+        <Icon className="absolute right-5 top-5" size={featured ? 30 : 24} strokeWidth={1.7} aria-hidden="true" />
+        <div className="mx-auto flex size-20 items-center justify-center rounded-full border border-white/20 bg-black/10">
+          <Icon size={34} strokeWidth={1.5} aria-hidden="true" />
+        </div>
       </div>
-      <div className="mt-auto pt-10">
-        <p className={`text-[11px] font-semibold uppercase ${muted}`}>
+      <div className="p-5 md:p-6">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#956f2c]">
           История клиента
         </p>
         <h3
-          className={`mt-3 font-semibold leading-tight ${featured ? "text-2xl md:text-3xl" : "text-xl"}`}
+          className="mt-3 text-xl font-semibold leading-tight text-[#101827]"
         >
           {title}
         </h3>
-        <p className={`mt-3 text-sm leading-6 ${muted}`}>{text}</p>
+        <div className="mt-5 flex items-center justify-between border-t border-[#e5e9ef] pt-4 text-xs font-semibold text-[#98a3b2]">
+          <span>Материал готовится</span>
+          <span className="rounded-full bg-[#f0f2f5] px-2.5 py-1">Скоро</span>
+        </div>
       </div>
     </article>
   );
