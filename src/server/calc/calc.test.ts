@@ -12,7 +12,15 @@ assert.equal(genesisG70.dutyRub, 850_735.61);
 assert.equal(genesisG70.feesRub, 13_541);
 assert.equal(genesisG70.utilRub, 1_838_400);
 assert.equal(genesisG70.koreaExpensesRub, 105_284);
-assert.equal(genesisG70.totalRub, 4_329_578.76);
+assert.equal(genesisG70.totalRub, 4_286_063.76);
+
+const moscowDelivery = calculateRuVladivostok({
+  priceKrw: 26_690_000, year: 2021, month: 10, engineCc: 1998, powerHp: 252,
+  fuelType: "gasoline", destinationCity: "Москва", calculationDate: "2026-07-26T00:00:00.000Z",
+  rates: { krwRub: 0.050135, usdRub: 77.929, eurRub: 88.707, kztRub: 0.15 },
+});
+assert.equal(moscowDelivery.deliveryRub, 220_000);
+assert.equal(moscowDelivery.totalRub, genesisG70.totalRub + 220_000);
 assert.equal(genesisG70.customs.mode, "volume");
 
 const dualRate = calculateRuVladivostok({

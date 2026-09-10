@@ -58,7 +58,7 @@ export interface CalcRateDetails {
 
 export interface CalcResult {
   countryCode: "RU";
-  destinationCity: "Владивосток";
+  destinationCity: "Владивосток" | "Уссурийск" | "Москва";
   importerType: "individual";
   calcVersion: string;
   carPriceRub: number;
@@ -66,6 +66,8 @@ export interface CalcResult {
   customsValueRub: number;
   freightRub: number;
   brokerRub: number;
+  deliveryRub: number;
+  serviceFeeRub: number;
   dutyRub: number;
   exciseRub: number;
   vatRub: number;

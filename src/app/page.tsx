@@ -24,6 +24,7 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { CatalogQuickNav } from "@/components/home/CatalogQuickNav";
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
+import { StoryCarousel } from "@/components/home/StoryCarousel";
 
 export const revalidate = 60;
 
@@ -55,7 +56,7 @@ export default async function Home() {
 
       <section className="border-b border-[#e2e6ed] bg-white" aria-label="Актуальные предложения">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-5 sm:py-6">
-          <div className="scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+          <StoryCarousel>
             <DodoStoryCard
               title="Новая Avanta до 160 л.с."
               href="/catalog?search=Avante&powerMax=160&yearMin=2025&sort=fresh"
@@ -92,7 +93,7 @@ export default async function Home() {
               position="object-center"
               status="Скоро"
             />
-          </div>
+          </StoryCarousel>
         </div>
       </section>
 
@@ -343,7 +344,7 @@ function DodoStoryCard({
       {status ? <span className="absolute right-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">{status}</span> : null}
     </>
   );
-  const className = "group relative aspect-[0.78] w-[166px] shrink-0 overflow-hidden rounded-[24px] bg-[#edf0f4] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg sm:w-[200px] sm:rounded-[30px] lg:w-[230px]";
+  const className = "group relative aspect-[0.78] w-[166px] shrink-0 snap-start overflow-hidden rounded-[24px] bg-[#edf0f4] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg sm:w-[200px] sm:rounded-[30px] lg:w-[230px]";
   return href ? <Link href={href} className={className}>{content}</Link> : <div className={className} aria-disabled="true">{content}</div>;
 }
 

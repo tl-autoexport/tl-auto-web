@@ -11,7 +11,7 @@ import {
   RefreshCw,
   X,
 } from "lucide-react";
-import { whatsappContactUrl, vehicleClientMessage } from "@/lib/contact";
+import { CLIENT_CONTACT, whatsappContactUrl, vehicleClientMessage } from "@/lib/contact";
 import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
 import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
 import { useDestination } from "@/components/site/DestinationProvider";
@@ -32,6 +32,8 @@ type LiveCalculation = {
   carPriceRub: number;
   freightRub: number;
   brokerRub: number;
+  deliveryRub: number;
+  serviceFeeRub: number;
   dutyRub: number;
   feesRub: number;
   utilRub: number;
@@ -101,7 +103,7 @@ function resultNumber(result: unknown, key: string) {
 export function PriceCalculationCard(props: PriceCalculationCardProps) {
   const { country, city } = useDestination();
   if (country.countryCode === "KZ" && city.id === "almaty") return <KzPriceCalculationCard {...props} />;
-  if (country.countryCode !== "RU" || city.id !== "vladivostok") return <PendingDestinationCard {...props} />;
+  if (country.countryCode !== "RU" || !["vladivostok", "ussuriysk", "moscow"].includes(city.id)) return <PendingDestinationCard {...props} />;
   return <RuPriceCalculationCard {...props} />;
 }
 
@@ -119,6 +121,7 @@ function RuPriceCalculationCard({
   year,
   registrationMonth,
 }: PriceCalculationCardProps) {
+  const { city } = useDestination();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDutyInfoOpen, setDutyInfoOpen] = useState(false);
   const calculationTitleId = useId();
@@ -134,10 +137,14 @@ function RuPriceCalculationCard({
       : calc;
   const [isRefreshing, setRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
-  const total = number(activeCalc?.total_rub);
+  const delivery = city.id === "moscow" ? 220_000 : 0;
+  const serviceFee = resultNumber(activeCalc?.result, "serviceFeeRub") || 50_000;
+  const hasServiceFee = resultValue(activeCalc?.result, "serviceFeeRub") != null;
+  const hasDelivery = resultValue(activeCalc?.result, "deliveryRub") != null;
+  const total = number(activeCalc?.total_rub) - number(activeCalc?.freight_rub) + (hasServiceFee ? 0 : serviceFee) + (hasDelivery ? 0 : delivery);
   const car = number(activeCalc?.car_price_rub);
-  const korea = number(activeCalc?.freight_rub) + number(activeCalc?.broker_rub) + resultNumber(activeCalc?.result, "koreaExpensesRub");
-  const russia = number(activeCalc?.fees_rub) + number(activeCalc?.util_rub);
+  const korea = resultNumber(activeCalc?.result, "koreaExpensesRub");
+  const russia = number(activeCalc?.broker_rub) + delivery + serviceFee;
   const duty = number(activeCalc?.duty_rub);
   const excise = resultNumber(activeCalc?.result, "exciseRub");
   const vat = resultNumber(activeCalc?.result, "vatRub");
@@ -165,6 +172,8 @@ function RuPriceCalculationCard({
           engineCc,
           powerHp,
           fuelType: fuel,
+          countryCode: "RU",
+          destinationCity: city.label,
         }),
       });
       const payload = (await response.json()) as LiveCalculation | { error?: string };
@@ -200,7 +209,7 @@ function RuPriceCalculationCard({
         { label: "Стоимость авто", value: car, color: "bg-[#65758c]" },
         { label: "Расходы в Южной Корее", value: korea, color: "bg-[#3568c6]" },
         {
-          label: "Услуги во Владивостоке",
+          label: "Расходы в России",
           value: russia,
           color: "bg-[#1683a7]",
         },
@@ -238,7 +247,7 @@ function RuPriceCalculationCard({
             Расчёт для РФ
           </span>
           <span className="rounded-full bg-[#eef1f6] px-2.5 py-1 text-[11px] font-semibold text-[#536174] sm:px-3 sm:text-xs">
-            Владивосток
+            {city.label}
           </span>
         </div>
 
@@ -254,7 +263,7 @@ function RuPriceCalculationCard({
             {money(total)}
           </p>
           <span className="mt-1.5 block text-xs text-[#647084] sm:text-sm">
-            под ключ до Владивостока
+            под ключ до {city.label}
           </span>
         </div>
 
@@ -366,14 +375,14 @@ function RuPriceCalculationCard({
           ref={dialogRef}
           aria-labelledby={calculationTitleId}
           aria-modal="true"
-          className="fixed inset-0 z-[110] grid place-items-center bg-[#07152d]/75 p-0 sm:p-6"
+          className="fixed inset-0 z-[110] grid place-items-center overflow-y-auto bg-[#07152d]/75 p-2 sm:p-4"
           onMouseDown={(event) =>
             event.currentTarget === event.target && setModalOpen(false)
           }
           role="dialog"
         >
-          <section className="max-h-[100dvh] w-full max-w-xl overflow-y-auto bg-[#f4f5f7] pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[calc(100dvh-48px)] sm:max-w-[30rem] sm:rounded-lg">
-            <header className="sticky top-0 z-10 flex min-h-14 items-center justify-between border-b border-[#e1e5eb] bg-white px-4 py-2 sm:px-4 sm:py-3">
+          <section className="my-auto flex max-h-[calc(100dvh-1rem)] w-full max-w-[min(30rem,calc(100vw-1rem))] flex-col overflow-hidden rounded-lg bg-[#f4f5f7] shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:max-w-[30rem]">
+            <header className="z-10 flex shrink-0 min-h-14 items-center justify-between border-b border-[#e1e5eb] bg-white px-4 py-2 sm:px-4 sm:py-3">
               <div>
                 <h2 id={calculationTitleId} className="text-xl font-semibold text-[#121722] sm:text-lg">
                   Расчёт цены
@@ -395,7 +404,7 @@ function RuPriceCalculationCard({
               </button>
             </header>
 
-            <div className="space-y-4 p-5 sm:space-y-3 sm:p-4">
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:space-y-3 sm:p-4">
               <div className="flex flex-col items-end gap-2 sm:gap-1">
                 <button
                   className="inline-flex min-h-10 items-center gap-2 rounded bg-[#956f2c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#7f5d25] disabled:cursor-wait disabled:opacity-60"
@@ -420,9 +429,15 @@ function RuPriceCalculationCard({
                 title="Расходы в Южной Корее"
                 rows={[
                   ["Стоимость автомобиля", car],
-                  ["Фиксированные расходы в Корее", resultNumber(calc?.result, "koreaExpensesRub")],
-                  ["Фрахт", number(calc?.freight_rub)],
-                  ["Брокерские услуги", number(calc?.broker_rub)],
+                  ["Расходы в Корее", resultNumber(activeCalc?.result, "koreaExpensesRub")],
+                ]}
+              />
+              <CalculationSection
+                title="Расходы в России"
+                rows={[
+                  ["Брокер", number(activeCalc?.broker_rub)],
+                  [`Доставка до ${city.label}`, delivery],
+                  ["Услуга под ключ", serviceFee],
                 ]}
               />
               <CalculationSection
@@ -435,13 +450,13 @@ function RuPriceCalculationCard({
                   ...(vat > 0
                     ? ([["НДС", vat]] as Array<[string, number]>)
                     : []),
-                  ["Таможенный сбор", number(calc?.fees_rub)],
-                  ["Утилизационный сбор", number(calc?.util_rub)],
+                  ["Таможенный сбор", number(activeCalc?.fees_rub)],
+                  ["Утилизационный сбор", number(activeCalc?.util_rub)],
                 ]}
               />
               <div className="rounded bg-[#07152d] p-4 text-white sm:p-3">
                 <div className="flex items-baseline justify-between gap-4">
-                  <span className="font-medium">Под ключ до Владивостока</span>
+                  <span className="font-medium">Под ключ до {city.label}</span>
                   <span className="text-xl font-semibold">{money(total)}</span>
                 </div>
                 <p className="mt-2 text-xs leading-5 text-[#cdd5e2]">
@@ -455,6 +470,25 @@ function RuPriceCalculationCard({
                     менеджера перед оформлением.
                   </p>
                 )}
+              </div>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <a
+                  className="flex min-h-11 items-center justify-center gap-1.5 rounded border border-[#d8dde6] bg-white px-2 py-2 text-xs font-semibold text-[#273246] transition hover:border-[#956f2c] hover:bg-[#fbf7ed] sm:text-sm"
+                  href={`tel:${CLIENT_CONTACT.russiaPhone}`}
+                >
+                  <Phone size={16} />
+                  Позвонить на российский номер
+                </a>
+                <a
+                  aria-label="Открыть MAX"
+                  className="flex min-h-11 items-center justify-center gap-1.5 rounded bg-[linear-gradient(135deg,#5367f5,#8d37d8)] px-2 py-2 text-xs font-semibold text-white transition hover:brightness-95 sm:text-sm"
+                  href={CLIENT_CONTACT.maxUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <span className="font-black tracking-[-0.08em]">MAX</span>
+                  Написать в MAX
+                </a>
               </div>
             </div>
           </section>

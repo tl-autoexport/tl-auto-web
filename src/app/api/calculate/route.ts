@@ -102,7 +102,7 @@ export async function POST(request: Request) {
         { headers: responseHeaders },
       );
     }
-    if (parsed.data.countryCode !== "RU" || parsed.data.destinationCity !== "Владивосток") {
+    if (parsed.data.countryCode !== "RU" || !["Владивосток", "Уссурийск", "Москва"].includes(parsed.data.destinationCity)) {
       return NextResponse.json(
         { error: "Для выбранного направления тарифы ещё уточняются.", calculationStatus: "pending" },
         { status: 422, headers: responseHeaders },

@@ -1,4 +1,6 @@
 export const CLIENT_CONTACT = {
+  russiaPhone: "+79964896588",
+  russiaPhoneLabel: "+7 996 489-65-88",
   telegramUsername: "TL_Auto_export",
   maxUrl: "https://max.ru/u/f9LHodD0cOIbbrnixgCklxVJDZIlM34DRERMCzVgn9RAgFkAEE2giwsuORA",
   whatsappCarPhone: "821076260741",
