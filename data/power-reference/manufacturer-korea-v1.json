@@ -1836,7 +1836,7 @@
       "fuelType": "diesel",
       "propulsionType": "ice",
       "engineCc": 1993,
-      "years": [2023, 2026],
+      "years": [2024, 2026],
       "power": { "value": 197, "unit": "PS", "kw": 144.89325375 },
       "powerBasis": "combustion_engine",
       "source": {
@@ -1846,8 +1846,29 @@
         "note": "Official Mercedes-Benz Media table lists the E 220 d combustion engine at 1,993 cc and 145 kW/197 PS. Exact E220d badge matching prevents mixing it with E200/E300 gasoline versions."
       },
       "matches": [
-        { "badge": "E220d 4MATIC AMG Line", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1980, "engineCcTo": 2005 },
-        { "badge": "E220d 4MATIC Exclusive", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1980, "engineCcTo": 2005 }
+        { "badge": "E220d 4MATIC AMG Line", "yearFrom": 2024, "yearTo": 2026, "engineCcFrom": 1980, "engineCcTo": 2005 },
+        { "badge": "E220d 4MATIC Exclusive", "yearFrom": 2024, "yearTo": 2026, "engineCcFrom": 1980, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mercedes-e-class-w214-e300-1999-258ps-2024-2026",
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2024, 2026],
+      "power": { "value": 258, "unit": "PS", "kw": 189.7586775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz Korea official launch data — E 300 4MATIC, M254, 258 PS",
+        "uri": "https://www.mercedes-benz.co.kr/passengercars/brand/news-events/news-story/2024/news-20240123.html",
+        "retrievedAt": "2026-09-10",
+        "note": "Mercedes-Benz Korea identifies E 300 4MATIC AMG Line and E 300 4MATIC Exclusive as the new 11th-generation W214 launch models and states 258 PS for the M254 four-cylinder gasoline engine. The rule is restricted to these exact badges and 2024–2026 Korean-market cards; E300e plug-in hybrids remain separate."
+      },
+      "matches": [
+        { "badge": "E300 4MATIC AMG Line", "yearFrom": 2024, "yearTo": 2026, "engineCcFrom": 1985, "engineCcTo": 2010 },
+        { "badge": "E300 4MATIC Exclusive", "yearFrom": 2024, "yearTo": 2026, "engineCcFrom": 1985, "engineCcTo": 2010 }
       ]
     },
     {
@@ -2046,6 +2067,47 @@
       "matches": [
         { "badge": "GLB200 d", "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1940, "engineCcTo": 1960 },
         { "badge": "GLB200 d 4MATIC", "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1940, "engineCcTo": 1960 }
+      ]
+    },
+    {
+      "specKey": "mercedes-e-class-w213-e220d-1950-194ps-2021-2023",
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1950,
+      "years": [2021, 2023],
+      "power": { "value": 194, "unit": "PS", "kw": 142.6867575 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz E-Class W213 official technical data — E 220 d 4MATIC, 1,950 cc, 143 kW/194 PS",
+        "uri": "https://presse.mercedes-benz.at/news-die-aktualisierte-mercedes-benz-e-klasse?id=110011&l=deutsch",
+        "retrievedAt": "2026-09-10",
+        "note": "Official Mercedes-Benz press data for the facelifted W213 lists the E 220 d and E 220 d 4MATIC with the OM654 engine, 1,950 cc and 143 kW/194 PS. The year limit prevents mixing these cards with the W214 E220d specification (1,993 cc, 197 PS)."
+      },
+      "matches": [
+        { "badge": "E220d 4MATIC AMG Line", "yearFrom": 2021, "yearTo": 2023, "engineCcFrom": 1940, "engineCcTo": 1960 },
+        { "badge": "E220d 4MATIC Exclusive", "yearFrom": 2021, "yearTo": 2023, "engineCcFrom": 1940, "engineCcTo": 1960 }
+      ]
+    },
+    {
+      "specKey": "mercedes-e-class-w213-e300-1991-258ps-2021-2022",
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1991,
+      "years": [2021, 2022],
+      "power": { "value": 258, "unit": "PS", "kw": 189.7586775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz E-Class W213 official technical data — E 300, 1,991 cc, 190 kW/258 PS",
+        "uri": "https://presse.mercedes-benz.at/news-die-aktualisierte-mercedes-benz-e-klasse?id=110011&l=deutsch",
+        "retrievedAt": "2026-09-10",
+        "note": "Official Mercedes-Benz press data for the facelifted W213 lists the E 300 with the M264 engine, 1,991 cc and 190 kW/258 PS. The rule is limited to the exact E300 4MATIC AMG Line badge and 2021–2022 to avoid changing E300e/PHEV or later ambiguous badge records."
+      },
+      "matches": [
+        { "badge": "E300 4MATIC AMG Line", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1980, "engineCcTo": 2005 }
       ]
     },
     {
