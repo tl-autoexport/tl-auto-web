@@ -1,5 +1,7 @@
 "use client";
 
+import { createPortal } from "react-dom";
+
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   BadgeCheck,
@@ -100,6 +102,19 @@ function resultNumber(result: unknown, key: string) {
   return typeof value === "number" ? value : 0;
 }
 
+function objectNumber(object: Record<string, unknown> | null, key: string) {
+  const value = object?.[key];
+  return typeof value === "number" ? value : 0;
+}
+
+function rate(value: number) {
+  return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 4, maximumFractionDigits: 5 }).format(value);
+}
+
+function wholeRate(value: number) {
+  return new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(value);
+}
+
 export function PriceCalculationCard(props: PriceCalculationCardProps) {
   const { country, city } = useDestination();
   if (country.countryCode === "KZ" && city.id === "almaty") return <KzPriceCalculationCard {...props} />;
@@ -113,7 +128,6 @@ function RuPriceCalculationCard({
   fuel,
   mileageKm,
   powerHp,
-  powerConfidence,
   priceKrw,
   source,
   sourceId,
@@ -146,6 +160,11 @@ function RuPriceCalculationCard({
   const korea = resultNumber(activeCalc?.result, "koreaExpensesRub");
   const russia = number(activeCalc?.broker_rub) + delivery + serviceFee;
   const duty = number(activeCalc?.duty_rub);
+  const dealerRates = resultObject(activeCalc?.result, "rates");
+  const rateDetails = resultObject(activeCalc?.result, "rateDetails");
+  const dealerKrwRub = objectNumber(dealerRates, "krwRub");
+  const dealerUsdRub = objectNumber(dealerRates, "usdRub");
+  const usdtKrw = objectNumber(rateDetails, "usdtKrwAdjusted");
   const excise = resultNumber(activeCalc?.result, "exciseRub");
   const vat = resultNumber(activeCalc?.result, "vatRub");
   const customs = duty + excise + vat;
@@ -370,22 +389,22 @@ function RuPriceCalculationCard({
         </a>
       </div>
 
-      {isModalOpen && (
+      {isModalOpen && createPortal(
         <div
           ref={dialogRef}
           aria-labelledby={calculationTitleId}
           aria-modal="true"
-          className="fixed inset-0 z-[110] grid place-items-center overflow-y-auto bg-[#07152d]/75 p-2 sm:p-4"
+          className="fixed inset-0 z-[1000] grid place-items-center bg-[#07152d]/65 p-3 backdrop-blur-sm sm:p-6"
           onMouseDown={(event) =>
             event.currentTarget === event.target && setModalOpen(false)
           }
           role="dialog"
         >
-          <section className="my-auto flex max-h-[calc(100dvh-1rem)] w-full max-w-[min(30rem,calc(100vw-1rem))] flex-col overflow-hidden rounded-lg bg-[#f4f5f7] shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:max-w-[30rem]">
+          <section className="flex min-h-0 max-h-[calc(100dvh-1.5rem)] w-full max-w-[560px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-h-[85dvh]">
             <header className="z-10 flex shrink-0 min-h-14 items-center justify-between border-b border-[#e1e5eb] bg-white px-4 py-2 sm:px-4 sm:py-3">
               <div>
                 <h2 id={calculationTitleId} className="text-xl font-semibold text-[#121722] sm:text-lg">
-                  Расчёт цены
+                  Расчёт стоимости
                 </h2>
                 {calculatedAt && (
                   <p className="mt-1 text-xs text-[#647084]">
@@ -404,20 +423,28 @@ function RuPriceCalculationCard({
               </button>
             </header>
 
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:space-y-3 sm:p-4">
-              <div className="flex flex-col items-end gap-2 sm:gap-1">
-                <button
-                  className="inline-flex min-h-10 items-center gap-2 rounded bg-[#956f2c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#7f5d25] disabled:cursor-wait disabled:opacity-60"
-                  disabled={isRefreshing || !priceKrw || !year || !engineCc || !powerHp}
-                  onClick={refreshCalculation}
-                  type="button"
-                >
-                  <RefreshCw className={isRefreshing ? "animate-spin" : ""} size={16} />
-                  {isRefreshing ? "Обновляем" : "Обновить цену"}
-                </button>
-                {refreshError && <p className="text-xs font-medium text-[#b42318]">{refreshError}</p>}
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-4 sm:px-6">
+              <div className="rounded border border-[#ead8ac] bg-[#fffaf0] p-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-[#121722]">Актуальные курсы</p>
+                  <button
+                    className="inline-flex min-h-10 items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-[#956f2c] transition hover:bg-[#f2e8d3] disabled:cursor-wait disabled:opacity-60"
+                    disabled={isRefreshing || !priceKrw || !year || !engineCc || !powerHp}
+                    onClick={refreshCalculation}
+                    type="button"
+                  >
+                    <RefreshCw className={isRefreshing ? "animate-spin" : ""} size={16} />
+                    {isRefreshing ? "Обновляем" : "Обновить"}
+                  </button>
+                </div>
+                <div className="mt-2 divide-y divide-[#ead8ac] border-y border-[#ead8ac] text-sm">
+                  <div className="flex items-center justify-between gap-4 py-2"><span className="text-[#647084]">KRW/RUB</span><strong className="tabular-nums text-[#121722]">{dealerKrwRub ? `${rate(dealerKrwRub)} ₽` : "—"}</strong></div>
+                  <div className="flex items-center justify-between gap-4 py-2"><span className="text-[#647084]">USD/RUB</span><strong className="tabular-nums text-[#121722]">{dealerUsdRub ? `${rate(dealerUsdRub)} ₽` : "—"}</strong></div>
+                  <div className="flex items-center justify-between gap-4 py-2"><span className="text-[#647084]">USDT/KRW</span><strong className="tabular-nums text-[#121722]">{usdtKrw ? `${wholeRate(usdtKrw)} ₩` : "—"}</strong></div>
+                </div>
+                {refreshError && <p className="mt-2 text-xs font-medium text-[#b42318]">{refreshError}</p>}
               </div>
-              <div className="rounded bg-white p-4 ring-1 ring-[#e1e5eb] sm:p-3">
+              <div className="rounded bg-white p-3 ring-1 ring-[#e1e5eb]">
                 <p className="text-sm text-[#647084]">
                   Цена автомобиля в Корее
                 </p>
@@ -427,6 +454,8 @@ function RuPriceCalculationCard({
               </div>
               <CalculationSection
                 title="Расходы в Южной Корее"
+                collapsible
+                total={car + korea}
                 rows={[
                   ["Стоимость автомобиля", car],
                   ["Расходы в Корее", resultNumber(activeCalc?.result, "koreaExpensesRub")],
@@ -434,6 +463,8 @@ function RuPriceCalculationCard({
               />
               <CalculationSection
                 title="Расходы в России"
+                collapsible
+                total={russia}
                 rows={[
                   ["Брокер", number(activeCalc?.broker_rub)],
                   [`Доставка до ${city.label}`, delivery],
@@ -442,6 +473,7 @@ function RuPriceCalculationCard({
               />
               <CalculationSection
                 title="Таможенные платежи"
+                collapsible
                 rows={[
                   ["Пошлина", duty],
                   ...(excise > 0
@@ -453,46 +485,34 @@ function RuPriceCalculationCard({
                   ["Таможенный сбор", number(activeCalc?.fees_rub)],
                   ["Утилизационный сбор", number(activeCalc?.util_rub)],
                 ]}
+                total={customs + number(activeCalc?.fees_rub) + number(activeCalc?.util_rub)}
               />
-              <div className="rounded bg-[#07152d] p-4 text-white sm:p-3">
-                <div className="flex items-baseline justify-between gap-4">
-                  <span className="font-medium">Под ключ до {city.label}</span>
-                  <span className="text-xl font-semibold">{money(total)}</span>
-                </div>
-                <p className="mt-2 text-xs leading-5 text-[#cdd5e2]">
-                  Предварительный расчёт. Итог зависит от курса, даты оформления
-                  , подтверждённой комплектации и фактических расходов по сделке.
-                </p>
-                {powerConfidence === "automatic" && (
-                  <p className="mt-2 border-t border-white/15 pt-2 text-xs leading-5 text-[#dce4ee]">
-                    Параметры двигателя определены автоматическим сопоставлением
-                    технических данных. Рекомендуем подтвердить комплектацию у
-                    менеджера перед оформлением.
-                  </p>
-                )}
-              </div>
+            </div>
+            <footer className="shrink-0 space-y-2 border-t border-[#e1e5eb] bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6">
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <a
-                  className="flex min-h-11 items-center justify-center gap-1.5 rounded border border-[#d8dde6] bg-white px-2 py-2 text-xs font-semibold text-[#273246] transition hover:border-[#956f2c] hover:bg-[#fbf7ed] sm:text-sm"
+                  className="flex min-h-11 items-center justify-center gap-2 rounded border border-[#d8dde6] bg-white px-3 py-2 text-sm font-semibold text-[#273246] transition hover:border-[#956f2c] hover:bg-[#fbf7ed]"
                   href={`tel:${CLIENT_CONTACT.russiaPhone}`}
                 >
                   <Phone size={16} />
-                  Позвонить на российский номер
+                  Позвонить
                 </a>
                 <a
                   aria-label="Открыть MAX"
-                  className="flex min-h-11 items-center justify-center gap-1.5 rounded bg-[linear-gradient(135deg,#5367f5,#8d37d8)] px-2 py-2 text-xs font-semibold text-white transition hover:brightness-95 sm:text-sm"
+                  className="flex min-h-11 items-center justify-center rounded bg-[linear-gradient(135deg,#5367f5,#8d37d8)] px-3 py-2 text-sm font-black tracking-[-0.08em] text-white transition hover:brightness-95"
                   href={CLIENT_CONTACT.maxUrl}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  <span className="font-black tracking-[-0.08em]">MAX</span>
-                  Написать в MAX
+                  MAX
                 </a>
               </div>
-            </div>
+              <p className="text-center text-xs leading-5 text-[#647084]">
+                Расчёт предварительный. Для подтверждения итоговой стоимости и комплектации свяжитесь с менеджером.
+              </p>
+            </footer>
           </section>
-        </div>
+        </div>, document.body
       )}
     </>
   );
@@ -615,28 +635,48 @@ function Spec({ label, value }: { label: string; value: string }) {
 }
 
 function CalculationSection({
+  collapsible = false,
   title,
   rows,
+  total,
 }: {
+  collapsible?: boolean;
   title: string;
   rows: Array<[string, number]>;
+  total?: number;
 }) {
+  const content = (
+    <div className="mt-2 grid gap-2 text-sm">
+      {rows.map(([label, value]) => (
+        <div
+          className="flex justify-between gap-4 border-b border-dashed border-[#cbd3df] pb-2 last:border-0 last:pb-0"
+          key={label}
+        >
+          <span className="text-[#647084]">{label}</span>
+          <span className="shrink-0 whitespace-nowrap text-right font-semibold text-[#121722] tabular-nums">
+            {money(value)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+
+  if (collapsible) {
+    return (
+      <details className="group border-b border-[#e1e5eb] bg-white py-2">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[#121722] [&::-webkit-details-marker]:hidden">
+          <span>{title}</span>
+          <span className="flex shrink-0 items-center gap-2 text-sm font-semibold tabular-nums"><span>{money(total)}</span><ChevronDown size={16} className="transition group-open:rotate-180" /></span>
+        </summary>
+        {content}
+      </details>
+    );
+  }
+
   return (
-    <section className="rounded bg-white p-4 ring-1 ring-[#e1e5eb] sm:p-3">
+    <section className="rounded bg-white p-3 ring-1 ring-[#e1e5eb]">
       <h3 className="font-semibold text-[#121722]">{title}</h3>
-      <div className="mt-3 grid gap-3 text-sm sm:mt-2 sm:gap-2">
-        {rows.map(([label, value]) => (
-          <div
-            className="flex justify-between gap-4 border-b border-dashed border-[#cbd3df] pb-3 last:border-0 last:pb-0 sm:pb-2"
-            key={label}
-          >
-            <span className="text-[#647084]">{label}</span>
-            <span className="shrink-0 whitespace-nowrap text-right font-semibold text-[#121722] tabular-nums">
-              {money(value)}
-            </span>
-          </div>
-        ))}
-      </div>
+      {content}
     </section>
   );
 }
