@@ -37,17 +37,8 @@ type LiveCalculation = {
   utilRub: number;
   totalRub: number;
   koreaExpensesRub: number;
-  rates: { krwRub: number; usdRub: number; eurRub: number; kztRub: number };
   ratesAsOf: string | null;
   ratesSource: string;
-  rateDetails: {
-    cbrMarkupPercent: number;
-    cbrUsdRub: number;
-    usdtKrwRaw: number;
-    usdtKrwAdjustment: number;
-    usdtKrwAdjusted: number;
-    fetchedAt: string;
-  } | null;
 };
 
 type PriceCalculationCardProps = {
@@ -56,6 +47,7 @@ type PriceCalculationCardProps = {
   fuel: string;
   mileageKm: number | null;
   powerHp: number | null;
+  powerConfidence?: "official" | "high" | "automatic" | null;
   priceKrw: number | null;
   source: string;
   sourceId: string;
@@ -94,10 +86,6 @@ function number(value: number | null | undefined) {
   return value ?? 0;
 }
 
-function rate(value: number | null | undefined) {
-  return value == null ? "-" : value.toLocaleString("ru-RU", { maximumFractionDigits: 5 });
-}
-
 function resultValue(result: unknown, key: string): string | number | null {
   if (!result || typeof result !== "object" || Array.isArray(result))
     return null;
@@ -123,6 +111,7 @@ function RuPriceCalculationCard({
   fuel,
   mileageKm,
   powerHp,
+  powerConfidence,
   priceKrw,
   source,
   sourceId,
@@ -153,7 +142,6 @@ function RuPriceCalculationCard({
   const excise = resultNumber(activeCalc?.result, "exciseRub");
   const vat = resultNumber(activeCalc?.result, "vatRub");
   const customs = duty + excise + vat;
-  const hasCalculationResult = Boolean(activeCalc?.result);
   const calculatedAt = activeCalc?.calculated_at
     ? new Intl.DateTimeFormat("ru-RU", {
         day: "numeric",
@@ -161,8 +149,6 @@ function RuPriceCalculationCard({
         year: "numeric",
       }).format(new Date(activeCalc.calculated_at))
     : null;
-  const rateDetails = resultObject(activeCalc?.result, "rateDetails") as LiveCalculation["rateDetails"];
-  const resultRates = resultObject(activeCalc?.result, "rates");
 
   async function refreshCalculation() {
     if (!priceKrw || !year || !engineCc || !powerHp) return;
@@ -380,16 +366,16 @@ function RuPriceCalculationCard({
           ref={dialogRef}
           aria-labelledby={calculationTitleId}
           aria-modal="true"
-          className="fixed inset-0 z-[80] grid place-items-center bg-[#07152d]/75 p-0 sm:p-4"
+          className="fixed inset-0 z-[110] grid place-items-center bg-[#07152d]/75 p-0 sm:p-6"
           onMouseDown={(event) =>
             event.currentTarget === event.target && setModalOpen(false)
           }
           role="dialog"
         >
-          <section className="max-h-[100dvh] w-full max-w-xl overflow-y-auto bg-[#f4f5f7] pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[calc(100dvh-32px)] sm:rounded">
-            <header className="sticky top-0 z-10 flex min-h-14 items-center justify-between border-b border-[#e1e5eb] bg-white px-4 py-2 sm:px-5 sm:py-4">
+          <section className="max-h-[100dvh] w-full max-w-xl overflow-y-auto bg-[#f4f5f7] pb-[env(safe-area-inset-bottom)] shadow-2xl sm:max-h-[calc(100dvh-48px)] sm:max-w-[30rem] sm:rounded-lg">
+            <header className="sticky top-0 z-10 flex min-h-14 items-center justify-between border-b border-[#e1e5eb] bg-white px-4 py-2 sm:px-4 sm:py-3">
               <div>
-                <h2 id={calculationTitleId} className="text-xl font-semibold text-[#121722]">
+                <h2 id={calculationTitleId} className="text-xl font-semibold text-[#121722] sm:text-lg">
                   Расчёт цены
                 </h2>
                 {calculatedAt && (
@@ -409,30 +395,20 @@ function RuPriceCalculationCard({
               </button>
             </header>
 
-            <div className="space-y-4 p-5">
-              <section className="rounded bg-[#fffaf0] p-4 ring-1 ring-[#e7cf9b]">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-semibold text-[#121722]">Актуальные курсы</h3>
-                  </div>
-                  <button
-                    className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded bg-[#956f2c] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#7f5d25] disabled:cursor-wait disabled:opacity-60"
-                    disabled={isRefreshing || !priceKrw || !year || !engineCc || !powerHp}
-                    onClick={refreshCalculation}
-                    type="button"
-                  >
-                    <RefreshCw className={isRefreshing ? "animate-spin" : ""} size={15} />
-                    {isRefreshing ? "Обновляем" : "Обновить цену"}
-                  </button>
-                </div>
-                <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
-                  <RateRow label="KRW/RUB" value={`${rate(typeof resultRates?.krwRub === "number" ? resultRates.krwRub : null)} ₽`} />
-                  <RateRow label="USD/RUB" value={`${rate(typeof resultRates?.usdRub === "number" ? resultRates.usdRub : null)} ₽`} />
-                  <RateRow label="USDT/KRW" value={rateDetails ? `${rate(rateDetails.usdtKrwAdjusted)} ₩` : "-"} />
-                </div>
-                {refreshError && <p className="mt-2 text-xs font-medium text-[#b42318]">{refreshError}</p>}
-              </section>
-              <div className="rounded bg-white p-4 ring-1 ring-[#e1e5eb]">
+            <div className="space-y-4 p-5 sm:space-y-3 sm:p-4">
+              <div className="flex flex-col items-end gap-2 sm:gap-1">
+                <button
+                  className="inline-flex min-h-10 items-center gap-2 rounded bg-[#956f2c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#7f5d25] disabled:cursor-wait disabled:opacity-60"
+                  disabled={isRefreshing || !priceKrw || !year || !engineCc || !powerHp}
+                  onClick={refreshCalculation}
+                  type="button"
+                >
+                  <RefreshCw className={isRefreshing ? "animate-spin" : ""} size={16} />
+                  {isRefreshing ? "Обновляем" : "Обновить цену"}
+                </button>
+                {refreshError && <p className="text-xs font-medium text-[#b42318]">{refreshError}</p>}
+              </div>
+              <div className="rounded bg-white p-4 ring-1 ring-[#e1e5eb] sm:p-3">
                 <p className="text-sm text-[#647084]">
                   Цена автомобиля в Корее
                 </p>
@@ -463,19 +439,23 @@ function RuPriceCalculationCard({
                   ["Утилизационный сбор", number(calc?.util_rub)],
                 ]}
               />
-              <div className="rounded bg-[#07152d] p-4 text-white">
+              <div className="rounded bg-[#07152d] p-4 text-white sm:p-3">
                 <div className="flex items-baseline justify-between gap-4">
                   <span className="font-medium">Под ключ до Владивостока</span>
                   <span className="text-xl font-semibold">{money(total)}</span>
                 </div>
                 <p className="mt-2 text-xs leading-5 text-[#cdd5e2]">
                   Предварительный расчёт. Итог зависит от курса, даты оформления
-                  и фактических расходов по сделке.
+                  , подтверждённой комплектации и фактических расходов по сделке.
                 </p>
+                {powerConfidence === "automatic" && (
+                  <p className="mt-2 border-t border-white/15 pt-2 text-xs leading-5 text-[#dce4ee]">
+                    Параметры двигателя определены автоматическим сопоставлением
+                    технических данных. Рекомендуем подтвердить комплектацию у
+                    менеджера перед оформлением.
+                  </p>
+                )}
               </div>
-              {hasCalculationResult && (
-                <p className="text-xs text-[#647084]">Курс и цена обновляются кнопкой выше. Сохранённый расчёт используется как исходное значение до обновления.</p>
-              )}
             </div>
           </section>
         </div>
@@ -591,15 +571,6 @@ function resultObject(result: unknown, key: string): Record<string, unknown> | n
     : null;
 }
 
-function RateRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 border-b border-[#eadfca] pb-2">
-      <span className="truncate text-[#647084]">{label}</span>
-      <strong className="whitespace-nowrap text-right tabular-nums text-[#121722]">{value}</strong>
-    </div>
-  );
-}
-
 function Spec({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex min-h-7 items-start justify-between gap-3 border-b border-dashed border-[#cbd3df] pb-2">
@@ -617,12 +588,12 @@ function CalculationSection({
   rows: Array<[string, number]>;
 }) {
   return (
-    <section className="rounded bg-white p-4 ring-1 ring-[#e1e5eb]">
+    <section className="rounded bg-white p-4 ring-1 ring-[#e1e5eb] sm:p-3">
       <h3 className="font-semibold text-[#121722]">{title}</h3>
-      <div className="mt-3 grid gap-3 text-sm">
+      <div className="mt-3 grid gap-3 text-sm sm:mt-2 sm:gap-2">
         {rows.map(([label, value]) => (
           <div
-            className="flex justify-between gap-4 border-b border-dashed border-[#cbd3df] pb-3 last:border-0 last:pb-0"
+            className="flex justify-between gap-4 border-b border-dashed border-[#cbd3df] pb-3 last:border-0 last:pb-0 sm:pb-2"
             key={label}
           >
             <span className="text-[#647084]">{label}</span>

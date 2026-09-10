@@ -1,4 +1,4 @@
-import type { CalcRateDetails, CalcRates } from "./types";
+import type { CalcRateDetails, CalcRates, CustomsRates } from "./types";
 import { createSupabasePublic } from "@/server/supabase/public";
 
 const CBR_DAILY_RATES_URL = "https://www.cbr.ru/scripts/XML_daily.asp";
@@ -11,6 +11,8 @@ const MAX_STORED_RATE_AGE_MS = 24 * 60 * 60 * 1000;
 
 export type CalcRateSnapshot = {
   rates: CalcRates;
+  /** Official Central Bank rates for customs value and state payments. */
+  customsRates: CustomsRates;
   asOf: string;
   source: "cbr.ru + naver.com/Bithumb";
   rateDetails: CalcRateDetails;
@@ -143,6 +145,7 @@ async function buildLiveRateSnapshot(): Promise<CalcRateSnapshot> {
   };
   return {
     rates: { krwRub, usdRub, eurRub, kztRub: cbr.kztRub },
+    customsRates: { krwRub: cbr.krwRub, eurRub: cbr.eurRub },
     asOf: cbr.asOf,
     source: "cbr.ru + naver.com/Bithumb",
     rateDetails,
@@ -166,6 +169,10 @@ async function getStoredRateSnapshot(): Promise<CalcRateSnapshot | null> {
   if (!Number.isFinite(rates.krwRub) || !Number.isFinite(rates.usdRub) || !Number.isFinite(rates.eurRub) || !Number.isFinite(rates.kztRub)) return null;
   return {
     rates: { krwRub: Number(rates.krwRub), usdRub: Number(rates.usdRub), eurRub: Number(rates.eurRub), kztRub: Number(rates.kztRub) },
+    customsRates: {
+      krwRub: Number(details.cbrKrwRub ?? rates.krwRub),
+      eurRub: Number(details.cbrEurRub ?? rates.eurRub),
+    },
     asOf: String(data.as_of),
     source: String(data.source) as CalcRateSnapshot["source"],
     rateDetails: {

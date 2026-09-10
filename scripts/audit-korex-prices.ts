@@ -107,6 +107,7 @@ async function main() {
       powerHp: car.power_hp,
       fuelType: car.fuel_type ?? undefined,
       rates: rateSnapshot.rates,
+      customsRates: rateSnapshot.customsRates,
       ratesAsOf: rateSnapshot.asOf,
       ratesSource: rateSnapshot.source,
       rateDetails: rateSnapshot.rateDetails,

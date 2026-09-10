@@ -1,4 +1,4 @@
-import type { CalcInput, CalcRates, CalcResult } from "./types";
+import type { CalcInput, CalcRates, CalcResult, CustomsRates } from "./types";
 import {
   tksCustomsFeeRub,
   tksDutyVolumeRate,
@@ -8,7 +8,7 @@ import {
   tksStpExciseRub,
 } from "./tks-rules";
 
-export const CALC_VERSION = "ru-individual-autoexport-tks-usdt-2026.01";
+export const CALC_VERSION = "ru-individual-autoexport-tks-dual-rate-2026.02";
 
 const DEFAULT_RATES: CalcRates = { krwRub: 0.04718, eurRub: 87.403, usdRub: 70.95, kztRub: 0.14 };
 const DEFAULT_CLEARANCE_DAYS = 90;
@@ -76,13 +76,19 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
     usdRub: input.rates?.usdRub ?? DEFAULT_RATES.usdRub,
     kztRub: input.rates?.kztRub ?? DEFAULT_RATES.kztRub,
   };
+  // Commercial conversion is used for the car price and TL Auto services.
+  // Customs value must use the official Central Bank rate, as in TKS.
+  const customsRates: CustomsRates = {
+    krwRub: input.customsRates?.krwRub ?? input.rateDetails?.cbrKrwRub ?? rates.krwRub,
+    eurRub: input.customsRates?.eurRub ?? input.rateDetails?.cbrEurRub ?? rates.eurRub,
+  };
   const calculationDate = input.calculationDate ? new Date(input.calculationDate) : new Date();
   if (Number.isNaN(calculationDate.getTime())) throw new Error("Invalid calculation date");
   const clearanceDate = getClearanceDate(calculationDate, input.clearanceDays);
   const currentCarAgeYears = getCarAgeYears(input.year, input.month || 6, calculationDate);
   const carAgeYears = getCarAgeYears(input.year, input.month || 6, clearanceDate);
-  const customsValueRub = input.priceKrw * rates.krwRub;
-  const carPriceRub = Math.round(customsValueRub);
+  const carPriceRub = Math.round(input.priceKrw * rates.krwRub);
+  const customsValueRub = input.priceKrw * customsRates.krwRub;
   const propulsion = input.hybridSequential
     ? "hybrid_sequential" as const
     : input.fuelType === "electric"
@@ -93,7 +99,7 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
   const usesStp = propulsion === "electric" || propulsion === "hybrid_sequential";
   const customs = usesStp
     ? { dutyRub: roundRub(customsValueRub * 0.15), eurPerCc: 0, percentRate: 0.15, mode: "stp" as const, excisePerHp: 0, vatRate: 0.22 }
-    : getIndividualDutyRub({ priceRub: customsValueRub, engineCc: input.engineCc ?? 0, ageYearsAtClearance: carAgeYears, eurRub: rates.eurRub });
+    : getIndividualDutyRub({ priceRub: customsValueRub, engineCc: input.engineCc ?? 0, ageYearsAtClearance: carAgeYears, eurRub: customsRates.eurRub });
   const freightRub = Math.round(FREIGHT_USD * rates.usdRub);
   const koreaExpensesRub = Math.round(KOREA_EXPENSES_KRW * rates.krwRub);
   const brokerRub = BROKER_RUB;
@@ -107,8 +113,9 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
   const totalRub = roundRub(customsValueRub + freightRub + koreaExpensesRub + brokerRub + customs.dutyRub + exciseRub + vatRub + feesRub + utilRub);
   return {
     countryCode: "RU", destinationCity: "Владивосток", importerType: "individual", calcVersion: CALC_VERSION,
-    carPriceRub, freightRub, brokerRub, dutyRub: customs.dutyRub, exciseRub, vatRub, feesRub, utilRub, totalRub,
+    carPriceRub, customsValueRub: roundRub(customsValueRub), freightRub, brokerRub, dutyRub: customs.dutyRub, exciseRub, vatRub, feesRub, utilRub, totalRub,
     rates, ratesAsOf: input.ratesAsOf ?? null, ratesSource: input.ratesSource ?? "provided-or-default",
+    customsRates,
     rateDetails: input.rateDetails ?? null,
     koreaExpensesRub,
     customs: { eurPerCc: customs.eurPerCc, percentRate: customs.percentRate, mode: customs.mode, excisePerHp: usesStp ? tksStpExciseRub(powerKw!) / (powerKw! * KW_TO_HP) : 0, vatRate: usesStp ? 0.22 : 0 },

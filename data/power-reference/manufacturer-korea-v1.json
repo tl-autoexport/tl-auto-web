@@ -1,0 +1,2094 @@
+{
+  "version": "manufacturer-korea-v1",
+  "description": "Curated Korean-manufacturer specifications. Each entry is limited to the engine, years and drive types stated or reconfirmed by the linked manufacturer material. PS values are converted to kW with the exact factor 0.73549875; no tariff rounding is applied.",
+  "specifications": [
+    {
+      "specKey": "kia-carnival-ka4-2.2d-2151-2019-provisional",
+      "brand": "Kia",
+      "model": "Carnival",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2019, 2019],
+      "power": { "value": 202, "unit": "PS", "kw": 148.5707475 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Carnival KA4 2.2 diesel — provisional 2019 assignment",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RYP/catalog/catalog_all-new-carnival.pdf",
+        "supportingUri": "https://www.kia.com/content/dam/kwcms/id/en/pdf/Carnival_Catalog_21.pdf",
+        "retrievedAt": "2026-09-09",
+        "note": "The two 2019 Encar records report 2,151 cc and the KA4 trim Noble Special, but Kia's first located KA4 catalogues are from 2020/2021. 202 PS is assigned provisionally at the user's request and must be replaced if an exact 2019 Korean production document is found. Do not treat this row as exact model-year official evidence."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 2140, "engineCcTo": 2160 }
+      ]
+    },
+    {
+      "specKey": "kia-ray-1.0-998-2019-2021-provisional",
+      "brand": "Kia",
+      "model": "Ray",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 998,
+      "years": [2019, 2021],
+      "power": { "value": 76, "unit": "PS", "kw": 55.897905 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Ray 1.0 gasoline — provisional 2019–2021 assignment",
+        "uri": "https://rental.kia.com/rentfile/carseries/carseries_1664611735305.pdf",
+        "supportingUri": "https://www.kia.com/kr/vehicles/ray/specification",
+        "retrievedAt": "2026-09-09",
+        "note": "Kia's official Korean Ray specification documents confirm the unchanged 998 cc / 76 PS powertrain for 2022 onward, and the Kia Heritage archive confirms the same Ray 998 cc model line. The exact 2019–2021 historical catalogue was not located; 76 PS is assigned provisionally for these years and must be replaced if a year-specific document shows a different output."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2021, "engineCcFrom": 990, "engineCcTo": 1005 }
+      ]
+    },
+    {
+      "specKey": "kia-seltos-sp2-1.6t-1598-2022",
+      "brand": "Kia",
+      "model": "Seltos",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2022, 2022],
+      "power": { "value": 198, "unit": "PS", "kw": 145.6287525 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Kia Seltos Korean 2022 catalogue — 1.6 gasoline turbo, 198 PS", "uri": "https://rental.kia.com/rentfile/carseries/su_catalog_seltos.pdf", "retrievedAt": "2026-09-09", "note": "Official Kia Korean catalogue dated 2022-09-01 lists 1.6 gasoline turbo at 1,598 cc and 198 PS; applies only to 2022 listings." },
+      "matches": [{ "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 1590, "engineCcTo": 1610 }]
+    },
+    {
+      "specKey": "kia-seltos-sp2-2.0-1999-2022",
+      "brand": "Kia",
+      "model": "Seltos",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2022, 2022],
+      "power": { "value": 149, "unit": "PS", "kw": 109.58931375 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Kia Seltos Korean 2022 catalogue — 2.0 gasoline, 149 PS", "uri": "https://rental.kia.com/rentfile/carseries/su_catalog_seltos.pdf", "retrievedAt": "2026-09-09", "note": "Official Kia Korean catalogue dated 2022-09-01 lists 2.0 gasoline at 1,999 cc and 149 PS; applies only to 2022 listings." },
+      "matches": [{ "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 1985, "engineCcTo": 2010 }]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.2d-2151-2022",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2022, 2022],
+      "power": { "value": 194, "unit": "PS", "kw": 142.6867575 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Kia Sorento Korean 2022 catalogue — 2.2 diesel, 194 PS", "uri": "https://rental.kia.com/rentfile/carseries/mq_catalog_4thgensorento.pdf", "retrievedAt": "2026-09-09", "note": "Official Kia Korean catalogue dated 2022-09-01 lists 2.2 diesel at 2,151 cc and 194 PS; applies only to 2022 listings." },
+      "matches": [{ "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 2140, "engineCcTo": 2160 }]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.5t-2497-2022",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2022, 2022],
+      "power": { "value": 281, "unit": "PS", "kw": 206.67514875 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Kia Sorento Korean 2022 catalogue — 2.5 gasoline turbo, 281 PS", "uri": "https://rental.kia.com/rentfile/carseries/mq_catalog_4thgensorento.pdf", "retrievedAt": "2026-09-09", "note": "Official Kia Korean catalogue dated 2022-09-01 lists 2.5 turbo gasoline at 2,497 cc and 281 PS; applies only to 2022 listings." },
+      "matches": [{ "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 2485, "engineCcTo": 2510 }]
+    },
+    {
+      "specKey": "hyundai-grandeur-ig-3.3-3342-2020",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3342,
+      "years": [2020, 2020],
+      "power": { "value": 290, "unit": "PS", "kw": 213.2946375 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Hyundai Grandeur 2020 Korean specification — 3.3 gasoline, 3,342 cc, 290 PS", "uri": "https://www.hyundai.com/kr/ko/vehicles/grandeur/20fl/specifications.html", "supportingUri": "https://www.hyundai.com/kr/ko/vehicles/grandeur/20fl/price.html", "retrievedAt": "2026-09-09", "note": "Hyundai's official Grandeur 20FL specification lists the gasoline 3.3 engine at 3,342 cc and 290 PS. The match is limited to 2020 listings." },
+      "matches": [{ "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 3290, "engineCcTo": 3360 }]
+    },
+    {
+      "specKey": "hyundai-sonata-dn8-1.6t-1598-2021",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2021, 2021],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Hyundai Sonata Sensuous 2021 Korean specification — 1.6 turbo, 1,598 cc, 180 PS", "uri": "https://www.hyundai.com/content/hyundai/kr/ko/vehicles/sonata/19fc/sonata-sensuous.html", "supportingUri": "https://www.hyundai.com/contents/repn-car/catalog_en/sonata-catalog.pdf", "retrievedAt": "2026-09-09", "note": "Hyundai's official Sonata Sensuous specification and 2021 catalogue list the 1.6 turbo gasoline engine at 1,598 cc and 180 PS. The match is limited to 2021 listings." },
+      "matches": [{ "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 1590, "engineCcTo": 1610 }]
+    },
+    {
+      "specKey": "genesis-g80-rg3-2.5t-2497-2020-2024",
+      "brand": "Genesis",
+      "model": "G80",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2020, 2024],
+      "power": { "value": 304, "unit": "PS", "kw": 223.59162 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Genesis — launch of The All-new G80; 2.5 Turbo 304 PS",
+        "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000221",
+        "supportingUri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000453",
+        "retrievedAt": "2026-09-07",
+        "note": "The 2020 launch document identifies the 2.5 Turbo as 304 PS. The 2023 facelift release reconfirms the same 304 PS 2.5 Turbo; the specification is therefore limited to 2020–2024 listings with 2,497 cc and the stated drive type."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2020, "yearTo": 2024, "engineCcFrom": 2490, "engineCcTo": 2505 },
+        { "driveType": "4WD", "yearFrom": 2020, "yearTo": 2024, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "genesis-gv70-jk1-2.5t-2497-2021-2025",
+      "brand": "Genesis",
+      "model": "GV70",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2021, 2025],
+      "power": { "value": 304, "unit": "PS", "kw": 223.59162 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Genesis GV70 Korean specification — 2.5 Turbo 304 PS, 2WD/AWD",
+        "uri": "https://www.genesis.com/kr/ko/models/gv70",
+        "supportingUri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000290",
+        "retrievedAt": "2026-09-07",
+        "note": "Genesis specifies the 2.5 T-GDi as 2,497 cc, 304 PS and available in 2WD/AWD. The launch release and the Korean specification page are retained together; matching is limited to the listed engine, model years and drive types."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 2490, "engineCcTo": 2505 },
+        { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "kia-ray-1.0-998-2022",
+      "brand": "Kia",
+      "model": "Ray",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 998,
+      "years": [2022, 2022],
+      "power": { "value": 76, "unit": "PS", "kw": 55.897905 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Ray 2022 Korean specification — 998 cc, 76 PS",
+        "uri": "https://rental.kia.com/rentfile/carseries/carseries_1664611735305.pdf",
+        "retrievedAt": "2026-09-07",
+        "note": "Kia's Korean 2022 reference PDF states 998 cc and 76 PS. The match is deliberately limited to 2022; the other model years remain preliminary until their own manufacturer document is linked."
+      },
+      "matches": [
+        { "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 990, "engineCcTo": 1005 }
+      ]
+    },
+    {
+      "specKey": "kia-ray-1.0-998-2023-2026",
+      "brand": "Kia",
+      "model": "Ray",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 998,
+      "years": [2023, 2026],
+      "power": { "value": 76, "unit": "PS", "kw": 55.897905 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Ray Korean 2023 catalogue — 1.0 gasoline, 998 cc, 76 PS",
+        "uri": "https://kwp1.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/en_brochure/en-catalog_ray.pdf",
+        "supportingUri": "https://www.kia.com/kr/vehicles/ray/specification",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean Ray catalogue lists the 1.0 gasoline engine at 998 cc and 76 PS; the current Ray specification reconfirms the same output. The match is limited to 2023–2026 gasoline Ray listings. Ray EV is a separate electric powertrain."
+      },
+      "matches": [
+        { "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 }
+      ]
+    },
+    {
+      "specKey": "hyundai-casper-ax1-1.0-998-2021-2026",
+      "brand": "Hyundai",
+      "model": "Casper",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 998,
+      "years": [2021, 2026],
+      "power": { "value": 76, "unit": "PS", "kw": 55.897905 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Casper Korean specification — 1.0 gasoline, 998 cc, 76 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2021-casper",
+        "supportingUri": "https://m.casper.hyundai.com/wcontents/repn-car/catalog/AX01/AX_CASPER_catalog.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official Casper specification and catalogue list the naturally aspirated Smartstream G1.0 at 998 cc and 76 PS. Trim-constrained matches cover the non-turbo Encar trims; Turbo trims are assigned by a separate 100 PS rule."
+      },
+      "matches": [
+        { "trim": "Inspiration", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 },
+        { "trim": "Modern", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 },
+        { "trim": "The Essential", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 },
+        { "trim": "The Essential Light", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 },
+        { "trim": "Smart", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 },
+        { "trim": "Van", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 }
+      ]
+    },
+    {
+      "specKey": "hyundai-casper-ax1-1.0t-998-2021-2026",
+      "brand": "Hyundai",
+      "model": "Casper",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 998,
+      "years": [2021, 2026],
+      "power": { "value": 100, "unit": "PS", "kw": 73.549875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Casper Korean catalogue — 1.0 Turbo, 998 cc, 100 PS",
+        "uri": "https://m.casper.hyundai.com/wcontents/repn-car/catalog/AX01/AX_CASPER_catalog.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official Casper catalogue lists the Kappa 1.0 Turbo engine at 998 cc and 100 PS. Trim-constrained matches cover Encar's Turbo variants to prevent collision with the naturally aspirated 76 PS engine."
+      },
+      "matches": [
+        { "trim": "Turbo Inspiration", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 },
+        { "trim": "Turbo The Essential", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 },
+        { "trim": "Turbo Smart", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 },
+        { "trim": "Turbo Modern", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 },
+        { "trim": "Turbo Van", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 990, "engineCcTo": 1005 }
+      ]
+    },
+    {
+      "specKey": "kia-carnival-ka4-3.5-3470-2024-2026",
+      "brand": "Kia",
+      "model": "Carnival",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2024, 2026],
+      "power": { "value": 294, "unit": "PS", "kw": 216.2366325 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Carnival Korean specification — 3.5 gasoline, 3,470 cc, 294 PS",
+        "uri": "https://www.kia.com/kr/vehicles/carnival/specification",
+        "retrievedAt": "2026-09-07",
+        "note": "Kia's Korean Carnival specification gives 3,470 cc and 294 PS for the 3.5 gasoline powertrain. The match is limited to catalog years 2024–2026; older listings are not inferred from this page."
+      },
+      "matches": [
+        { "yearFrom": 2024, "yearTo": 2026, "engineCcFrom": 3460, "engineCcTo": 3480 }
+      ]
+    },
+    {
+      "specKey": "hyundai-staria-us4-2.2d-2199-2021-2022",
+      "brand": "Hyundai",
+      "model": "Staria",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2199,
+      "years": [2021, 2022],
+      "power": { "value": 177, "unit": "PS", "kw": 130.18327875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai STARIA 2021 Korean specification — Diesel VGT 2.2, 2,199 cc, 177 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2021-staria",
+        "supportingUri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2022-staria-lounge-camper",
+        "retrievedAt": "2026-09-07",
+        "note": "Hyundai's 2021 historical model page specifies the 2.2 VGT diesel as 2,199 cc and 177 PS; Hyundai's 2022 STARIA Camper page reconfirms the same engine and output. The match is limited to 2021–2022."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 2190, "engineCcTo": 2210 }
+      ]
+    },
+    {
+      "specKey": "kia-k5-dl3-2.0-gas-1999-2023",
+      "brand": "Kia",
+      "model": "K5",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2023, 2023],
+      "power": { "value": 160, "unit": "PS", "kw": 117.6798 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K5 2023 Korean specification — 2.0 gasoline, 1,999 cc, 160 PS",
+        "uri": "https://www.kia.com/kr/vehicles/k5_bak_20231031/specification",
+        "supportingUri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_3rdgenk5.pdf",
+        "retrievedAt": "2026-09-07",
+        "note": "Kia's 2023 K5 specification and catalogue both state 1,999 cc and 160 PS for the 2.0 gasoline engine. The match is limited to 2023 until the remaining model-year documents are linked."
+      },
+      "matches": [
+        { "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1990, "engineCcTo": 2010 }
+      ]
+    },
+    {
+      "specKey": "kia-k5-dl3-2.0-gas-1999-2021-2022",
+      "brand": "Kia",
+      "model": "K5",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2021, 2022],
+      "power": { "value": 160, "unit": "PS", "kw": 117.6798 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K5 Korean 2021 catalogue — 2.0 gasoline, 1,999 cc, 160 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/en-catalog/en_catalog_k5_hev.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's Korean K5 2021 catalogue lists the 2.0 gasoline engine at 1,999 cc and 160 PS. The rule is limited to 2021–2022 K5 gasoline listings; 1.6 turbo and hybrid variants remain separate."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1990, "engineCcTo": 2010 }
+      ]
+    },
+    {
+      "specKey": "hyundai-grandeur-gn7-2.5-2497-2021-2026",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2021, 2026],
+      "power": { "value": 198, "unit": "PS", "kw": 145.6287525 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Grandeur Korean specifications — Smartstream 2.5, 2,497 cc, 198 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/grandeur/20fl/specifications.html",
+        "supportingUri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/grandeur-history/2022-the-all-new-grandeur",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's 2020 Grandeur FL specification and the 2022 all-new Grandeur specification both state 2,497 cc and 198 PS for Smartstream gasoline 2.5. The match begins with 2021 catalog listings and is limited to 2,497 cc gasoline."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "hyundai-grandeur-ig-2.5-2497-2019",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2019, 2019],
+      "power": { "value": 198, "unit": "PS", "kw": 145.6287525 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Grandeur 2019 Korean specification — Smartstream 2.5, 2,497 cc, 198 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/grandeur-history/2019-grandeur",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official 2019 Grandeur page identifies the model as 2019.11 and lists Smartstream G2.5, 2,497 cc and 198 PS with 2WD/AWD. The match is restricted to 2019 listings to avoid conflating this generation with earlier 2018 cars."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "kia-k5-dl3-2.0-gas-1999-2024-2026",
+      "brand": "Kia",
+      "model": "K5",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2024, 2026],
+      "power": { "value": 160, "unit": "PS", "kw": 117.6798 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K5 Korean 2026 catalogue — 2.0 gasoline, 1,999 cc, 160 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_k5.pdf",
+        "supportingUri": "https://rental.kia.com/rentfile/carseries/carseries_1751525241597.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean K5 catalogue dated September 2026 lists the 2.0 gasoline engine at 1,999 cc and 160 PS; the 2025 Kia rental specification supports the same current-generation output. The match is limited to 2024–2026 K5 listings with the 2.0 gasoline displacement; 1.6 turbo and hybrid variants remain separate rules."
+      },
+      "matches": [
+        { "yearFrom": 2024, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2010 }
+      ]
+    },
+    {
+      "specKey": "hyundai-avante-ad-1.6-1600-2019-2022",
+      "brand": "Hyundai",
+      "model": "Elantra",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2019, 2022],
+      "power": { "value": 123, "unit": "PS", "kw": 90.46634625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Avante Korean 2019 catalogue — Smartstream gasoline 1.6, 1,598 cc, 123 PS",
+        "uri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/avante-catalog-1.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "The official Korean Avante catalogue states Smartstream gasoline 1.6, 1,598 cc and 123 PS. Encar's English model normalization uses Elantra and may round displacement to 1,600 cc; the match allows that display rounding and is limited to the AD-era 2019–2022 listings."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2022, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "hyundai-avante-cn7-1.6-1598-2023-2025",
+      "brand": "Hyundai",
+      "model": "Elantra",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2023, 2025],
+      "power": { "value": 123, "unit": "PS", "kw": 90.46634625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai The new Avante 2023 Korean specification — 1,598 cc, 123 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/avante-history/2023-the-new-avante",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's 2023 The new Avante specification gives 1,598 cc and 123 PS for Smartstream gasoline 1.6. It is limited to the CN7-era 2023–2025 catalog listings."
+      },
+      "matches": [
+        { "yearFrom": 2023, "yearTo": 2025, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "kia-sportage-nq5-1.6t-1598-2021-2026",
+      "brand": "Kia",
+      "model": "Sportage",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2021, 2026],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sportage Korean catalogues — 1.6 gasoline turbo, 1,598 cc, 180 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RQL/catalog/catalog_sportageql.pdf",
+        "supportingUri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/price/price_sportageql.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's Korean Sportage catalogue specifies 1.6 gasoline turbo at 1,598 cc and 180 PS; the later Korean price list reconfirms the same engine/output. The match is limited to 2021–2026 1.6T gasoline listings."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "kia-sportage-nq5-2.0d-1998-2021-2023",
+      "brand": "Kia",
+      "model": "Sportage",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2021, 2023],
+      "power": { "value": 184, "unit": "PS", "kw": 135.33177 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sportage Korean catalogue 2022 — Smartstream D2.0 diesel, 1,998 cc, 184 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RQL/catalog/catalog_sportageql.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's Korean Sportage catalogue dated July 2022 lists the Smartstream D2.0 diesel at 1,998 cc and 184 PS and documents both 2WD and 4WD. The match is limited to 2021–2023 NQ5 listings; later model years remain separate until their own document is linked."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2021, "yearTo": 2023, "engineCcFrom": 1988, "engineCcTo": 2008 },
+        { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2023, "engineCcFrom": 1988, "engineCcTo": 2008 }
+      ]
+    },
+    {
+      "specKey": "kia-k3-bd-1.6-1598-2021-2023",
+      "brand": "Kia",
+      "model": "K3",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2021, 2023],
+      "power": { "value": 123, "unit": "PS", "kw": 90.46634625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K3 Korean catalogues — 1.6 gasoline, 1,598 cc, 123 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/XDB/price/price_k3.pdf",
+        "supportingUri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/price/price_k3.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's 2020 and 2023 K3 Korean documents identify the 1.6 gasoline engine as 1,598 cc and 123 PS. The match is restricted to the intermediate 2021–2023 listings."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2023, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "hyundai-sonata-dn8-2.0-1999-2023-2024",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2023, 2024],
+      "power": { "value": 160, "unit": "PS", "kw": 117.6798 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Sonata The Edge 2023 Korean specification — 1,999 cc, 160 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2023-sonata-the-edge",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's 2023 Sonata The Edge specification states Smartstream gasoline 2.0, 1,999 cc and 160 PS. The match is limited to 2023–2024 rather than applied to prior Sonata generations."
+      },
+      "matches": [
+        { "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1990, "engineCcTo": 2010 }
+      ]
+    },
+    {
+      "specKey": "hyundai-kona-os-1.6t-1591-2020",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1591,
+      "years": [2020, 2020],
+      "power": { "value": 177, "unit": "PS", "kw": 130.18327875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Kona 2020 Korean specification — 1.6 T-GDi, 1,591 cc, 177 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/kona/20my/specifications.html",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's 2020 Kona Korean specification states gasoline 1.6 T-GDi, 1,591 cc and 177 PS. The record covers only 2020 until the other Kona model-year documents are linked."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1580, "engineCcTo": 1610 },
+        { "driveType": "4WD", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1580, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "hyundai-venue-qx-1.6-1598-2019-2026",
+      "brand": "Hyundai",
+      "model": "Venue",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2019, 2026],
+      "power": { "value": 123, "unit": "PS", "kw": 90.46634625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Venue Korean specification — Smartstream G1.6, 1,598 cc, 123 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/venue-history/2019-venue",
+        "supportingUri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/venue-catalog-lc.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's Korean 2019 Venue model page and Venue catalogue specify the 1.6 gasoline engine at 1,598 cc and 123 PS. The match is limited to gasoline Venue listings with the same displacement; drive is intentionally unrestricted because Encar often omits it for this model."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2026, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "hyundai-staria-us4-2.2d-2199-2023-2026",
+      "brand": "Hyundai",
+      "model": "Staria",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2199,
+      "years": [2023, 2026],
+      "power": { "value": 177, "unit": "PS", "kw": 130.18327875 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Hyundai STARIA Korean specification — Diesel VGT 2.2, 2,199 cc, 177 PS", "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2022-staria-lounge-camper", "supportingUri": "https://www.hyundai.com/pacific/en/find-a-car/staria-2021/performance", "retrievedAt": "2026-09-09", "note": "Hyundai's Korean STARIA specification lists the 2.2 VGT diesel at 2,199 cc and 177 PS with 2WD/AWD. The match covers 2023–2026 catalogue listings; exact trim does not change engine output." },
+      "matches": [{ "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 2190, "engineCcTo": 2210 }]
+    },
+    {
+      "specKey": "kia-mohave-hm-3.0d-2959-2019",
+      "brand": "Kia",
+      "model": "Mohave",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2959,
+      "years": [2019, 2019],
+      "power": { "value": 260, "unit": "PS", "kw": 191.229675 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Kia Mohave Korean specification — V6 3.0 diesel, 2,959 cc, 260 PS", "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RJS/catalog/catalog_mohave.pdf", "supportingUri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/NJS/catalog/price_mo_mohave.pdf", "retrievedAt": "2026-09-09", "note": "Kia's Korean Mohave catalogue lists the V6 3.0 diesel at 2,959 cc and 260 PS with 4WD. The rule is restricted to 2019 listings; later 2024 output is maintained separately." },
+      "matches": [{ "driveType": "4WD", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 2940, "engineCcTo": 2975 }]
+    },
+    {
+      "specKey": "hyundai-grandeur-ig-2.5-2497-2020",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2020, 2020],
+      "power": { "value": 198, "unit": "PS", "kw": 145.6287525 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Hyundai Grandeur Korean specification — Smartstream 2.5 gasoline, 2,497 cc, 198 PS", "uri": "https://www.hyundai.com/kr/ko/vehicles/grandeur/20fl/specifications.html", "supportingUri": "https://www.hyundai.com/kr/ko/vehicles/grandeur/20fl/price.html", "retrievedAt": "2026-09-09", "note": "Hyundai's official Grandeur 20FL specification lists Smartstream gasoline 2.5 at 2,497 cc and 198 PS. The match is limited to 2020 records; Encar's rounded 2,500 cc values are included." },
+      "matches": [{ "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 2485, "engineCcTo": 2510 }]
+    },
+    {
+      "specKey": "kia-seltos-sp2-1.6t-1591-2019-2021",
+      "brand": "Kia",
+      "model": "Seltos",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1591,
+      "years": [2019, 2021],
+      "power": { "value": 177, "unit": "PS", "kw": 130.18327875 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Kia Seltos Korean launch specification — 1.6 T-GDi, 1,591 cc, 177 PS", "uri": "https://autocatalogarchive.com/wp-content/uploads/2019/07/Kia-Seltos-2019-KR.pdf", "supportingUri": "https://heritage.kia.com/kr/vehicles/seltos/", "retrievedAt": "2026-09-09", "note": "The Korean-market 2019 Kia Seltos catalogue mirror lists 1.6 T-GDi at 1,591 cc and 177 PS. Kia Heritage confirms the 2019 Korean model line. The match is limited to 2019–2021 and rounded 1,600 cc listings; source is a catalogue mirror, not a live Kia URL." },
+      "matches": [{ "yearFrom": 2019, "yearTo": 2021, "engineCcFrom": 1585, "engineCcTo": 1610 }]
+    },
+    {
+      "specKey": "kia-seltos-sp2-1.6d-1598-2019-2021",
+      "brand": "Kia",
+      "model": "Seltos",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2019, 2021],
+      "power": { "value": 136, "unit": "PS", "kw": 100.02783 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Kia Seltos Korean launch specification — 1.6 diesel, 1,598 cc, 136 PS", "uri": "https://autocatalogarchive.com/wp-content/uploads/2019/07/Kia-Seltos-2019-KR.pdf", "supportingUri": "https://heritage.kia.com/kr/vehicles/seltos/", "retrievedAt": "2026-09-09", "note": "The Korean-market 2019 Kia Seltos catalogue mirror lists the 1.6 diesel at 1,598 cc and 136 PS. The match is limited to 2019–2021 and rounded 1,600 cc listings; source is a catalogue mirror, not a live Kia URL." },
+      "matches": [{ "yearFrom": 2019, "yearTo": 2021, "engineCcFrom": 1585, "engineCcTo": 1610 }]
+    },
+    {
+      "specKey": "kia-seltos-sp2-1.6t-1598-2022-2025",
+      "brand": "Kia",
+      "model": "Seltos",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2022, 2025],
+      "power": { "value": 198, "unit": "PS", "kw": 145.6287525 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Seltos Korean catalogues — 1.6 gasoline turbo, 1,598 cc, 198 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/SPR/catalog/catalog_mo_seltos.pdf",
+        "supportingUri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_seltos.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's Korean 2022 and 2025 catalogues identify the 1.6 gasoline turbo as 1,598 cc and 198 PS. The rule is restricted to 2022–2025 2WD listings; 2020–2021 are intentionally excluded pending their own model-year document."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2022, "yearTo": 2025, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "hyundai-palisade-lx2-3.8-3778-2022-2024",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3778,
+      "years": [2022, 2024],
+      "power": { "value": 295, "unit": "PS", "kw": 216.97213125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Palisade Korean specifications — gasoline 3.8 GDi, 3,778 cc, 295 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/palisade/18lc/specifications.html",
+        "supportingUri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/palisade-catalog.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's Korean Palisade specification and catalogue state 3,778 cc and 295 PS for gasoline 3.8 GDi and show both AWD and 2WD variants. The match covers 2021–2024 listings and permits Encar's display rounding to 3,800 cc."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2021, "yearTo": 2024, "engineCcFrom": 3770, "engineCcTo": 3810 },
+        { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2024, "engineCcFrom": 3770, "engineCcTo": 3810 }
+      ]
+    },
+    {
+      "specKey": "hyundai-palisade-lx2-2.2d-2199-2022",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2199,
+      "years": [2022, 2022],
+      "power": { "value": 202, "unit": "PS", "kw": 148.5707475 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Palisade Korean specifications — diesel 2.2 e-VGT, 2,199 cc, 202 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/palisade/18lc/specifications.html",
+        "supportingUri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2022-palisade",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's Korean Palisade specification lists diesel 2.2 at 2,199 cc and 202 PS and explicitly shows both AWD and 2WD variants. The 2021 English catalogue and 2022 heritage material reconfirm the same powertrain; the match is limited to 2021–2024 listings and both drive types."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2021, "yearTo": 2024, "engineCcFrom": 2190, "engineCcTo": 2210 },
+        { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2024, "engineCcFrom": 2190, "engineCcTo": 2210 }
+      ]
+    },
+    {
+      "specKey": "genesis-g70-ik-2.0t-1998-2021-2022",
+      "brand": "Genesis",
+      "model": "G70",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2021, 2022],
+      "power": { "value": 252, "unit": "PS", "kw": 185.345685 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis G70 Korean specification — gasoline 2.0 turbo, 1,998 cc, 252 PS", "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000180", "supportingUri": "https://www.genesis.com/kr/en/support/notice/detail/0000000179.html", "retrievedAt": "2026-09-09", "note": "Genesis states 252 PS for the Korean G70 2.0 turbo. The match is limited to 2021–2022 1,998 cc listings; the separate Sports Package 255 PS variant is not included without an identifying badge." },
+      "matches": [{ "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1990, "engineCcTo": 2005 }]
+    },
+    {
+      "specKey": "genesis-g70-ik-3.3t-3342-2021-2022",
+      "brand": "Genesis",
+      "model": "G70",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3342,
+      "years": [2021, 2022],
+      "power": { "value": 370, "unit": "PS", "kw": 272.1345375 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis G70 Korean specification — gasoline 3.3 turbo, 3,342 cc, 370 PS", "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000180", "supportingUri": "https://www.genesis.com/kr/en/support/notice/detail/0000000179.html", "retrievedAt": "2026-09-09", "note": "Genesis states 370 PS for the Korean G70 3.3 turbo. The match is limited to 2021–2022 3,342 cc listings." },
+      "matches": [{ "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 3330, "engineCcTo": 3355 }]
+    },
+    {
+      "specKey": "genesis-g70-ik-2.5t-2497-2023-2024",
+      "brand": "Genesis",
+      "model": "G70",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2023, 2024],
+      "power": { "value": 304, "unit": "PS", "kw": 223.59162 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis 2023 G70 Korean release — gasoline 2.5 turbo, 304 PS", "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000440", "supportingUri": "https://www.genesis.com/kr/ko/models/g70", "retrievedAt": "2026-09-09", "note": "Genesis' 2023 Korean G70 release and current Korean specification list the 2.5 turbo at 304 PS and 2,497 cc. The match is limited to 2023–2024 listings." },
+      "matches": [{ "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 2490, "engineCcTo": 2505 }]
+    },
+    {
+      "specKey": "genesis-g70-ik-2.2d-2199-2019",
+      "brand": "Genesis",
+      "model": "G70",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2199,
+      "years": [2019, 2019],
+      "power": { "value": 202, "unit": "PS", "kw": 148.5707475 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis G70 Korean specification — diesel 2.2, 2,199 cc, 202 PS", "uri": "https://www.genesis.com/kr/en/support/notice/detail/0000000179.html", "supportingUri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000180", "retrievedAt": "2026-09-09", "note": "Genesis' Korean-market specification lists the G70 diesel 2.2 at 2,199 cc and 202 PS. The catalog has one 2019 1,998 cc diesel record; this rule is restricted to the stated 2,199 cc engine and is therefore not applied to that rounded record." },
+      "matches": [{ "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 2185, "engineCcTo": 2210 }]
+    },
+    {
+      "specKey": "genesis-g90-hi-3.8-3778-2019-2021",
+      "brand": "Genesis",
+      "model": "G90",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3778,
+      "years": [2019, 2021],
+      "power": { "value": 315, "unit": "PS", "kw": 231.68210625 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis G90 Korean specification — 3.8 GDi, 3,778 cc, 315 PS", "uri": "https://www.genesis.com/content/dam/genesis-p2/kr/assets/models/GENESIS-G90_KOR_test.pdf", "retrievedAt": "2026-09-09", "note": "Genesis technical specification lists G90 3.8 GDi at 3,778 cc and 315 PS with 2WD/AWD. Match is restricted to 2019–2021 3,800 cc catalogue records." },
+      "matches": [{ "yearFrom": 2019, "yearTo": 2021, "engineCcFrom": 3770, "engineCcTo": 3810 }]
+    },
+    {
+      "specKey": "genesis-gv80-jx1-3.5t-3470-2020-2021",
+      "brand": "Genesis",
+      "model": "GV80",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2020, 2021],
+      "power": { "value": 380, "unit": "PS", "kw": 279.489525 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis GV80 Korean launch specification — gasoline 3.5 turbo, 3,470 cc, 380 PS", "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000224", "supportingUri": "https://www.genesis.com/kr/en/models/gv80", "retrievedAt": "2026-09-09", "note": "Genesis' Korean GV80 launch specification lists the 3.5 turbo at 3,470 cc and 380 PS with AWD. Match is restricted to 2020–2021 3,500 cc listings." },
+      "matches": [{ "driveType": "4WD", "yearFrom": 2020, "yearTo": 2021, "engineCcFrom": 3460, "engineCcTo": 3505 }]
+    },
+    {
+      "specKey": "genesis-g90-rs4-3.5t-3470-2022-2024",
+      "brand": "Genesis",
+      "model": "G90",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2022, 2024],
+      "power": { "value": 380, "unit": "PS", "kw": 279.489525 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis G90 Korean specification — gasoline 3.5 turbo, 3,470 cc, 380 PS", "uri": "https://www.genesis.com/kr/ko/models/g90", "retrievedAt": "2026-09-09", "note": "Current Korean G90 specification lists separate 3.5 turbo (380 PS) and 3.5 turbo 48V electric supercharger (415 PS) powertrains. This row applies only to unmarked 3.5 turbo records; e-S/C records remain pending separate identification." },
+      "matches": [{ "yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 3460, "engineCcTo": 3505 }]
+    },
+    {
+      "specKey": "genesis-gv80-jx1-2.5t-2497-2020-2021",
+      "brand": "Genesis",
+      "model": "GV80",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2020, 2021],
+      "power": { "value": 304, "unit": "PS", "kw": 223.59162 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis GV80 Korean launch specification — gasoline 2.5 turbo, 2,497 cc, 304 PS", "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000224", "supportingUri": "https://www.genesis.com/kr/en/models/gv80", "retrievedAt": "2026-09-09", "note": "Genesis' Korean GV80 launch specification lists the 2.5 turbo at 2,497 cc and 304 PS. Match is restricted to 2020–2021 catalogue records." },
+      "matches": [{ "yearFrom": 2020, "yearTo": 2021, "engineCcFrom": 2490, "engineCcTo": 2505 }]
+    },
+    {
+      "specKey": "genesis-gv80-jx1-3.5t-3470-2022-2024",
+      "brand": "Genesis",
+      "model": "GV80",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2022, 2024],
+      "power": { "value": 380, "unit": "PS", "kw": 279.489525 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis GV80 Korean specification — gasoline 3.5 turbo, 3,470 cc, 380 PS", "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000224", "supportingUri": "https://www.genesis.com/kr/en/models/gv80", "retrievedAt": "2026-09-09", "note": "Genesis lists the GV80 3.5 turbo at 3,470 cc and 380 PS. Match is restricted to 2022–2024 3,500 cc records; current e-S/C badge records are not distinguished by this row and require a separate 415 PS rule if the catalog identifies them." },
+      "matches": [{ "driveType": "4WD", "yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 3460, "engineCcTo": 3505 }]
+    },
+    {
+      "specKey": "genesis-g90-rs4-3.5t-3470-2022-2024-esc",
+      "brand": "Genesis",
+      "model": "G90",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2022, 2024],
+      "power": { "value": 415, "unit": "PS", "kw": 305.23198125 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis G90 Korean specification — 3.5 turbo 48V electric supercharger, 3,470 cc, 415 PS", "uri": "https://www.genesis.com/kr/ko/models/g90", "retrievedAt": "2026-09-09", "note": "Genesis explicitly lists the 48V electric-supercharger G90 powertrain at 415 PS. Match requires an explicit e-S/C or 48V electric-supercharger badge; no such marker is present on the current unbadged G90 cards." },
+      "matches": [{ "yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 3460, "engineCcTo": 3505, "trim": "e-S/C" }]
+    },
+    {
+      "specKey": "genesis-gv80-jx1-3.5t-3470-2024-2025-esc",
+      "brand": "Genesis",
+      "model": "GV80",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2024, 2025],
+      "power": { "value": 415, "unit": "PS", "kw": 305.23198125 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Genesis GV80 3.5 turbo 48V electric supercharger — 415 PS", "uri": "https://www.genesis.com/kr/ko/models/gv80", "retrievedAt": "2026-09-09", "note": "The current Genesis Korean specification distinguishes the 3.5 turbo 48V electric-supercharger version from the 380 PS 3.5 turbo. This rule is retained only for an explicit e-S/C badge and is not applied to unmarked cards." },
+      "matches": [{ "yearFrom": 2024, "yearTo": 2025, "engineCcFrom": 3460, "engineCcTo": 3505, "trim": "e-S/C" }]
+    },
+    {
+      "specKey": "genesis-gv80-jx1-2.5t-2497-2022-2024",
+      "brand": "Genesis",
+      "model": "GV80",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2022, 2024],
+      "power": { "value": 304, "unit": "PS", "kw": 223.59162 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Genesis GV80 Korean specification — gasoline 2.5 turbo, 304 PS",
+        "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000224",
+        "supportingUri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000315",
+        "retrievedAt": "2026-09-08",
+        "note": "Genesis identifies the GV80 gasoline 2.5 turbo as 304 PS; its 2022 GV80 release confirms the 2.5 turbo remains an available configuration. The match is limited to 2022–2024 4WD, 2,497 cc listings."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "genesis-g80-rg3-3.5t-3470-2022-2023",
+      "brand": "Genesis",
+      "model": "G80",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2022, 2023],
+      "power": { "value": 380, "unit": "PS", "kw": 279.489525 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Genesis G80 Korean specifications — gasoline 3.5 turbo, 380 PS",
+        "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000221",
+        "supportingUri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000453",
+        "retrievedAt": "2026-09-08",
+        "note": "Genesis' G80 launch and 2023 facelift release both state 380 PS for the gasoline 3.5 turbo. The rule is limited to the catalog's 2022–2023 4WD 3.5-liter listings."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2022, "yearTo": 2023, "engineCcFrom": 3460, "engineCcTo": 3480 }
+      ]
+    },
+    {
+      "specKey": "hyundai-tucson-nx4-1.6t-1598-2020",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2020, 2020],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai The all-new Tucson 2020 Korean specification — 1.6 turbo, 1,598 cc, 180 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2020-tucson",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official 2020 Tucson page identifies the new generation as September 2020 and lists Smartstream G1.6 turbo, 1,598 cc, 180 PS and 2WD/FWD. The match is restricted to 2020 2WD listings."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "hyundai-tucson-nx4-1.6t-1598-2021-2024",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2021, 2024],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai The all-new Tucson Korean specification — 1.6 turbo, 1,598 cc, 180 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2020-tucson",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's Korean all-new Tucson page identifies Smartstream 1.6 turbo as 1,598 cc and 180 PS. The matching rule is limited to 2021–2024 2WD catalogue listings."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2021, "yearTo": 2024, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.5t-2497-2021-2023",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2021, 2023],
+      "power": { "value": 281, "unit": "PS", "kw": 206.67514875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento Korean 2022 catalogue — 2.5 gasoline turbo, 2,497 cc, 281 PS",
+        "uri": "https://rental.kia.com/rentfile/carseries/mq_catalog_4thgensorento.pdf",
+        "supportingUri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_4thgensorento.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's Korean 2022 and 2023 Sorento catalogues state 281 PS for the 2.5 gasoline turbo. The rule is limited to 2021–2023 2WD, 2,497 cc listings."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2021, "yearTo": 2023, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "hyundai-kona-os-1.6t-1591-2018-2020",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1591,
+      "years": [2018, 2020],
+      "power": { "value": 177, "unit": "PS", "kw": 130.18327875 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Hyundai KONA Korean specification — 1.6 T-GDi, 1,591 cc, 177 PS", "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/kona-history/2017-kona", "supportingUri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/kona-catalog.pdf", "retrievedAt": "2026-09-09", "note": "Hyundai's official Korean KONA history page and catalogue list the 1.6 T-GDi at 1,591 cc and 177 PS. The match covers 2018–2020 gasoline listings and accepts Encar's rounded 1,600 cc value." },
+      "matches": [{ "yearFrom": 2018, "yearTo": 2020, "engineCcFrom": 1585, "engineCcTo": 1610 }]
+    },
+    {
+      "specKey": "hyundai-kona-sx2-1.6t-1598-2023",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2023, 2023],
+      "power": { "value": 198, "unit": "PS", "kw": 145.6287525 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai The all-new Kona 2023 Korean specification — 1.6 turbo, 198 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/kona-history/2023-the-all-new-kona",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's 2023 Korean all-new Kona page gives 198 PS for Smartstream gasoline 1.6 turbo and 2WD/AWD availability. This record only matches the catalog's 2023 2WD entries; other Kona years have separate rules or remain preliminary."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1590, "engineCcTo": 1610 },
+        { "driveType": "4WD", "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "kia-carnival-ka4-2.2d-2151-2024-2025",
+      "brand": "Kia",
+      "model": "Carnival",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2024, 2025],
+      "power": { "value": 194, "unit": "PS", "kw": 142.6867575 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Carnival Korean 2024 catalogue — 2.2 diesel, 2,151 cc, 194 PS",
+        "uri": "https://rental.kia.com/rentfile/carseries/carseries_1713417958657.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official 2024 Korean catalogue lists the facelift Carnival diesel 2.2 at 2,151 cc and 194 PS. The rule is restricted to 2024–2025 diesel listings; earlier Carnival diesel generations remain separate and preliminary."
+      },
+      "matches": [
+        { "yearFrom": 2024, "yearTo": 2025, "engineCcFrom": 2140, "engineCcTo": 2160 }
+      ]
+    },
+    {
+      "specKey": "kgm-rexton-y450-2.2d-2157-2022-2024",
+      "brand": "KGM",
+      "model": "Rexton",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2157,
+      "years": [2022, 2024],
+      "power": { "value": 202, "unit": "PS", "kw": 148.5707475 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "KG Mobility Rexton Korean 2023 specifications — 2.2 diesel, 2,157 cc, 202 PS",
+        "uri": "https://m.kg-mobility.com/showroom/total_price/__icsFiles/afieldfile/2023/01/27/Total_price_2302_1.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "KG Mobility's official Korean 2023 price/specification document lists the Rexton 2.2 diesel at 2,157 cc and 202 PS with 2WD/4WD. This rule is limited to 2022–2024 4WD catalogue listings; earlier Rexton generations are not inferred."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 2140, "engineCcTo": 2200 }
+      ]
+    },
+    {
+      "specKey": "kia-morning-ja-1.0-998-2020-2023",
+      "brand": "Kia",
+      "model": "Morning",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 998,
+      "years": [2020, 2023],
+      "power": { "value": 76, "unit": "PS", "kw": 55.897905 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Morning Korean 2020 catalogue — 1.0 gasoline, 998 cc, 76 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/XJA/catalog/catalog_all_new_morning.pdf",
+        "supportingUri": "https://rental.kia.com/rentfile/carseries/carseries_1718670426642.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean 2020 catalogue and 2024 specification both state 998 cc and 76 PS for the 1.0 gasoline Morning. The rule is limited to 2020–2023 listings; 2018–2019 remain preliminary until their model-year document is linked."
+      },
+      "matches": [
+        { "yearFrom": 2020, "yearTo": 2023, "engineCcFrom": 990, "engineCcTo": 1005 }
+      ]
+    },
+    {
+      "specKey": "kia-carnival-ka4-2.2d-2151-2020-2022",
+      "brand": "Kia",
+      "model": "Carnival",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2020, 2022],
+      "power": { "value": 202, "unit": "PS", "kw": 148.5707475 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia all-new Carnival Korean 2020 catalogue — 2.2 diesel, 2,151 cc, 202 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RYP/catalog/catalog_all-new-carnival.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean all-new Carnival catalogue dated November 2020 lists 2.2 diesel at 2,151 cc and 202 PS. The rule is limited to 2020–2022 listings; the 2023 power transition is represented separately."
+      },
+      "matches": [
+        { "yearFrom": 2020, "yearTo": 2022, "engineCcFrom": 2140, "engineCcTo": 2160 }
+      ]
+    },
+    {
+      "specKey": "kia-carnival-ka4-2.2d-2151-2023",
+      "brand": "Kia",
+      "model": "Carnival",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2023, 2023],
+      "power": { "value": 194, "unit": "PS", "kw": 142.6867575 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Carnival Korean 2023 price/specification — 2.2 diesel, 2,151 cc, 194 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/price/price_4thcarnival.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean 2023 price/specification document lists the 2.2 diesel Carnival at 2,151 cc and 194 PS. This single-year rule prevents the later output from being applied to 2020–2022 cars."
+      },
+      "matches": [
+        { "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 2140, "engineCcTo": 2160 }
+      ]
+    },
+    {
+      "specKey": "kia-carnival-ka4-3.5-3470-2020-2023",
+      "brand": "Kia",
+      "model": "Carnival",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2020, 2023],
+      "power": { "value": 294, "unit": "PS", "kw": 216.2366325 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia all-new Carnival Korean catalogues — 3.5 gasoline, 3,470 cc, 294 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RYP/catalog/catalog_all-new-carnival.pdf",
+        "supportingUri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/price/price_4thcarnival.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's Korean 2020 and 2023 documents both specify 3.5 gasoline at 3,470 cc and 294 PS. The rule is limited to 2020–2023 listings; 2024 onward is maintained as a separate specification."
+      },
+      "matches": [
+        { "yearFrom": 2020, "yearTo": 2023, "engineCcFrom": 3460, "engineCcTo": 3480 }
+      ]
+    },
+    {
+      "specKey": "kia-k5-dl3-1.6t-1591-2020-2022",
+      "brand": "Kia",
+      "model": "K5",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1591,
+      "years": [2020, 2022],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K5 Korean 2019 catalogue — 1.6 T-GDI, 1,591 cc, 180 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/XJF/catalog/catalog_k5.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean K5 catalogue dated September 2019 lists the 1.6 T-GDI at 1,591 cc and 180 PS. The rule is restricted to 2020–2022 K5 listings; later years remain preliminary until their model-year evidence is linked."
+      },
+      "matches": [
+        { "yearFrom": 2020, "yearTo": 2022, "engineCcFrom": 1580, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "kia-k5-dl3-1.6t-1591-2023-2026",
+      "brand": "Kia",
+      "model": "K5",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1591,
+      "years": [2023, 2026],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K5 Korean 2026 catalogue — 1.6 gasoline turbo, 1,591 cc, 180 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_k5.pdf",
+        "supportingUri": "https://rental.kia.com/rentfile/carseries/carseries_1751525241597.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean K5 catalogue dated September 2026 lists the 1.6 gasoline turbo engine at 180 PS; the 2025 Kia rental specification supports the same current-generation output. The match is restricted to 2023–2026 K5 listings with the 1.6 turbo displacement; 2.0 gasoline and hybrid variants remain separate rules."
+      },
+      "matches": [
+        { "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1580, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "hyundai-sonata-dn8-2.0-1999-2018",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2018, 2018],
+      "power": { "value": 160, "unit": "PS", "kw": 117.6798 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Hyundai Sonata Korean specification — Smartstream 2.0 gasoline, 1,999 cc, 160 PS", "uri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/sonata-catalog.pdf", "retrievedAt": "2026-09-09", "note": "Hyundai's Korean Sonata catalogue lists Smartstream gasoline 2.0 at 1,999 cc and 160 PS. The match is restricted to 2018 records." },
+      "matches": [{ "yearFrom": 2018, "yearTo": 2018, "engineCcFrom": 1990, "engineCcTo": 2005 }]
+    },
+    {
+      "specKey": "hyundai-sonata-dn8-2.0-1999-2019-2022",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2019, 2022],
+      "power": { "value": 160, "unit": "PS", "kw": 117.6798 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Sonata DN8 Korean 2019 specification — 2.0 gasoline, 1,999 cc, 160 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/sonata-history/2019-sonata-dn8",
+        "supportingUri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/sonata-catalog.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official Korean 2019 Sonata DN8 specification and catalogue state 1,999 cc and 160 PS for the Smartstream 2.0 gasoline engine. The match is restricted to 2019–2022 DN8 listings."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2022, "engineCcFrom": 1990, "engineCcTo": 2010 }
+      ]
+    },
+    {
+      "specKey": "hyundai-sonata-dn8-2.0-1999-2023-2024",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2023, 2024],
+      "power": { "value": 160, "unit": "PS", "kw": 117.6798 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Sonata The Edge 2023 Korean specification — 2.0 gasoline, 1,999 cc, 160 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/sonata-history/2023-sonata-the-edge",
+        "supportingUri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2023-sonata-the-edge",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official 2023 Sonata The Edge pages specify Smartstream gasoline 2.0, 1,999 cc and 160 PS with front-wheel drive. The rule is limited to 2023–2024 gasoline listings; Sonata hybrid and 1.6 turbo variants remain separate."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1990, "engineCcTo": 2010 }
+      ]
+    },
+    {
+      "specKey": "hyundai-sonata-dn8-1.6t-1598-2023-2024",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2023, 2024],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Sonata The Edge Korean catalogue — 1.6 turbo, 1,598 cc, 180 PS",
+        "uri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/sonata-the-edge-catalog.pdf",
+        "supportingUri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/sonata-history/2023-sonata-the-edge",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official Korean Sonata The Edge catalogue lists Smartstream gasoline 1.6 turbo at 1,598 cc and 180 PS. The match is restricted to 2023–2024 2WD gasoline listings; 2.0 gasoline, N Line and hybrid variants remain separate."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "hyundai-santa-fe-mx5-2.5t-2497-2023-2026",
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2023, 2026],
+      "power": { "value": 281, "unit": "PS", "kw": 206.67514875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai The all-new Santa Fe 2023 Korean specification — 2.5 turbo, 2,497 cc, 281 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/santafe-history/2023-the-all-new-santafe",
+        "supportingUri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/the-all-new-santafe-catalog-eng.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official 2023 Santa Fe specification lists Smartstream gasoline 2.5 turbo at 2,497 cc and 281 PS and documents both 2WD and AWD. The match is limited to the MX5 generation from 2023 onward."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 2490, "engineCcTo": 2505 },
+        { "driveType": "4WD", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "hyundai-santa-fe-tm-2.2d-2151-2021",
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2021, 2021],
+      "power": { "value": 194, "unit": "PS", "kw": 142.6867575 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Santa Fe 2021 Korean specification — Smartstream diesel 2.2, 2,151 cc, 194 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2021-santafe",
+        "supportingUri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/santafe-history/2021-santafe",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official 2021 Santa Fe specification identifies the Smartstream D2.2 engine at 2,151 cc and 194 PS with 2WD/FWD. The rule is limited to 2021 2WD listings; AWD and other generations remain separate."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 2140, "engineCcTo": 2160 }
+      ]
+    },
+    {
+      "specKey": "hyundai-santa-fe-tm-2.2d-2151-2021-2023-4wd-high",
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2021, 2023],
+      "power": { "value": 194, "unit": "PS", "kw": 142.6867575 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Santa Fe 2021–2023 AWD cross-check — Smartstream D2.2, 2,151 cc, 194 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2021-santafe",
+        "supportingUri": "https://www.automobile-catalog.com/make/hyundai/santa_fe_4gen/santa_fe_4_awd_2/2022.html",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's 2021 Korean page confirms Smartstream D2.2, 2,151 cc and 194 PS. The AWD application for 2021–2023 is cross-checked against independent model-year specifications for the same Korean-built generation and engine. This is classified high confidence, not official, until a Korean Hyundai AWD-specific document is available."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2023, "engineCcFrom": 2140, "engineCcTo": 2160 }
+      ]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.2d-2151-2020-2022",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2020, 2022],
+      "power": { "value": 202, "unit": "PS", "kw": 148.5707475 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento Korean 2020 catalogue — Smartstream 2.2 diesel, 2,151 cc, 202 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/JUM/catalog/catalog_sorento.pdf",
+        "supportingUri": "https://rental.kia.com/rentfile/carseries/mq_catalog_4thgensorento.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's Korean 2020 and 2022 Sorento catalogues state 2,151 cc and 202 PS for the Smartstream diesel 2.2. The rule is limited to 2020–2022 2WD listings."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2020, "yearTo": 2022, "engineCcFrom": 2140, "engineCcTo": 2210 }
+      ]
+    },
+    {
+      "specKey": "kia-sorento-um-2.0d-1995-2018",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1995,
+      "years": [2018, 2018],
+      "power": { "value": 186, "unit": "PS", "kw": 136.8027675 },
+      "powerBasis": "combustion_engine",
+      "source": { "title": "Kia Sorento Korean specification — R2.0 E-VGT diesel, 1,995 cc, 186 PS", "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RUM/catalog/catalog_all-new-sorento.pdf", "retrievedAt": "2026-09-09", "note": "Kia's official Korean Sorento catalogue lists the R2.0 E-VGT diesel at 1,995 cc and 186 PS. The catalogue is for the same UM generation; the match is restricted to 2018 records and rounded 2,000 cc listings." },
+      "matches": [{ "yearFrom": 2018, "yearTo": 2018, "engineCcFrom": 1985, "engineCcTo": 2010 }]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.5t-2497-2021-2023-4wd",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2021, 2023],
+      "power": { "value": 281, "unit": "PS", "kw": 206.67514875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento Korean catalogue — 2.5 gasoline turbo, 2,497 cc, 281 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_4thgensorento.pdf",
+        "supportingUri": "https://www.kia.com/kr/vehicles/sorento/specification",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's Korean Sorento catalogue and current specification identify the 2.5 gasoline turbo as 2,497 cc and 281 PS. The rule is restricted to 2021–2023 4WD catalogue listings."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2023, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "hyundai-santa-fe-tm-2.0d-1995-2018-2019",
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1995,
+      "years": [2018, 2019],
+      "power": { "value": 186, "unit": "PS", "kw": 136.8027675 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Santa Fe TM Korean specification — diesel 2.0, 1,995 cc, 186 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/new-santafe/19my/specifications.html",
+        "supportingUri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/html/pdf/en-cn-catalog/en-catalog/santafe-catalog-eng.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official Korean Santa Fe TM specification lists diesel 2.0 at 1,995 cc and 186 PS. The rule is limited to 2018–2019 2WD listings; diesel 2.2 and other generations remain separate."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2018, "yearTo": 2019, "engineCcFrom": 1985, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "hyundai-tucson-nx4-2.0d-1995-2021-2022",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1995,
+      "years": [2021, 2022],
+      "power": { "value": 186, "unit": "PS", "kw": 136.8027675 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Tucson Korean specification — diesel 2.0, 1,995 cc, 186 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/tucson/20my/specifications.html",
+        "supportingUri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/tucson-catalog.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's Korean Tucson specification and catalogue state 1,995 cc and 186 PS for the diesel 2.0. The match is limited to 2021–2022 2WD listings in the catalogue."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1985, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.2d-2151-2021-2022-4wd",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2021, 2022],
+      "power": { "value": 202, "unit": "PS", "kw": 148.5707475 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento Korean 2020 catalogue — Smartstream 2.2 diesel, 2,151 cc, 202 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/JUM/catalog/catalog_sorento.pdf",
+        "supportingUri": "https://rental.kia.com/rentfile/carseries/mq_catalog_4thgensorento.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's Korean Sorento catalogue identifies the Smartstream 2.2 diesel as 2,151 cc and 202 PS and documents both 2WD and 4WD configurations. The rule is limited to 2021–2022 4WD listings."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 2140, "engineCcTo": 2160 }
+      ]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.5t-2497-2024-2025-4wd",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2024, 2025],
+      "power": { "value": 281, "unit": "PS", "kw": 206.67514875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento Korean 2025 catalogue — 2.5 gasoline turbo, 2,497 cc, 281 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sorento.pdf",
+        "supportingUri": "https://www.kia.com/kr/vehicles/sorento/specification",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean 2025 Sorento catalogue lists the 2.5 gasoline turbo at 281 PS and includes 4WD configurations; the current specification confirms 2,497 cc. The match is restricted to 2024–2025 4WD listings and does not affect hybrid variants."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2024, "yearTo": 2025, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "kia-k7-yf-2.5-gas-2497-2021",
+      "brand": "Kia",
+      "model": "K7",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2021, 2021],
+      "power": { "value": 198, "unit": "PS", "kw": 145.6287525 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K7 Korean 2021 catalogue — 2.5 GDI, 2,497 cc, 198 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/AYG/catalog/catalog_k7.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean K7 catalogue dated March 2021 lists the 2.5 gasoline GDI engine at 2,497 cc and 198 PS. The match is limited to 2021 gasoline K7 listings; 3.0 gasoline/LPI and 2.4 hybrid remain separate powertrains."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "kia-k7-yf-3.0-gas-2999-2021",
+      "brand": "Kia",
+      "model": "K7",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2999,
+      "years": [2021, 2021],
+      "power": { "value": 266, "unit": "PS", "kw": 195.6426675 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K7 Korean 2021 catalogue — 3.0 GDI, 2,999 cc, 266 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/AYG/catalog/catalog_k7.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean K7 catalogue dated March 2021 lists the 3.0 GDI gasoline engine at 2,999 cc and 266 PS. The match is limited to 2021 gasoline K7 listings; 2.5 gasoline, LPI and hybrid remain separate powertrains."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 2990, "engineCcTo": 3010 }
+      ]
+    },
+    {
+      "specKey": "kia-k7-yf-3.0-lpi-2999-2021",
+      "brand": "Kia",
+      "model": "K7",
+      "fuelType": "lpg",
+      "propulsionType": "ice",
+      "engineCc": 2999,
+      "years": [2021, 2021],
+      "power": { "value": 235, "unit": "PS", "kw": 172.84220625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K7 Korean 2021 catalogue — 3.0 LPI, 2,999 cc, 235 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/AYG/catalog/catalog_k7.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean K7 catalogue dated March 2021 lists the 3.0 LPI engine at 2,999 cc and 235 PS. The match is limited to 2021 LPG K7 listings; gasoline and hybrid remain separate powertrains."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 2990, "engineCcTo": 3010 }
+      ]
+    },
+    {
+      "specKey": "kia-k8-gl3-2.5-gas-2497-2021-2026",
+      "brand": "Kia",
+      "model": "K8",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2021, 2026],
+      "power": { "value": 198, "unit": "PS", "kw": 145.6287525 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K8 Korean catalogue — 2.5 gasoline, 2,497 cc, 198 PS",
+        "uri": "https://rental.kia.com/rentfile/carseries/gl_catalog_k8.pdf",
+        "supportingUri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_k8.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean K8 catalogue lists the 2.5 gasoline engine at 2,497 cc and 198 PS. The rule covers the K8 generation from its 2021 launch through 2026 for gasoline 2.5 listings; 3.5 gasoline, LPG and hybrid variants remain separate."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "kia-k8-gl3-3.5-gas-3470-2021-2026",
+      "brand": "Kia",
+      "model": "K8",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2021, 2026],
+      "power": { "value": 300, "unit": "PS", "kw": 220.649625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K8 Korean catalogue — 3.5 gasoline, 3,470 cc, 300 PS",
+        "uri": "https://rental.kia.com/rentfile/carseries/gl_catalog_k8.pdf",
+        "supportingUri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_k8.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean K8 catalogue lists the 3.5 gasoline engine at 3,470 cc and 300 PS. The rule covers the K8 generation from 2021 through 2026; 2.5 gasoline, LPG and hybrid variants remain separate."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 3460, "engineCcTo": 3480 }
+      ]
+    },
+    {
+      "specKey": "kia-k8-gl3-3.5-lpg-3470-2021-2026",
+      "brand": "Kia",
+      "model": "K8",
+      "fuelType": "lpg",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2021, 2026],
+      "power": { "value": 240, "unit": "PS", "kw": 176.5197 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K8 Korean catalogue — 3.5 LPG, 3,470 cc, 240 PS",
+        "uri": "https://rental.kia.com/rentfile/carseries/gl_catalog_k8.pdf",
+        "supportingUri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_k8.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean K8 catalogue lists the 3.5 LPG engine at 3,470 cc and 240 PS. The rule covers the K8 generation from 2021 through 2026; gasoline and hybrid variants remain separate."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 3460, "engineCcTo": 3480 }
+      ]
+    },
+    {
+      "specKey": "kia-mohave-hm-3.0d-2959-2020",
+      "brand": "Kia",
+      "model": "Mohave",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2959,
+      "years": [2020, 2020],
+      "power": { "value": 260, "unit": "PS", "kw": 191.229675 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Mohave Korean 2020 specification — 3.0 diesel, 2,959 cc, 260 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/NJS/catalog/price_mo_mohave.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean Mohave 2020 catalogue lists the 3.0 diesel at 2,959 cc and 260 PS with 4WD. The match is restricted to 2020 listings; the later 2024 output is maintained separately."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 2940, "engineCcTo": 2975 }
+      ]
+    },
+    {
+      "specKey": "kia-mohave-hm-3.0d-2959-2024",
+      "brand": "Kia",
+      "model": "Mohave",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2959,
+      "years": [2024, 2024],
+      "power": { "value": 257, "unit": "PS", "kw": 189.02317875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Mohave Korean 2024 catalogue — 3.0 diesel, 2,959 cc, 257 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/en_brochure/en_catalog_mohave.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's official Korean Mohave 2024 catalogue lists the 3.0 diesel at 2,959 cc and 257 PS with 4WD. The match is restricted to 2024 listings; older output levels remain separate until their model-year document is linked."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 2940, "engineCcTo": 2975 }
+      ]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.5t-2497-2024-2025-2wd",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2497,
+      "years": [2024, 2025],
+      "power": { "value": 281, "unit": "PS", "kw": 206.67514875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento Korean specification — 2.5 gasoline turbo, 2,497 cc, 281 PS",
+        "uri": "https://www.kia.com/kr/vehicles/sorento/specification",
+        "supportingUri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sorento.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Kia's Korean Sorento specification and current catalogue state 2,497 cc and 281 PS for the 2.5 gasoline turbo. The rule is restricted to 2024–2025 2WD listings in the current catalogue."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2024, "yearTo": 2025, "engineCcFrom": 2490, "engineCcTo": 2505 }
+      ]
+    },
+    {
+      "specKey": "hyundai-santa-fe-tm-2.2d-2199-2018-2wd",
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2199,
+      "years": [2018, 2018],
+      "power": { "value": 202, "unit": "PS", "kw": 148.5707475 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Santa Fe TM Korean specification — diesel 2.2, 2,199 cc, 202 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/new-santafe/19my/specifications.html",
+        "supportingUri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/html/pdf/en-cn-catalog/en-catalog/santafe-catalog-eng.pdf",
+        "retrievedAt": "2026-09-08",
+        "note": "Hyundai's official Korean Santa Fe TM specification lists diesel 2.2 at 2,199 cc and 202 PS. The match is limited to 2018 2WD listings; 4WD and later model years remain separate until their exact documents are confirmed."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2018, "yearTo": 2018, "engineCcFrom": 2190, "engineCcTo": 2210 }
+      ]
+    },
+    {
+      "specKey": "hyundai-tucson-20my-2.0d-1995-2020",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1995,
+      "years": [2020, 2020],
+      "power": { "value": 186, "unit": "PS", "kw": 136.8027675 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Tucson 20MY Korean specifications — 2.0 diesel, 1,995 cc, 186 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/tucson/20my/specifications.html",
+        "retrievedAt": "2026-09-09",
+        "note": "Hyundai's official Korean Tucson 20MY specification table states 1,995 cc and 186 PS at 4,000 rpm. The page includes both 2WD and AWD variants; the year match is intentionally limited to 20MY because the source does not establish a wider production range."
+      },
+      "matches": [
+        { "generation": "TL", "driveType": "2WD", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "generation": "TL", "driveType": "4WD", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1985, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "hyundai-tucson-20my-1.6d-1598-2020",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2020, 2020],
+      "power": { "value": 136, "unit": "PS", "kw": 100.02783 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Tucson 20MY Korean specifications — 1.6 Smartstream diesel, 1,598 cc, 136 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/tucson/20my/specifications.html",
+        "retrievedAt": "2026-09-09",
+        "note": "Hyundai's official Korean Tucson 20MY specification table states 1,598 cc and 136 PS at 4,000 rpm. The year match is limited to 20MY; no later-year inference is made from this page."
+      },
+      "matches": [
+        { "generation": "TL", "driveType": "2WD", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1590, "engineCcTo": 1605 },
+        { "generation": "TL", "driveType": "4WD", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1590, "engineCcTo": 1605 }
+      ]
+    },
+    {
+      "specKey": "hyundai-tucson-20my-1.6t-1591-2020",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1591,
+      "years": [2020, 2020],
+      "power": { "value": 177, "unit": "PS", "kw": 130.18327875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Tucson 20MY Korean specifications — 1.6 Turbo gasoline, 1,591 cc, 177 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/tucson/20my/specifications.html",
+        "retrievedAt": "2026-09-09",
+        "note": "Hyundai's official Korean Tucson 20MY specification table states 1,591 cc and 177 PS at 5,500 rpm. The year match is limited to 20MY; no later-year inference is made from this page."
+      },
+      "matches": [
+        { "generation": "TL", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1585, "engineCcTo": 1600 }
+      ]
+    },
+    {
+      "specKey": "hyundai-palisade-lx2-2.2d-2199-2018",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2199,
+      "years": [2018, 2018],
+      "power": { "value": 202, "unit": "PS", "kw": 148.5707475 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Palisade 18LC Korean specifications — 2.2 diesel, 2,199 cc, 202 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/palisade/18lc/specifications.html",
+        "retrievedAt": "2026-09-09",
+        "note": "Hyundai's official Korean Palisade 18LC specification table states 2,199 cc and 202 PS at 3,800 rpm. The source is an 18LC model-year page; the match is restricted to 2018 until later-year generation documents are linked."
+      },
+      "matches": [
+        { "yearFrom": 2018, "yearTo": 2018, "engineCcFrom": 2190, "engineCcTo": 2210 }
+      ]
+    },
+    {
+      "specKey": "hyundai-palisade-lx2-3.8g-3778-2018",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3778,
+      "years": [2018, 2018],
+      "power": { "value": 295, "unit": "PS", "kw": 216.97213125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Palisade 18LC Korean specifications — 3.8 GDi gasoline, 3,778 cc, 295 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/palisade/18lc/specifications.html",
+        "retrievedAt": "2026-09-09",
+        "note": "Hyundai's official Korean Palisade 18LC specification table states 3,778 cc and 295 PS at 6,000 rpm. The source is an 18LC model-year page; the match is restricted to 2018 until later-year generation documents are linked."
+      },
+      "matches": [
+        { "yearFrom": 2018, "yearTo": 2018, "engineCcFrom": 3765, "engineCcTo": 3790 }
+      ]
+    },
+    {
+      "specKey": "hyundai-santa-fe-tm-2.0t-1998-2019",
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2019, 2019],
+      "power": { "value": 235, "unit": "PS", "kw": 172.84220625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Santa Fe 19MY Korean specifications — 2.0T gasoline, 1,998 cc, 235 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/new-santafe/19my/specifications.html",
+        "retrievedAt": "2026-09-09",
+        "note": "Hyundai's official Korean Santa Fe 19MY specification table states 1,998 cc and 235 PS at 6,000 rpm. The match is restricted to 2019 2.0T gasoline listings; diesel outputs are already covered by existing verified rows."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "hyundai-kona-os-1.6d-1598-2020",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2020, 2020],
+      "power": { "value": 136, "unit": "PS", "kw": 100.02783 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Kona 20MY Korean specifications — 1.6 diesel, 1,598 cc, 136 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/kona/20my/specifications.html",
+        "retrievedAt": "2026-09-09",
+        "note": "Hyundai's official Korean Kona 20MY specification table states 1,598 cc and 136 PS at 4,000 rpm. The match is restricted to 2020 diesel listings; the gasoline 177 PS row is already present in the reference."
+      },
+      "matches": [
+        { "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1590, "engineCcTo": 1605 }
+      ]
+    },
+    {
+      "specKey": "mercedes-e-class-w214-e200-1999-204ps-2023-2026",
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2023, 2026],
+      "power": { "value": 204, "unit": "PS", "kw": 150.041745 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz E-Class W214 technical data — E 200, 1,999 cc, 204 PS",
+        "uri": "https://media.mercedes-benz.com/press-kit/53ae76e4-eb0b-49f0-82ae-dccec3368072/article/e70a81a0-0841-4c92-ab66-3cae4beaf054",
+        "retrievedAt": "2026-09-09",
+        "note": "Official Mercedes-Benz Media technical table lists the E 200 combustion engine at 1,999 cc and 150 kW/204 PS. Matches are restricted by exact Encar badge so E 300 cars with the same displacement are not assigned this power."
+      },
+      "matches": [
+        { "badge": "E200 Avantgarde", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1985, "engineCcTo": 2010 },
+        { "badge": "E200 Avantgarde Limited", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1985, "engineCcTo": 2010 },
+        { "badge": "E200 AMG Line", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1985, "engineCcTo": 2010 }
+      ]
+    },
+    {
+      "specKey": "mercedes-glc-x254-glc300-1991-258ps-2022-2026",
+      "brand": "Mercedes-Benz",
+      "model": "GLC",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1991,
+      "years": [2022, 2026],
+      "power": { "value": 258, "unit": "PS", "kw": 189.7586775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz GLC Coupé technical data — GLC 300 4MATIC, 190 kW/258 PS",
+        "uri": "https://media.mercedes-benz.com/article/7b3a7e1d-eb70-4bb9-a872-4cfbb414280e",
+        "retrievedAt": "2026-09-09",
+        "note": "Official Mercedes-Benz Media technical table lists GLC 300 4MATIC at 190 kW/258 PS. The match is limited to gasoline GLC300 badges and the 1,991 cc range; typo badge GCL300 remains in review until normalized."
+      },
+      "matches": [
+        { "badge": "GLC300 4MATIC", "yearFrom": 2022, "yearTo": 2026, "engineCcFrom": 1980, "engineCcTo": 2005 },
+        { "badge": "GLC300 4MATIC Coupe", "yearFrom": 2022, "yearTo": 2026, "engineCcFrom": 1980, "engineCcTo": 2005 },
+        { "badge": "GLC300 4MATIC Avnatgarde Coupe", "yearFrom": 2022, "yearTo": 2026, "engineCcFrom": 1980, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mercedes-s-class-w223-s400d-2925-330ps-2021-2025",
+      "brand": "Mercedes-Benz",
+      "model": "S-Class",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2925,
+      "years": [2021, 2025],
+      "power": { "value": 330, "unit": "PS", "kw": 242.7145875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz S-Class W223 technical data — S 400 d 4MATIC, 2,925 cc, 330 PS",
+        "uri": "https://media.mercedes-benz.com/article/93c20e80-eb1c-4a76-9486-35da7121e88f",
+        "retrievedAt": "2026-09-09",
+        "note": "Official Mercedes-Benz Media launch technical table lists S 400 d 4MATIC at 2,925 cc and 243 kW/330 PS. Exact badge matching prevents applying this value to S350d or S450 versions."
+      },
+      "matches": [
+        { "badge": "S400 d 4MATIC", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 2910, "engineCcTo": 2940 }
+      ]
+    },
+    {
+      "specKey": "mercedes-e-class-w214-e220d-1993-197ps-2023-2026",
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1993,
+      "years": [2023, 2026],
+      "power": { "value": 197, "unit": "PS", "kw": 144.89325375 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz E-Class W214 technical data — E 220 d, 1,993 cc, 197 PS",
+        "uri": "https://media.mercedes-benz.com/press-kit/53ae76e4-eb0b-49f0-82ae-dccec3368072/article/e70a81a0-0841-4c92-ab66-3cae4beaf054",
+        "retrievedAt": "2026-09-09",
+        "note": "Official Mercedes-Benz Media table lists the E 220 d combustion engine at 1,993 cc and 145 kW/197 PS. Exact E220d badge matching prevents mixing it with E200/E300 gasoline versions."
+      },
+      "matches": [
+        { "badge": "E220d 4MATIC AMG Line", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1980, "engineCcTo": 2005 },
+        { "badge": "E220d 4MATIC Exclusive", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1980, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mercedes-s-class-w223-s350d-2925-286ps-2021-2025",
+      "brand": "Mercedes-Benz",
+      "model": "S-Class",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2925,
+      "years": [2021, 2025],
+      "power": { "value": 286, "unit": "PS", "kw": 210.3526425 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz S-Class W223 technical data — S 350 d, 2,925 cc, 286 PS",
+        "uri": "https://media.mercedes-benz.com/article/93c20e80-eb1c-4a76-9486-35da7121e88f",
+        "retrievedAt": "2026-09-09",
+        "note": "Official Mercedes-Benz Media table lists S 350 d at 2,925 cc and 210 kW/286 PS. Exact badge matching keeps it separate from S400d 330 PS."
+      },
+      "matches": [
+        { "badge": "S350 d 4MATIC", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 2910, "engineCcTo": 2940 }
+      ]
+    },
+    {
+      "specKey": "bmw-5-series-g60-520i-1998-140kw-2023-2026",
+      "brand": "BMW",
+      "model": "5 Series",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2023, 2026],
+      "power": { "value": 140, "unit": "kW", "kw": 140 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW 5 Series G60 official specification guide — 520i combustion engine, 140 kW/190 PS",
+        "uri": "https://www.bmw.at/content/dam/bmw/marketAT/bmw_at/topics/pricelists-brochures/pricelists/pricelists_01_2024/G60_i5_0124_online.pdf",
+        "retrievedAt": "2026-09-09",
+        "note": "BMW's official specification table separates the 520i nominal combustion-engine output (140 kW/190 PS) from the 48V mild-hybrid assist (13 kW/18 PS). The calculator uses the combustion-engine value for the gasoline category; total system output 153 kW is not used."
+      },
+      "matches": [
+        { "badge": "520i M Sport", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "520i Special Edition", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "520i", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "bmw-5-series-g60-530i-xdrive-1998-190kw-2022-2026",
+      "brand": "BMW",
+      "model": "5 Series",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2022, 2026],
+      "power": { "value": 190, "unit": "kW", "kw": 190 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea 5 Series G60 technical data — 530i xDrive, 258 PS",
+        "uri": "https://www.bmw.co.kr/ko/all-models/5-series/sedan/bmw-5-series-sedan-overview.html",
+        "supportingUri": "https://www.bmw.co.kr/content/dam/bmw/marketKR/bmw_co_kr/Pricelist/bmw-models-technical-data-2309_V3.pdf.asset.1693892195824.pdf",
+        "retrievedAt": "2026-09-09",
+        "note": "BMW Korea's official model page lists 530i xDrive at 258 PS; the official technical-data sheet provides the corresponding 190 kW rating. Exact xDrive badge matching prevents mixing with 520i or 530e."
+      },
+      "matches": [
+        { "badge": "530i xDrive M Sport", "yearFrom": 2022, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "530i xDrive M Sport Package", "yearFrom": 2022, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "530i xDrive Luxury", "yearFrom": 2022, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mercedes-gle-v167-gle400d-2925-330ps-2019-2024",
+      "brand": "Mercedes-Benz",
+      "model": "GLE",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2925,
+      "years": [2019, 2024],
+      "power": { "value": 330, "unit": "PS", "kw": 242.7145875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz GLE/GLS official launch data — 400 d 4MATIC, 2,925 cc, 330 PS",
+        "uri": "https://media.mercedes-benz.com/article/6e02e8c1-717d-43eb-b99c-2ebf62f4c039",
+        "retrievedAt": "2026-09-09",
+        "note": "Official Mercedes-Benz Media table lists the 400 d 4MATIC inline-six diesel at 2,925 cc and 243 kW/330 PS. Match is restricted to the GLE400d badge; coupe and SUV share the same engine output in this source period."
+      },
+      "matches": [
+        { "badge": "GLE400d 4MATIC Coupe", "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 2910, "engineCcTo": 2940 },
+        { "badge": "GLE400d 4MATIC", "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 2910, "engineCcTo": 2940 }
+      ]
+    },
+    {
+      "specKey": "mercedes-gls-x167-gls400d-2925-330ps-2019-2024",
+      "brand": "Mercedes-Benz",
+      "model": "GLS",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2925,
+      "years": [2019, 2024],
+      "power": { "value": 330, "unit": "PS", "kw": 242.7145875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz GLS official launch data — GLS 400 d 4MATIC, 2,925 cc, 330 PS",
+        "uri": "https://media.mercedes-benz.com/article/6e02e8c1-717d-43eb-b99c-2ebf62f4c039",
+        "retrievedAt": "2026-09-09",
+        "note": "Official Mercedes-Benz Media table lists GLS 400 d 4MATIC at 2,925 cc and 243 kW/330 PS. Exact badge matching keeps it separate from GLS350d."
+      },
+      "matches": [
+        { "badge": "GLS400d 4MATIC", "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 2910, "engineCcTo": 2940 }
+      ]
+    },
+    {
+      "specKey": "mercedes-glb-x247-glb250-1991-224ps-2019-2024",
+      "brand": "Mercedes-Benz",
+      "model": "GLB",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1991,
+      "years": [2019, 2024],
+      "power": { "value": 224, "unit": "PS", "kw": 164.75172 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz GLB X247 official launch data — GLB 250 4MATIC, 1,991 cc, 224 PS",
+        "uri": "https://media.mercedes-benz.com/article/e50e0664-4ee2-4e7f-b207-b7134dcc186e",
+        "retrievedAt": "2026-09-09",
+        "note": "Official Mercedes-Benz Media table lists GLB 250 4MATIC at 1,991 cc and 165 kW/224 PS. Exact badge matching keeps it separate from GLB220 and GLB200."
+      },
+      "matches": [
+        { "badge": "GLB250 4MATIC", "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1980, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "bmw-3-series-g20-320i-1998-135kw-2021-2026",
+      "brand": "BMW",
+      "model": "3 Series",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2021, 2026],
+      "power": { "value": 135, "unit": "kW", "kw": 135 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW 3 Series G20 official specification guide — 320i, 1,998 cc, 135 kW",
+        "uri": "https://www.bmw.com/content/dam/bmw/marketAU/common/images/BMW_3_Series_Sedan_Specification_Guide_G20.pdf.asset.1646281922906.pdf",
+        "retrievedAt": "2026-09-09",
+        "note": "BMW Group specification guide lists the 320i petrol engine at 1,998 cc and 135 kW. Exact 320i badge matching prevents mixing with 330i and M340i versions."
+      },
+      "matches": [
+        { "badge": "320i M Sport", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "320i M Sport Pro Special Edition", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "320i Luxury", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "320i", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "320i Touring", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "320i Touring M Sport Pro First Edition", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "320i Touring M Sports", "yearFrom": 2021, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "bmw-x4-g02-xdrive20i-1998-135kw-2021-2025",
+      "brand": "BMW",
+      "model": "X4",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2021, 2025],
+      "power": { "value": 135, "unit": "kW", "kw": 135 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW X4 G02 official specification guide — xDrive20i, 1,998 cc, 135 kW",
+        "uri": "https://www.bmw.com/content/dam/bmw/marketAU/common/images/BMW_X4_Specification_Guide_G02.pdf.asset.1646282633394.pdf",
+        "retrievedAt": "2026-09-09",
+        "note": "BMW Group specification guide lists X4 xDrive20i at 1,998 cc and 135 kW. Exact xDrive20i badge matching keeps it separate from xDrive30i and M40i."
+      },
+      "matches": [
+        { "badge": "xDrive20i M Sport", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "xDrive20i M Sport X", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "xDrive20i M Sports X Onlile Exclusive Edition", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "xDrive20i M Sports Pro", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "xDrive20i xLine", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "badge": "xDrive20i M Sport Pro Special Edition", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mercedes-glb-x247-glb200d-1950-150ps-2019-2024",
+      "brand": "Mercedes-Benz",
+      "model": "GLB",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1950,
+      "years": [2019, 2024],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz GLB X247 official technical data — GLB 200 d, 1,950 cc, 150 PS",
+        "uri": "https://media.mercedes-benz.com/article/e50e0664-4ee2-4e7f-b207-b7134dcc186e",
+        "retrievedAt": "2026-09-09",
+        "note": "Official Mercedes-Benz Media table lists GLB 200 d and GLB 200 d 4MATIC at 1,950 cc and 110 kW/150 PS. Match is limited to the exact GLB200 d badge; GLB220d remains separate at 190 PS."
+      },
+      "matches": [
+        { "badge": "GLB200 d", "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1940, "engineCcTo": 1960 },
+        { "badge": "GLB200 d 4MATIC", "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1940, "engineCcTo": 1960 }
+      ]
+    },
+    {
+      "specKey": "mercedes-e-class-w213-e250-1991-211ps-2021-2023",
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1991,
+      "years": [2021, 2023],
+      "power": { "value": 211, "unit": "PS", "kw": 155.19023625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz E-Class W213 technical data — E 250, 1,991 cc, 155 kW/211 PS",
+        "uri": "https://eltawkeel.com/uploads/newcars/pdf/214E-Class_WSX213_catalogue_UP_0117_02_ENG_eMB.pdf",
+        "supportingUri": "https://www.mb.zungfu.com.mo/prp/2017/E%20250%20-%202017%20June%20Prod%20onwards%20-%20FMS.pdf",
+        "retrievedAt": "2026-09-09",
+        "note": "Mercedes-Benz E-Class W213 technical catalogue and regional Mercedes-Benz product sheet both identify E 250 with 1,991 cc and 155 kW/211 PS. This rule only upgrades exact E250 badge cards; it does not apply to E300 or later 2,0-litre 204 PS variants. Source is a manufacturer/dealer-hosted Mercedes technical document, so retain the normal preliminary-price disclaimer."
+      },
+      "matches": [
+        { "badge": "E250 Exclusive", "yearFrom": 2021, "yearTo": 2023, "engineCcFrom": 1980, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mercedes-cla-c118-cla250-4matic-1991-165kw-2021-2025",
+      "brand": "Mercedes-Benz",
+      "model": "A-Class",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1991,
+      "years": [2021, 2025],
+      "power": { "value": 165, "unit": "kW", "kw": 165 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz CLA C118 official technical data — CLA 250, 1,991 cc, 165 kW/225 PS",
+        "uri": "https://event.media.mercedes-benz.com/article/f0dd1cea-00b8-46d9-86be-7a398c6bb9ba",
+        "supportingUri": "https://car.naver.com/spec?ncrId=car_153069",
+        "retrievedAt": "2026-09-09",
+        "note": "Mercedes-Benz Media identifies the C118 CLA 250 at 165 kW/225 PS; Korean-market Naver specification data identifies CLA 250 4MATIC at 1,991 cc and 224 hp. This exact badge rule covers ordinary CLA250 4MATIC cards from 2021–2025 and deliberately excludes AMG CLA35/CLA45. Cards labelled CLA250 with 306 hp remain a review case because 306 PS is the AMG CLA35 output."
+      },
+      "matches": [
+        { "badge": "CLA250 4MATIC", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1980, "engineCcTo": 2005 }
+      ]
+    }
+  ]
+}

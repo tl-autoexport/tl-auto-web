@@ -227,6 +227,7 @@ export default async function CarDetailPage({
             fuel={translateFuel(car.fuel_type)}
             mileageKm={car.mileage_km}
             powerHp={car.power_hp}
+            powerConfidence={car.power_confidence}
             priceKrw={car.price_krw}
             source={source}
             sourceId={sourceId}

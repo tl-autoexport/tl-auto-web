@@ -18,6 +18,8 @@ export interface CalcInput {
   destinationCity?: string;
   importerType?: "individual";
   rates?: Partial<CalcRates>;
+  /** Official Central Bank rates used exclusively for customs value and state payments. */
+  customsRates?: Partial<CustomsRates>;
   ratesAsOf?: string | null;
   ratesSource?: string;
   rateDetails?: CalcRateDetails;
@@ -30,6 +32,15 @@ export interface CalcRates {
   usdRub: number;
   eurRub: number;
   kztRub: number;
+}
+
+/**
+ * Customs conversion is deliberately isolated from the commercial TL Auto
+ * conversion. TKS uses the official Central Bank rate for customs value.
+ */
+export interface CustomsRates {
+  krwRub: number;
+  eurRub: number;
 }
 
 export interface CalcRateDetails {
@@ -51,6 +62,8 @@ export interface CalcResult {
   importerType: "individual";
   calcVersion: string;
   carPriceRub: number;
+  /** Customs value in rubles, converted at the official Central Bank rate. */
+  customsValueRub: number;
   freightRub: number;
   brokerRub: number;
   dutyRub: number;
@@ -60,6 +73,7 @@ export interface CalcResult {
   utilRub: number;
   totalRub: number;
   rates: CalcRates;
+  customsRates: CustomsRates;
   ratesAsOf: string | null;
   ratesSource: string;
   rateDetails: CalcRateDetails | null;

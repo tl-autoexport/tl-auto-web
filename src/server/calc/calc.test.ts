@@ -15,6 +15,17 @@ assert.equal(genesisG70.koreaExpensesRub, 105_284);
 assert.equal(genesisG70.totalRub, 4_329_578.76);
 assert.equal(genesisG70.customs.mode, "volume");
 
+const dualRate = calculateRuVladivostok({
+  priceKrw: 10_000_000, year: 2021, month: 7, engineCc: 1998, powerHp: 150,
+  fuelType: "gasoline", calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,
+  rates: { krwRub: 0.07, usdRub: 90, eurRub: 110, kztRub: 0.15 },
+  customsRates: { krwRub: 0.06, eurRub: 100 },
+});
+assert.equal(dualRate.carPriceRub, 700_000, "car price uses the TL Auto commercial rate");
+assert.equal(dualRate.customsValueRub, 600_000, "customs value uses the official Central Bank KRW rate");
+assert.equal(dualRate.feesRub, 4_924, "customs fee uses the official customs value");
+assert.equal(dualRate.customsRates.krwRub, 0.06);
+
 const genesisLargeNew = calculateRuVladivostok({
   priceKrw: 29_000_000, year: 2024, month: 7, engineCc: 3342, powerHp: 370,
   fuelType: "gasoline", calculationDate: "2026-08-28T00:00:00.000Z", clearanceDays: 0,

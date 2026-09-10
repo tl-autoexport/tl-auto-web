@@ -87,6 +87,7 @@ async function main() {
         powerHp: row.power_hp,
         fuelType: row.fuel_type,
         rates: rateSnapshot!.rates,
+        customsRates: rateSnapshot!.customsRates,
         ratesAsOf: rateSnapshot!.asOf,
         ratesSource: rateSnapshot!.source,
         rateDetails: rateSnapshot!.rateDetails,

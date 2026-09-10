@@ -1,10 +1,11 @@
 import { config } from "dotenv";
 import { createSupabaseAdmin } from "@/server/supabase/admin";
+import { CALC_VERSION } from "@/server/calc/ru";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
-const CURRENT_VERSION = "ru-individual-autoexport-tks-usdt-2026.01";
+const CURRENT_VERSION = CALC_VERSION;
 
 type Car = {
   id: string;

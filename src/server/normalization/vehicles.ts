@@ -1090,6 +1090,30 @@ const VERIFIED_MODEL_POWER_MAP: Record<string, number> = {
   peugeot_2008_1560: 99,
 };
 
+/**
+ * Legacy power data is exposed for one-way migration into the TL Auto
+ * evidence workflow. These values are candidates only: callers must not
+ * treat them as approved evidence or use them to unlock a final calculation.
+ */
+export function getLegacyPowerCandidates() {
+  return {
+    exactSpecs: VERIFIED_SPECS.map((spec) => ({
+      kind: "legacy_exact_spec" as const,
+      ...spec,
+    })),
+    badgeMaps: Object.entries(VERIFIED_BADGE_POWER_MAP).map(([key, powerHp]) => ({
+      kind: "legacy_badge_map" as const,
+      key,
+      powerHp,
+    })),
+    modelMaps: Object.entries(VERIFIED_MODEL_POWER_MAP).map(([key, powerHp]) => ({
+      kind: "legacy_model_map" as const,
+      key,
+      powerHp,
+    })),
+  };
+}
+
 // Encar sometimes omits displacement from the list payload. These are the
 // conservative, source-backed defaults used by the previous Autoexport
 // catalog when a trim does not expose a separate engine size. They are only a

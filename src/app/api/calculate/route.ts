@@ -113,6 +113,7 @@ export async function POST(request: Request) {
       calculateRuVladivostok({
         ...parsed.data,
         rates: rateSnapshot.rates,
+        customsRates: rateSnapshot.customsRates,
         ratesAsOf: rateSnapshot.asOf,
         ratesSource: rateSnapshot.source,
         rateDetails: rateSnapshot.rateDetails,

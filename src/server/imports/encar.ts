@@ -1026,6 +1026,7 @@ async function mapCar(
           hybridSequential: hybridPower?.sequential,
           fuelType: fuelType ?? undefined,
           rates: rateSnapshot.rates,
+          customsRates: rateSnapshot.customsRates,
           ratesAsOf: rateSnapshot.asOf,
           ratesSource: rateSnapshot.source,
           rateDetails: rateSnapshot.rateDetails,
