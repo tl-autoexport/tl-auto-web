@@ -226,7 +226,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     .from("cars")
     .select(CATALOG_CAR_SELECT)
     .eq("is_available", true)
-    .eq("primary_source", "encar")
+    .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
     .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
@@ -291,7 +291,7 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
     .from("cars")
     .select("id", { count: "exact", head: true })
     .eq("is_available", true)
-    .eq("primary_source", "encar")
+    .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
     .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
@@ -547,7 +547,7 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
       .from("cars")
       .select("brand, model, trim, body_type, fuel_type, transmission, drive_type, color, owners_count")
       .eq("is_available", true)
-      .eq("primary_source", "encar")
+      .in("primary_source", ["encar", "chestny_prigon"])
       .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
       .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
       .order("id", { ascending: true })
@@ -588,7 +588,7 @@ export async function getSitemapCars(): Promise<SitemapCar[]> {
       .from("cars")
       .select("primary_source, source_id, source_updated_at")
       .eq("is_available", true)
-      .eq("primary_source", "encar")
+      .in("primary_source", ["encar", "chestny_prigon"])
       .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
       .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
       .order("id", { ascending: true })
@@ -614,7 +614,7 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
   const { data, error } = await supabase
     .from("cars")
     .select(`${CATALOG_CAR_SELECT}, car_options(category, source_code, name_original, name_ru, value_original, value_ru, description_original, description_ru, is_present, sort_order), car_condition_reports(source, report_type, summary, items)`)
-    .eq("primary_source", "encar")
+    .in("primary_source", ["encar", "chestny_prigon"])
     .eq("source_id", sourceId)
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
     .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
