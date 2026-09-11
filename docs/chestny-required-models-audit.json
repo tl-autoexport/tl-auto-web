@@ -1,0 +1,2390 @@
+{
+  "generatedAt": "2026-09-11T13:49:06.696Z",
+  "stagingRows": 32265,
+  "groups": [
+    {
+      "manufacturer": "Hyundai",
+      "requestedModel": "Avante",
+      "sourceCount": 981,
+      "configurations": [
+        {
+          "configuration": "AVANTE | 2021 | 1598 | 가솔린 | ",
+          "count": 188
+        },
+        {
+          "configuration": "AVANTE | 2022 | 1598 | 가솔린 | ",
+          "count": 182
+        },
+        {
+          "configuration": "AVANTE | 2023 | 1598 | 가솔린 | ",
+          "count": 154
+        },
+        {
+          "configuration": "AVANTE | 2020 | 1598 | 가솔린 | ",
+          "count": 122
+        },
+        {
+          "configuration": "AVANTE | 2019 | 1598 | 가솔린 | ",
+          "count": 80
+        },
+        {
+          "configuration": "AVANTE | 2022 | 1998 | 가솔린 | ",
+          "count": 32
+        },
+        {
+          "configuration": "AVANTE | 2024 | 1598 | 가솔린 | ",
+          "count": 32
+        },
+        {
+          "configuration": "AVANTE | 2025 | 1598 | 가솔린 | ",
+          "count": 29
+        },
+        {
+          "configuration": "AVANTE | 2021 | 1998 | 가솔린 | ",
+          "count": 24
+        },
+        {
+          "configuration": "AVANTE | 2022 | 1580 | 가솔린+전기 | ",
+          "count": 22
+        },
+        {
+          "configuration": "AVANTE | 2025 | 1998 | 가솔린 | ",
+          "count": 18
+        },
+        {
+          "configuration": "AVANTE | 2023 | 1998 | 가솔린 | ",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "requestedModel": "Sonata",
+      "sourceCount": 712,
+      "configurations": [
+        {
+          "configuration": "Sonata | 2022 | 1999 | 가솔린 | ",
+          "count": 159
+        },
+        {
+          "configuration": "Sonata | 2019 | 1999 | 가솔린 | ",
+          "count": 89
+        },
+        {
+          "configuration": "Sonata | 2021 | 1999 | 가솔린 | ",
+          "count": 64
+        },
+        {
+          "configuration": "Sonata | 2020 | 1999 | 가솔린 | ",
+          "count": 38
+        },
+        {
+          "configuration": "Sonata | 2024 | 1999 | 가솔린 | ",
+          "count": 32
+        },
+        {
+          "configuration": "Sonata | 2023 | 1999 | 가솔린 | ",
+          "count": 31
+        },
+        {
+          "configuration": "Sonata | 2021 | 1598 | 가솔린 | ",
+          "count": 31
+        },
+        {
+          "configuration": "Sonata | 2020 | 1598 | 가솔린 | ",
+          "count": 26
+        },
+        {
+          "configuration": "Sonata | 2023 | 1999 | 가솔린+전기 | ",
+          "count": 26
+        },
+        {
+          "configuration": "Sonata | 2024 | 1598 | 가솔린 | ",
+          "count": 24
+        },
+        {
+          "configuration": "Sonata | 2021 | 1999 | 가솔린+전기 | ",
+          "count": 23
+        },
+        {
+          "configuration": "Sonata | 2023 | 1598 | 가솔린 | ",
+          "count": 22
+        }
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "requestedModel": "Venue",
+      "sourceCount": 152,
+      "configurations": [
+        {
+          "configuration": "Venue | 2021 | 1598 | 가솔린 | ",
+          "count": 37
+        },
+        {
+          "configuration": "Venue | 2020 | 1598 | 가솔린 | ",
+          "count": 32
+        },
+        {
+          "configuration": "Venue | 2019 | 1598 | 가솔린 | ",
+          "count": 26
+        },
+        {
+          "configuration": "Venue | 2022 | 1598 | 가솔린 | ",
+          "count": 23
+        },
+        {
+          "configuration": "Venue | 2025 | 1598 | 가솔린 | ",
+          "count": 14
+        },
+        {
+          "configuration": "Venue | 2023 | 1598 | 가솔린 | ",
+          "count": 12
+        },
+        {
+          "configuration": "Venue | 2024 | 1598 | 가솔린 | ",
+          "count": 5
+        },
+        {
+          "configuration": "Venue | 2026 | 1598 | 가솔린 | ",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "requestedModel": "Casper",
+      "sourceCount": 495,
+      "configurations": [
+        {
+          "configuration": "Casper | 2022 | 998 | 가솔린 | ",
+          "count": 280
+        },
+        {
+          "configuration": "Casper | 2023 | 998 | 가솔린 | ",
+          "count": 82
+        },
+        {
+          "configuration": "Casper | 2024 | 998 | 가솔린 | ",
+          "count": 55
+        },
+        {
+          "configuration": "Casper | 2021 | 998 | 가솔린 | ",
+          "count": 34
+        },
+        {
+          "configuration": "Casper | 2026 | 998 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "Casper | 2024 | 158 | 전기 | ",
+          "count": 10
+        },
+        {
+          "configuration": "Casper | 2025 | 998 | 가솔린 | ",
+          "count": 10
+        },
+        {
+          "configuration": "Casper | 2025 | 158 | 전기 | ",
+          "count": 5
+        },
+        {
+          "configuration": "Casper | 2026 | 158 | 전기 | ",
+          "count": 3
+        },
+        {
+          "configuration": "Casper | 2024 |  | 전기 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "requestedModel": "Veloster",
+      "sourceCount": 48,
+      "configurations": [
+        {
+          "configuration": "Veloster | 2019 | 1998 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "Veloster | 2020 | 1998 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Veloster | 2021 | 1998 | 가솔린 | ",
+          "count": 11
+        },
+        {
+          "configuration": "Veloster | 2019 | 1591 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "Veloster | 2020 | 1591 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "Veloster | 2022 | 1998 | 가솔린 | ",
+          "count": 1
+        },
+        {
+          "configuration": "Veloster | 2020 | 1353 | 가솔린 | ",
+          "count": 1
+        },
+        {
+          "configuration": "Veloster | 2019 | 1353 | 가솔린 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "requestedModel": "Tucson",
+      "sourceCount": 484,
+      "configurations": [
+        {
+          "configuration": "Tucson | 2022 | 1598 | 가솔린 | 2WD",
+          "count": 57
+        },
+        {
+          "configuration": "Tucson | 2021 | 1598 | 가솔린 | 2WD",
+          "count": 48
+        },
+        {
+          "configuration": "Tucson | 2021 | 1998 | 디젤 | 2WD",
+          "count": 32
+        },
+        {
+          "configuration": "Tucson | 2022 | 1998 | 디젤 | 2WD",
+          "count": 29
+        },
+        {
+          "configuration": "Tucson | 2021 | 1598 | 가솔린+전기 | 2WD",
+          "count": 27
+        },
+        {
+          "configuration": "Tucson | 2022 | 1598 | 가솔린+전기 | 2WD",
+          "count": 24
+        },
+        {
+          "configuration": "Tucson | 2019 | 1995 | 디젤 | 2WD",
+          "count": 21
+        },
+        {
+          "configuration": "Tucson | 2024 | 1598 | 가솔린+전기 | 2WD",
+          "count": 20
+        },
+        {
+          "configuration": "Tucson | 2023 | 1598 | 가솔린+전기 | 2WD",
+          "count": 16
+        },
+        {
+          "configuration": "Tucson | 2023 | 1598 | 가솔린 | 2WD",
+          "count": 16
+        },
+        {
+          "configuration": "Tucson | 2023 | 1998 | 디젤 | 2WD",
+          "count": 15
+        },
+        {
+          "configuration": "Tucson | 2020 | 1995 | 디젤 | 2WD",
+          "count": 15
+        }
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "requestedModel": "Kona",
+      "sourceCount": 236,
+      "configurations": [
+        {
+          "configuration": "Kona | 2019 | 1591 | 가솔린 | 2WD",
+          "count": 29
+        },
+        {
+          "configuration": "Kona | 2023 | 1598 | 가솔린 | 2WD",
+          "count": 22
+        },
+        {
+          "configuration": "Kona | 2021 | 1598 | 가솔린 | 2WD",
+          "count": 14
+        },
+        {
+          "configuration": "Kona | 2022 | 1580 | 가솔린+전기 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Kona | 2020 | 1591 | 가솔린 | 2WD",
+          "count": 13
+        },
+        {
+          "configuration": "Kona | 2024 | 1598 | 가솔린 | 2WD",
+          "count": 10
+        },
+        {
+          "configuration": "Kona | 2021 | 1999 | 가솔린 | 2WD",
+          "count": 9
+        },
+        {
+          "configuration": "Kona | 2024 | 1580 | 가솔린+전기 | ",
+          "count": 9
+        },
+        {
+          "configuration": "Kona | 2023 | 1999 | 가솔린 | 2WD",
+          "count": 8
+        },
+        {
+          "configuration": "Kona | 2023 | 1580 | 가솔린+전기 | ",
+          "count": 8
+        },
+        {
+          "configuration": "Kona | 2020 | 1580 | 가솔린+전기 | ",
+          "count": 8
+        },
+        {
+          "configuration": "Kona | 2025 | 1580 | 가솔린+전기 | ",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "requestedModel": "Staria",
+      "sourceCount": 496,
+      "configurations": [
+        {
+          "configuration": "Staria | 2022 | 2199 | 디젤 | ",
+          "count": 92
+        },
+        {
+          "configuration": "Staria | 2023 | 2199 | 디젤 | ",
+          "count": 83
+        },
+        {
+          "configuration": "Staria | 2021 | 2199 | 디젤 | ",
+          "count": 61
+        },
+        {
+          "configuration": "Staria | 2024 | 2199 | 디젤 | ",
+          "count": 41
+        },
+        {
+          "configuration": "Staria | 2023 | 3470 | LPG(일반인 구입) | ",
+          "count": 29
+        },
+        {
+          "configuration": "Staria | 2021 | 3470 | LPG(일반인 구입) | ",
+          "count": 24
+        },
+        {
+          "configuration": "Staria | 2021 | 2199 | 디젤 | 4WD",
+          "count": 23
+        },
+        {
+          "configuration": "Staria | 2022 | 2199 | 디젤 | 4WD",
+          "count": 22
+        },
+        {
+          "configuration": "Staria | 2025 | 1598 | 가솔린+전기 | ",
+          "count": 19
+        },
+        {
+          "configuration": "Staria | 2025 | 2199 | 디젤 | ",
+          "count": 17
+        },
+        {
+          "configuration": "Staria | 2024 | 3470 | LPG(일반인 구입) | ",
+          "count": 15
+        },
+        {
+          "configuration": "Staria | 2024 | 1598 | 가솔린+전기 | ",
+          "count": 13
+        }
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "requestedModel": "Seltos",
+      "sourceCount": 427,
+      "configurations": [
+        {
+          "configuration": "Seltos | 2022 | 1591 | 가솔린 | 2WD",
+          "count": 56
+        },
+        {
+          "configuration": "Seltos | 2021 | 1591 | 가솔린 | 2WD",
+          "count": 54
+        },
+        {
+          "configuration": "Seltos | 2020 | 1591 | 가솔린 | 2WD",
+          "count": 35
+        },
+        {
+          "configuration": "Seltos | 2019 | 1591 | 가솔린 | 2WD",
+          "count": 32
+        },
+        {
+          "configuration": "Seltos | 2023 | 1598 | 가솔린 | 2WD",
+          "count": 25
+        },
+        {
+          "configuration": "Seltos | 2025 | 1598 | 가솔린 | 2WD",
+          "count": 23
+        },
+        {
+          "configuration": "Seltos | 2024 | 1598 | 가솔린 | 2WD",
+          "count": 16
+        },
+        {
+          "configuration": "Seltos | 2022 | 1999 | 가솔린 | 2WD",
+          "count": 16
+        },
+        {
+          "configuration": "Seltos | 2024 | 1591 | 가솔린 | 2WD",
+          "count": 14
+        },
+        {
+          "configuration": "Seltos | 2020 | 1598 | 디젤 | 2WD",
+          "count": 14
+        },
+        {
+          "configuration": "Seltos | 2022 | 1598 | 가솔린 | 2WD",
+          "count": 13
+        },
+        {
+          "configuration": "Seltos | 2019 | 1598 | 디젤 | 2WD",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "requestedModel": "K5",
+      "sourceCount": 796,
+      "configurations": [
+        {
+          "configuration": "K5 | 2022 | 1999 | 가솔린 | ",
+          "count": 115
+        },
+        {
+          "configuration": "K5 | 2023 | 1999 | 가솔린 | ",
+          "count": 84
+        },
+        {
+          "configuration": "K5 | 2021 | 1999 | 가솔린 | ",
+          "count": 75
+        },
+        {
+          "configuration": "K5 | 2020 | 1999 | 가솔린 | ",
+          "count": 70
+        },
+        {
+          "configuration": "K5 | 2020 | 1598 | 가솔린 | ",
+          "count": 55
+        },
+        {
+          "configuration": "K5 | 2024 | 1999 | 가솔린 | ",
+          "count": 52
+        },
+        {
+          "configuration": "K5 | 2021 | 1598 | 가솔린 | ",
+          "count": 49
+        },
+        {
+          "configuration": "K5 | 2025 | 1999 | 가솔린 | ",
+          "count": 34
+        },
+        {
+          "configuration": "K5 | 2019 | 1999 | 가솔린 | ",
+          "count": 28
+        },
+        {
+          "configuration": "K5 | 2023 | 1999 | 가솔린+전기 | ",
+          "count": 28
+        },
+        {
+          "configuration": "K5 | 2026 | 1999 | 가솔린 | ",
+          "count": 27
+        },
+        {
+          "configuration": "K5 | 2023 | 1598 | 가솔린 | ",
+          "count": 26
+        }
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "requestedModel": "K3",
+      "sourceCount": 372,
+      "configurations": [
+        {
+          "configuration": "K3 | 2022 | 1598 | 가솔린 | ",
+          "count": 99
+        },
+        {
+          "configuration": "K3 | 2021 | 1598 | 가솔린 | ",
+          "count": 90
+        },
+        {
+          "configuration": "K3 | 2019 | 1598 | 가솔린 | ",
+          "count": 54
+        },
+        {
+          "configuration": "K3 | 2023 | 1598 | 가솔린 | ",
+          "count": 44
+        },
+        {
+          "configuration": "K3 | 2024 | 1598 | 가솔린 | ",
+          "count": 33
+        },
+        {
+          "configuration": "K3 | 2020 | 1598 | 가솔린 | ",
+          "count": 23
+        },
+        {
+          "configuration": "K3 | 2021 | 1591 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "K3 | 2022 | 1591 | 가솔린 | ",
+          "count": 6
+        },
+        {
+          "configuration": "K3 | 2019 | 1591 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "K3 | 2020 | 1591 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "K3 | 2024 | 1591 | 가솔린 | ",
+          "count": 2
+        },
+        {
+          "configuration": "K3 | 2020 | 1600 | 가솔린 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "requestedModel": "Niro",
+      "sourceCount": 219,
+      "configurations": [
+        {
+          "configuration": "Niro | 2022 | 1580 | 가솔린+전기 | ",
+          "count": 74
+        },
+        {
+          "configuration": "Niro | 2023 | 180 | 전기 | ",
+          "count": 27
+        },
+        {
+          "configuration": "Niro | 2021 | 1580 | 가솔린+전기 | ",
+          "count": 24
+        },
+        {
+          "configuration": "Niro | 2019 | 1580 | 가솔린+전기 | ",
+          "count": 19
+        },
+        {
+          "configuration": "Niro | 2022 | 180 | 전기 | ",
+          "count": 16
+        },
+        {
+          "configuration": "Niro | 2020 | 1580 | 가솔린+전기 | ",
+          "count": 14
+        },
+        {
+          "configuration": "Niro | 2021 | 180 | 전기 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Niro | 2025 | 1580 | 가솔린+전기 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Niro | 2024 | 1580 | 가솔린+전기 | ",
+          "count": 6
+        },
+        {
+          "configuration": "Niro | 2023 | 1580 | 가솔린+전기 | ",
+          "count": 5
+        },
+        {
+          "configuration": "Niro | 2026 | 1580 | 가솔린+전기 | ",
+          "count": 3
+        },
+        {
+          "configuration": "Niro | 2022 | 111 | 전기 | ",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "requestedModel": "Morning",
+      "sourceCount": 309,
+      "configurations": [
+        {
+          "configuration": "morning | 2022 | 998 | 가솔린 | ",
+          "count": 65
+        },
+        {
+          "configuration": "morning | 2023 | 998 | 가솔린 | ",
+          "count": 52
+        },
+        {
+          "configuration": "morning | 2019 | 998 | 가솔린 | ",
+          "count": 42
+        },
+        {
+          "configuration": "morning | 2020 | 998 | 가솔린 | ",
+          "count": 39
+        },
+        {
+          "configuration": "morning | 2024 | 998 | 가솔린 | ",
+          "count": 34
+        },
+        {
+          "configuration": "morning | 2021 | 998 | 가솔린 | ",
+          "count": 34
+        },
+        {
+          "configuration": "morning | 2025 | 998 | 가솔린 | ",
+          "count": 21
+        },
+        {
+          "configuration": "morning | 2026 | 998 | 가솔린 | ",
+          "count": 17
+        },
+        {
+          "configuration": "morning | 2019 | 998 | LPG(일반인 구입) | ",
+          "count": 4
+        },
+        {
+          "configuration": "morning | 2020 | 998 | LPG(일반인 구입) | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "requestedModel": "Ray",
+      "sourceCount": 543,
+      "configurations": [
+        {
+          "configuration": "RAY | 2022 | 998 | 가솔린 | ",
+          "count": 116
+        },
+        {
+          "configuration": "RAY | 2023 | 998 | 가솔린 | ",
+          "count": 107
+        },
+        {
+          "configuration": "RAY | 2021 | 998 | 가솔린 | ",
+          "count": 89
+        },
+        {
+          "configuration": "RAY | 2024 | 998 | 가솔린 | ",
+          "count": 65
+        },
+        {
+          "configuration": "RAY | 2019 | 998 | 가솔린 | ",
+          "count": 42
+        },
+        {
+          "configuration": "RAY | 2020 | 998 | 가솔린 | ",
+          "count": 41
+        },
+        {
+          "configuration": "RAY | 2025 | 998 | 가솔린 | ",
+          "count": 28
+        },
+        {
+          "configuration": "RAY | 2026 | 998 | 가솔린 | ",
+          "count": 25
+        },
+        {
+          "configuration": "RAY | 2024 | 133 | 전기 | ",
+          "count": 15
+        },
+        {
+          "configuration": "RAY | 2023 | 133 | 전기 | ",
+          "count": 10
+        },
+        {
+          "configuration": "RAY | 2025 | 133 | 전기 | ",
+          "count": 4
+        },
+        {
+          "configuration": "RAY | 2023 |  | 전기 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "requestedModel": "Sportage",
+      "sourceCount": 641,
+      "configurations": [
+        {
+          "configuration": "Sportage | 2022 | 1598 | 가솔린 | 2WD",
+          "count": 56
+        },
+        {
+          "configuration": "Sportage | 2021 | 1998 | 디젤 | 2WD",
+          "count": 47
+        },
+        {
+          "configuration": "Sportage | 2021 | 1598 | 가솔린 | 2WD",
+          "count": 40
+        },
+        {
+          "configuration": "Sportage | 2019 | 1995 | 디젤 | 2WD",
+          "count": 35
+        },
+        {
+          "configuration": "Sportage | 2025 | 1598 | 가솔린 | 2WD",
+          "count": 33
+        },
+        {
+          "configuration": "Sportage | 2022 | 1998 | 디젤 | 2WD",
+          "count": 33
+        },
+        {
+          "configuration": "Sportage | 2022 | 1598 | 가솔린+전기 | 2WD",
+          "count": 31
+        },
+        {
+          "configuration": "Sportage | 2024 | 1598 | 가솔린 | 2WD",
+          "count": 29
+        },
+        {
+          "configuration": "Sportage | 2023 | 1598 | 가솔린+전기 | 2WD",
+          "count": 29
+        },
+        {
+          "configuration": "Sportage | 2022 | 1999 | LPG(일반인 구입) | 2WD",
+          "count": 27
+        },
+        {
+          "configuration": "Sportage | 2024 | 1598 | 가솔린+전기 | 2WD",
+          "count": 21
+        },
+        {
+          "configuration": "Sportage | 2023 | 1999 | LPG(일반인 구입) | 2WD",
+          "count": 21
+        }
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "requestedModel": "Sorento",
+      "sourceCount": 872,
+      "configurations": [
+        {
+          "configuration": "Sorento | 2021 | 2151 | 디젤 | 2WD",
+          "count": 74
+        },
+        {
+          "configuration": "Sorento | 2020 | 2151 | 디젤 | 2WD",
+          "count": 70
+        },
+        {
+          "configuration": "Sorento | 2024 | 1598 | 가솔린+전기 | 2WD",
+          "count": 64
+        },
+        {
+          "configuration": "Sorento | 2022 | 1598 | 가솔린+전기 | 2WD",
+          "count": 53
+        },
+        {
+          "configuration": "Sorento | 2023 | 1598 | 가솔린+전기 | 2WD",
+          "count": 50
+        },
+        {
+          "configuration": "Sorento | 2022 | 2151 | 디젤 | 2WD",
+          "count": 43
+        },
+        {
+          "configuration": "Sorento | 2019 | 1995 | 디젤 | 2WD",
+          "count": 39
+        },
+        {
+          "configuration": "Sorento | 2021 | 1598 | 가솔린+전기 | 2WD",
+          "count": 39
+        },
+        {
+          "configuration": "Sorento | 2021 | 2497 | 가솔린 | 2WD",
+          "count": 27
+        },
+        {
+          "configuration": "Sorento | 2021 | 2151 | 디젤 | 4WD",
+          "count": 27
+        },
+        {
+          "configuration": "Sorento | 2020 | 1598 | 가솔린+전기 | 2WD",
+          "count": 26
+        },
+        {
+          "configuration": "Sorento | 2025 | 1598 | 가솔린+전기 | 2WD",
+          "count": 24
+        }
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "requestedModel": "Mohave",
+      "sourceCount": 307,
+      "configurations": [
+        {
+          "configuration": "Mohave | 2021 | 2959 | 디젤 | 4WD",
+          "count": 94
+        },
+        {
+          "configuration": "Mohave | 2022 | 2959 | 디젤 | 4WD",
+          "count": 83
+        },
+        {
+          "configuration": "Mohave | 2020 | 2959 | 디젤 | 4WD",
+          "count": 72
+        },
+        {
+          "configuration": "Mohave | 2019 | 2959 | 디젤 | 4WD",
+          "count": 28
+        },
+        {
+          "configuration": "Mohave | 2023 | 2959 | 디젤 | 4WD",
+          "count": 22
+        },
+        {
+          "configuration": "Mohave | 2024 | 2959 | 디젤 | 4WD",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "requestedModel": "Carnival",
+      "sourceCount": 1544,
+      "configurations": [
+        {
+          "configuration": "Canival | 2021 | 2151 | 디젤 | ",
+          "count": 300
+        },
+        {
+          "configuration": "Canival | 2022 | 2151 | 디젤 | ",
+          "count": 197
+        },
+        {
+          "configuration": "Canival | 2023 | 2151 | 디젤 | ",
+          "count": 144
+        },
+        {
+          "configuration": "Canival | 2019 | 2199 | 디젤 | ",
+          "count": 122
+        },
+        {
+          "configuration": "Canival | 2022 | 3470 | 가솔린 | ",
+          "count": 115
+        },
+        {
+          "configuration": "Canival | 2020 | 2151 | 디젤 | ",
+          "count": 105
+        },
+        {
+          "configuration": "Canival | 2023 | 3470 | 가솔린 | ",
+          "count": 103
+        },
+        {
+          "configuration": "Canival | 2021 | 3470 | 가솔린 | ",
+          "count": 86
+        },
+        {
+          "configuration": "Canival | 2024 | 1598 | 가솔린+전기 | ",
+          "count": 74
+        },
+        {
+          "configuration": "Canival | 2024 | 2151 | 디젤 | ",
+          "count": 67
+        },
+        {
+          "configuration": "Canival | 2024 | 3470 | 가솔린 | ",
+          "count": 50
+        },
+        {
+          "configuration": "Canival | 2025 | 1598 | 가솔린+전기 | ",
+          "count": 35
+        }
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "requestedModel": "Trailblazer",
+      "sourceCount": 160,
+      "configurations": [
+        {
+          "configuration": "Trailblazer | 2022 | 1341 | 가솔린 | 4WD",
+          "count": 35
+        },
+        {
+          "configuration": "Trailblazer | 2021 | 1341 | 가솔린 | 2WD",
+          "count": 28
+        },
+        {
+          "configuration": "Trailblazer | 2023 | 1341 | 가솔린 | 4WD",
+          "count": 23
+        },
+        {
+          "configuration": "Trailblazer | 2022 | 1341 | 가솔린 | 2WD",
+          "count": 23
+        },
+        {
+          "configuration": "Trailblazer | 2023 | 1341 | 가솔린 | 2WD",
+          "count": 13
+        },
+        {
+          "configuration": "Trailblazer | 2021 | 1341 | 가솔린 | 4WD",
+          "count": 13
+        },
+        {
+          "configuration": "Trailblazer | 2024 | 1341 | 가솔린 | 2WD",
+          "count": 9
+        },
+        {
+          "configuration": "Trailblazer | 2020 | 1341 | 가솔린 | 2WD",
+          "count": 5
+        },
+        {
+          "configuration": "Trailblazer | 2025 | 1341 | 가솔린 | 4WD",
+          "count": 4
+        },
+        {
+          "configuration": "Trailblazer | 2020 | 1341 | 가솔린 | 4WD",
+          "count": 2
+        },
+        {
+          "configuration": "Trailblazer | 2025 | 1341 | 가솔린 | 2WD",
+          "count": 2
+        },
+        {
+          "configuration": "Trailblazer | 2024 | 1341 | 가솔린 | 4WD",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "requestedModel": "Malibu",
+      "sourceCount": 31,
+      "configurations": [
+        {
+          "configuration": "Malibu | 2021 | 1341 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "Malibu | 2021 | 1998 | 가솔린 | ",
+          "count": 6
+        },
+        {
+          "configuration": "Malibu | 2022 | 1998 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "Malibu | 2019 | 1341 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "Malibu | 2020 | 1998 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "Malibu | 2020 | 1598 | 디젤 | ",
+          "count": 3
+        },
+        {
+          "configuration": "Malibu | 2019 | 1998 | 가솔린 | ",
+          "count": 2
+        },
+        {
+          "configuration": "Malibu | 2022 | 1341 | 가솔린 | ",
+          "count": 1
+        },
+        {
+          "configuration": "Malibu | 2020 | 1341 | 가솔린 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "requestedModel": "Equinox",
+      "sourceCount": 10,
+      "configurations": [
+        {
+          "configuration": "Equinox | 2022 | 1490 | 가솔린 | 4WD",
+          "count": 5
+        },
+        {
+          "configuration": "Equinox | 2022 | 1490 | 가솔린 | 2WD",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "requestedModel": "Trax",
+      "sourceCount": 137,
+      "configurations": [
+        {
+          "configuration": "Trax | 2023 | 1199 | 가솔린 | ",
+          "count": 63
+        },
+        {
+          "configuration": "Trax | 2024 | 1199 | 가솔린 | ",
+          "count": 29
+        },
+        {
+          "configuration": "Trax | 2025 | 1199 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "Trax | 2019 | 1362 | 가솔린 | ",
+          "count": 10
+        },
+        {
+          "configuration": "Trax | 2020 | 1362 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "Trax | 2019 | 1598 | 디젤 | ",
+          "count": 6
+        },
+        {
+          "configuration": "Trax | 2026 | 1199 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "Trax | 2022 | 1399 | 가솔린 | ",
+          "count": 2
+        },
+        {
+          "configuration": "Trax | 2021 | 1362 | 가솔린 | ",
+          "count": 1
+        },
+        {
+          "configuration": "Trax | 2021 | 1399 | 가솔린 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "requestedModel": "Spark",
+      "sourceCount": 55,
+      "configurations": [
+        {
+          "configuration": "Spark | 2021 | 999 | 가솔린 | ",
+          "count": 18
+        },
+        {
+          "configuration": "Spark | 2022 | 999 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "Spark | 2020 | 999 | 가솔린 | ",
+          "count": 12
+        },
+        {
+          "configuration": "Spark | 2019 | 999 | 가솔린 | ",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "requestedModel": "GLB-Class",
+      "sourceCount": 125,
+      "configurations": [
+        {
+          "configuration": "GLB-Class | 2021 | 1991 | 가솔린 | ",
+          "count": 32
+        },
+        {
+          "configuration": "GLB-Class | 2022 | 1991 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "GLB-Class | 2025 | 1991 | 가솔린 | ",
+          "count": 14
+        },
+        {
+          "configuration": "GLB-Class | 2020 | 1991 | 가솔린 | ",
+          "count": 14
+        },
+        {
+          "configuration": "GLB-Class | 2023 | 1991 | 가솔린 | ",
+          "count": 12
+        },
+        {
+          "configuration": "GLB-Class | 2024 | 1950 | 디젤 | ",
+          "count": 9
+        },
+        {
+          "configuration": "GLB-Class | 2021 | 1950 | 디젤 | ",
+          "count": 9
+        },
+        {
+          "configuration": "GLB-Class | 2022 | 1950 | 디젤 | ",
+          "count": 7
+        },
+        {
+          "configuration": "GLB-Class | 2024 | 1991 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "B-Class | 2018 | 1991 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "GLB-Class | 2023 | 1950 | 디젤 | ",
+          "count": 2
+        },
+        {
+          "configuration": "B-Class | 2016 | 2143 | 디젤 | ",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "requestedModel": "C-Class",
+      "sourceCount": 720,
+      "configurations": [
+        {
+          "configuration": "GLC-Class | 2019 | 1991 | 가솔린 | ",
+          "count": 40
+        },
+        {
+          "configuration": "C-Class | 2019 | 1950 | 디젤 | ",
+          "count": 37
+        },
+        {
+          "configuration": "C-Class | 2020 | 1991 | 가솔린 | ",
+          "count": 34
+        },
+        {
+          "configuration": "C-Class | 2017 | 1991 | 가솔린 | ",
+          "count": 29
+        },
+        {
+          "configuration": "GLC-Class | 2021 | 1991 | 가솔린+전기 | ",
+          "count": 24
+        },
+        {
+          "configuration": "GLC-Class | 2018 | 1991 | 가솔린+전기 | ",
+          "count": 21
+        },
+        {
+          "configuration": "C-Class | 2019 | 1991 | 가솔린 | ",
+          "count": 21
+        },
+        {
+          "configuration": "C-Class | 2021 | 1991 | 가솔린 | ",
+          "count": 21
+        },
+        {
+          "configuration": "GLC-Class | 2017 | 2143 | 디젤 | ",
+          "count": 20
+        },
+        {
+          "configuration": "GLC-Class | 2020 | 1991 | 가솔린 | ",
+          "count": 20
+        },
+        {
+          "configuration": "C-Class | 2016 | 1991 | 가솔린 | ",
+          "count": 19
+        },
+        {
+          "configuration": "GLC-Class | 2018 | 2143 | 디젤 | ",
+          "count": 19
+        }
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "requestedModel": "A-Class",
+      "sourceCount": 374,
+      "configurations": [
+        {
+          "configuration": "A-Class | 2020 | 1991 | 가솔린 | ",
+          "count": 42
+        },
+        {
+          "configuration": "A-Class | 2021 | 1991 | 가솔린 | ",
+          "count": 30
+        },
+        {
+          "configuration": "CLA-Class | 2021 | 1991 | 가솔린 | ",
+          "count": 24
+        },
+        {
+          "configuration": "GLA-Class | 2018 | 1991 | 가솔린 | ",
+          "count": 22
+        },
+        {
+          "configuration": "GLA-Class | 2019 | 1991 | 가솔린 | ",
+          "count": 19
+        },
+        {
+          "configuration": "CLA-Class | 2022 | 1991 | 가솔린 | ",
+          "count": 16
+        },
+        {
+          "configuration": "CLA-Class | 2020 | 1991 | 가솔린 | ",
+          "count": 16
+        },
+        {
+          "configuration": "CLA-Class | 2018 | 1991 | 가솔린 | ",
+          "count": 14
+        },
+        {
+          "configuration": "CLA-Class | 2023 | 1991 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "A-Class | 2025 | 1991 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "A-Class | 2022 | 1991 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "A-Class | 2019 | 1991 | 가솔린 | ",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "requestedModel": "Jetta",
+      "sourceCount": 139,
+      "configurations": [
+        {
+          "configuration": "Jetta | 2021 | 1395 | 가솔린 | ",
+          "count": 59
+        },
+        {
+          "configuration": "Jetta | 2023 | 1495 | 가솔린 | ",
+          "count": 22
+        },
+        {
+          "configuration": "Jetta | 2024 | 1495 | 가솔린 | ",
+          "count": 17
+        },
+        {
+          "configuration": "Jetta | 2020 | 1395 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "Jetta | 2022 | 1495 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Jetta | 2023 | 1498 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "Jetta | 2024 | 1498 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "Jetta | 2022 | 1498 | 가솔린 | ",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "requestedModel": "Tiguan",
+      "sourceCount": 255,
+      "configurations": [
+        {
+          "configuration": "Tiguan | 2020 | 1968 | 디젤 | ",
+          "count": 89
+        },
+        {
+          "configuration": "Tiguan | 2023 | 1984 | 가솔린 | ",
+          "count": 31
+        },
+        {
+          "configuration": "Tiguan | 2022 | 1968 | 디젤 | ",
+          "count": 30
+        },
+        {
+          "configuration": "Tiguan | 2021 | 1968 | 디젤 | ",
+          "count": 28
+        },
+        {
+          "configuration": "Tiguan | 2022 | 1984 | 가솔린 | ",
+          "count": 25
+        },
+        {
+          "configuration": "Tiguan | 2023 | 1968 | 디젤 | ",
+          "count": 20
+        },
+        {
+          "configuration": "Tiguan | 2019 | 1968 | 디젤 | ",
+          "count": 17
+        },
+        {
+          "configuration": "Tiguan | 2024 | 1984 | 가솔린 | ",
+          "count": 8
+        },
+        {
+          "configuration": "Tiguan | 2024 | 1968 | 디젤 | ",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "requestedModel": "Golf",
+      "sourceCount": 74,
+      "configurations": [
+        {
+          "configuration": "Golf | 2024 | 1984 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Golf | 2022 | 1968 | 디젤 | ",
+          "count": 12
+        },
+        {
+          "configuration": "Golf | 2025 | 1968 | 디젤 | ",
+          "count": 10
+        },
+        {
+          "configuration": "Golf | 2024 | 1968 | 디젤 | ",
+          "count": 10
+        },
+        {
+          "configuration": "Golf | 2026 | 1968 | 디젤 | ",
+          "count": 7
+        },
+        {
+          "configuration": "Golf | 2023 | 1968 | 디젤 | ",
+          "count": 6
+        },
+        {
+          "configuration": "Golf | 2025 | 1984 | 가솔린 | ",
+          "count": 5
+        },
+        {
+          "configuration": "Golf | 2023 | 1984 | 가솔린 | ",
+          "count": 5
+        },
+        {
+          "configuration": "Golf | 2026 | 1984 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "Golf | 2022 | 1984 | 가솔린 | ",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "manufacturer": "BMW",
+      "requestedModel": "X1",
+      "sourceCount": 110,
+      "configurations": [
+        {
+          "configuration": "X1 | 2022 | 1998 | 가솔린 | ",
+          "count": 26
+        },
+        {
+          "configuration": "X1 | 2025 | 1998 | 가솔린 | ",
+          "count": 16
+        },
+        {
+          "configuration": "X1 | 2024 | 1998 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "X1 | 2021 | 1998 | 가솔린 | ",
+          "count": 12
+        },
+        {
+          "configuration": "X1 | 2023 | 1998 | 가솔린 | ",
+          "count": 10
+        },
+        {
+          "configuration": "X1 | 2016 | 1995 | 디젤 | ",
+          "count": 7
+        },
+        {
+          "configuration": "X1 | 2018 | 1995 | 디젤 | ",
+          "count": 5
+        },
+        {
+          "configuration": "X1 | 2021 | 1995 | 디젤 | ",
+          "count": 4
+        },
+        {
+          "configuration": "X1 | 2017 | 1995 | 디젤 | ",
+          "count": 4
+        },
+        {
+          "configuration": "X1 | 2020 | 1998 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "X1 | 2019 | 1995 | 디젤 | ",
+          "count": 3
+        },
+        {
+          "configuration": "X1 | 2020 | 1995 | 디젤 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "BMW",
+      "requestedModel": "X2",
+      "sourceCount": 31,
+      "configurations": [
+        {
+          "configuration": "X2 (F39) | 2022 | 1998 | 가솔린 | ",
+          "count": 10
+        },
+        {
+          "configuration": "X2 (F39) | 2025 | 1998 | 가솔린 | ",
+          "count": 6
+        },
+        {
+          "configuration": "X2 (F39) | 2024 | 1998 | 가솔린 | ",
+          "count": 5
+        },
+        {
+          "configuration": "X2 (F39) | 2023 | 1998 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "X2 (F39) | 2020 | 1998 | 가솔린 | ",
+          "count": 2
+        },
+        {
+          "configuration": "X2 (F39) | 2019 | 1998 | 가솔린 | ",
+          "count": 2
+        },
+        {
+          "configuration": "X2 (F39) | 2021 | 1998 | 가솔린 | ",
+          "count": 2
+        },
+        {
+          "configuration": "X2 (F39) | 2018 | 1995 | 디젤 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "BMW",
+      "requestedModel": "1-Series",
+      "sourceCount": 119,
+      "configurations": [
+        {
+          "configuration": "1-Series | 2021 | 1995 | 디젤 | ",
+          "count": 17
+        },
+        {
+          "configuration": "1-Series | 2022 | 1998 | 가솔린 | ",
+          "count": 17
+        },
+        {
+          "configuration": "1-Series | 2023 | 1998 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "1-Series | 2021 | 1998 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "1-Series | 2017 | 1995 | 디젤 | ",
+          "count": 12
+        },
+        {
+          "configuration": "1-Series | 2018 | 1995 | 디젤 | ",
+          "count": 11
+        },
+        {
+          "configuration": "1-Series | 2020 | 1995 | 디젤 | ",
+          "count": 10
+        },
+        {
+          "configuration": "1-Series | 2024 | 1998 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "1-Series | 2025 | 1998 | 가솔린 | ",
+          "count": 6
+        },
+        {
+          "configuration": "1-Series | 2016 | 1995 | 디젤 | ",
+          "count": 6
+        },
+        {
+          "configuration": "1-Series | 2019 | 1995 | 디젤 | ",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "manufacturer": "BMW",
+      "requestedModel": "2-Series",
+      "sourceCount": 72,
+      "configurations": [
+        {
+          "configuration": "2-Series | 2024 | 1998 | 가솔린 | ",
+          "count": 9
+        },
+        {
+          "configuration": "2-Series | 2022 | 1998 | 가솔린 | ",
+          "count": 9
+        },
+        {
+          "configuration": "2-Series | 2021 | 1998 | 가솔린 | ",
+          "count": 8
+        },
+        {
+          "configuration": "2-Series | 2025 | 1998 | 가솔린 | ",
+          "count": 6
+        },
+        {
+          "configuration": "2-Series | 2021 | 1995 | 디젤 | ",
+          "count": 5
+        },
+        {
+          "configuration": "2-Series | 2018 | 1995 | 디젤 | ",
+          "count": 5
+        },
+        {
+          "configuration": "2-Series | 2023 | 1998 | 가솔린 | ",
+          "count": 5
+        },
+        {
+          "configuration": "2-Series | 2019 | 1995 | 디젤 | ",
+          "count": 4
+        },
+        {
+          "configuration": "2-Series | 2020 | 1995 | 디젤 | ",
+          "count": 4
+        },
+        {
+          "configuration": "2-Series | 2016 | 1995 | 디젤 | ",
+          "count": 3
+        },
+        {
+          "configuration": "2-Series | 2023 | 1995 | 디젤 | ",
+          "count": 2
+        },
+        {
+          "configuration": "2-Series | 2023 | 2998 | 가솔린 | ",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "manufacturer": "Audi",
+      "requestedModel": "Q2",
+      "sourceCount": 20,
+      "configurations": [
+        {
+          "configuration": "Q2 | 2023 | 1968 | 디젤 | ",
+          "count": 14
+        },
+        {
+          "configuration": "Q2 | 2020 | 1968 | 디젤 | ",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "manufacturer": "Audi",
+      "requestedModel": "Q3",
+      "sourceCount": 108,
+      "configurations": [
+        {
+          "configuration": "Q3 | 2022 | 1968 | 디젤 | ",
+          "count": 33
+        },
+        {
+          "configuration": "Q3 | 2023 | 1968 | 디젤 | ",
+          "count": 26
+        },
+        {
+          "configuration": "Q3 | 2020 | 1968 | 디젤 | ",
+          "count": 20
+        },
+        {
+          "configuration": "Q3 | 2025 | 1984 | 가솔린 | ",
+          "count": 10
+        },
+        {
+          "configuration": "Q3 | 2025 | 1968 | 디젤 | ",
+          "count": 5
+        },
+        {
+          "configuration": "Q3 | 2024 | 1984 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "Q3 | 2023 | 1984 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "Q3 | 2026 | 1984 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "Q3 | 2026 | 1968 | 디젤 | ",
+          "count": 1
+        },
+        {
+          "configuration": "Q3 | 2024 | 1968 | 디젤 | ",
+          "count": 1
+        },
+        {
+          "configuration": "Q3 | 2016 | 1984 | 가솔린 | ",
+          "count": 1
+        },
+        {
+          "configuration": "Q3 | 2016 | 1968 | 디젤 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Audi",
+      "requestedModel": "A4",
+      "sourceCount": 106,
+      "configurations": [
+        {
+          "configuration": "A4 | 2019 | 1984 | 가솔린 | ",
+          "count": 31
+        },
+        {
+          "configuration": "A4 | 2021 | 1984 | 가솔린 | ",
+          "count": 17
+        },
+        {
+          "configuration": "A4 | 2023 | 1984 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "A4 | 2018 | 1968 | 디젤 | ",
+          "count": 10
+        },
+        {
+          "configuration": "A4 | 2016 | 1984 | 가솔린 | ",
+          "count": 6
+        },
+        {
+          "configuration": "A4 | 2020 | 1984 | 가솔린 | ",
+          "count": 6
+        },
+        {
+          "configuration": "A4 | 2022 | 1984 | 가솔린 | ",
+          "count": 6
+        },
+        {
+          "configuration": "A4 | 2021 | 1968 | 디젤 | ",
+          "count": 5
+        },
+        {
+          "configuration": "A4 | 2022 | 1968 | 디젤 | ",
+          "count": 3
+        },
+        {
+          "configuration": "A4 | 2023 | 1968 | 디젤 | ",
+          "count": 3
+        },
+        {
+          "configuration": "A4 | 2016 | 1968 | 디젤 | ",
+          "count": 3
+        },
+        {
+          "configuration": "A4 | 2020 | 1968 | 디젤 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Audi",
+      "requestedModel": "A3",
+      "sourceCount": 59,
+      "configurations": [
+        {
+          "configuration": "A3 | 2023 | 1984 | 가솔린 | ",
+          "count": 16
+        },
+        {
+          "configuration": "A3 | 2018 | 1984 | 가솔린 | ",
+          "count": 11
+        },
+        {
+          "configuration": "A3 | 2025 | 1984 | 가솔린 | ",
+          "count": 8
+        },
+        {
+          "configuration": "A3 | 2022 | 1984 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "A3 | 2026 | 1984 | 가솔린 | ",
+          "count": 5
+        },
+        {
+          "configuration": "A3 | 2020 | 1984 | 가솔린 | ",
+          "count": 5
+        },
+        {
+          "configuration": "A3 | 2024 | 1984 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "A3 | 2019 | 1984 | 가솔린 | ",
+          "count": 1
+        },
+        {
+          "configuration": "A3 | 2016 | 1395 | 가솔린+전기 | ",
+          "count": 1
+        },
+        {
+          "configuration": "A3 | 2016 | 1968 | 디젤 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "MINI",
+      "requestedModel": "Cooper",
+      "sourceCount": 282,
+      "configurations": [
+        {
+          "configuration": "Cooper | 2021 | 1499 | 가솔린 | ",
+          "count": 30
+        },
+        {
+          "configuration": "Cooper | 2020 | 1499 | 가솔린 | ",
+          "count": 22
+        },
+        {
+          "configuration": "Cooper | 2022 | 1499 | 가솔린 | ",
+          "count": 21
+        },
+        {
+          "configuration": "Cooper | 2023 | 1499 | 가솔린 | ",
+          "count": 20
+        },
+        {
+          "configuration": "Cooper | 2023 | 1998 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "Cooper | 2025 | 1998 | 가솔린 | ",
+          "count": 14
+        },
+        {
+          "configuration": "Cooper | 2019 | 1998 | 가솔린 | ",
+          "count": 14
+        },
+        {
+          "configuration": "Cooper | 2020 | 1998 | 가솔린 | ",
+          "count": 14
+        },
+        {
+          "configuration": "Cooper | 2018 | 1499 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Cooper | 2019 | 1499 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Cooper | 2024 | 1499 | 가솔린 | ",
+          "count": 12
+        },
+        {
+          "configuration": "Cooper | 2022 | 1998 | 가솔린 | ",
+          "count": 11
+        }
+      ]
+    },
+    {
+      "manufacturer": "MINI",
+      "requestedModel": "Clubman",
+      "sourceCount": 102,
+      "configurations": [
+        {
+          "configuration": "Clubman | 2023 | 1998 | 가솔린 | ",
+          "count": 14
+        },
+        {
+          "configuration": "Clubman | 2021 | 1499 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Clubman | 2023 | 1499 | 가솔린 | ",
+          "count": 11
+        },
+        {
+          "configuration": "Clubman | 2018 | 1499 | 가솔린 | ",
+          "count": 10
+        },
+        {
+          "configuration": "Clubman | 2020 | 1499 | 가솔린 | ",
+          "count": 9
+        },
+        {
+          "configuration": "Clubman | 2021 | 1998 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "Clubman | 2022 | 1499 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "Clubman | 2019 | 1499 | 가솔린 | ",
+          "count": 6
+        },
+        {
+          "configuration": "Clubman | 2022 | 1998 | 가솔린 | ",
+          "count": 5
+        },
+        {
+          "configuration": "Clubman | 2020 | 1995 | 디젤 | ",
+          "count": 4
+        },
+        {
+          "configuration": "Clubman | 2024 | 1499 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "Clubman | 2020 | 1998 | 가솔린 | ",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "manufacturer": "MINI",
+      "requestedModel": "Countryman",
+      "sourceCount": 184,
+      "configurations": [
+        {
+          "configuration": "Countryman | 2023 | 1499 | 가솔린 | ",
+          "count": 36
+        },
+        {
+          "configuration": "Countryman | 2022 | 1499 | 가솔린 | ",
+          "count": 17
+        },
+        {
+          "configuration": "Countryman | 2023 | 1998 | 가솔린 | ",
+          "count": 16
+        },
+        {
+          "configuration": "Countryman | 2022 | 1998 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "Countryman | 2021 | 1499 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Countryman | 2024 | 1499 | 가솔린 | ",
+          "count": 11
+        },
+        {
+          "configuration": "Countryman | 2020 | 1998 | 가솔린 | ",
+          "count": 9
+        },
+        {
+          "configuration": "Countryman | 2026 | 1998 | 가솔린 | ",
+          "count": 9
+        },
+        {
+          "configuration": "Countryman | 2024 | 1998 | 가솔린 | ",
+          "count": 9
+        },
+        {
+          "configuration": "Countryman | 2025 | 1998 | 가솔린 | ",
+          "count": 8
+        },
+        {
+          "configuration": "Countryman | 2021 | 1998 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "Countryman | 2018 | 1995 | 디젤 | ",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "manufacturer": "Land Rover",
+      "requestedModel": "Discovery",
+      "sourceCount": 200,
+      "configurations": [
+        {
+          "configuration": "Discovery | 2019 | 2993 | 디젤 | ",
+          "count": 29
+        },
+        {
+          "configuration": "Discovery Sport | 2025 | 1997 | 가솔린 | ",
+          "count": 24
+        },
+        {
+          "configuration": "Discovery Sport | 2020 | 1999 | 디젤 | ",
+          "count": 21
+        },
+        {
+          "configuration": "Discovery Sport | 2019 | 1999 | 디젤 | ",
+          "count": 19
+        },
+        {
+          "configuration": "Discovery Sport | 2020 | 1997 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Discovery Sport | 2022 | 1997 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Discovery | 2019 | 1999 | 디젤 | ",
+          "count": 11
+        },
+        {
+          "configuration": "Discovery Sport | 2021 | 1997 | 가솔린 | ",
+          "count": 11
+        },
+        {
+          "configuration": "Discovery Sport | 2024 | 1997 | 가솔린 | ",
+          "count": 10
+        },
+        {
+          "configuration": "Discovery | 2020 | 2993 | 디젤 | ",
+          "count": 8
+        },
+        {
+          "configuration": "Discovery | 2021 | 2996 | 디젤 | ",
+          "count": 5
+        },
+        {
+          "configuration": "Discovery Sport | 2023 | 1997 | 가솔린 | ",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "manufacturer": "Land Rover",
+      "requestedModel": "Range Rover Evoque",
+      "sourceCount": 139,
+      "configurations": [
+        {
+          "configuration": "Range Rover Evoque | 2025 | 1997 | 가솔린 | ",
+          "count": 25
+        },
+        {
+          "configuration": "Range Rover Evoque | 2024 | 1997 | 가솔린 | ",
+          "count": 14
+        },
+        {
+          "configuration": "Range Rover | 2021 | 2997 | 디젤 | ",
+          "count": 14
+        },
+        {
+          "configuration": "Range Rover Evoque | 2019 | 1999 | 디젤 | ",
+          "count": 9
+        },
+        {
+          "configuration": "Range Rover Evoque | 2021 | 1997 | 가솔린 | ",
+          "count": 9
+        },
+        {
+          "configuration": "Range Rover | 2019 | 5000 | 가솔린 | ",
+          "count": 8
+        },
+        {
+          "configuration": "Range Rover | 2020 | 4367 | 디젤 | ",
+          "count": 8
+        },
+        {
+          "configuration": "Range Rover Evoque | 2022 | 1997 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "Range Rover | 2021 | 4999 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "Range Rover | 2023 | 4395 | 가솔린 | ",
+          "count": 7
+        },
+        {
+          "configuration": "Range Rover Evoque | 2026 | 1997 | 가솔린 | ",
+          "count": 6
+        },
+        {
+          "configuration": "Range Rover Evoque | 2020 | 1999 | 디젤 | ",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "manufacturer": "Land Rover",
+      "requestedModel": "Discovery Sport",
+      "sourceCount": 200,
+      "configurations": [
+        {
+          "configuration": "Discovery | 2019 | 2993 | 디젤 | ",
+          "count": 29
+        },
+        {
+          "configuration": "Discovery Sport | 2025 | 1997 | 가솔린 | ",
+          "count": 24
+        },
+        {
+          "configuration": "Discovery Sport | 2020 | 1999 | 디젤 | ",
+          "count": 21
+        },
+        {
+          "configuration": "Discovery Sport | 2019 | 1999 | 디젤 | ",
+          "count": 19
+        },
+        {
+          "configuration": "Discovery Sport | 2020 | 1997 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Discovery Sport | 2022 | 1997 | 가솔린 | ",
+          "count": 13
+        },
+        {
+          "configuration": "Discovery | 2019 | 1999 | 디젤 | ",
+          "count": 11
+        },
+        {
+          "configuration": "Discovery Sport | 2021 | 1997 | 가솔린 | ",
+          "count": 11
+        },
+        {
+          "configuration": "Discovery Sport | 2024 | 1997 | 가솔린 | ",
+          "count": 10
+        },
+        {
+          "configuration": "Discovery | 2020 | 2993 | 디젤 | ",
+          "count": 8
+        },
+        {
+          "configuration": "Discovery | 2021 | 2996 | 디젤 | ",
+          "count": 5
+        },
+        {
+          "configuration": "Discovery Sport | 2023 | 1997 | 가솔린 | ",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "manufacturer": "KGM",
+      "requestedModel": "KORANDO",
+      "sourceCount": 57,
+      "configurations": [
+        {
+          "configuration": "KORANDO | 2021 | 1497 | 가솔린 | 2WD",
+          "count": 14
+        },
+        {
+          "configuration": "KORANDO | 2020 | 1497 | 가솔린 | 2WD",
+          "count": 13
+        },
+        {
+          "configuration": "KORANDO | 2022 | 1497 | 가솔린 | 2WD",
+          "count": 9
+        },
+        {
+          "configuration": "KORANDO | 2019 | 1597 | 디젤 | 2WD",
+          "count": 5
+        },
+        {
+          "configuration": "KORANDO | 2021 | 1597 | 디젤 | 2WD",
+          "count": 3
+        },
+        {
+          "configuration": "KORANDO | 2019 | 1597 | 디젤 | 4WD",
+          "count": 3
+        },
+        {
+          "configuration": "KORANDO | 2023 | 1497 | 가솔린 | 2WD",
+          "count": 2
+        },
+        {
+          "configuration": "KORANDO | 2020 | 1597 | 디젤 | 2WD",
+          "count": 2
+        },
+        {
+          "configuration": "KORANDO | 2022 | 1597 | 디젤 | 2WD",
+          "count": 1
+        },
+        {
+          "configuration": "KORANDO | 2021 | 1497 | 가솔린 | 4WD",
+          "count": 1
+        },
+        {
+          "configuration": "KORANDO | 2023 | 1497 | 가솔린 | 4WD",
+          "count": 1
+        },
+        {
+          "configuration": "KORANDO | 2024 | 1497 | 가솔린 | 2WD",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "KGM",
+      "requestedModel": "TIBOLI",
+      "sourceCount": 120,
+      "configurations": [
+        {
+          "configuration": "TIBOLI | 2022 | 1497 | 가솔린 | 2WD",
+          "count": 32
+        },
+        {
+          "configuration": "TIBOLI | 2021 | 1497 | 가솔린 | 2WD",
+          "count": 29
+        },
+        {
+          "configuration": "TIBOLI | 2020 | 1497 | 가솔린 | 2WD",
+          "count": 20
+        },
+        {
+          "configuration": "TIBOLI | 2019 | 1497 | 가솔린 | 2WD",
+          "count": 10
+        },
+        {
+          "configuration": "TIBOLI | 2019 | 1597 | 가솔린 | 2WD",
+          "count": 6
+        },
+        {
+          "configuration": "TIBOLI | 2024 | 1597 | 가솔린 | 2WD",
+          "count": 3
+        },
+        {
+          "configuration": "TIBOLI | 2020 | 1597 | 디젤 | 2WD",
+          "count": 3
+        },
+        {
+          "configuration": "TIBOLI | 2025 | 1597 | 가솔린 | 2WD",
+          "count": 3
+        },
+        {
+          "configuration": "TIBOLI | 2023 | 1497 | 가솔린 | 2WD",
+          "count": 3
+        },
+        {
+          "configuration": "TIBOLI | 2024 | 1497 | 가솔린 | 2WD",
+          "count": 2
+        },
+        {
+          "configuration": "TIBOLI | 2019 | 1597 | 디젤 | 2WD",
+          "count": 2
+        },
+        {
+          "configuration": "TIBOLI | 2021 | 1497 | 가솔린 | 4WD",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Renault Korea",
+      "requestedModel": "SM6",
+      "sourceCount": 42,
+      "configurations": [
+        {
+          "configuration": "SM6 | 2021 | 1332 | 가솔린 | ",
+          "count": 8
+        },
+        {
+          "configuration": "SM6 | 2022 | 1332 | 가솔린 | ",
+          "count": 5
+        },
+        {
+          "configuration": "SM6 | 2022 | 1798 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "SM6 | 2023 | 1332 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "SM6 | 2024 | 1332 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "SM6 | 2019 | 1998 | LPG(일반인 구입) | ",
+          "count": 3
+        },
+        {
+          "configuration": "SM6 | 2021 | 1998 | LPG(일반인 구입) | ",
+          "count": 3
+        },
+        {
+          "configuration": "SM6 | 2023 | 1998 | LPG(일반인 구입) | ",
+          "count": 2
+        },
+        {
+          "configuration": "SM6 | 2020 | 1997 | 가솔린 | ",
+          "count": 2
+        },
+        {
+          "configuration": "SM6 | 2020 | 1998 | LPG(일반인 구입) | ",
+          "count": 2
+        },
+        {
+          "configuration": "SM6 | 2019 | 1997 | 가솔린 | ",
+          "count": 2
+        },
+        {
+          "configuration": "SM6 | 2023 | 1798 | 가솔린 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Renault Korea",
+      "requestedModel": "QM6",
+      "sourceCount": 169,
+      "configurations": [
+        {
+          "configuration": "QM6 | 2021 | 1998 | LPG(일반인 구입) | 2WD",
+          "count": 34
+        },
+        {
+          "configuration": "QM6 | 2022 | 1998 | LPG(일반인 구입) | 2WD",
+          "count": 26
+        },
+        {
+          "configuration": "QM6 | 2021 | 1997 | 가솔린 | 2WD",
+          "count": 20
+        },
+        {
+          "configuration": "QM6 | 2022 | 1997 | 가솔린 | 2WD",
+          "count": 15
+        },
+        {
+          "configuration": "QM6 | 2019 | 1997 | 가솔린 | 2WD",
+          "count": 13
+        },
+        {
+          "configuration": "QM6 | 2023 | 1997 | 가솔린 | 2WD",
+          "count": 12
+        },
+        {
+          "configuration": "QM6 | 2019 | 1998 | LPG(일반인 구입) | 2WD",
+          "count": 10
+        },
+        {
+          "configuration": "QM6 | 2020 | 1998 | LPG(일반인 구입) | 2WD",
+          "count": 10
+        },
+        {
+          "configuration": "QM6 | 2024 | 1998 | LPG(일반인 구입) | 2WD",
+          "count": 7
+        },
+        {
+          "configuration": "QM6 | 2020 | 1997 | 가솔린 | 2WD",
+          "count": 7
+        },
+        {
+          "configuration": "QM6 | 2023 | 1998 | LPG(일반인 구입) | 2WD",
+          "count": 6
+        },
+        {
+          "configuration": "QM6 | 2026 | 1998 | LPG(일반인 구입) | 2WD",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "manufacturer": "Renault Korea",
+      "requestedModel": "XM3",
+      "sourceCount": 134,
+      "configurations": [
+        {
+          "configuration": "XM3 | 2022 | 1598 | 가솔린 | ",
+          "count": 36
+        },
+        {
+          "configuration": "XM3 | 2022 | 1332 | 가솔린 | ",
+          "count": 18
+        },
+        {
+          "configuration": "XM3 | 2021 | 1598 | 가솔린 | ",
+          "count": 16
+        },
+        {
+          "configuration": "XM3 | 2020 | 1332 | 가솔린 | ",
+          "count": 15
+        },
+        {
+          "configuration": "XM3 | 2023 | 1598 | 가솔린 | ",
+          "count": 14
+        },
+        {
+          "configuration": "XM3 | 2021 | 1332 | 가솔린 | ",
+          "count": 10
+        },
+        {
+          "configuration": "XM3 | 2020 | 1598 | 가솔린 | ",
+          "count": 8
+        },
+        {
+          "configuration": "XM3 | 2022 | 1598 | 가솔린+전기 | ",
+          "count": 7
+        },
+        {
+          "configuration": "XM3 | 2023 | 1332 | 가솔린 | ",
+          "count": 5
+        },
+        {
+          "configuration": "XM3 | 2024 | 1598 | 가솔린 | ",
+          "count": 4
+        },
+        {
+          "configuration": "XM3 | 2024 | 1332 | 가솔린 | ",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "manufacturer": "Renault Korea",
+      "requestedModel": "Captur",
+      "sourceCount": 5,
+      "configurations": [
+        {
+          "configuration": "Captur | 2020 | 1332 | 가솔린 | ",
+          "count": 3
+        },
+        {
+          "configuration": "Captur | 2021 | 1332 | 가솔린 | ",
+          "count": 2
+        }
+      ]
+    }
+  ],
+  "note": "Inventory only. Power and <=160 hp eligibility are resolved separately and no rows are published by this audit."
+}
