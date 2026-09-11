@@ -71,6 +71,7 @@
     "audit:korex": "tsx scripts/audit-korex-prices.ts",
     "sync:catalog": "npm run refresh:encar",
     "sync:catalog:write": "npm run refresh:encar:write"
+    ,"import:chestny:staging": "tsx scripts/import-chestny-catalog-staging.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.0",
