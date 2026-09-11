@@ -64,15 +64,18 @@ export function ContactLocations() {
             <p className="text-sm font-semibold text-[#956f2c]">Контакты и адреса</p>
             <h2 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">Мы на связи в России и Корее</h2>
           </div>
-          <div className="flex rounded-xl bg-[#eef1f5] p-1" aria-label="Выберите страну">
+          <div
+            className="inline-flex self-start rounded-2xl border border-[#dfe4eb] bg-[#f3f5f8] p-1 shadow-[0_6px_18px_rgba(16,24,39,0.06)]"
+            aria-label="Выберите страну"
+          >
             {(["ru", "kr"] as const).map((code) => (
               <button
-                className={`min-h-10 rounded-lg px-4 text-sm font-semibold transition ${country === code ? "bg-white text-[#101827] shadow-sm" : "text-[#647084] hover:text-[#101827]"}`}
+                className={`min-h-10 rounded-xl px-4 text-sm font-semibold transition duration-200 ${country === code ? "bg-white text-[#8b682b] shadow-[0_2px_8px_rgba(16,24,39,0.12)] ring-1 ring-[#eadab5]" : "text-[#667389] hover:bg-white/70 hover:text-[#101827]"}`}
                 key={code}
                 onClick={() => selectCountry(code)}
                 type="button"
               >
-                {code === "ru" ? "Россия" : "Южная Корея"}
+                {code === "ru" ? "Россия" : "Корея"}
               </button>
             ))}
           </div>
@@ -84,7 +87,7 @@ export function ContactLocations() {
               allowFullScreen
               className="absolute inset-0 h-full w-full border-0"
               key={active.id}
-              loading="lazy"
+              loading="eager"
               referrerPolicy="no-referrer-when-downgrade"
               src={active.mapEmbed}
               title={`Карта офиса TL Auto — ${active.city}`}
