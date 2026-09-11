@@ -70,8 +70,10 @@
     "sync:published-calc-prices:write": "PUBLISHED_CALC_SYNC_DRY_RUN=false tsx scripts/sync-published-calc-prices.ts",
     "audit:korex": "tsx scripts/audit-korex-prices.ts",
     "sync:catalog": "npm run refresh:encar",
-    "sync:catalog:write": "npm run refresh:encar:write"
-    ,"import:chestny:staging": "tsx scripts/import-chestny-catalog-staging.ts"
+    "sync:catalog:write": "npm run refresh:encar:write",
+    "import:chestny:staging": "tsx scripts/import-chestny-catalog-staging.ts",
+    "archive:catalog": "tsx scripts/archive-current-catalog.ts",
+    "restore:catalog": "tsx scripts/restore-catalog-archive.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.0",
