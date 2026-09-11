@@ -2105,6 +2105,30 @@
       ]
     },
     {
+      "specKey": "bmw-3-series-g20-320d-1995-190ps-2021-2025",
+      "brand": "BMW",
+      "model": "3 Series",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1995,
+      "years": [2021, 2025],
+      "power": { "value": 190, "unit": "PS", "kw": 139.7447625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea 3 Series G20 technical data — 320d, 1,995 cc, 190 PS",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0405304KO?forceSitePreference=DESKTOP",
+        "supportingUri": "https://www.press.bmwgroup.com/korea/article/detail/T0294550KO",
+        "retrievedAt": "2026-09-11",
+        "note": "BMW Korea technical releases identify the 3 Series 320d sedan, Touring and xDrive variants at 1,995 cc and 190 PS. Exact 320d badges are matched for 2021–2025; cards without a badge remain unresolved."
+      },
+      "matches": [
+        { "badge": "320d", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "badge": "320d M Sport", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "badge": "320d Touring M Sport", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "badge": "320d xDrive M Sport", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 2005 }
+      ]
+    },
+    {
       "specKey": "bmw-3-series-g20-320i-1998-135kw-2021-2026",
       "brand": "BMW",
       "model": "3 Series",
