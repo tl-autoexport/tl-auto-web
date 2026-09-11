@@ -1952,6 +1952,53 @@
       ]
     },
     {
+      "specKey": "bmw-5-series-g30-523d-1995-190ps-2021-2022",
+      "brand": "BMW",
+      "model": "5 Series",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1995,
+      "years": [2021, 2022],
+      "power": { "value": 190, "unit": "PS", "kw": 139.7447625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea 5 Series G30 technical data — 523d, 1,995 cc, 190 PS",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0318366KO/bmw-%EC%BD%94%EB%A6%AC%EC%95%84-%EB%89%B4-5%EC%8B%9C%EB%A6%AC%EC%A6%88-%EB%B0%8F-%EB%89%B4-6%EC%8B%9C%EB%A6%AC%EC%A6%88-%EA%B7%B8%EB%9E%80%ED%88%AC%EB%A6%AC%EC%8A%A4%ED%86%A0%EB%AA%A8-%EA%B5%AD%EB%82%B4-%EC%B6%9C%EC%8B%9C?language=ko",
+        "retrievedAt": "2026-09-11",
+        "note": "BMW Korea's technical table lists the G30 523d and 523d xDrive at 1,995 cc and 190 PS. The match is restricted to 2021–2022 G30 badges."
+      },
+      "matches": [
+        { "badge": "523d M Sport", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "badge": "523d Luxury", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "badge": "523d xDrive Luxury", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "badge": "523d xDrive M Sport", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1985, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "bmw-5-series-g60-523d-1995-197ps-2023-2026",
+      "brand": "BMW",
+      "model": "5 Series",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1995,
+      "years": [2023, 2026],
+      "power": { "value": 197, "unit": "PS", "kw": 144.89325375 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea 5 Series G60 technical data — 523d, 1,995 cc, 197 PS",
+        "uri": "https://www.bmw.co.kr/ko/all-models/5-series/sedan/bmw-5-series-sedan-overview.html",
+        "supportingUri": "https://www.bmw.co.jp/ja/press/2023/20230713_2.html",
+        "retrievedAt": "2026-09-11",
+        "note": "BMW Korea's current 5 Series specification states 523d at 197 PS; BMW technical material gives 145 kW system output for the 1,995 cc diesel. Exact 523d/523d xDrive badges are matched from 2023 onward."
+      },
+      "matches": [
+        { "badge": "523d", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "badge": "523d M Sport", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "badge": "523d xDrive Luxury", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "badge": "523d xDrive M Sport", "yearFrom": 2023, "yearTo": 2026, "engineCcFrom": 1985, "engineCcTo": 2005 }
+      ]
+    },
+    {
       "specKey": "bmw-5-series-g60-520i-1998-140kw-2023-2026",
       "brand": "BMW",
       "model": "5 Series",
