@@ -74,6 +74,7 @@
     "import:chestny:staging": "tsx scripts/import-chestny-catalog-staging.ts",
     "audit:chestny:size": "tsx scripts/audit-chestny-staging-size.ts",
     "audit:chestny:required": "tsx scripts/audit-chestny-required-models.ts",
+    "dry-run:chestny:promotion": "tsx scripts/dry-run-chestny-promotion.ts",
     "archive:catalog": "tsx scripts/archive-current-catalog.ts",
     "restore:catalog": "tsx scripts/restore-catalog-archive.ts"
   },
