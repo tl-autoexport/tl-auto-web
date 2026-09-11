@@ -11,7 +11,10 @@ import {
 export const CALC_VERSION = "ru-individual-autoexport-tks-dual-rate-2026.02";
 
 const DEFAULT_RATES: CalcRates = { krwRub: 0.04718, eurRub: 87.403, usdRub: 70.95, kztRub: 0.14 };
-const DEFAULT_CLEARANCE_DAYS = 90;
+// TL Auto uses a 30-day planning window for the estimated customs clearance
+// date. This keeps borderline vehicles in the same age bucket as the TKS
+// reference calculation while remaining an explicit, overridable input.
+const DEFAULT_CLEARANCE_DAYS = 30;
 const BROKER_RUB = 90_000;
 const KOREA_EXPENSES_KRW = 2_100_000;
 const SERVICE_FEE_RUB = 50_000;

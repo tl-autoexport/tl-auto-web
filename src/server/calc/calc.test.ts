@@ -8,11 +8,11 @@ const genesisG70 = calculateRuVladivostok({
   rates: { krwRub: 0.050135, usdRub: 77.929, eurRub: 88.707, kztRub: 0.15 },
 });
 assert.equal(genesisG70.carPriceRub, 1_338_103);
-assert.equal(genesisG70.dutyRub, 850_735.61);
+assert.equal(genesisG70.dutyRub, 478_538.78);
 assert.equal(genesisG70.feesRub, 13_541);
 assert.equal(genesisG70.utilRub, 1_838_400);
 assert.equal(genesisG70.koreaExpensesRub, 105_284);
-assert.equal(genesisG70.totalRub, 4_286_063.76);
+assert.equal(genesisG70.totalRub, 3_913_866.93);
 
 const moscowDelivery = calculateRuVladivostok({
   priceKrw: 26_690_000, year: 2021, month: 10, engineCc: 1998, powerHp: 252,
@@ -117,6 +117,14 @@ assert.ok(ageBoundary.currentCarAgeYears < 5);
 assert.ok(ageBoundary.carAgeYears > 5);
 assert.equal(ageBoundary.customs.eurPerCc, 3);
 assert.equal(ageBoundary.util.coefficient, 0.26);
+
+const thirtyDayBorderline = calculateRuVladivostok({
+  priceKrw: 41_000_000, year: 2023, month: 10, engineCc: 1950, powerKw: 142.6868,
+  fuelType: "diesel", calculationDate: "2026-09-11T00:00:00.000Z",
+  rates: { krwRub: 0.06532, usdRub: 87.72, eurRub: 102.22, kztRub: 0.18 },
+});
+assert.ok(thirtyDayBorderline.carAgeYears < 3, "30-day clearance window keeps the October 2023 vehicle under three years");
+assert.equal(thirtyDayBorderline.util.coefficient, 47.64);
 
 const hybridUsesIndividualRegime = calculateRuVladivostok({
   priceKrw: 14_150_000, year: 2019, month: 2, engineCc: 2359, powerHp: 159,
