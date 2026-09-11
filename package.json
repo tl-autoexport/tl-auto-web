@@ -76,6 +76,7 @@
     "audit:chestny:required": "tsx scripts/audit-chestny-required-models.ts",
     "dry-run:chestny:promotion": "tsx scripts/dry-run-chestny-promotion.ts",
     "build:chestny:power-queue": "tsx scripts/build-chestny-power-review-queue.ts",
+    "import:chestny:verified": "tsx scripts/import-verified-chestny-catalog.ts",
     "archive:catalog": "tsx scripts/archive-current-catalog.ts",
     "restore:catalog": "tsx scripts/restore-catalog-archive.ts"
   },
