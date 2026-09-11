@@ -2263,6 +2263,47 @@
       ]
     },
     {
+      "specKey": "volkswagen-tiguan-ad-1968-150ps-2018-2024",
+      "brand": "Volkswagen",
+      "model": "티구안 2세대",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1968,
+      "years": [2018, 2024],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Volkswagen Korea Tiguan 2.0 TDI technical specifications — 150 PS",
+        "uri": "https://map.vwkr.co.kr/bro/vwk-tiguan-20180419.pdf",
+        "supportingUri": "https://www.volkswagen.co.kr/ko/promotion_news/news/2021/2021-07-07.html",
+        "retrievedAt": "2026-09-11",
+        "note": "Volkswagen Korea technical data and 2021 model announcement identify the Tiguan 2.0 TDI at 1,968 cc and 150 PS. The Korean model-name match is restricted to 티구안 2세대; cards with a documented 200 PS 4Motion badge use a separate rule."
+      },
+      "matches": [
+        { "yearFrom": 2018, "yearTo": 2024, "engineCcFrom": 1960, "engineCcTo": 1975 }
+      ]
+    },
+    {
+      "specKey": "volkswagen-tiguan-ad-1968-200ps-2021-2024",
+      "brand": "Volkswagen",
+      "model": "Tiguan",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1968,
+      "years": [2021, 2024],
+      "power": { "value": 200, "unit": "PS", "kw": 147.09975 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Volkswagen Tiguan II facelift 2.0 TDI 4MOTION technical data — 200 PS",
+        "uri": "https://www.volkswagen.co.kr/ko/promotion_news/news/2021/2021-07-23.html",
+        "retrievedAt": "2026-09-11",
+        "note": "The 200 PS output is restricted to Encar's exact 2.0 TDI Prestige badge and 2021–2024 1,968 cc listings; unbadged Tiguan records remain preliminary."
+      },
+      "matches": [
+        { "badge": "2.0 TDI Prestige", "yearFrom": 2021, "yearTo": 2024, "engineCcFrom": 1960, "engineCcTo": 1975 }
+      ]
+    },
+    {
       "specKey": "mercedes-cla-c118-cla250-4matic-1991-165kw-2021-2025",
       "brand": "Mercedes-Benz",
       "model": "A-Class",
