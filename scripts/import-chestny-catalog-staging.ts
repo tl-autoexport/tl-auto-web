@@ -11,6 +11,9 @@ const sourceUrl = process.env.CHESTNY_SUPABASE_URL?.trim();
 const sourceKey = process.env.CHESTNY_SUPABASE_SERVICE_ROLE_KEY?.trim();
 const dryRun = process.env.CHESTNY_IMPORT_DRY_RUN !== "false";
 const limit = Math.max(1, Number(process.env.CHESTNY_IMPORT_LIMIT ?? 10000));
+// Keep the TL Auto mirror lightweight. Raw source rows are retained in Chesty
+// and are not needed for catalogue matching or power resolution.
+const includeRawPayload = process.env.CHESTNY_IMPORT_INCLUDE_RAW === "true";
 
 if (!sourceUrl || !sourceKey) {
   throw new Error("CHESTNY_SUPABASE_URL and CHESTNY_SUPABASE_SERVICE_ROLE_KEY are required");
@@ -82,7 +85,10 @@ async function main() {
       body_type: row.body_type,
       location: row.location,
       vin_masked: row.vin_masked,
-      raw_payload: row,
+      // Only copy raw JSON when explicitly requested for a controlled audit.
+      // The normal production import is metadata-only.
+      ...(includeRawPayload ? { raw_payload: row } : {}),
+      image_urls: [],
       payload_hash: hash(row),
       source_updated_at: row.source_updated_at,
       last_seen_at: row.last_seen_at ?? new Date().toISOString(),
@@ -91,8 +97,7 @@ async function main() {
     const { error } = await target.from("chestny_catalog_staging").upsert(batch, { onConflict: "source_listing_id" });
     if (error) throw new Error(`TL Auto staging write failed: ${error.message}`);
   }
-  console.log(JSON.stringify({ dryRun, fetched: rows.length, unique: unique.length, staged: unique.length }, null, 2));
+  console.log(JSON.stringify({ dryRun, includeRawPayload, fetched: rows.length, unique: unique.length, staged: unique.length, table: "public.chestny_catalog_staging" }, null, 2));
 }
 
 main().catch((error) => { console.error(error); process.exit(1); });
-

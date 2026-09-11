@@ -41,3 +41,9 @@ create index if not exists chestny_catalog_staging_identity_idx
 alter table public.chestny_catalog_staging enable row level security;
 revoke all privileges on table public.chestny_catalog_staging from anon, authenticated;
 
+comment on table public.chestny_catalog_staging is
+  'Private metadata mirror of Chesty Prigon. Raw JSON and image binaries stay in the source project unless explicitly imported for an audit.';
+comment on column public.chestny_catalog_staging.raw_payload is
+  'Optional audit payload. The normal importer leaves this as an empty object to avoid duplicating the source catalogue.';
+comment on column public.chestny_catalog_staging.image_urls is
+  'External image URLs only; image binaries are never copied into TL Auto staging.';
