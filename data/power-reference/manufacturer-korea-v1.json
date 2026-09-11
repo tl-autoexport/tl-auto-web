@@ -2304,6 +2304,68 @@
       ]
     },
     {
+      "specKey": "volkswagen-arteon-ad-1968-200ps-2022-2024",
+      "brand": "Volkswagen",
+      "model": "Arteon",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1968,
+      "years": [2022, 2024],
+      "power": { "value": 200, "unit": "PS", "kw": 147.09975 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Volkswagen Korea Arteon 2.0 TDI technical data — 200 PS",
+        "uri": "https://www.volkswagen.co.kr/idhub/content/dam/onehub_pkw/importers/kr/models/arteon-2-0-tdi/leaflet/Arteon_Price_List_web_230710.pdf",
+        "supportingUri": "https://www.volkswagen.co.kr/ko/promotion_news/news/news-2022/2022-07-07.html",
+        "retrievedAt": "2026-09-11",
+        "note": "Volkswagen Korea lists Arteon 2.0 TDI at 1,968 cc and 200 PS. The rule is limited to the exact 2.0 TDI Prestige badge and 2022–2024 model years."
+      },
+      "matches": [
+        { "badge": "2.0 TDI Prestige", "yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 1960, "engineCcTo": 1975 }
+      ]
+    },
+    {
+      "specKey": "volkswagen-passat-gt-1968-200ps-2022",
+      "brand": "Volkswagen",
+      "model": "Passat",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1968,
+      "years": [2022, 2022],
+      "power": { "value": 200, "unit": "PS", "kw": 147.09975 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Volkswagen Korea Passat GT 2.0 TDI technical announcement — 200 PS",
+        "uri": "https://www.volkswagen.co.kr/ko/promotion_news/news/news-2022/2022-02-09.html",
+        "retrievedAt": "2026-09-11",
+        "note": "Volkswagen Korea identifies the 2022 Passat GT 2.0 TDI 4MOTION with the 200 PS EA288 evo engine. Match is restricted to the exact 2.0 TDI Prestige badge and 2022 model year."
+      },
+      "matches": [
+        { "badge": "2.0 TDI Prestige", "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 1960, "engineCcTo": 1975 }
+      ]
+    },
+    {
+      "specKey": "volkswagen-golf-8-1968-150ps-2025",
+      "brand": "Volkswagen",
+      "model": "Golf",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1968,
+      "years": [2025, 2025],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Volkswagen Korea The new Golf 2.0 TDI price list — 150 PS",
+        "uri": "https://www.volkswagen.co.kr/idhub/content/dam/onehub_pkw/importers/kr/models/2025-golf/leaflet/The%20new%20Golf_Price%20List.pdf",
+        "supportingUri": "https://www.volkswagen.co.kr/ko/promotion_news/news/new-2025/2025-03-14.html",
+        "retrievedAt": "2026-09-11",
+        "note": "Volkswagen Korea lists both Golf 2.0 TDI Premium and Prestige at 1,968 cc and 150 PS. This corrects the current 200 PS preliminary value for the exact 2025 2.0 TDI Prestige listing."
+      },
+      "matches": [
+        { "badge": "2.0 TDI Prestige", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1960, "engineCcTo": 1975 }
+      ]
+    },
+    {
       "specKey": "mercedes-cla-c118-cla250-4matic-1991-165kw-2021-2025",
       "brand": "Mercedes-Benz",
       "model": "A-Class",
