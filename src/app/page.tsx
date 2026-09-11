@@ -2,17 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowRight,
-  Calculator,
   ChevronRight,
-  CircleDollarSign,
-  FileCheck2,
-  MapPin,
   MessageSquareQuote,
   Images,
   PlayCircle,
-  Search,
-  Ship,
-  ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import {
@@ -25,6 +18,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { CatalogQuickNav } from "@/components/home/CatalogQuickNav";
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 import { StoryCarousel } from "@/components/home/StoryCarousel";
+import { ContactLocations } from "@/components/home/ContactLocations";
 
 export const revalidate = 60;
 
@@ -133,106 +127,7 @@ export default async function Home() {
         empty="Свежие поступления появятся в этой витрине после обновления каталога."
       />
 
-      <section id="how-it-works" className="border-y border-[#dce2eb] bg-white">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-5 sm:py-12 lg:grid-cols-[0.85fr_1.15fr]">
-          <div>
-            <p className="text-sm font-semibold text-[#956f2c]">
-              Точный расчёт для РФ
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold leading-tight">
-              Цена не прячется за формой заявки
-            </h2>
-            <p className="mt-4 max-w-xl text-base leading-7 text-[#647084]">
-              В карточке автомобиля видны итог до Владивостока, основные части
-              расчёта и подробная расшифровка по кнопке.
-            </p>
-            <Link
-              href="/catalog"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#956f2c]"
-            >
-              Посмотреть расчёты в каталоге <ArrowRight size={16} />
-            </Link>
-          </div>
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
-            <ValueCard
-              icon={CircleDollarSign}
-              title="Стоимость авто"
-              text="Цена автомобиля в Корее, переведённая по расчётному курсу."
-            />
-            <ValueCard
-              icon={Calculator}
-              title="Расходы по пути"
-              text="Фрахт, брокер и услуги во Владивостоке."
-            />
-            <ValueCard
-              icon={ShieldCheck}
-              title="Таможенные платежи"
-              text="Пошлина, сборы и утилизационный сбор для РФ."
-            />
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="delivery"
-        className="scroll-mt-28 border-b border-[#dce2eb] bg-[#eef1f5]"
-      >
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-5 md:py-16">
-          <div className="grid gap-6 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
-            <div>
-              <p className="text-sm font-semibold text-[#956f2c]">
-                Путь автомобиля
-              </p>
-              <h2 className="mt-3 text-3xl font-semibold leading-tight">
-                От выбора до Владивостока
-              </h2>
-            </div>
-            <p className="max-w-2xl text-sm leading-6 text-[#647084] lg:justify-self-end">
-              Конкретные сроки, договор, способ оплаты и условия доставки
-              менеджер подтверждает до оформления заявки.
-            </p>
-          </div>
-
-          <ol className="mt-6 grid grid-cols-2 border-y border-[#cfd6e0] sm:mt-9 md:grid-cols-2 xl:grid-cols-4">
-            <DeliveryStep
-              number="01"
-              icon={Search}
-              title="Выбор"
-              text="Фильтры, рекомендации и подробная карточка помогают найти подходящий автомобиль."
-            />
-            <DeliveryStep
-              number="02"
-              icon={FileCheck2}
-              title="Проверка"
-              text="Сверяем доступные данные, историю и материалы осмотра из источника."
-            />
-            <DeliveryStep
-              number="03"
-              icon={Ship}
-              title="Расчёт"
-              text="Показываем цену до Владивостока и расшифровываем основные статьи расходов."
-            />
-            <DeliveryStep
-              number="04"
-              icon={MapPin}
-              title="Заявка"
-              text="Менеджер получает выбранный автомобиль и уточняет дальнейшие условия оформления."
-            />
-          </ol>
-
-          <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm text-[#647084]">
-              Регистрация для просмотра каталога и отправки заявки не требуется.
-            </p>
-            <Link
-              href="/catalog"
-              className="inline-flex items-center gap-2 rounded-md bg-[#11151d] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1b3555]"
-            >
-              Начать подбор <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </section>
+      <ContactLocations />
 
       <section
         id="reviews"
@@ -412,49 +307,6 @@ function selectShelfCars(
   }
 
   return selected;
-}
-
-function ValueCard({
-  icon: Icon,
-  text,
-  title,
-}: {
-  icon: typeof Calculator;
-  text: string;
-  title: string;
-}) {
-  return (
-    <div className="rounded-md border border-[#dce2eb] p-3 sm:p-5">
-      <Icon size={22} className="text-[#956f2c]" />
-      <h3 className="mt-3 text-sm font-semibold sm:mt-5 sm:text-base">{title}</h3>
-      <p className="mt-2 hidden text-sm leading-6 text-[#647084] sm:block">{text}</p>
-    </div>
-  );
-}
-
-function DeliveryStep({
-  icon: Icon,
-  number,
-  text,
-  title,
-}: {
-  icon: typeof Ship;
-  number: string;
-  text: string;
-  title: string;
-}) {
-  return (
-    <li className="relative border-b border-r border-[#cfd6e0] py-4 even:border-r-0 last:border-b-0 md:py-7 md:odd:border-r md:[&:nth-child(3)]:border-b-0 xl:border-b-0 xl:border-r xl:last:border-r-0 xl:[&:nth-child(2)]:border-b-0">
-      <div className="px-3 sm:px-5 sm:first:pl-0 xl:first:pl-0">
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-xs font-bold text-[#98a3b2]">{number}</span>
-          <Icon size={20} className="text-[#956f2c]" aria-hidden="true" />
-        </div>
-        <h3 className="mt-3 text-sm font-semibold text-[#101827] sm:mt-7 sm:text-lg">{title}</h3>
-        <p className="mt-2 hidden text-sm leading-6 text-[#647084] sm:block">{text}</p>
-      </div>
-    </li>
-  );
 }
 
 function ReviewPlaceholder({

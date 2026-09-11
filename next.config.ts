@@ -91,7 +91,7 @@ const contentSecurityPolicy = [
   `connect-src 'self' ${yandexMetrikaConnections}`,
   "media-src 'self' blob: https://d2avc2iz4eoo2p.cloudfront.net https://prnd-car-purchase.s3.ap-northeast-2.amazonaws.com",
   `child-src blob: ${yandexMetrikaOrigins.join(" ")}`,
-  `frame-src blob: https://d1mfhizjlo84v0.cloudfront.net ${yandexMetrikaOrigins.join(" ")}`,
+  `frame-src blob: https://d1mfhizjlo84v0.cloudfront.net https://yandex.ru https://maps.google.com https://www.google.com ${yandexMetrikaOrigins.join(" ")}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
