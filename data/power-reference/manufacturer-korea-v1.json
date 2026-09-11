@@ -861,6 +861,46 @@
       ]
     },
     {
+      "specKey": "genesis-g80-rg3-3.5t-3470-2021-badge",
+      "brand": "Genesis",
+      "model": "G80",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2021, 2021],
+      "power": { "value": 380, "unit": "PS", "kw": 279.489525 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Genesis The All-new G80 Korean launch — 3.5 Turbo, 380 PS",
+        "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000221",
+        "retrievedAt": "2026-09-11",
+        "note": "Genesis Korean launch material identifies the G80 3.5 Turbo at 3,470 cc and 380 PS. Exact badge and 2021-year matching prevents applying the value to other G80 engines."
+      },
+      "matches": [
+        { "badge": "Gasoline 3.5 Turbo AWD", "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 3460, "engineCcTo": 3480 }
+      ]
+    },
+    {
+      "specKey": "genesis-g80-rg3-3.5t-3470-2024-2025-badge",
+      "brand": "Genesis",
+      "model": "G80",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 3470,
+      "years": [2024, 2025],
+      "power": { "value": 380, "unit": "PS", "kw": 279.489525 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Genesis G80 facelift Korean specification — 3.5 Turbo, 380 PS",
+        "uri": "https://www.genesis.com/kr/ko/support/pr-center/detail.html?seq=0000000453",
+        "retrievedAt": "2026-09-11",
+        "note": "Genesis Korean facelift material reconfirms the G80 3.5 Turbo at 3,470 cc and 380 PS. Exact badge and 2024–2025-year matching is limited to AWD cards with the named 3.5 Turbo configuration."
+      },
+      "matches": [
+        { "badge": "Gasoline 3.5 Turbo AWD", "yearFrom": 2024, "yearTo": 2025, "engineCcFrom": 3460, "engineCcTo": 3480 }
+      ]
+    },
+    {
       "specKey": "genesis-g80-rg3-3.5t-3470-2022-2023",
       "brand": "Genesis",
       "model": "G80",
