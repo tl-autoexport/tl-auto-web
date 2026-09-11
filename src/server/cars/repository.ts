@@ -608,13 +608,13 @@ export async function getSitemapCars(): Promise<SitemapCar[]> {
 }
 
 async function fetchCarDetail(source: string, sourceId: string): Promise<CarDetail | null> {
-  if (buildWithoutCatalog || source !== "encar") return null;
+  if (buildWithoutCatalog || !["encar", "chestny_prigon"].includes(source)) return null;
 
   const supabase = createSupabaseServerRead();
   const { data, error } = await supabase
     .from("cars")
     .select(`${CATALOG_CAR_SELECT}, car_options(category, source_code, name_original, name_ru, value_original, value_ru, description_original, description_ru, is_present, sort_order), car_condition_reports(source, report_type, summary, items)`)
-    .in("primary_source", ["encar", "chestny_prigon"])
+    .eq("primary_source", source)
     .eq("source_id", sourceId)
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
     .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
