@@ -79,6 +79,7 @@
     "build:chestny:power-queue": "tsx scripts/build-chestny-power-review-queue.ts",
     "import:chestny:verified": "tsx scripts/import-verified-chestny-catalog.ts",
     "sync:chestny:images": "tsx scripts/sync-chestny-images.ts",
+    "enrich:chestny:encar": "tsx scripts/enrich-chestny-from-encar.ts",
     "archive:catalog": "tsx scripts/archive-current-catalog.ts",
     "restore:catalog": "tsx scripts/restore-catalog-archive.ts"
   },

@@ -8,8 +8,10 @@ export const ENCAR_HEADERS = {
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
   Accept: "application/json, text/plain, */*",
   "Accept-Language": "ko-KR,ko;q=0.9,en;q=0.8",
-  Referer: "https://car.encar.com/",
-  Origin: "https://car.encar.com",
+  // The readside endpoints are requested by the public FEM card.  Using its
+  // actual origin is also required by Encar's IP verification endpoint.
+  Referer: "https://fem.encar.com/",
+  Origin: "https://fem.encar.com",
 };
 
 type IpCheckResponse = { ipAddress?: string; ip?: string };
