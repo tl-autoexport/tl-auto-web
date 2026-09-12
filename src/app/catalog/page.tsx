@@ -119,17 +119,28 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     sort,
   };
 
-  const [totalCars, optionCars] = await Promise.all([
+  // Start the normal requested page immediately. Previously the page query
+  // waited for the count and the complete facets cache to finish first.
+  // Only an out-of-range page needs a second, corrected query.
+  const requestedCars = getCatalogCars({
+    ...filters,
+    limit: pageSize,
+    offset: (requestedPage - 1) * pageSize,
+  });
+  const [totalCars, optionCars, requestedShownCars] = await Promise.all([
     getCatalogCount(filters),
     getCatalogFacetCars(),
+    requestedCars,
   ]);
   const totalPages = Math.max(1, Math.ceil(totalCars / pageSize));
   const currentPage = Math.min(requestedPage, totalPages);
-  const shownCars = await getCatalogCars({
-    ...filters,
-    limit: pageSize,
-    offset: (currentPage - 1) * pageSize,
-  });
+  const shownCars = currentPage === requestedPage
+    ? requestedShownCars
+    : await getCatalogCars({
+      ...filters,
+      limit: pageSize,
+      offset: (currentPage - 1) * pageSize,
+    });
   const brands = unique(optionCars.map((car) => car.brand));
   const modelsByBrand = optionCars.reduce<Record<string, string[]>>((groups, car) => {
     if (!car.brand || !car.model) return groups;
