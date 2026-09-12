@@ -139,8 +139,12 @@ export default async function CarDetailPage({
       media.category !== "encar_inspection_document" &&
       media.category !== "exterior_360_thumbnail",
   );
-  const encarGalleryMedia = galleryMedia.filter((media) => media.source === "encar");
-  const displayGalleryMedia = encarGalleryMedia.length > 0 ? encarGalleryMedia : galleryMedia;
+  // Показываем полную галерею из всех доступных источников. Ранее при наличии
+  // хотя бы одной фотографии Encar мы отбрасывали изображения из
+  // `chestny_prigon`, из-за чего в карточке оставалось только пять фото.
+  const displayGalleryMedia = Array.from(
+    new Map(galleryMedia.map((media) => [media.url, media])).values(),
+  );
 
   return (
     <main className="min-h-screen bg-[#f4f5f7] text-[#121722]">
