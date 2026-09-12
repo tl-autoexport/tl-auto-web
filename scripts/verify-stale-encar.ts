@@ -1,23 +1,21 @@
 import { config } from "dotenv";
 import { createSupabaseAdmin } from "../src/server/supabase/admin";
-import { encarClient } from "../src/server/imports/encar-client";
-
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
-const ENCAR_DETAIL_URL = "https://api.encar.com/v1/readside/vehicle";
+const ENCAR_DETAIL_URL = "https://fem.encar.com/cars/detail";
+const DELETED_MARKERS = [
+  "이 차량은 판매되었거나 삭제된 차량입니다.",
+  "이 차량은 판매되었거나 삭제된 차량입니다",
+];
 type StaleCar = {
   id: string;
+  primary_source: string;
   source_id: string;
-  source_updated_at: string | null;
+  source_url: string | null;
+  last_checked_at: string | null;
   last_seen_at: string | null;
-};
-
-type EncarDetailPayload = {
-  manage?: {
-    modifyDateTime?: string;
-    firstAdvertisedDateTime?: string;
-  };
+  revalidation_miss_count: number;
 };
 
 function positiveInt(value: string | undefined, fallback: number) {
@@ -31,104 +29,85 @@ function sleep(ms: number) {
 
 async function main() {
   const dryRun = process.env.ENCAR_STALE_DRY_RUN !== "false";
-  const staleDays = positiveInt(process.env.ENCAR_STALE_DAYS, 60);
   const limit = Math.min(
     positiveInt(process.env.ENCAR_STALE_VERIFY_LIMIT, 250),
     1_000,
   );
-  const threshold = new Date(
-    Date.now() - staleDays * 24 * 60 * 60 * 1_000,
-  ).toISOString();
+  const concurrency = Math.min(positiveInt(process.env.ENCAR_STALE_CONCURRENCY, 3), 4);
+  const delayMs = Math.max(500, positiveInt(process.env.ENCAR_STALE_DELAY_MS, 1_000));
   const supabase = createSupabaseAdmin();
   const { data, error } = await supabase
     .from("cars")
-    .select("id, source_id, source_updated_at, last_seen_at")
-    .eq("primary_source", "encar")
+    .select("id, primary_source, source_id, source_url, last_checked_at, last_seen_at, revalidation_miss_count")
     .eq("is_available", true)
-    .or(`source_updated_at.is.null,source_updated_at.lt.${threshold}`)
-    .order("source_updated_at", { ascending: true, nullsFirst: true })
+    .in("primary_source", ["encar", "chestny_prigon"])
+    .not("source_url", "is", null)
+    .order("last_checked_at", { ascending: true, nullsFirst: true })
     .limit(limit);
 
   if (error) throw error;
   const candidates = (data ?? []) as StaleCar[];
   const confirmedUnavailable: StaleCar[] = [];
-  const active: Array<{ car: StaleCar; modifiedAt: string | null }> = [];
+  const active: StaleCar[] = [];
   const uncertain: Array<{ car: StaleCar; status?: number; error?: string }> = [];
 
-  for (const car of candidates) {
-    try {
-      const response = await encarClient.response(`${ENCAR_DETAIL_URL}/${car.source_id}`, {}, 1);
-      if (response.status === 404 || response.status === 410) {
-        confirmedUnavailable.push(car);
-      } else if (response.ok) {
-        const payload = (await response.json()) as EncarDetailPayload;
-        active.push({
-          car,
-          modifiedAt: payload.manage?.modifyDateTime ?? null,
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < candidates.length) {
+      const car = candidates[cursor++];
+      if (!car) return;
+      try {
+        const encarId = car.source_url?.match(/[?&]carid=(\d+)/i)?.[1] ?? car.source_id;
+        const response = await fetch(`${ENCAR_DETAIL_URL}/${encodeURIComponent(encarId)}`, {
+          headers: { accept: "text/html,application/xhtml+xml" },
+          signal: AbortSignal.timeout(15_000),
         });
-      } else {
-        uncertain.push({ car, status: response.status });
+        const html = await response.text();
+        const hasDeletedMarker = DELETED_MARKERS.some((marker) => html.includes(marker));
+        if (hasDeletedMarker) confirmedUnavailable.push(car);
+        else if (response.ok) active.push(car);
+        else uncertain.push({ car, status: response.status });
+      } catch (error) {
+        uncertain.push({ car, error: error instanceof Error ? error.message : String(error) });
       }
-    } catch (error) {
-      uncertain.push({
-        car,
-        error: error instanceof Error ? error.message : String(error),
-      });
+      await sleep(delayMs);
     }
-    await sleep(80);
-  }
+  };
+  await Promise.all(Array.from({ length: Math.min(concurrency, candidates.length) }, () => worker()));
 
+  let hidden = 0;
   if (!dryRun) {
     const checkedAt = new Date().toISOString();
-    const unavailableIds = confirmedUnavailable.map((car) => car.id);
-    for (let from = 0; from < unavailableIds.length; from += 100) {
-      const { error: updateError } = await supabase
-        .from("cars")
-        .update({
-          is_available: false,
-          sale_status: "source_unavailable",
-          last_seen_at: checkedAt,
-        })
-        .in("id", unavailableIds.slice(from, from + 100));
-      if (updateError) throw updateError;
-    }
-
-    for (const { car, modifiedAt } of active) {
-      const { error: updateError } = await supabase
-        .from("cars")
-        .update({
-          last_seen_at: checkedAt,
-          // This field is also the freshness cursor for the verifier. If the
-          // source has no modification timestamp, the successful live check
-          // itself is the latest authoritative freshness signal.
-          source_updated_at: modifiedAt ?? checkedAt,
-        })
-        .eq("id", car.id);
-      if (updateError) throw updateError;
-    }
+    const { data: revalidationData, error: revalidationError } = await supabase.rpc("apply_catalog_revalidation", {
+      p_found_source_ids: active.map((car) => car.source_id),
+      p_missing_source_ids: confirmedUnavailable.map((car) => car.source_id),
+      p_checked_at: checkedAt,
+      p_hide_after: 2,
+    });
+    if (revalidationError) throw revalidationError;
+    hidden = Number(revalidationData?.[0]?.hidden_count ?? 0);
   }
 
   console.log(
     JSON.stringify(
       {
         dryRun,
-        staleDays,
-        threshold,
+        concurrency,
+        delayMs,
         checked: candidates.length,
         confirmedUnavailable: confirmedUnavailable.length,
-        deactivated: dryRun ? 0 : confirmedUnavailable.length,
+        deactivated: hidden,
         active: active.length,
         uncertain: uncertain.length,
         unavailableSample: confirmedUnavailable.slice(0, 10).map((car) => ({
           sourceId: car.source_id,
-          sourceUpdatedAt: car.source_updated_at,
+          lastCheckedAt: car.last_checked_at,
           lastSeenAt: car.last_seen_at,
         })),
-        activeSample: active.slice(0, 5).map(({ car, modifiedAt }) => ({
+        activeSample: active.slice(0, 5).map((car) => ({
           sourceId: car.source_id,
-          storedUpdatedAt: car.source_updated_at,
+          lastCheckedAt: car.last_checked_at,
           storedLastSeenAt: car.last_seen_at,
-          sourceModifiedAt: modifiedAt,
         })),
         uncertainSample: uncertain.slice(0, 5).map(({ car, status, error }) => ({
           sourceId: car.source_id,
