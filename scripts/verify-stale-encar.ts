@@ -82,7 +82,7 @@ async function main() {
       p_found_source_ids: active.map((car) => car.source_id),
       p_missing_source_ids: confirmedUnavailable.map((car) => car.source_id),
       p_checked_at: checkedAt,
-      p_hide_after: 2,
+      p_hide_after: 1,
     });
     if (revalidationError) throw revalidationError;
     hidden = Number(revalidationData?.[0]?.hidden_count ?? 0);
