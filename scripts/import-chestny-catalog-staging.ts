@@ -36,6 +36,7 @@ type Vehicle = {
   fuel_type: string | null;
   transmission: string | null;
   drive_type: string | null;
+  exterior_color: string | null;
   body_type: string | null;
   location: string | null;
   vin_masked: string | null;
@@ -55,7 +56,7 @@ async function main() {
   const rows: Vehicle[] = [];
   for (let from = 0; from < limit; from += 1000) {
     const to = Math.min(from + 999, limit - 1);
-    const { data, error } = await source.from("vehicles").select("source_listing_id,manufacturer,model,generation,trim,model_year,first_registration_date,mileage_km,price_krw,engine_cc,fuel_type,transmission,drive_type,body_type,location,vin_masked,source_url,source_updated_at,last_seen_at,status").range(from, to);
+    const { data, error } = await source.from("vehicles").select("source_listing_id,manufacturer,model,generation,trim,model_year,first_registration_date,mileage_km,price_krw,engine_cc,fuel_type,transmission,drive_type,exterior_color,body_type,location,vin_masked,source_url,source_updated_at,last_seen_at,status").range(from, to);
     if (error) throw new Error(`Chesty source read failed: ${error.message}`);
     rows.push(...((data ?? []) as Vehicle[]));
     if (!data || data.length < 1000) break;
@@ -82,6 +83,7 @@ async function main() {
       fuel_type: row.fuel_type,
       transmission: row.transmission,
       drive_type: row.drive_type,
+      exterior_color: row.exterior_color,
       body_type: row.body_type,
       location: row.location,
       vin_masked: row.vin_masked,

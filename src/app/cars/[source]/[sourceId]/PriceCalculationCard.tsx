@@ -247,18 +247,20 @@ function RuPriceCalculationCard({
   return (
     <>
       <aside className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
-        <div className="flex items-center justify-between gap-3 text-xs font-semibold text-[#956f2c] sm:text-sm">
-          <div className="flex min-w-0 items-center gap-2">
-            <BadgeCheck className="size-4 shrink-0 sm:size-[18px]" />
-            <span className="truncate">Источник Encar</span>
-          </div>
+        <div>
+          <p className="whitespace-nowrap text-[30px] font-semibold leading-none tracking-tight text-[#121722] tabular-nums sm:text-3xl">
+            {money(total)}
+          </p>
+          <span className="mt-1.5 block text-xs text-[#647084] sm:text-sm">
+            Цена под ключ до {city.label}
+          </span>
         </div>
-        <h1 className="mt-2 line-clamp-2 text-2xl font-semibold leading-[1.12] text-[#121722] sm:mt-3 sm:text-3xl">
+        <h1 className="mt-4 line-clamp-2 text-2xl font-semibold leading-[1.12] text-[#121722] sm:mt-5 sm:text-3xl">
           {title}
         </h1>
         <p className="mt-1.5 text-[13px] text-[#647084] sm:mt-2 sm:text-sm">
           {formatVehicleYear(year)} · {rub.format(mileageKm ?? 0)} км ·{" "}
-          {formatEngineCapacity(engineCc)}
+          {formatEngineCapacity(engineCc)} · {fuel}
         </p>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -274,15 +276,6 @@ function RuPriceCalculationCard({
           <span>Оплата</span>
           <span className="inline-flex min-h-10 items-center gap-2 rounded border border-[#d8dde6] px-3 py-2 font-medium text-[#121722]">
             ₽ в рублях <ChevronDown size={16} />
-          </span>
-        </div>
-
-        <div className="mt-4 sm:mt-5">
-          <p className="whitespace-nowrap text-[30px] font-semibold leading-none tracking-tight text-[#121722] tabular-nums sm:text-3xl">
-            {money(total)}
-          </p>
-          <span className="mt-1.5 block text-xs text-[#647084] sm:text-sm">
-            под ключ до {city.label}
           </span>
         </div>
 

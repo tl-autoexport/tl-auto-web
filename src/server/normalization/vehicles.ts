@@ -218,38 +218,72 @@ const MODEL_MAP: Record<string, string> = {
 };
 
 const COLOR_MAP: Record<string, string> = {
+  // Белый / светлые
   흰색: "Белый",
   백색: "Белый",
   화이트: "Белый",
+  진주색: "Белый",
+  펄: "Белый",
+  // Чёрный
   검정색: "Черный",
   검은색: "Черный",
+  검정: "Черный",
   블랙: "Черный",
+  // Серый / серебристый
+  진회색: "Темно-серый",
+  쥐색: "Темно-серый",
+  시멘트: "Серый",
   회색: "Серый",
   그레이: "Серый",
-  쥐색: "Темно-серый",
-  은색: "Серебристый",
   은하색: "Серебристый",
+  은색: "Серебристый",
   실버: "Серебристый",
-  파란색: "Синий",
-  청색: "Синий",
-  빨간색: "Красный",
-  적색: "Красный",
-  갈색: "Коричневый",
-  녹색: "Зеленый",
-  베이지: "Бежевый",
-  카키: "Хаки",
+  // Синий / голубой
+  하늘색: "Голубой",
+  청록색: "Темно-синий",
   네이비: "Темно-синий",
   남색: "Темно-синий",
-  블루: "Синий",
+  파란색: "Синий",
   파랑: "Синий",
+  청색: "Синий",
+  블루: "Синий",
+  하늘: "Голубой",
+  // Красный / бордовый
+  빨간색: "Красный",
+  적색: "Красный",
+  레드: "Красный",
+  버건디: "Бордовый",
+  보르도: "Бордовый",
+  와인: "Бордовый",
+  // Коричневый / бежевый
+  갈색: "Коричневый",
+  브라운: "Коричневый",
+  갈대색: "Бежевый",
+  상아색: "Бежевый",
+  베이지: "Бежевый",
+  크림: "Бежевый",
+  // Зелёный
+  초록색: "Зеленый",
+  연두색: "Зеленый",
+  녹색: "Зеленый",
+  그린: "Зеленый",
+  카키: "Хаки",
+  // Жёлтый / золотистый
   노란색: "Желтый",
+  노랑: "Желтый",
   옐로: "Желтый",
+  금색: "Золотистый",
+  골드: "Золотистый",
+  // Оранжевый
   주황색: "Оранжевый",
   오렌지: "Оранжевый",
+  // Фиолетовый / розовый
   보라색: "Фиолетовый",
+  자주색: "Фиолетовый",
   퍼플: "Фиолетовый",
-  와인: "Бордовый",
-  골드: "Золотистый",
+  분홍색: "Розовый",
+  핑크: "Розовый",
+  // Прочее
   민트: "Мятный",
 };
 
@@ -1253,17 +1287,27 @@ export function resolveEngineCc(input: VehicleIdentityInput) {
   return VERIFIED_MODEL_ENGINE_MAP[modelEngineKey(brand, model)] ?? null;
 }
 
+const COLOR_MODIFIERS: Array<{ pattern: RegExp; label: string }> = [
+  { pattern: /매트|matte/i, label: "Матовый" },
+  { pattern: /진주|펄|pearl/i, label: "Перламутровый" },
+  { pattern: /투톤|two[\s-]?tone|2톤/i, label: "Двухцветный" },
+];
+
 export function normalizeColor(value: unknown) {
   const raw = String(value ?? "").trim();
   if (!raw) return null;
+  const haystack = raw.toLowerCase();
 
   const baseColor = Object.entries(COLOR_MAP)
     .sort(([left], [right]) => right.length - left.length)
-    .find(([source]) => raw.includes(source))?.[1];
+    .find(([source]) => haystack.includes(source.toLowerCase()))?.[1];
 
   if (baseColor) {
-    return raw.includes("매트")
-      ? `Матовый ${baseColor.toLowerCase()}`
+    const modifiers = COLOR_MODIFIERS.filter(({ pattern }) => pattern.test(raw)).map(
+      ({ label }) => label,
+    );
+    return modifiers.length
+      ? `${modifiers.join(" ")} ${baseColor.toLowerCase()}`
       : baseColor;
   }
 
@@ -1366,21 +1410,50 @@ function normalizeBadgeForPower(value: unknown) {
     .trim();
 }
 
+const FOUR_WHEEL_TOKENS = [
+  "4wd",
+  "awd",
+  "4x4",
+  "xdrive",
+  "quattro",
+  "콰트로",
+  "4matic",
+  "4motion",
+  "htrac",
+  "e-awd",
+  "eawd",
+  "4륜",
+  "사륜",
+  "풀타임",
+  "파트타임",
+];
+
 export function normalizeDrive(value: unknown) {
   const text = normalizeText(value);
   if (!text) return null;
-  if (
-    text.includes("4wd") ||
-    text.includes("awd") ||
-    text.includes("xdrive") ||
-    text.includes("quattro") ||
-    text.includes("콰트로")
-  )
-    return "4WD";
-  if (text.includes("2wd")) return "2WD";
-  if (text.includes("fwd")) return "FWD";
-  if (text.includes("rwd")) return "RWD";
+  if (FOUR_WHEEL_TOKENS.some((token) => text.includes(token))) return "4WD";
+  if (text.includes("후륜") || text.includes("rwd")) return "RWD";
+  if (text.includes("전륜") || text.includes("fwd")) return "FWD";
+  if (text.includes("2륜") || text.includes("2wd")) return "2WD";
   return null;
+}
+
+const TWO_WHEEL_DRIVE = new Set(["2wd", "fwd", "rwd"]);
+
+/**
+ * FWD and RWD are both two-wheel-drive variants, so a reference row marked
+ * only "2WD" must still match a card that states the axle explicitly. A
+ * missing value on either side stays unrestricted.
+ */
+export function driveTypesCompatible(
+  reference: string | null | undefined,
+  actual: string | null | undefined,
+) {
+  if (!reference || !actual) return true;
+  const left = normalizeText(reference);
+  const right = normalizeText(actual);
+  if (left === right) return true;
+  return TWO_WHEEL_DRIVE.has(left) && TWO_WHEEL_DRIVE.has(right);
 }
 
 function badgeMatches(inputBadge: string, specBadge: string) {
@@ -1410,8 +1483,7 @@ function findVerifiedSpec(input: VehicleIdentityInput) {
       if (normalizeText(item.model) !== normalizeText(model)) return false;
       if (item.engineCc !== engineCc) return false;
       if (item.fuelType && fuelType && item.fuelType !== fuelType) return false;
-      if (item.driveType && driveType && item.driveType !== driveType)
-        return false;
+      if (!driveTypesCompatible(item.driveType, driveType)) return false;
       if (year && item.minYear && year < item.minYear) return false;
       if (year && item.maxYear && year > item.maxYear) return false;
       return badgeMatches(badgeText, item.badgeDetail);

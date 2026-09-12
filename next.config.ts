@@ -129,6 +129,12 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  async rewrites() {
+    return [{
+      source: "/cars/korea/:sourceId",
+      destination: "/cars/chestny_prigon/:sourceId",
+    }];
+  },
   turbopack: {
     root: process.cwd(),
   },

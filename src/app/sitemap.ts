@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/lib/site-url";
 import { getSitemapCars } from "@/server/cars/repository";
+import { publicCarPath } from "@/lib/car-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
@@ -29,7 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     ...cars.map((car) => ({
       url: new URL(
-        `/cars/${encodeURIComponent(car.primary_source)}/${encodeURIComponent(car.source_id)}`,
+        publicCarPath(car.primary_source, car.source_id),
         siteUrl,
       ).toString(),
       lastModified: car.source_updated_at ?? undefined,

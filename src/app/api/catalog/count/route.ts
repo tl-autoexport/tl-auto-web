@@ -18,7 +18,6 @@ export async function GET(request: Request) {
     registrationMonth: numberParam(params.get("month")),
     trim: params.get("trim") || undefined,
     bodyType: params.get("body") || undefined,
-    driveType: params.get("drive") || undefined,
     color: params.get("color") || undefined,
     minOwners: numberParam(params.get("ownersMin")),
     maxOwners: numberParam(params.get("ownersMax")),

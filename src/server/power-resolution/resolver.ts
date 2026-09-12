@@ -7,6 +7,8 @@
  * result stays transparent instead of being guessed from engine displacement.
  */
 
+import { driveTypesCompatible } from "../normalization/vehicles";
+
 export type PowerConfidence = "official" | "high" | "automatic";
 export type PowerBasis = "combustion_engine" | "electric_30min" | "parallel_sum";
 
@@ -100,7 +102,7 @@ function matchesInput(candidate: ApprovedPowerCandidate, input: PowerReferenceIn
     exactOrUnrestricted(match.modelCode, input.modelCode) &&
     exactOrUnrestricted(match.engineCode, input.engineCode) &&
     exactOrUnrestricted(match.fuelType, input.fuelType) &&
-    exactOrUnrestricted(match.driveType, input.driveType) &&
+    driveTypesCompatible(match.driveType, input.driveType) &&
     rangeOrUnrestricted(input.year, match.productionYearFrom, match.productionYearTo) &&
     rangeOrUnrestricted(input.engineCc, match.engineCcFrom, match.engineCcTo)
   );

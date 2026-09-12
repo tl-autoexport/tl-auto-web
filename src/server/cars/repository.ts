@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { createSupabaseAdmin } from "@/server/supabase/admin";
 import { createSupabasePublic } from "@/server/supabase/public";
+import { normalizeColor, normalizeDrive } from "@/server/normalization/vehicles";
 
 const buildWithoutCatalog =
   process.env.TL_AUTO_BUILD_WITHOUT_CATALOG === "true";
@@ -47,6 +48,7 @@ export type CatalogCar = {
   source_updated_at: string | null;
   vehicle_specs?: Record<string, unknown>;
   car_media?: Array<{
+    source: string;
     url: string;
     thumbnail_url: string | null;
     media_type: string;
@@ -57,7 +59,7 @@ export type CatalogCar = {
 };
 
 const CATALOG_CAR_SELECT =
-  "id, primary_source, source_kind, source_id, source_url, published_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(url, thumbnail_url, media_type, category, is_primary, sort_order)";
+  "id, primary_source, source_kind, source_id, source_url, published_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(source, url, thumbnail_url, media_type, category, is_primary, sort_order)";
 
 export type CarDetail = CatalogCar & {
   car_options?: Array<{
@@ -281,7 +283,12 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     console.error("[cars] Catalog query failed", error);
     throw error;
   }
-  return (data ?? []).map((car) => ({ ...car, vehicle_type: "car" as const })) as CatalogCar[];
+  return (data ?? []).map((car) => ({
+    ...car,
+    vehicle_type: "car" as const,
+    color: normalizeColor(car.color),
+    drive_type: normalizeDrive(car.drive_type),
+  })) as CatalogCar[];
 }
 
 export async function getCatalogCount(filters: CatalogFilters = {}): Promise<number> {
@@ -448,9 +455,13 @@ function mapPassoStagingRow(row: {
       power_hp: null,
       fuel_type: typeof row.vehicle_specs?.fuel === "string" ? row.vehicle_specs.fuel : null,
       transmission: typeof row.vehicle_specs?.transmission === "string" ? row.vehicle_specs.transmission : null,
-      drive_type: null,
+      drive_type: normalizeDrive(
+        [row.vehicle_specs?.drive_type, row.vehicle_specs?.drive, row.vehicle_specs?.driveType]
+          .filter((value): value is string => typeof value === "string")
+          .join(" "),
+      ),
       body_type: null,
-      color: typeof row.vehicle_specs?.color === "string" ? row.vehicle_specs.color : null,
+      color: normalizeColor(row.vehicle_specs?.color ?? row.vehicle_specs?.exterior_color),
       owners_count: null,
       accident_count: null,
       insurance_payout_count: null,
@@ -667,6 +678,8 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
   return {
     ...data,
     vehicle_type: "car",
+    color: normalizeColor(data.color),
+    drive_type: normalizeDrive(data.drive_type),
     car_condition_reports: (data.car_condition_reports ?? []).map((report) => ({
       ...report,
       raw_payload: rawPayloadByReportType.get(report.report_type) ?? null,

@@ -934,7 +934,14 @@ async function mapCar(
     return null;
   }
   const driveType = normalizeDrive(
-    [listCar.Badge, listCar.BadgeDetail].filter(Boolean).join(" "),
+    [
+      listCar.Badge,
+      listCar.BadgeDetail,
+      detail?.gradeEnglish,
+      detail?.gradeDetailEnglish,
+    ]
+      .filter(Boolean)
+      .join(" "),
   );
   const powerInput = {
     brand,

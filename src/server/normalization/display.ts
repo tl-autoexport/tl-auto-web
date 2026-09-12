@@ -336,6 +336,22 @@ export function translateTransmission(value: string | null | undefined) {
   return cleanDisplay(value);
 }
 
+export function translateColor(value: string | null | undefined) {
+  const raw = String(value ?? "").trim();
+  const map: Record<string, string> = {
+    "흰색": "Белый",
+    "검정색": "Чёрный",
+    "은색": "Серебристый",
+    "회색": "Серый",
+    "파란색": "Синий",
+    "빨간색": "Красный",
+    "갈색": "Коричневый",
+    "베이지색": "Бежевый",
+    "녹색": "Зелёный",
+  };
+  return map[raw] ?? cleanDisplay(value);
+}
+
 export function translateOption(value: string | null | undefined) {
   const text = String(value ?? "").trim();
   if (!text) return null;

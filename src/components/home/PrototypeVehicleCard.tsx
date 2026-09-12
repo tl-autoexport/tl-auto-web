@@ -9,7 +9,8 @@ import {
 import { RemoteImage } from "@/components/site/RemoteImage";
 import { useDestination } from "@/components/site/DestinationProvider";
 import { vehicleClientMessage, whatsappContactUrl } from "@/lib/contact";
-import { translateFuel } from "@/server/normalization/display";
+import { publicCarPath } from "@/lib/car-url";
+import { translateFuel, translateTransmission } from "@/server/normalization/display";
 import type { CatalogCar } from "@/server/cars/repository";
 
 const rub = new Intl.NumberFormat("ru-RU");
@@ -53,14 +54,16 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
   );
   const [shareNotice, setShareNotice] = useState("");
   const title = [car.brand, car.model].filter(Boolean).join(" ") || "Автомобиль из Кореи";
-  const detailsHref = `/cars/${car.primary_source}/${car.source_id}`;
+  const detailsHref = publicCarPath(car.primary_source, car.source_id);
   const message = vehicleClientMessage({ source: car.primary_source, sourceId: car.source_id, title });
-  const seats = typeof car.vehicle_specs?.seats === "number" ? `${car.vehicle_specs.seats} мест` : null;
+  const seats = typeof car.vehicle_specs?.seats === "number" && car.vehicle_specs.seats > 0
+    ? `${car.vehicle_specs.seats} мест`
+    : null;
   const primaryFacts = [
     car.brand,
     car.model,
     car.engine_cc ? `${engine.format(car.engine_cc / 1000)} л` : null,
-    car.transmission,
+    car.transmission ? translateTransmission(car.transmission) : null,
     car.year ? `${car.year} г.` : null,
     car.mileage_km ? `${rub.format(car.mileage_km)} км` : null,
   ].filter((value): value is string => Boolean(value));
@@ -68,9 +71,8 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
     car.trim || car.badge,
     car.fuel_type ? translateFuel(car.fuel_type) : null,
     car.power_hp ? `${car.power_hp} л.с.` : null,
-    car.drive_type,
     bodyShapeForCard(car),
-    seats ?? "Места уточняются",
+    seats,
   ].filter((value): value is string => Boolean(value));
   const saleDays = daysOnSale(car);
   const isVladivostokPrice = country.countryCode === "RU" && city.id === "vladivostok";

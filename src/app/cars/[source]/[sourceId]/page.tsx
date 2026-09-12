@@ -18,11 +18,13 @@ import {
   getShowcasePhoto,
 } from "@/server/cars/repository";
 import {
+  categorizeOption,
   carDisplayTitle,
   translateHeyDealerNote,
   translateHeyDealerText,
   translateConditionDescription,
   translateConditionLabel,
+  translateColor,
   translateFuel,
   translateOption,
   translateTransmission,
@@ -33,6 +35,7 @@ import type { ThermalEntry, ThermalReference } from "./thermalTypes";
 import { PriceCalculationCard } from "./PriceCalculationCard";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
+import { publicCarPath } from "@/lib/car-url";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const getCachedCarDetail = cache(getCarDetail);
@@ -68,7 +71,7 @@ export async function generateMetadata({
       : null,
   ].filter(Boolean);
   const description = `${title}: ${details.join(", ")}. Фотографии, характеристики, история и расчёт стоимости для России.`;
-  const canonical = `/cars/${encodeURIComponent(source)}/${encodeURIComponent(sourceId)}`;
+  const canonical = publicCarPath(car.primary_source, sourceId);
   const photo = getShowcasePhoto(car);
 
   return {
@@ -136,6 +139,8 @@ export default async function CarDetailPage({
       media.category !== "encar_inspection_document" &&
       media.category !== "exterior_360_thumbnail",
   );
+  const encarGalleryMedia = galleryMedia.filter((media) => media.source === "encar");
+  const displayGalleryMedia = encarGalleryMedia.length > 0 ? encarGalleryMedia : galleryMedia;
 
   return (
     <main className="min-h-screen bg-[#f4f5f7] text-[#121722]">
@@ -152,7 +157,7 @@ export default async function CarDetailPage({
                   ? [`Страховые выплаты: ${car.insurance_payout_count}`]
                   : []),
               ]}
-              images={galleryMedia.length ? galleryMedia : imageMedia}
+              images={displayGalleryMedia.length ? displayGalleryMedia : imageMedia}
               title={title}
             />
           </div>
@@ -189,8 +194,10 @@ export default async function CarDetailPage({
                   label="КПП"
                   value={translateTransmission(car.transmission)}
                 />
-                <Spec label="Привод" value={car.drive_type ?? "-"} />
-                <Spec label="Цвет" value={car.color ?? "-"} />
+                <Spec label="Цвет" value={translateColor(car.color)} />
+                {typeof car.vehicle_specs?.seats === "number" && car.vehicle_specs.seats > 0 ? (
+                  <Spec label="Места" value={`${car.vehicle_specs.seats} мест`} />
+                ) : null}
               </div>
             </div>
 
@@ -840,7 +847,9 @@ function buildOptionGroups(rows: OptionRow[]) {
   for (const option of [...rows].sort((a, b) => a.sort_order - b.sort_order)) {
     const name = option.name_ru ?? translateOption(option.name_original);
     if (!name) continue;
-    const category = option.category || "Другое";
+    const category = option.category?.startsWith("Опции Encar")
+      ? categorizeOption(option.name_original, name)
+      : option.category || "Другое";
     const key = `${category}:${name}`.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);

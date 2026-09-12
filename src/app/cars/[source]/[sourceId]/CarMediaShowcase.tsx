@@ -6,6 +6,7 @@ import { useDialogAccessibility } from "@/components/site/useDialogAccessibility
 import { RemoteImage } from "@/components/site/RemoteImage";
 
 type Media = {
+  source: string;
   url: string;
   thumbnail_url: string | null;
   media_type: string;
@@ -36,8 +37,6 @@ export function CarMediaShowcase({
   const mobilePhotoTouchStartX = useRef<number | null>(null);
   const suppressMobilePhotoClick = useRef(false);
   const selectedImage = images[selected] ?? images[0] ?? null;
-  const previewImages = images.length > 6 ? images.slice(0, 5) : images.slice(0, 6);
-  const hiddenImagesCount = images.length > 6 ? images.length - previewImages.length : 0;
   const filteredIndexes = useMemo(
     () =>
       images
@@ -266,11 +265,11 @@ export function CarMediaShowcase({
 
       {images.length > 0 && (
         <div className="hidden border-t border-[#edf0f5] p-3 sm:block">
-          <div className="scrollbar-none flex snap-x gap-2 overflow-x-auto pb-0.5 sm:grid sm:grid-cols-6 sm:overflow-visible">
-            {previewImages.map((media, index) => (
+          <div className="scrollbar-none flex snap-x gap-2 overflow-x-auto pb-0.5">
+            {images.map((media, index) => (
               <button
                 aria-label={`Открыть фото ${index + 1}: ${mediaCategoryLabel(media.category)}`}
-                className={`relative aspect-[7/5] w-[88px] shrink-0 snap-start overflow-hidden rounded bg-[#dfe4ec] ring-offset-2 transition sm:w-auto sm:min-w-0 ${
+                className={`relative aspect-[7/5] w-[112px] shrink-0 snap-start overflow-hidden rounded bg-[#dfe4ec] ring-offset-2 transition ${
                   mode === "photo" && index === selected ? "ring-2 ring-[#956f2c]" : "ring-1 ring-[#d8dde6]"
                 }`}
                 key={media.url}
@@ -284,6 +283,7 @@ export function CarMediaShowcase({
                   alt={title}
                   className="object-cover"
                   fill
+                  loading="lazy"
                   sizes="112px"
                   src={media.thumbnail_url ?? media.url}
                   fallback="Нет фото"
@@ -293,32 +293,6 @@ export function CarMediaShowcase({
                 </span>
               </button>
             ))}
-            {hiddenImagesCount > 0 && (
-              <button
-                aria-label={`Открыть остальные фотографии, ещё ${hiddenImagesCount}`}
-                className="relative aspect-[7/5] w-[88px] shrink-0 snap-start overflow-hidden rounded bg-[#1a202b] text-white ring-1 ring-[#d8dde6] ring-offset-2 sm:w-auto sm:min-w-0"
-                onClick={() => {
-                  setSelected(previewImages.length);
-                  setGalleryAlbum("all");
-                  setMode("photo");
-                  setGalleryOpen(true);
-                }}
-                type="button"
-              >
-                <RemoteImage
-                  alt=""
-                  className="object-cover opacity-45"
-                  fill
-                  sizes="112px"
-                  src={images[previewImages.length]?.thumbnail_url ?? images[previewImages.length]?.url}
-                  fallback="Нет фото"
-                />
-                <span className="absolute inset-0 flex flex-col items-center justify-center text-xs font-bold sm:text-sm">
-                  <Images size={18} />
-                  Ещё {hiddenImagesCount}
-                </span>
-              </button>
-            )}
           </div>
         </div>
       )}

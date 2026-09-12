@@ -2,16 +2,24 @@ import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
 import {
+  categorizeOption,
   translateInspectionLabel,
   translateInspectionStatus,
   translateOption,
 } from "../src/server/normalization/display";
+import {
+  normalizeColor,
+  normalizeDrive,
+  normalizeFuel,
+} from "../src/server/normalization/vehicles";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const chestnyUrl = process.env.CHESTNY_SUPABASE_URL;
+const chestnyKey = process.env.CHESTNY_SUPABASE_SERVICE_ROLE_KEY;
 const write = process.env.CHESTNY_ENCAR_ENRICH_DRY_RUN === "false";
 const requestedIds = (process.env.CHESTNY_ENCAR_ENRICH_IDS ?? "")
   .split(",").map((value) => value.trim()).filter(Boolean);
@@ -22,7 +30,14 @@ const force = process.env.CHESTNY_ENCAR_ENRICH_FORCE === "true";
 if (!url || !key) throw new Error("TL Auto Supabase admin credentials are required");
 
 type RecordValue = Record<string, unknown>;
-type Car = { id: string; source_id: string; source_url: string | null; brand: string | null; model: string | null };
+type Car = {
+  id: string; source_id: string; source_url: string | null; brand: string | null; model: string | null;
+  fuel_type: string | null; drive_type: string | null; color: string | null; vehicle_specs: RecordValue | null;
+};
+type ChestnyVehicle = {
+  source_listing_id: string; fuel_type: string | null; drive_type: string | null; exterior_color: string | null;
+  trim: string | null; generation: string | null;
+};
 type StandardOption = {
   optionCd?: string; optionName?: string; optionTitle?: string; groupOptionName?: string;
   optionTypeCd?: string; sort?: number; description?: string; subOptions?: StandardOption[];
@@ -30,8 +45,14 @@ type StandardOption = {
 
 function object(value: unknown): RecordValue { return value && typeof value === "object" ? value as RecordValue : {}; }
 function text(value: unknown) { return typeof value === "string" && value.trim() ? value.trim() : null; }
+function number(value: unknown) { return typeof value === "number" && Number.isFinite(value) ? value : null; }
 function encarId(sourceUrl: string | null) { return sourceUrl?.match(/[?&]carid=(\d+)/i)?.[1] ?? null; }
 function imageUrl(path: string) { return path.startsWith("http") ? path : `https://ci.encar.com${path}`; }
+function photoCategory(value: unknown) {
+  const type = text(value)?.toLowerCase();
+  if (type === "outer" || type === "inner" || type === "option" || type === "thumbnail") return type;
+  return "photo";
+}
 
 async function getJson<T>(requestUrl: string): Promise<T> {
   // Encar's public FEM card reads these endpoints directly.  Do not use the
@@ -64,7 +85,7 @@ function selectedOptions(catalog: StandardOption[], codes: string[]) {
     const nameOriginal = option.optionTitle ?? option.groupOptionName ?? option.optionName ?? null;
     const values = subOptions.map((sub) => sub.groupOptionName ?? sub.optionName).filter((value): value is string => Boolean(value));
     return [{
-      source: "encar", category: `Опции Encar · ${option.optionTypeCd ?? "прочее"}`, source_code: option.optionCd ?? null,
+      source: "encar", category: categorizeOption(nameOriginal, translateOption(nameOriginal)), source_code: option.optionCd ?? null,
       name_original: nameOriginal, name_ru: translateOption(nameOriginal), value_original: values.join(", ") || null,
       value_ru: values.map(translateOption).filter(Boolean).join(", ") || null, description_original: option.description ?? null,
       description_ru: null, price_krw: null, is_present: true, sort_order: Number(option.sort ?? index),
@@ -76,7 +97,7 @@ async function main() {
   const db = createClient(url!, key!, { auth: { persistSession: false, autoRefreshToken: false } });
   const cars: Car[] = [];
   for (let from = 0; from < limit; from += 1000) {
-    let query = db.from("cars").select("id,source_id,source_url,brand,model").eq("primary_source", "chestny_prigon").eq("is_available", true).order("source_id").range(from, Math.min(from + 999, limit - 1));
+    let query = db.from("cars").select("id,source_id,source_url,brand,model,fuel_type,drive_type,color,vehicle_specs").eq("primary_source", "chestny_prigon").eq("is_available", true).order("source_id").range(from, Math.min(from + 999, limit - 1));
     if (requestedIds.length) query = query.in("source_id", requestedIds);
     const { data, error } = await query; if (error) throw error;
     cars.push(...((data ?? []) as Car[])); if (!data || data.length < 1000 || requestedIds.length) break;
@@ -89,7 +110,38 @@ async function main() {
     .limit(10_000);
   if (existingReportsError) throw existingReportsError;
   const enrichedCarIds = new Set((existingReports ?? []).map((report) => String(report.car_id)));
-  const selectedCars = force || requestedIds.length ? cars : cars.filter((car) => !enrichedCarIds.has(car.id));
+  const { data: existingGalleries, error: existingGalleriesError } = await db
+    .from("car_media")
+    .select("car_id")
+    .eq("source", "encar")
+    .in("category", ["outer", "inner", "option", "thumbnail", "photo"])
+    .limit(20_000);
+  if (existingGalleriesError) throw existingGalleriesError;
+  const galleryCarIds = new Set((existingGalleries ?? []).map((media) => String(media.car_id)));
+  const selectedCars = force || requestedIds.length
+    ? cars
+    : cars.filter((car) => {
+      const seats = number(object(car.vehicle_specs).seats);
+      // Metadata import must not be skipped just because the inspection report
+      // and photo gallery were loaded in an earlier pass.
+      const metadataIncomplete = !seats || !car.color || !car.drive_type;
+      return metadataIncomplete || !enrichedCarIds.has(car.id) || !galleryCarIds.has(car.id);
+    });
+  // Chesty is the source used to publish these cards.  It retains the original
+  // exterior colour and, where supplied, the drive type.  Encar's exact card
+  // supplements it with seat count and a current fuel/color confirmation.
+  const chestnyBySourceId = new Map<string, ChestnyVehicle>();
+  if (chestnyUrl && chestnyKey && selectedCars.length) {
+    const chestny = createClient(chestnyUrl, chestnyKey, { auth: { persistSession: false, autoRefreshToken: false } });
+    for (let offset = 0; offset < selectedCars.length; offset += 200) {
+      const sourceIds = selectedCars.slice(offset, offset + 200).map((car) => car.source_id);
+      const { data, error } = await chestny.from("vehicles")
+        .select("source_listing_id,fuel_type,drive_type,exterior_color,trim,generation")
+        .in("source_listing_id", sourceIds);
+      if (error) throw new Error(`Chesty metadata read failed: ${error.message}`);
+      for (const row of (data ?? []) as ChestnyVehicle[]) chestnyBySourceId.set(row.source_listing_id, row);
+    }
+  }
   const catalog = await getJson<{ options?: StandardOption[] }>("https://api.encar.com/v1/readside/vehicles/car/options/standard");
   const results: Array<RecordValue> = []; let cursor = 0;
 
@@ -98,6 +150,19 @@ async function main() {
     if (!id) return { sourceId: car.source_id, status: "missing_encar_id" };
     try {
       const detail = object(await getJson<unknown>(`https://api.encar.com/v1/readside/vehicle/${id}`));
+      const spec = object(detail.spec);
+      const category = object(detail.category);
+      const chestny = chestnyBySourceId.get(car.source_id);
+      const seats = number(spec.seatCount);
+      const fuelType = normalizeFuel(text(spec.fuelName) ?? chestny?.fuel_type ?? car.fuel_type);
+      const color = normalizeColor(text(spec.colorName) ?? chestny?.exterior_color ?? car.color);
+      // A bare 2WD cannot be truthfully turned into front/rear drive.  Store
+      // only a source-provided or explicitly named drive, never a model guess.
+      const driveType = normalizeDrive([
+        chestny?.drive_type, chestny?.trim, chestny?.generation, car.drive_type,
+        text(category.gradeEnglishName), text(category.gradeDetailEnglishName),
+      ].filter(Boolean).join(" ")) ?? car.drive_type;
+      const vehicleSpecs = { ...object(car.vehicle_specs), ...(seats && seats > 0 ? { seats } : {}) };
       const condition = object(detail.condition); const inspectionCondition = object(condition.inspection);
       const formats = Array.isArray(inspectionCondition.formats) ? inspectionCondition.formats : [];
       const [inspection, summary, choices] = await Promise.all([
@@ -111,11 +176,15 @@ async function main() {
         : [];
       const options = [
         ...selectedOptions(catalog.options ?? [], optionCodes),
-        ...choices.map((option, index) => ({ source: "encar", category: "Дополнительные опции", source_code: null, name_original: option.optionName ?? null, name_ru: translateOption(option.optionName), value_original: null, value_ru: null, description_original: null, description_ru: null, price_krw: option.price ?? null, is_present: true, sort_order: 1000 + index })),
+        ...choices.map((option, index) => ({ source: "encar", category: categorizeOption(option.optionName, translateOption(option.optionName)), source_code: null, name_original: option.optionName ?? null, name_ru: translateOption(option.optionName), value_original: null, value_ru: null, description_original: null, description_ru: null, price_krw: option.price ?? null, is_present: true, sort_order: 1000 + index })),
       ];
       const inspectionData = object(inspection); const master = object(inspectionData.master); const masterDetail = object(master.detail);
       const images = Array.isArray(inspectionData.images) ? inspectionData.images.flatMap((value, index) => {
         const item = object(value); const path = text(item.path); return path ? [{ car_id: car.id, source: "encar", media_type: "image", category: "encar_inspection_document", url: imageUrl(path), thumbnail_url: imageUrl(path), sort_order: 2000 + index, is_primary: false, legal_mode: "external_url" }] : [];
+      }) : [];
+      const galleryImages = Array.isArray(detail.photos) ? detail.photos.flatMap((value, index) => {
+        const item = object(value); const path = text(item.path);
+        return path ? [{ car_id: car.id, source: "encar", media_type: "image", category: photoCategory(item.type), url: imageUrl(path), thumbnail_url: imageUrl(path), sort_order: index, is_primary: index === 0, legal_mode: "external_url" }] : [];
       }) : [];
       const report = inspection ? {
         car_id: car.id, source: "encar", report_type: "encar_inspection",
@@ -129,14 +198,29 @@ async function main() {
         if (report) { const { error } = await db.from("car_condition_reports").insert(report); if (error) throw error; }
         const { error: mediaDeleteError } = await db.from("car_media").delete().eq("car_id", car.id).eq("source", "encar").eq("category", "encar_inspection_document"); if (mediaDeleteError) throw mediaDeleteError;
         if (images.length) { const { error } = await db.from("car_media").insert(images); if (error) throw error; }
-        const vehicleNo = text(detail.vehicleNo); if (vehicleNo) { const { error } = await db.from("cars").update({ vehicle_no_masked: vehicleNo }).eq("id", car.id); if (error) throw error; }
+        const { error: galleryDeleteError } = await db.from("car_media").delete().eq("car_id", car.id).eq("source", "encar").in("category", ["outer", "inner", "option", "thumbnail", "photo"]); if (galleryDeleteError) throw galleryDeleteError;
+        if (galleryImages.length) { const { error } = await db.from("car_media").insert(galleryImages); if (error) throw error; }
+        const vehicleNo = text(detail.vehicleNo);
+        const { error: carUpdateError } = await db.from("cars").update({
+          ...(vehicleNo ? { vehicle_no_masked: vehicleNo } : {}),
+          ...(fuelType ? { fuel_type: fuelType } : {}),
+          ...(color ? { color } : {}),
+          ...(driveType ? { drive_type: driveType } : {}),
+          vehicle_specs: vehicleSpecs,
+        }).eq("id", car.id);
+        if (carUpdateError) throw carUpdateError;
       }
-      return { sourceId: car.source_id, encarId: id, status: write ? "written" : "dry_run", options: options.length, inspection: Boolean(report), inspectionItems: report?.items.length ?? 0, inspectionImages: images.length };
+      return {
+        sourceId: car.source_id, encarId: id, status: write ? "written" : "dry_run", options: options.length,
+        inspection: Boolean(report), inspectionItems: report?.items.length ?? 0, inspectionImages: images.length,
+        galleryImages: galleryImages.length, seats, fuelType, color, driveType,
+        chestnyMetadataFound: Boolean(chestny),
+      };
     } catch (error) { return { sourceId: car.source_id, encarId: id, status: "error", error: error instanceof Error ? error.message : String(error) }; }
   }
   async function worker() { while (cursor < selectedCars.length) { const car = selectedCars[cursor++]; if (car) results.push(await enrich(car)); } }
   await Promise.all(Array.from({ length: concurrency }, worker));
-  const summary = { write, found: cars.length, skippedAlreadyEnriched: cars.length - selectedCars.length, requested: selectedCars.length, written: results.filter((result) => result.status === "written").length, dryRun: results.filter((result) => result.status === "dry_run").length, inspectionAvailable: results.filter((result) => result.inspection).length, optionsLoaded: results.reduce((sum, result) => sum + Number(result.options ?? 0), 0), errors: results.filter((result) => result.status === "error").slice(0, 20), results: requestedIds.length ? results : undefined };
+  const summary = { write, found: cars.length, skippedAlreadyEnriched: cars.length - selectedCars.length, requested: selectedCars.length, written: results.filter((result) => result.status === "written").length, dryRun: results.filter((result) => result.status === "dry_run").length, inspectionAvailable: results.filter((result) => result.inspection).length, optionsLoaded: results.reduce((sum, result) => sum + Number(result.options ?? 0), 0), galleryImagesLoaded: results.reduce((sum, result) => sum + Number(result.galleryImages ?? 0), 0), seatsFound: results.filter((result) => Number(result.seats) > 0).length, colorsFound: results.filter((result) => Boolean(result.color)).length, drivesFound: results.filter((result) => Boolean(result.driveType)).length, chestnyMetadataFound: results.filter((result) => Boolean(result.chestnyMetadataFound)).length, errors: results.filter((result) => result.status === "error").slice(0, 20), results: requestedIds.length ? results : undefined };
   console.log(JSON.stringify(summary, null, 2));
 }
 

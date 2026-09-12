@@ -139,7 +139,7 @@ function buildFacts(car: CatalogCar, specs: Record<string, unknown>) {
     numberFrom("power_hp") ? `${number.format(numberFrom("power_hp")!)} л.с.` : null,
     fuel ? translateFuel(fuel) : null,
     transmission ? translateTransmission(String(transmission)) : null,
-    textFrom("drive_type", "drive", "propulsion", "engine_type"),
+    textFrom("engine_type"),
     textFrom("condition", "status"),
   ].filter((value): value is string => Boolean(value));
   return { primary, secondary: [...new Set(secondary)] };
