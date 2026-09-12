@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   Bike,
   CarFront,
@@ -202,8 +202,8 @@ export function SiteHeader() {
     };
   }, [mobileOpen]);
 
-  useEffect(() => {
-    let ticking = false;
+  useLayoutEffect(() => {
+    let frame: number | undefined;
 
     const updateUtilityOpacity = () => {
       const utility = mobileUtilityRef.current;
@@ -211,19 +211,21 @@ export function SiteHeader() {
         const progress = Math.min(Math.max(window.scrollY / 40, 0), 1);
         utility.style.opacity = String(1 - progress);
       }
-      ticking = false;
+      frame = undefined;
     };
 
     const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(updateUtilityOpacity);
+      if (frame !== undefined) return;
+      frame = window.requestAnimationFrame(updateUtilityOpacity);
     };
 
     updateUtilityOpacity();
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("pageshow", updateUtilityOpacity);
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pageshow", updateUtilityOpacity);
+      if (frame !== undefined) window.cancelAnimationFrame(frame);
     };
   }, []);
 

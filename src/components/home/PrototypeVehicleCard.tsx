@@ -106,7 +106,7 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
 
       <div className="pointer-events-none relative z-10 aspect-[2.25/1] overflow-hidden bg-[#e8edf3]">
         {photos[0] ? (
-          <RemoteImage alt={title} className="object-cover" fill loading="eager" sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)" src={photos[0].url} />
+          <RemoteImage alt={title} className="object-cover" decoding="sync" fill loading="eager" sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)" src={photos[0].url} />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-[#647084]">Фото временно недоступно</div>
         )}
