@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   MessageCircle,
   Share2,
@@ -46,7 +45,6 @@ function daysOnSale(car: CatalogCar) {
 }
 
 export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
-  const router = useRouter();
   const { country, city } = useDestination();
   const photos = useMemo(
     () => (car.car_media ?? [])
@@ -86,7 +84,6 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
   const pendingPriceMeta = country.countryCode === "KZ"
     ? "В тенге · с доставкой · без таможни"
     : `Тариф для направления ${country.countryLabel} уточняется`;
-  const prefetchDetail = () => router.prefetch(detailsHref);
 
   const share = async () => {
     const shareData = { title, text: `Автомобиль ${title} в каталоге TL Auto`, url: window.location.origin + detailsHref };
@@ -105,22 +102,17 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
     <article
       className="relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_14px_35px_rgba(28,43,61,0.13)] ring-1 ring-[#dce2eb] sm:min-h-[412px] sm:rounded-[24px]"
     >
-      <Link
-        aria-label={`Открыть карточку ${title}`}
-        className="relative z-10 block aspect-[2.25/1] overflow-hidden bg-[#e8edf3]"
-        href={detailsHref}
-        onFocus={prefetchDetail}
-        onMouseEnter={prefetchDetail}
-        prefetch={false}
-      >
+      <Link aria-label={`Открыть карточку ${title}`} className="absolute inset-0 z-0" href={detailsHref} prefetch={false} />
+
+      <div className="pointer-events-none relative z-10 aspect-[2.25/1] overflow-hidden bg-[#e8edf3]">
         {photos[0] ? (
           <RemoteImage alt={title} className="object-cover" fill loading="eager" sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)" src={photos[0].url} />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-[#647084]">Фото временно недоступно</div>
         )}
-      </Link>
+      </div>
 
-      <div className="relative z-10 flex-1 p-2.5 sm:p-4">
+      <div className="pointer-events-none relative z-10 flex-1 p-2.5 sm:p-4">
         <div>
           {hasExactVladivostokPrice ? (
             <>
@@ -135,10 +127,10 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
           )}
         </div>
 
-        <Link className="mt-2 flex flex-wrap items-center gap-1.5 text-lg font-bold leading-tight text-[#101827] transition hover:text-[#956f2c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#956f2c] sm:mt-4 sm:gap-2 sm:text-xl" href={detailsHref} onFocus={prefetchDetail} onMouseEnter={prefetchDetail} prefetch={false}>
+        <h3 className="mt-2 flex flex-wrap items-center gap-1.5 text-lg font-bold leading-tight text-[#101827] transition hover:text-[#956f2c] sm:mt-4 sm:gap-2 sm:text-xl">
           <span>{primaryFacts.length ? primaryFacts.slice(0, 2).join(" ") : title}</span>
           {car.year ? <span className="rounded-full border border-[#cfd6e0] px-2 py-0.5 text-xs font-medium text-[#4e5b6d] sm:px-2.5 sm:py-1 sm:text-sm">{car.year}</span> : null}
-        </Link>
+        </h3>
         <div className="mt-1 flex flex-wrap gap-1.5 sm:mt-3">
           {car.accident_count === 0 ? <span className="rounded-full bg-[#e8f5ef] px-2 py-0.5 text-[11px] font-semibold text-[#18794e] sm:px-2.5 sm:py-1 sm:text-xs">Без ДТП</span> : null}
           {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? <span className="rounded-full bg-[#fff2e5] px-2 py-0.5 text-[11px] font-semibold text-[#9a5b1c] sm:px-2.5 sm:py-1 sm:text-xs">Страховые выплаты: {car.insurance_payout_count}</span> : null}

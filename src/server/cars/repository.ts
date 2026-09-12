@@ -227,7 +227,6 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   let query = supabase
     .from("cars")
     .select(CATALOG_CAR_SELECT)
-    .eq("vehicle_type", "car")
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
@@ -278,13 +277,6 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   const { data, error } = await query
     .order(order.column, { ascending: order.ascending, nullsFirst: false })
     .order("id", { ascending: true })
-    // A catalog card needs a cover, not its entire gallery. PostgREST applies
-    // this limit per embedded car_media collection, keeping detail pages free
-    // to request every image while making list and home requests scale with
-    // the number of cards rather than the number of photos.
-    .order("is_primary", { foreignTable: "car_media", ascending: false })
-    .order("sort_order", { foreignTable: "car_media", ascending: true })
-    .limit(1, { foreignTable: "car_media" })
     .range(offset, offset + limit - 1);
 
   if (error) {
@@ -305,7 +297,6 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
   let query = supabase
     .from("cars")
     .select("id", { count: "exact", head: true })
-    .eq("vehicle_type", "car")
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
@@ -566,7 +557,6 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
     const { data, error } = await supabase
       .from("cars")
       .select("brand, model, trim, body_type, fuel_type, transmission, drive_type, color, owners_count")
-      .eq("vehicle_type", "car")
       .eq("is_available", true)
       .in("primary_source", ["encar", "chestny_prigon"])
       .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
@@ -608,7 +598,6 @@ export async function getSitemapCars(): Promise<SitemapCar[]> {
     const { data, error } = await supabase
       .from("cars")
       .select("primary_source, source_id, source_updated_at")
-      .eq("vehicle_type", "car")
       .eq("is_available", true)
       .in("primary_source", ["encar", "chestny_prigon"])
       .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
@@ -654,26 +643,11 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
   // report kinds need their raw JSON for the body map, Eye report and
   // insurance-event details. Keeping the raw payload out of the relation
   // prevents unrelated diagnostic blobs from being sent on every card view.
-  const [rawReportsResult, latestSnapshotResult] = await Promise.all([
-    supabase
-      .from("car_condition_reports")
-      .select("report_type, raw_payload")
-      .eq("car_id", data.id)
-      .in("report_type", ["carhistory", "encar_carhistory", "encar_inspection"]),
-    // The card uses only the current published calculation. Loading the entire
-    // calculation history for every public visit wastes database egress.
-    supabase
-      .from("calc_snapshots")
-      .select(
-        "total_rub, car_price_rub, duty_rub, fees_rub, util_rub, freight_rub, broker_rub, calculated_at, result",
-      )
-      .eq("car_id", data.id)
-      .order("calculated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ]);
-  const { data: rawReports, error: rawReportsError } = rawReportsResult;
-  const { data: latestSnapshot, error: latestSnapshotError } = latestSnapshotResult;
+  const { data: rawReports, error: rawReportsError } = await supabase
+    .from("car_condition_reports")
+    .select("report_type, raw_payload")
+    .eq("car_id", data.id)
+    .in("report_type", ["carhistory", "encar_carhistory", "encar_inspection"]);
 
   if (rawReportsError) {
     console.error("[cars] Diagnostic payload query failed", { source, sourceId, rawReportsError });
@@ -683,6 +657,18 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
   const rawPayloadByReportType = new Map(
     (rawReports ?? []).map((report) => [report.report_type, report.raw_payload]),
   );
+
+  // The card uses only the current published calculation. Loading the entire
+  // calculation history for every public visit wastes database egress.
+  const { data: latestSnapshot, error: latestSnapshotError } = await supabase
+    .from("calc_snapshots")
+    .select(
+      "total_rub, car_price_rub, duty_rub, fees_rub, util_rub, freight_rub, broker_rub, calculated_at, result",
+    )
+    .eq("car_id", data.id)
+    .order("calculated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   if (latestSnapshotError) {
     console.error("[cars] Latest calculation query failed", { source, sourceId, latestSnapshotError });
@@ -702,16 +688,11 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
   } as CarDetail;
 }
 
-const getCachedPublicCarDetail = unstable_cache(
-  fetchCarDetail,
-  ["public-car-detail-v3", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
-  // A short cache absorbs repeated transitions and prefetches without keeping
-  // commercial calculations stale for more than one minute.
-  { revalidate: 60 },
-);
-
 export async function getCarDetail(source: string, sourceId: string): Promise<CarDetail | null> {
-  return getCachedPublicCarDetail(source, sourceId);
+  // Price, rates and the condition report are dynamic commercial data. A
+  // five-minute server cache could show an outdated calculation after a
+  // catalog-wide refresh, so detail pages always load the latest snapshot.
+  return fetchCarDetail(source, sourceId);
 }
 
 export async function getLatestCalculation(carId: string): Promise<LatestCalculation | null> {
