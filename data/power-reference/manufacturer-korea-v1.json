@@ -2613,7 +2613,7 @@
       "fuelType": "gasoline",
       "propulsionType": "ice",
       "engineCc": 1591,
-      "years": [2018, 2022],
+      "years": [2021, 2022],
       "power": { "value": 177, "unit": "PS", "kw": 130.18327875 },
       "powerBasis": "combustion_engine",
       "source": {
@@ -2623,7 +2623,7 @@
         "note": "Hyundai Korea lists 1,591 cc 1.6 T-GDi at 177 PS; restricted to 2018–2022 gasoline Kona rows."
       },
       "matches": [
-        { "yearFrom": 2018, "yearTo": 2022, "engineCcFrom": 1585, "engineCcTo": 1605 }
+        { "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1585, "engineCcTo": 1605 }
       ]
     },
     {
@@ -2633,7 +2633,7 @@
       "fuelType": "gasoline",
       "propulsionType": "ice",
       "engineCc": 1598,
-      "years": [2020, 2022],
+      "years": [2020, 2020],
       "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
       "powerBasis": "combustion_engine",
       "source": {
@@ -2643,7 +2643,7 @@
         "note": "Hyundai identifies the 2020 Sonata Smartstream 1.6L turbo at 180 horsepower; restricted to matching 1,598 cc gasoline rows."
       },
       "matches": [
-        { "yearFrom": 2020, "yearTo": 2022, "engineCcFrom": 1585, "engineCcTo": 1610 }
+        { "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1585, "engineCcTo": 1610 }
       ]
     }
   ]
