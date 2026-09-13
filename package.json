@@ -85,6 +85,7 @@
     "audit:reserve-queue": "tsx scripts/audit-chestny-reserve-queue.ts",
     "audit:local-enrichment": "tsx scripts/audit-chestny-local-enrichment.ts",
     "sync:local-queue-images": "tsx scripts/sync-chestny-queue-images-local.ts",
+    "enrich:staging:encar:test": "tsx scripts/enrich-chestny-staging-encar-test.ts",
     "import:chestny:verified": "tsx scripts/import-verified-chestny-catalog.ts",
     "backfill:chestny:attributes": "tsx scripts/backfill-chestny-attributes.ts",
     "sync:chestny:images": "tsx scripts/sync-chestny-images.ts",
