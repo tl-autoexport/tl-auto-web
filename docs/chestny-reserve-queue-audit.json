@@ -1,0 +1,124 @@
+{
+  "generatedAt": "2026-09-13T04:34:40.083Z",
+  "encarRequests": 0,
+  "queueTotal": 2834,
+  "byFreshness": {
+    "8_30_дней": 1403,
+    "до_7_дней": 1299,
+    "31_60_дней": 131,
+    "старше_60_дней": 1
+  },
+  "byBrand": {
+    "Hyundai": {
+      "quota": 1400,
+      "published": 1344,
+      "queued": 56,
+      "missing": {
+        "привод": 39,
+        "фото": 56,
+        "места": 56
+      }
+    },
+    "Kia": {
+      "quota": 1000,
+      "published": 790,
+      "queued": 211,
+      "missing": {
+        "привод": 109,
+        "фото": 211,
+        "места": 211,
+        "объём": 1
+      }
+    },
+    "Mercedes-Benz": {
+      "quota": 500,
+      "published": 0,
+      "queued": 500,
+      "missing": {
+        "привод": 500,
+        "фото": 500,
+        "места": 500
+      }
+    },
+    "Chevrolet": {
+      "quota": 350,
+      "published": 0,
+      "queued": 350,
+      "missing": {
+        "привод": 198,
+        "фото": 350,
+        "места": 350
+      }
+    },
+    "Volkswagen": {
+      "quota": 350,
+      "published": 0,
+      "queued": 350,
+      "missing": {
+        "привод": 350,
+        "фото": 350,
+        "места": 350
+      }
+    },
+    "BMW": {
+      "quota": 300,
+      "published": 0,
+      "queued": 300,
+      "missing": {
+        "привод": 300,
+        "фото": 300,
+        "места": 300
+      }
+    },
+    "Audi": {
+      "quota": 250,
+      "published": 0,
+      "queued": 250,
+      "missing": {
+        "привод": 250,
+        "фото": 250,
+        "места": 250
+      }
+    },
+    "MINI": {
+      "quota": 250,
+      "published": 0,
+      "queued": 250,
+      "missing": {
+        "привод": 250,
+        "фото": 250,
+        "места": 250
+      }
+    },
+    "Land Rover": {
+      "quota": 250,
+      "published": 0,
+      "queued": 250,
+      "missing": {
+        "привод": 250,
+        "фото": 250,
+        "места": 250
+      }
+    },
+    "KGM": {
+      "quota": 200,
+      "published": 0,
+      "queued": 167,
+      "missing": {
+        "фото": 167,
+        "места": 167
+      }
+    },
+    "Renault Korea": {
+      "quota": 150,
+      "published": 0,
+      "queued": 150,
+      "missing": {
+        "привод": 83,
+        "фото": 150,
+        "места": 150
+      }
+    }
+  },
+  "note": "Read-only local audit. No public cars or Encar data changed."
+}
