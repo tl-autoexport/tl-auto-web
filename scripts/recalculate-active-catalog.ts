@@ -105,12 +105,14 @@ async function main() {
       .map((value) => value.trim().toLowerCase())
       .filter(Boolean),
   );
+  const idFilter = new Set((process.env.RECALCULATE_IDS ?? "").split(",").map((value) => value.trim()).filter(Boolean));
   const eligible = onlyApprovedPower
     ? data.filter((car) => car.calculation_power_status === "matched" || car.calculation_power_status === "approved")
     : data;
+  const filteredById = idFilter.size ? eligible.filter((car) => idFilter.has(car.id)) : eligible;
   const filtered = modelFilter.size
-    ? eligible.filter((car) => modelFilter.has(String(car.model ?? "").trim().toLowerCase()))
-    : eligible;
+    ? filteredById.filter((car) => modelFilter.has(String(car.model ?? "").trim().toLowerCase()))
+    : filteredById;
   const pending = force ? filtered : filtered.filter((car) => !existingVersionIds.has(car.id));
   const rows: Array<Record<string, unknown>> = [];
   let skipped = 0;

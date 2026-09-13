@@ -1,5 +1,7 @@
 import { config } from "dotenv";
 import { fetch as undiciFetch, ProxyAgent } from "undici";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { createSupabaseAdmin } from "../src/server/supabase/admin";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
 
@@ -8,6 +10,7 @@ config({ path: ".env", quiet: true });
 
 const DETAIL_URL = "https://api.encar.com/v1/readside/vehicle";
 const LOCK_PATH = process.env.TL_AUTO_ENCAR_LOCK_PATH ?? "/tmp/tl-auto-encar-queue.lock";
+const execFileAsync = promisify(execFile);
 let proxyAgent: ProxyAgent | undefined;
 let configuredProxyUrl: string | undefined;
 
@@ -76,6 +79,7 @@ async function main() {
     if (error) throw error;
     const cars = (data ?? []) as Car[];
     const errorSamples: Array<{ sourceId: string; error: string }> = [];
+    const priceChangedIds: string[] = [];
     const summary = { dryRun, requested: cars.length, checked: 0, active: 0, unavailable: 0, priceChanged: 0, priceMissing: 0, errors: 0 };
     for (const car of cars) {
       const checkedAt = new Date().toISOString();
@@ -90,7 +94,7 @@ async function main() {
         } else {
           const detail = await response.json() as Detail;
           const priceKrw = priceFrom(detail);
-          summary.active++; if (priceKrw == null) summary.priceMissing++; else if (priceKrw !== car.price_krw) summary.priceChanged++;
+          summary.active++; if (priceKrw == null) summary.priceMissing++; else if (priceKrw !== car.price_krw) { summary.priceChanged++; priceChangedIds.push(car.id); }
           if (!dryRun) await db.from("cars").update({ ...(priceKrw == null ? {} : { price_krw: priceKrw }), is_available: true, sale_status: null, source_updated_at: detail.manage?.modifyDateTime ?? checkedAt, last_seen_at: checkedAt, encar_price_checked_at: checkedAt, encar_check_status: "ok", encar_check_error: null, encar_check_attempts: 0, next_encar_check_at: new Date(Date.now() + intervalHours * 3600_000).toISOString() }).eq("id", car.id);
         }
       } catch (error) {
@@ -101,7 +105,16 @@ async function main() {
       }
       await sleep(delayMs);
     }
-    console.log(JSON.stringify({ ...summary, errorSamples }, null, 2));
+    let recalculation: unknown = null;
+    if (!dryRun && priceChangedIds.length) {
+      const result = await execFileAsync("/usr/bin/npm", ["run", "recalculate:catalog:write"], {
+        cwd: process.cwd(),
+        env: { ...process.env, RECALCULATE_DRY_RUN: "false", RECALCULATE_FORCE: "true", RECALCULATE_IDS: priceChangedIds.join(","), RECALCULATE_SUMMARY: "true" },
+        maxBuffer: 10 * 1024 * 1024,
+      });
+      recalculation = result.stdout.trim();
+    }
+    console.log(JSON.stringify({ ...summary, errorSamples, recalculatedPriceIds: priceChangedIds.length, recalculation }, null, 2));
   } finally { await lockHandle.close(); await fs.unlink(LOCK_PATH).catch(() => undefined); proxyAgent?.close(); }
 }
 main().catch((error) => { console.error(error); process.exit(1); });
