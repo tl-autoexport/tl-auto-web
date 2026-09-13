@@ -1,0 +1,20 @@
+[Unit]
+Description=TL Auto Encar freshness and price queue
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=tl-auto
+WorkingDirectory=/opt/tl-auto
+EnvironmentFile=/opt/tl-auto/.env
+Environment=TL_AUTO_ENCAR_BATCH_SIZE=500
+Environment=TL_AUTO_ENCAR_INTERVAL_HOURS=12
+Environment=TL_AUTO_ENCAR_DELAY_MS=1500
+Environment=TL_AUTO_ENCAR_DRY_RUN=false
+Environment=TL_AUTO_ENCAR_LOCK_PATH=/tmp/tl-auto-encar-queue.lock
+ExecStart=/usr/bin/flock -n /tmp/tl-auto-chestny-encar.lock /usr/bin/npm run check:encar:queue:write
+TimeoutStartSec=1800
+
+[Install]
+WantedBy=multi-user.target

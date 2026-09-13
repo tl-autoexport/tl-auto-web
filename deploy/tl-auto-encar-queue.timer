@@ -1,0 +1,11 @@
+[Unit]
+Description=Run TL Auto Encar queue every 12 hours
+
+[Timer]
+OnCalendar=*-*-* 13,19:00:00
+Persistent=true
+RandomizedDelaySec=300
+Unit=tl-auto-encar-queue.service
+
+[Install]
+WantedBy=timers.target
