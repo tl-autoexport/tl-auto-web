@@ -2785,6 +2785,27 @@
       "matches": [
         { "driveType": "2WD", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 2185, "engineCcTo": 2210 }
       ]
+    },
+    {
+      "specKey": "kia-mohave-hm-3.0d-2959-249ps-2021-2022",
+      "brand": "Kia",
+      "model": "Mohave",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2959,
+      "years": [2021, 2022],
+      "power": { "value": 249, "unit": "PS", "kw": 183.13918875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Mohave 2022 official model-year specification — 3.0 diesel, 249 PS",
+        "uri": "https://www.kia.ru/press/news/369/",
+        "supportingUri": "https://www.kia.ru/models/mohave/options/ENW7202220229CC5KGGP22/",
+        "retrievedAt": "2026-09-13",
+        "note": "Kia Russia's official 2022 model-year release specifies the 3.0 V6 diesel at 249 PS, 8AT and 4WD; restricted to 2021–2022 4WD rows."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 2940, "engineCcTo": 2975 }
+      ]
     }
   ]
 }
