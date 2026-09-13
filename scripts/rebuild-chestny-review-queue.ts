@@ -39,6 +39,7 @@ const keyPart = (value: string | null) => canonical(value).toLowerCase().replace
 const fuel = (value: string | null) => {
   const s = (value ?? "").toLowerCase();
   if (s.includes("디젤") || s.includes("diesel")) return "diesel";
+  if (s.includes("lpg") || s.includes("엘피지")) return "lpg";
   if (s.includes("전기") || s.includes("hybrid")) return "hybrid";
   if (s.includes("가솔린") || s.includes("gas")) return "gasoline";
   return value;
