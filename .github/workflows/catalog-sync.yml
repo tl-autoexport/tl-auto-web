@@ -1,4 +1,4 @@
-name: Fresh catalog sync
+name: Manual catalog sync
 
 on:
   workflow_dispatch:
@@ -11,8 +11,6 @@ on:
         options:
           - dry-run
           - write
-  schedule:
-    - cron: "15 2 * * *"
 
 permissions:
   contents: read
@@ -42,7 +40,8 @@ jobs:
           ENCAR_MAX_PAGES: "20"
           ENCAR_DRY_RUN: "true"
       - name: Update catalog
-        if: github.event_name == 'schedule' || inputs.mode == 'write'
+        # Encar blocks unattended GitHub traffic. Writes are explicit only.
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'write'
         run: npm run sync:catalog:write
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
