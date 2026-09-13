@@ -2465,6 +2465,66 @@
       "matches": [
         { "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 995, "engineCcTo": 1005 }
       ]
+    },
+    {
+      "specKey": "audi-a3-35-tfsi-1984-190ps-2018-2023",
+      "brand": "Audi",
+      "model": "A3",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1984,
+      "years": [2018, 2023],
+      "power": { "value": 190, "unit": "PS", "kw": 139.7447625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Audi MediaCenter A3 40 TFSI official technical data — 1,984 cc, 190 PS",
+        "uri": "https://uploads.audi-mediacenter.com/system/production/car_motorizations/1285/file_en/2390c9326d365919a3a1e8a7987c4037c8364f2b/TD-Audi-A3-Sportback-40-TFSI-quattro-S_tronic-140kW_230919.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Audi technical data specifies 1,984 cc and 140 kW/190 PS for the 40 TFSI; restricted to matching A3 gasoline rows."
+      },
+      "matches": [
+        { "yearFrom": 2018, "yearTo": 2023, "engineCcFrom": 1975, "engineCcTo": 1990 }
+      ]
+    },
+    {
+      "specKey": "audi-a4-40-tfsi-1984-190ps-2016-2023",
+      "brand": "Audi",
+      "model": "A4",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1984,
+      "years": [2016, 2023],
+      "power": { "value": 190, "unit": "PS", "kw": 139.7447625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Audi MediaCenter A4 40 TFSI official technical data — 1,984 cc, 190 PS",
+        "uri": "https://www.audi-mediacenter.com/en/the-audi-a4-major-upgrade-for-the-bestseller-11884/download",
+        "retrievedAt": "2026-09-13",
+        "note": "Audi MediaCenter lists A4 40 TFSI at 140 kW/190 PS; restricted to 1,984 cc gasoline A4 rows."
+      },
+      "matches": [
+        { "yearFrom": 2016, "yearTo": 2023, "engineCcFrom": 1975, "engineCcTo": 1990 }
+      ]
+    },
+    {
+      "specKey": "audi-q3-35-tdi-1968-150ps-2020-2022",
+      "brand": "Audi",
+      "model": "Q3",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1968,
+      "years": [2020, 2022],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Audi MediaCenter Q3 35 TDI official technical data — 1,968 cc, 150 PS",
+        "uri": "https://www.audi-mediacenter.com/system/production/car_motorizations/1186/file_en/14f12d3cda05553457a7c98d7b821b09154db555/eTD-Audi-Q3-35-TDI-110kW_231005.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Audi technical data specifies 1,968 cc and 110 kW/150 PS for Q3 35 TDI; restricted to 2020–2022 diesel rows."
+      },
+      "matches": [
+        { "yearFrom": 2020, "yearTo": 2022, "engineCcFrom": 1960, "engineCcTo": 1975 }
+      ]
     }
   ]
 }
