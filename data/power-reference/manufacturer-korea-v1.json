@@ -2705,6 +2705,46 @@
       "matches": [
         { "driveType": "2WD", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 1985, "engineCcTo": 2005 }
       ]
+    },
+    {
+      "specKey": "hyundai-kona-2.0-1999-149ps-2023-2wd",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2023, 2023],
+      "power": { "value": 149, "unit": "PS", "kw": 109.58931375 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai all-new KONA official specifications — 2.0 gasoline, 149 PS",
+        "uri": "https://www.hyundai.com/worldwide/en/suv/kona-2023/ice",
+        "retrievedAt": "2026-09-13",
+        "note": "Hyundai's all-new KONA specification lists the Smartstream 2.0 gasoline engine at 149 PS; restricted to 2023 2WD rows."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1988, "engineCcTo": 2010 }
+      ]
+    },
+    {
+      "specKey": "hyundai-tucson-1.6-tgdi-1598-180ps-2024-4wd",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2024, 2024],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Tucson 2024 official technical data — 1.6 T-GDI, 180 PS",
+        "uri": "https://www.hyundai.com/content/dam/hyundai/kw/en/data/marketing/brochure/product/tucson-2024/TUCSON-ENG.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Hyundai's 2024 Tucson technical data lists the 1.6 T-GDI at 1,598 cc and 180 PS with AWD availability; restricted to 2024 4WD rows."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1588, "engineCcTo": 1610 }
+      ]
     }
   ]
 }
