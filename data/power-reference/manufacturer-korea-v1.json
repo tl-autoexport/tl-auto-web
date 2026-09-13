@@ -2745,6 +2745,46 @@
       "matches": [
         { "driveType": "4WD", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1588, "engineCcTo": 1610 }
       ]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.2d-2151-194ps-2023-2024-4wd",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2023, 2024],
+      "power": { "value": 194, "unit": "PS", "kw": 142.6867575 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento 2023 official Korean catalogue — 2.2 diesel, 194 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/price/price_4thgensorento.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Kia's official 2023 Korean Sorento catalogue lists the 2.2 diesel at 2,151 cc and 194 PS with 4WD; restricted to 2023–2024 4WD rows."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 2140, "engineCcTo": 2165 }
+      ]
+    },
+    {
+      "specKey": "kia-sorento-um-2.2-diesel-2199-200ps-2019-2wd",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2199,
+      "years": [2019, 2019],
+      "power": { "value": 200, "unit": "PS", "kw": 147.09975 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento official technical specifications — 2.2 diesel, 2,199 cc, 200 PS",
+        "uri": "https://prod2-press.kia.com/eu/en/home/models/sorento/sorento-2018.html",
+        "retrievedAt": "2026-09-13",
+        "note": "Kia's official Sorento technical sheet lists the 2.2-litre diesel at 2,199 cc and 200 PS; restricted to 2019 2WD rows."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 2185, "engineCcTo": 2210 }
+      ]
     }
   ]
 }
