@@ -2685,6 +2685,26 @@
       "matches": [
         { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 1988, "engineCcTo": 2005 }
       ]
+    },
+    {
+      "specKey": "kia-sorento-um-2.0-diesel-1995-185ps-2019-2wd",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1995,
+      "years": [2019, 2019],
+      "power": { "value": 185, "unit": "PS", "kw": 136.06726875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento official technical specifications — 2.0 diesel, 1,995 cc, 185 PS",
+        "uri": "https://prod2-press.kia.com/eu/en/home/models/sorento/sorento-2018.html",
+        "retrievedAt": "2026-09-13",
+        "note": "Kia's official Sorento technical sheet lists the 2.0-litre diesel at 1,995 cc and 185 PS; restricted to 2019 2WD rows."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 1985, "engineCcTo": 2005 }
+      ]
     }
   ]
 }
