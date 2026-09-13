@@ -52,7 +52,7 @@ async function main() {
   try {
     const [staging, refs] = await Promise.all([
       c.query(`select manufacturer,model,model_year,engine_cc,fuel_type,drive_type,count(*)::int cards
-        from public.chestny_catalog_staging group by 1,2,3,4,5,6`),
+        from public.chestny_catalog_staging where source_status='active' group by 1,2,3,4,5,6`),
       c.query(`select spec.id spec_id,spec.version spec_version,spec.calculation_power_kw,spec.power_basis,spec.source_priority,
         evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.verification_status evidence_verification_status,evidence.reliability evidence_reliability,
         matcher.id match_id,matcher.priority match_priority,matcher.brand,matcher.model,matcher.generation,matcher.trim,matcher.badge_normalized,matcher.model_code,matcher.engine_code,
