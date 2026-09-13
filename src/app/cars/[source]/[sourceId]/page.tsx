@@ -30,6 +30,7 @@ import {
   translateTransmission,
 } from "@/server/normalization/display";
 import { CarMediaShowcase } from "./CarMediaShowcase";
+import { CarDetailToolbar } from "./CarDetailToolbar";
 import { InspectionPhotoGallery } from "./InspectionPhotoGallery";
 import type { ThermalEntry, ThermalReference } from "./thermalTypes";
 import { PriceCalculationCard } from "./PriceCalculationCard";
@@ -149,6 +150,13 @@ export default async function CarDetailPage({
   return (
     <main className="min-h-screen bg-[#f4f5f7] text-[#121722]">
       <SiteHeader />
+
+      <CarDetailToolbar
+        brand={car.brand}
+        model={car.model}
+        priceRub={car.price_rub}
+        title={title}
+      />
 
       <section className="mx-auto flex max-w-7xl flex-col gap-4 px-3 pb-24 pt-4 sm:gap-6 sm:px-5 sm:py-6 lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
         <div className="contents lg:col-start-1 lg:row-start-1 lg:grid lg:min-w-0 lg:gap-6">
