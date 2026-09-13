@@ -14,7 +14,6 @@ import {
   getHomeCatalogData,
   type CatalogCar,
 } from "@/server/cars/repository";
-import { SiteHeader } from "@/components/site/SiteHeader";
 import { CatalogQuickNav } from "@/components/home/CatalogQuickNav";
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 import { StoryCarousel } from "@/components/home/StoryCarousel";
@@ -46,7 +45,6 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-[#f5f6f8] text-[#101827]">
-      <SiteHeader />
 
       <section className="border-b border-[#e2e6ed] bg-white" aria-label="Актуальные предложения">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-5 sm:py-6">

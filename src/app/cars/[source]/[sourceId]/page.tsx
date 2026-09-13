@@ -34,7 +34,6 @@ import { CarDetailToolbar } from "./CarDetailToolbar";
 import { InspectionPhotoGallery } from "./InspectionPhotoGallery";
 import type { ThermalEntry, ThermalReference } from "./thermalTypes";
 import { PriceCalculationCard } from "./PriceCalculationCard";
-import { SiteHeader } from "@/components/site/SiteHeader";
 import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
 import { publicCarPath } from "@/lib/car-url";
 
@@ -149,8 +148,6 @@ export default async function CarDetailPage({
 
   return (
     <main className="min-h-screen bg-[#f4f5f7] text-[#121722]">
-      <SiteHeader />
-
       <CarDetailToolbar
         brand={car.brand}
         model={car.model}

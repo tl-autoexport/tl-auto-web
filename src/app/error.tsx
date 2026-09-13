@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { AlertTriangle, Home, RefreshCw } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
 
 export default function ErrorPage({
   error,
@@ -22,7 +21,6 @@ export default function ErrorPage({
   return (
     <main className="min-h-screen bg-[#f4f5f7] text-[#121722]">
       <title>Не удалось загрузить страницу | TL Auto</title>
-      <SiteHeader />
 
       <section className="mx-auto flex min-h-[calc(100vh-108px)] max-w-4xl items-center px-5 py-12">
         <div className="w-full rounded-md bg-white p-7 shadow-sm ring-1 ring-[#d8dde6] sm:p-10">

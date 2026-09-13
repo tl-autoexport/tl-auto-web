@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight, CarFront, Home, SearchX } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
 
 export const metadata: Metadata = {
   title: "Страница не найдена",
@@ -11,7 +10,6 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <main className="min-h-screen bg-[#f4f5f7] text-[#121722]">
-      <SiteHeader />
 
       <section className="mx-auto flex min-h-[calc(100vh-108px)] max-w-7xl items-center px-5 py-12">
         <div className="grid w-full overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-[#d8dde6] lg:grid-cols-[0.8fr_1.2fr]">

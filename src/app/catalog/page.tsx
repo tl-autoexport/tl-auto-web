@@ -23,7 +23,6 @@ import {
   type StagingCatalogType,
 } from "@/server/cars/repository";
 import { translateFuel, translateTransmission } from "@/server/normalization/display";
-import { SiteHeader } from "@/components/site/SiteHeader";
 import { MobileCatalogFilters } from "./MobileCatalogFilters";
 import { BrandModelFields } from "@/components/catalog/BrandModelFields";
 import { LiveCatalogCount } from "./LiveCatalogCount";
@@ -170,7 +169,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
   return (
     <main className="min-h-screen bg-[#f5f6f8] text-[#101827]">
-      <SiteHeader />
 
       <CatalogSearchBar brands={brands} initialValue={value("search")} models={searchableModels} />
 
@@ -279,7 +277,6 @@ async function StagingCatalogPage({ category, page }: { category: StagingCatalog
   }[category];
   return (
     <main className="min-h-screen bg-[#f5f6f8] text-[#101827]">
-      <SiteHeader />
       <section className="border-b border-[#dce2eb] bg-white">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-5 md:py-10">
           <div className="mt-1.5 flex flex-col gap-4">

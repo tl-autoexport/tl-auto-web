@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Manrope } from "next/font/google";
 import { YandexMetrika } from "@/components/analytics/YandexMetrika";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteHeader } from "@/components/site/SiteHeader";
 import { DestinationProvider } from "@/components/site/DestinationProvider";
 import { getSiteUrl, isIndexableSite } from "@/lib/site-url";
 import "./globals.css";
@@ -91,7 +92,10 @@ export default function RootLayout({
       className={`${manrope.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <DestinationProvider>{children}</DestinationProvider>
+        <DestinationProvider>
+          <SiteHeader />
+          {children}
+        </DestinationProvider>
         <SiteFooter />
         <YandexMetrika />
       </body>

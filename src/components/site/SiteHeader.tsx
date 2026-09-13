@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Bike,
   CarFront,
@@ -148,7 +148,6 @@ export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [destinationOpen, setDestinationOpen] = useState(false);
-  const mobileUtilityRef = useRef<HTMLDivElement>(null);
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
   const { city, country, setDestination } = useDestination();
 
@@ -202,33 +201,6 @@ export function SiteHeader() {
     };
   }, [mobileOpen]);
 
-  useLayoutEffect(() => {
-    let frame: number | undefined;
-
-    const updateUtilityOpacity = () => {
-      const utility = mobileUtilityRef.current;
-      if (utility) {
-        const progress = Math.min(Math.max(window.scrollY / 40, 0), 1);
-        utility.style.opacity = String(1 - progress);
-      }
-      frame = undefined;
-    };
-
-    const onScroll = () => {
-      if (frame !== undefined) return;
-      frame = window.requestAnimationFrame(updateUtilityOpacity);
-    };
-
-    updateUtilityOpacity();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("pageshow", updateUtilityOpacity);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("pageshow", updateUtilityOpacity);
-      if (frame !== undefined) window.cancelAnimationFrame(frame);
-    };
-  }, []);
-
   return (
     <>
       <div
@@ -261,10 +233,7 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div
-        ref={mobileUtilityRef}
-        className="flex h-11 bg-[#07528b] text-white will-change-[opacity] lg:hidden"
-      >
+      <div className="flex h-11 bg-[#07528b] text-white lg:hidden">
         <div className="mx-auto flex min-h-11 w-full items-center justify-between gap-3 px-4 text-xs font-medium">
           <button className="inline-flex min-w-0 items-center gap-1.5 whitespace-nowrap" onClick={() => setDestinationOpen(true)} type="button">
             <MapPin className="shrink-0" size={16} /><span className="max-w-[130px] truncate">{city.label}</span><ChevronDown className="shrink-0" size={13} />

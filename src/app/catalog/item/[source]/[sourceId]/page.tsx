@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { CalendarDays, ExternalLink, Images, ShieldCheck } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
 import { PassoMediaGallery } from "@/components/catalog/PassoMediaGallery";
 import { getPassoStagingCar } from "@/server/cars/repository";
 import { carDisplayTitle } from "@/server/normalization/display";
@@ -41,7 +40,6 @@ export default async function PassoCatalogItemPage({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-[#f4f5f7] text-[#101827]">
-      <SiteHeader />
       <div className="mx-auto max-w-7xl px-3 py-5 sm:px-5 sm:py-8">
         <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="rounded-md bg-white p-3 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">

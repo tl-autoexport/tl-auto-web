@@ -1,5 +1,3 @@
-import { SiteHeader } from "@/components/site/SiteHeader";
-
 const cards = Array.from({ length: 6 }, (_, index) => index);
 
 export default function CatalogLoading() {
@@ -9,8 +7,6 @@ export default function CatalogLoading() {
       aria-label="Загрузка каталога автомобилей"
       className="min-h-screen bg-[#f5f6f8] text-[#101827]"
     >
-      <SiteHeader />
-
       <section className="border-b border-[#dce2eb] bg-white">
         <div className="mx-auto max-w-7xl px-5 py-8 md:py-10">
           <div className="h-4 w-20 rounded bg-[#ffd7da] motion-safe:animate-pulse" />
