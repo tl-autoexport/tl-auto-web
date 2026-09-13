@@ -2605,6 +2605,46 @@
       "matches": [
         { "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1960, "engineCcTo": 1975 }
       ]
+    },
+    {
+      "specKey": "hyundai-kona-1.6-tgdi-1591-177ps-2018-2022",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1591,
+      "years": [2018, 2022],
+      "power": { "value": 177, "unit": "PS", "kw": 130.18327875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Korea KONA official specifications — 1.6 T-GDi, 177 PS",
+        "uri": "https://www.hyundai.com/kr/ko/vehicles/kona/20my/specifications.html",
+        "retrievedAt": "2026-09-13",
+        "note": "Hyundai Korea lists 1,591 cc 1.6 T-GDi at 177 PS; restricted to 2018–2022 gasoline Kona rows."
+      },
+      "matches": [
+        { "yearFrom": 2018, "yearTo": 2022, "engineCcFrom": 1585, "engineCcTo": 1605 }
+      ]
+    },
+    {
+      "specKey": "hyundai-sonata-1.6-turbo-1598-180ps-2020-2022",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2020, 2022],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai official 2020 SONATA Smartstream 1.6T technical data — 180 PS",
+        "uri": "https://www.hyundai.com/worldwide/en/newsroom/detail/0000000734",
+        "retrievedAt": "2026-09-13",
+        "note": "Hyundai identifies the 2020 Sonata Smartstream 1.6L turbo at 180 horsepower; restricted to matching 1,598 cc gasoline rows."
+      },
+      "matches": [
+        { "yearFrom": 2020, "yearTo": 2022, "engineCcFrom": 1585, "engineCcTo": 1610 }
+      ]
     }
   ]
 }
