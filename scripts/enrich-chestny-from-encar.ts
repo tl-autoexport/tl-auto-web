@@ -26,6 +26,7 @@ const requestedIds = (process.env.CHESTNY_ENCAR_ENRICH_IDS ?? "")
 const limit = Math.max(1, Number(process.env.CHESTNY_ENCAR_ENRICH_LIMIT ?? 2161));
 const concurrency = Math.min(6, Math.max(1, Number(process.env.CHESTNY_ENCAR_ENRICH_CONCURRENCY ?? 3)));
 const force = process.env.CHESTNY_ENCAR_ENRICH_FORCE === "true";
+const enrichedBatchOnly = process.env.CHESTNY_ENCAR_ENRICH_BATCH_ONLY === "true";
 
 if (!url || !key) throw new Error("TL Auto Supabase admin credentials are required");
 
@@ -98,6 +99,7 @@ async function main() {
   const cars: Car[] = [];
   for (let from = 0; from < limit; from += 1000) {
     let query = db.from("cars").select("id,source_id,source_url,brand,model,fuel_type,drive_type,color,vehicle_specs").eq("primary_source", "chestny_prigon").eq("is_available", true).order("source_id").range(from, Math.min(from + 999, limit - 1));
+    if (enrichedBatchOnly) query = query.eq("vehicle_specs->>calculation_status", "calculated_from_local_enriched_staging");
     if (requestedIds.length) query = query.in("source_id", requestedIds);
     const { data, error } = await query; if (error) throw error;
     cars.push(...((data ?? []) as Car[])); if (!data || data.length < 1000 || requestedIds.length) break;
@@ -118,9 +120,17 @@ async function main() {
     .limit(20_000);
   if (existingGalleriesError) throw existingGalleriesError;
   const galleryCarIds = new Set((existingGalleries ?? []).map((media) => String(media.car_id)));
+  const localGalleryCounts = new Map<string, number>();
+  for (let from = 0; ; from += 1000) {
+    const { data: localGalleryRows, error: localGalleryError } = await db.from("car_media").select("car_id").eq("source", "chestny_prigon").range(from, from + 999);
+    if (localGalleryError) throw localGalleryError;
+    for (const media of localGalleryRows ?? []) localGalleryCounts.set(String(media.car_id), (localGalleryCounts.get(String(media.car_id)) ?? 0) + 1);
+    if (!localGalleryRows || localGalleryRows.length < 1000) break;
+  }
   const selectedCars = force || requestedIds.length
     ? cars
     : cars.filter((car) => {
+      if (enrichedBatchOnly) return (localGalleryCounts.get(car.id) ?? 0) < 10;
       const seats = number(object(car.vehicle_specs).seats);
       // Metadata import must not be skipped just because the inspection report
       // and photo gallery were loaded in an earlier pass.
@@ -220,7 +230,7 @@ async function main() {
   }
   async function worker() { while (cursor < selectedCars.length) { const car = selectedCars[cursor++]; if (car) results.push(await enrich(car)); } }
   await Promise.all(Array.from({ length: concurrency }, worker));
-  const summary = { write, found: cars.length, skippedAlreadyEnriched: cars.length - selectedCars.length, requested: selectedCars.length, written: results.filter((result) => result.status === "written").length, dryRun: results.filter((result) => result.status === "dry_run").length, inspectionAvailable: results.filter((result) => result.inspection).length, optionsLoaded: results.reduce((sum, result) => sum + Number(result.options ?? 0), 0), galleryImagesLoaded: results.reduce((sum, result) => sum + Number(result.galleryImages ?? 0), 0), seatsFound: results.filter((result) => Number(result.seats) > 0).length, colorsFound: results.filter((result) => Boolean(result.color)).length, drivesFound: results.filter((result) => Boolean(result.driveType)).length, chestnyMetadataFound: results.filter((result) => Boolean(result.chestnyMetadataFound)).length, errors: results.filter((result) => result.status === "error").slice(0, 20), results: requestedIds.length ? results : undefined };
+  const summary = { write, found: cars.length, skippedAlreadyEnriched: cars.length - selectedCars.length, requested: selectedCars.length, localGalleryBelowTen: cars.filter((car) => (localGalleryCounts.get(car.id) ?? 0) < 10).length, written: results.filter((result) => result.status === "written").length, dryRun: results.filter((result) => result.status === "dry_run").length, inspectionAvailable: results.filter((result) => result.inspection).length, optionsLoaded: results.reduce((sum, result) => sum + Number(result.options ?? 0), 0), galleryImagesLoaded: results.reduce((sum, result) => sum + Number(result.galleryImages ?? 0), 0), seatsFound: results.filter((result) => Number(result.seats) > 0).length, colorsFound: results.filter((result) => Boolean(result.color)).length, drivesFound: results.filter((result) => Boolean(result.driveType)).length, chestnyMetadataFound: results.filter((result) => Boolean(result.chestnyMetadataFound)).length, errors: results.filter((result) => result.status === "error").slice(0, 20), results: requestedIds.length ? results : undefined };
   console.log(JSON.stringify(summary, null, 2));
 }
 
