@@ -5,9 +5,9 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-User=tl-auto
-WorkingDirectory=/opt/tl-auto
-EnvironmentFile=/opt/tl-auto/.env
+User=ubuntu
+WorkingDirectory=/home/ubuntu/tl-auto
+EnvironmentFile=/home/ubuntu/tl-auto/.env
 Environment=TL_AUTO_ENCAR_BATCH_SIZE=500
 Environment=TL_AUTO_ENCAR_INTERVAL_HOURS=12
 Environment=TL_AUTO_ENCAR_DELAY_MS=1500

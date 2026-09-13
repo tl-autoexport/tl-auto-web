@@ -7,7 +7,7 @@ the Encar search catalog and does not write to the Chesty database.
 ## Install on the TL Auto VPS
 
 Run as a deployment administrator, after the project is available at
-`/opt/tl-auto` and `/opt/tl-auto/.env` contains the TL Auto Supabase variables
+`/home/ubuntu/tl-auto` and `/home/ubuntu/tl-auto/.env` contains the TL Auto Supabase variables
 and Encar headers if required:
 
 ```bash
