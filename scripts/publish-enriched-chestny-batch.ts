@@ -102,7 +102,7 @@ async function main() {
       const invalid = !row.price_krw || !row.model_year || !row.mileage_km && row.mileage_km !== 0 || !row.engine_cc || !row.fuel_type || !hp || !images.length;
       if (invalid) return { row, error: "missing required source or power data" };
       const calc = calculateRuVladivostok({ priceKrw: row.price_krw, year: row.model_year, month: 6, engineCc: row.engine_cc, powerHp: hp, fuelType: fuel(row.fuel_type) ?? undefined, destinationCity: "Владивосток" });
-      return { row, hp: Math.round(hp), images, drive: driveFallback(row), spec, priceRub: Math.round(calc.totalRub) };
+      return { row, hp: Math.round(hp), images, drive: driveFallback(row), spec, calc, priceRub: Math.round(calc.totalRub) };
     });
     const failures = prepared.filter((item): item is { row: StageRow; error: string } => "error" in item);
     const valid = prepared.filter((item): item is Exclude<typeof item, { row: StageRow; error: string }> => !("error" in item));
@@ -111,7 +111,7 @@ async function main() {
     if (!dryRun) {
       await client.query("begin");
       try {
-        const carIds: Array<{ id: string; sourceId: string; images: string[] }> = [];
+        const carIds: Array<{ id: string; sourceId: string; images: string[]; calc: ReturnType<typeof calculateRuVladivostok>; row: StageRow; hp: number }> = [];
         for (const item of valid) {
           const { row, hp, drive, spec, priceRub, images } = item;
           const model = displayModel(row.model);
@@ -134,7 +134,7 @@ async function main() {
             returning id
           `, [row.source_listing_id, row.source_url, row.manufacturer, model, row.model_year, row.first_registration_date, row.mileage_km, row.price_krw, priceRub, row.engine_cc, hp,
             fuel(row.fuel_type), row.transmission, drive, row.exterior_color, row.body_type, row.location, row.vin_masked, JSON.stringify(metadata)]);
-          carIds.push({ id: result.rows[0].id, sourceId: row.source_listing_id, images });
+          carIds.push({ id: result.rows[0].id, sourceId: row.source_listing_id, images, calc: item.calc, row, hp });
         }
         const ids = carIds.map((car) => car.id);
         if (ids.length) await client.query(`delete from public.car_media where source='chestny_prigon' and car_id = any($1::uuid[])`, [ids]);
@@ -146,6 +146,18 @@ async function main() {
             return `($${base + 1},'chestny_prigon','image','outer',$${base + 2},$${base + 2},$${base + 3},$${base + 4},'external_url')`;
           });
           await client.query(`insert into public.car_media(car_id,source,media_type,category,url,thumbnail_url,sort_order,is_primary,legal_mode) values ${tuples.join(",")}`, values);
+        }
+        if (ids.length) await client.query(`delete from public.calc_snapshots where car_id = any($1::uuid[])`, [ids]);
+        for (let offset = 0; offset < carIds.length; offset += 100) {
+          const values: unknown[] = [];
+          const tuples = carIds.slice(offset, offset + 100).map((item, index) => {
+            const base = index * 12; const { calc, row, hp } = item;
+            values.push(item.id, calc.calcVersion,
+              JSON.stringify({ priceKrw: row.price_krw, year: row.model_year, month: 6, engineCc: row.engine_cc, powerHp: hp, fuelType: fuel(row.fuel_type), destinationCity: "Владивосток" }),
+              JSON.stringify({ ...calc.rates, details: calc.rateDetails }), JSON.stringify(calc), Math.round(calc.carPriceRub), Math.round(calc.dutyRub), Math.round(calc.feesRub), Math.round(calc.utilRub), Math.round(calc.freightRub), Math.round(calc.brokerRub), Math.round(calc.totalRub));
+            return `($${base + 1},'RU','Владивосток','individual',$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8},$${base + 9},$${base + 10},$${base + 11},$${base + 12})`;
+          });
+          await client.query(`insert into public.calc_snapshots(car_id,country_code,destination_city,importer_type,calc_version,inputs,rates,result,car_price_rub,duty_rub,fees_rub,util_rub,freight_rub,broker_rub,total_rub) values ${tuples.join(",")}`, values);
         }
         await client.query(`update public.chestny_catalog_staging set promotion_status='published', promotion_note='Published from local Encar-enriched staging; power and drive resolved locally.', updated_at=now() where source_listing_id = any($1::text[])`, [valid.map((item) => item.row.source_listing_id)]);
         await client.query("commit");
