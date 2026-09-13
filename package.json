@@ -111,6 +111,7 @@
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
     "tsx": "^4.23.0",
+    "undici": "^7.16.0",
     "typescript": "^5"
   },
   "overrides": {

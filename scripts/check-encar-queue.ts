@@ -1,4 +1,5 @@
 import { config } from "dotenv";
+import { fetch as undiciFetch, ProxyAgent } from "undici";
 import { createSupabaseAdmin } from "../src/server/supabase/admin";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
 
@@ -7,6 +8,8 @@ config({ path: ".env", quiet: true });
 
 const DETAIL_URL = "https://api.encar.com/v1/readside/vehicle";
 const LOCK_PATH = process.env.TL_AUTO_ENCAR_LOCK_PATH ?? "/tmp/tl-auto-encar-queue.lock";
+let proxyAgent: ProxyAgent | undefined;
+let configuredProxyUrl: string | undefined;
 
 type Car = { id: string; source_id: string; price_krw: number | null; encar_check_attempts: number };
 type Detail = { manage?: { modifyDateTime?: string }; advertisement?: { price?: number; salesStatus?: string; status?: string }; price?: number; salePrice?: number; sellPrice?: number; spec?: { price?: number; salePrice?: number } };
@@ -26,9 +29,16 @@ async function fetchDetail(sourceId: string, attempts: number) {
   let lastError: unknown;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      const response = await fetch(`${DETAIL_URL}/${sourceId}`, {
+      const proxyUrl = process.env.ENCAR_PROXY_URL?.trim();
+      if (proxyUrl && proxyUrl !== configuredProxyUrl) {
+        proxyAgent?.close();
+        proxyAgent = new ProxyAgent(proxyUrl);
+        configuredProxyUrl = proxyUrl;
+      }
+      const response = await undiciFetch(`${DETAIL_URL}/${sourceId}`, {
         headers: ENCAR_HEADERS,
         signal: AbortSignal.timeout(20_000),
+        ...(proxyAgent ? { dispatcher: proxyAgent } : {}),
       });
       if (response.status === 404 || response.status === 410) return response;
       if (!response.ok) throw new Error(`Encar HTTP ${response.status}`);
@@ -92,6 +102,6 @@ async function main() {
       await sleep(delayMs);
     }
     console.log(JSON.stringify({ ...summary, errorSamples }, null, 2));
-  } finally { await lockHandle.close(); await fs.unlink(LOCK_PATH).catch(() => undefined); }
+  } finally { await lockHandle.close(); await fs.unlink(LOCK_PATH).catch(() => undefined); proxyAgent?.close(); }
 }
 main().catch((error) => { console.error(error); process.exit(1); });
