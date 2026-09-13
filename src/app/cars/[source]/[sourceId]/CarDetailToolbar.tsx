@@ -140,7 +140,7 @@ export function CarDetailToolbar({ brand, model, priceRub, title }: CarDetailToo
           </div>
         </div>
 
-        <nav aria-label="Навигация по каталогу" className="mt-3 hidden items-center gap-1 overflow-x-auto whitespace-nowrap text-sm text-[#718096] lg:flex">
+        <nav aria-label="Навигация по каталогу" className="scrollbar-none -mx-3 mt-3 flex items-center gap-1 overflow-x-auto whitespace-nowrap px-3 text-sm text-[#718096] sm:mx-0 sm:px-0">
           <Link className="transition hover:text-[#8b682b]" href="/">TL Auto</Link>
           <ChevronRight size={15} />
           <Link className="transition hover:text-[#8b682b]" href="/catalog">Авто из Кореи</Link>
