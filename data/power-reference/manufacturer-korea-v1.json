@@ -2385,6 +2385,66 @@
       "matches": [
         { "badge": "CLA250 4MATIC", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1980, "engineCcTo": 2005 }
       ]
+    },
+    {
+      "specKey": "chevrolet-malibu-2.0-turbo-1998-253ps-2019-2022",
+      "brand": "Chevrolet",
+      "model": "Malibu",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2019, 2022],
+      "power": { "value": 253, "unit": "PS", "kw": 186.08118375 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Chevrolet Korea The New Malibu official price/specification document — 2.0 Turbo, 253 PS",
+        "uri": "https://www.chevrolet.co.kr/content/dam/chevrolet/as/kr/ko/index/finance/type-price/02-pdfs/2023%EB%85%84%202%EC%9B%94%20%EC%A0%84%EC%B0%A8%EC%A2%85%20%EA%B0%80%EA%B2%A9%ED%91%9C.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Chevrolet Korea document specifies the 1,998 cc 2.0 Turbo gasoline engine at 253 PS; restricted to matching Malibu engine/year rows."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2022, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "kia-sportage-ql-1.6-diesel-1598-136ps-2019-2021",
+      "brand": "Kia",
+      "model": "Sportage",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2019, 2021],
+      "power": { "value": 136, "unit": "PS", "kw": 100.02783 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sportage QL official Korean catalogue — 1.6 diesel, 136 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Kia official catalogue lists the 1.6 diesel at 1,598 cc and 136 PS; restricted to Sportage QL 2019–2021 rows."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2021, "engineCcFrom": 1590, "engineCcTo": 1605 }
+      ]
+    },
+    {
+      "specKey": "kia-sportage-ql-2.0-diesel-1995-184ps-2019-2021",
+      "brand": "Kia",
+      "model": "Sportage",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1995,
+      "years": [2019, 2021],
+      "power": { "value": 184, "unit": "PS", "kw": 135.33177 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sportage QL official Korean catalogue — 2.0 diesel, 184 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Kia official catalogue lists the 2.0 diesel at 1,995 cc and 184 PS; restricted to Sportage QL 2019–2021 rows."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2021, "engineCcFrom": 1985, "engineCcTo": 2005 }
+      ]
     }
   ]
 }
