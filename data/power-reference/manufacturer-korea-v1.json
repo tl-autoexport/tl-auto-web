@@ -2525,6 +2525,86 @@
       "matches": [
         { "yearFrom": 2020, "yearTo": 2022, "engineCcFrom": 1960, "engineCcTo": 1975 }
       ]
+    },
+    {
+      "specKey": "chevrolet-trax-1.4-turbo-1399-155ps-2021",
+      "brand": "Chevrolet",
+      "model": "Trax",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1399,
+      "years": [2021, 2021],
+      "power": { "value": 155, "unit": "PS", "kw": 114.00230625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Chevrolet Korea Trax official specification — 1.4 Turbo, 155 PS",
+        "uri": "https://pp.chevrolet.co.kr/httpobject/file/pricelist/trax.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Chevrolet Korea lists 1,399 cc and 155 PS for the SGE 1.4 Turbo; restricted to 2021 Trax rows."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 1390, "engineCcTo": 1405 }
+      ]
+    },
+    {
+      "specKey": "mercedes-glb-200d-1950-150ps-2021-2021",
+      "brand": "Mercedes-Benz",
+      "model": "GLB-Class",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1950,
+      "years": [2021, 2021],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz Media GLB 200 d official technical data — 2.0 diesel, 150 PS",
+        "uri": "https://static1.media.mercedes-benz.com/article/92f9e2d0-baf4-44f4-9013-1db013cd3cc4",
+        "retrievedAt": "2026-09-13",
+        "note": "Mercedes-Benz Media lists the GLB 200 d OM654q at 110 kW/150 PS; restricted to 1,950 cc 2021 diesel rows."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 1940, "engineCcTo": 1960 }
+      ]
+    },
+    {
+      "specKey": "volkswagen-jetta-1.4-tsi-1395-150ps-2021-2024",
+      "brand": "Volkswagen",
+      "model": "Jetta",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1395,
+      "years": [2021, 2024],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Volkswagen Newsroom Jetta official technical data — 1.4 TSI, 150 PS",
+        "uri": "https://www.volkswagen-newsroom.com/en/press-releases/the-new-jetta-world-premiere-north-american-international-auto-show-410",
+        "retrievedAt": "2026-09-13",
+        "note": "Volkswagen Newsroom lists the 1.4 TSI at 110 kW/150 PS; restricted to matching Jetta 1,395 cc gasoline rows."
+      },
+      "matches": [
+        { "yearFrom": 2021, "yearTo": 2024, "engineCcFrom": 1390, "engineCcTo": 1405 }
+      ]
+    },
+    {
+      "specKey": "volkswagen-tiguan-2.0-tdi-1968-150ps-2019-2024",
+      "brand": "Volkswagen",
+      "model": "Tiguan",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1968,
+      "years": [2019, 2024],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Volkswagen Newsroom Tiguan official technical data — 2.0 TDI, 150 PS",
+        "uri": "https://www.volkswagen-newsroom.com/en/the-new-tiguan-allspace-test-drives-7543/technical-data-7556",
+        "retrievedAt": "2026-09-13",
+        "note": "Volkswagen technical data lists 1,968 cc 2.0 TDI at 110 kW/150 PS; restricted to matching 2019–2024 Tiguan diesel rows."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1960, "engineCcTo": 1975 }
+      ]
     }
   ]
 }
