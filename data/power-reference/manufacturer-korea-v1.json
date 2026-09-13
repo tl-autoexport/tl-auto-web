@@ -2445,6 +2445,26 @@
       "matches": [
         { "yearFrom": 2019, "yearTo": 2021, "engineCcFrom": 1985, "engineCcTo": 2005 }
       ]
+    },
+    {
+      "specKey": "chevrolet-spark-m400-1.0-999-75ps-2020",
+      "brand": "Chevrolet",
+      "model": "Spark",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 999,
+      "years": [2020, 2020],
+      "power": { "value": 75, "unit": "PS", "kw": 55.16240625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Chevrolet Korea The New Spark official specification — 1.0 gasoline, 75 PS",
+        "uri": "https://pp.chevrolet.co.kr/httpobject/file/pricelist/spark.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Chevrolet Korea specification lists 999 cc and 75 PS for the 1.0 gasoline Spark; restricted to 2020 rows."
+      },
+      "matches": [
+        { "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 995, "engineCcTo": 1005 }
+      ]
     }
   ]
 }
