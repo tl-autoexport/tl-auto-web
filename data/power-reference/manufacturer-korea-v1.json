@@ -2645,6 +2645,46 @@
       "matches": [
         { "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1585, "engineCcTo": 1610 }
       ]
+    },
+    {
+      "specKey": "kia-k3-1.6-gasoline-1598-123ps-2019-2020",
+      "brand": "Kia",
+      "model": "K3",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2019, 2020],
+      "power": { "value": 123, "unit": "PS", "kw": 90.46634625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia K3 2020 official Korean catalogue — 1.6 gasoline, 123 PS",
+        "uri": "https://www.kia.com/content/dam/kwcms/kr/ko/files/XDB/price/price_k3.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Kia's 2020 Korean K3 catalogue lists the 1.6 gasoline engine at 1,598 cc and 123 PS; restricted to 2019–2020 rows."
+      },
+      "matches": [
+        { "yearFrom": 2019, "yearTo": 2020, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "hyundai-tucson-2.0-diesel-1998-186ps-2021-4wd",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2021, 2021],
+      "power": { "value": 186, "unit": "PS", "kw": 136.8027675 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Tucson 2021 official technical data — 2.0 diesel, 186 PS",
+        "uri": "https://www.hyundai.com/contents/repn-car/catalog_en/tucson-catalog.pdf",
+        "retrievedAt": "2026-09-13",
+        "note": "Hyundai's 2021 Tucson technical data lists the 1,998 cc Smartstream D2.0 at 186 PS and includes AWD configurations; restricted to 2021 4WD rows."
+      },
+      "matches": [
+        { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 1988, "engineCcTo": 2005 }
+      ]
     }
   ]
 }
