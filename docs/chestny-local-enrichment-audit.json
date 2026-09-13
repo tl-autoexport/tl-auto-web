@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-09-13T04:40:27.402Z",
+  "encarRequests": 0,
+  "queueRows": 2834,
+  "matchedSourceVehicles": 2834,
+  "queueRowsWithLocalPhotos": 587,
+  "queueRowsWithoutLocalPhotos": 2247,
+  "localPhotoRows": 14910,
+  "note": "Read-only comparison of TL Auto queue with existing Chesty vehicle_images; no writes."
+}

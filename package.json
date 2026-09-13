@@ -83,6 +83,7 @@
     "build:chestny:power-queue": "tsx scripts/build-chestny-power-review-queue.ts",
     "auto:qualify:reserve": "tsx scripts/auto-qualify-chestny-reserve.ts",
     "audit:reserve-queue": "tsx scripts/audit-chestny-reserve-queue.ts",
+    "audit:local-enrichment": "tsx scripts/audit-chestny-local-enrichment.ts",
     "import:chestny:verified": "tsx scripts/import-verified-chestny-catalog.ts",
     "backfill:chestny:attributes": "tsx scripts/backfill-chestny-attributes.ts",
     "sync:chestny:images": "tsx scripts/sync-chestny-images.ts",
