@@ -1,11 +1,12 @@
 [Unit]
-Description=Run approved TL Auto Chestny enrichment batch overnight
+Description=Run approved TL Auto Chestny enrichment batch continuously
 
 [Timer]
-## 00:00–06:40 Asia/Seoul = 15:00–21:40 UTC. Radar is least active in this window.
-OnCalendar=*-*-* 15,16,17,18,19,20,21:00,20,40:00 UTC
+## Each wave handles at most 50 rows. If the shared TL Auto lock is busy,
+## this run exits and the next five-minute slot retries the queue.
+OnCalendar=*-*-* *:0/5:00
 Persistent=true
-RandomizedDelaySec=2m
+AccuracySec=30s
 Unit=tl-auto-chestny-enrichment.service
 
 [Install]
