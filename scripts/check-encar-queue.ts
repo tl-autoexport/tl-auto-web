@@ -14,7 +14,7 @@ const execFileAsync = promisify(execFile);
 let proxyAgent: ProxyAgent | undefined;
 let configuredProxyUrl: string | undefined;
 
-type Car = { id: string; source_id: string; price_krw: number | null; encar_check_attempts: number };
+type Car = { id: string; source_id: string; source_url: string | null; price_krw: number | null; encar_check_attempts: number };
 type Detail = { manage?: { modifyDateTime?: string }; advertisement?: { price?: number; salesStatus?: string; status?: string }; price?: number; salePrice?: number; sellPrice?: number; spec?: { price?: number; salePrice?: number } };
 
 function positiveInt(value: string | undefined, fallback: number) {
@@ -27,6 +27,9 @@ function priceFrom(detail: Detail) {
   // Encar's advertisement.price is expressed in 만 KRW (10,000 KRW units).
   const multiplier = detail.advertisement?.price === raw ? 10_000 : 1;
   return typeof raw === "number" && Number.isFinite(raw) && raw > 0 ? Math.round(raw * multiplier) : null;
+}
+function encarId(car: Pick<Car, "source_id" | "source_url">) {
+  return car.source_url?.match(/[?&]carid=(\d+)/i)?.[1] ?? car.source_id;
 }
 async function fetchDetail(sourceId: string, attempts: number) {
   let lastError: unknown;
@@ -69,7 +72,7 @@ async function main() {
   try {
     const db = createSupabaseAdmin();
     const { data, error } = await db.from("cars")
-      .select("id,source_id,price_krw,encar_check_attempts")
+      .select("id,source_id,source_url,price_krw,encar_check_attempts")
       // TL Auto publishes the catalog sourced from Chesty; Encar is used only
       // as the live authority for availability and current price.
       .eq("primary_source", "chestny_prigon").eq("is_available", true)
@@ -85,7 +88,8 @@ async function main() {
       const checkedAt = new Date().toISOString();
       try {
         summary.checked++;
-        const response = await fetchDetail(car.source_id, positiveInt(process.env.TL_AUTO_ENCAR_ATTEMPTS, 5));
+        const sourceId = encarId(car);
+        const response = await fetchDetail(sourceId, positiveInt(process.env.TL_AUTO_ENCAR_ATTEMPTS, 5));
         if (response.status === 404 || response.status === 410) {
           summary.unavailable++;
           if (!dryRun) await db.from("cars").update({ is_available: false, sale_status: "source_unavailable", encar_check_status: "unavailable", encar_check_error: null, encar_check_attempts: 0, last_seen_at: checkedAt, next_encar_check_at: null }).eq("id", car.id);
@@ -100,7 +104,7 @@ async function main() {
       } catch (error) {
         summary.errors++;
         const message = error instanceof Error ? error.message : String(error);
-        if (errorSamples.length < 5) errorSamples.push({ sourceId: car.source_id, error: message });
+        if (errorSamples.length < 5) errorSamples.push({ sourceId: `${car.source_id} (encar:${encarId(car)})`, error: message });
         if (!dryRun) await db.from("cars").update({ encar_check_status: "error", encar_check_error: message, encar_check_attempts: car.encar_check_attempts + 1, next_encar_check_at: new Date(Date.now() + 15 * 60_000).toISOString() }).eq("id", car.id);
       }
       await sleep(delayMs);
