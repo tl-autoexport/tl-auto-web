@@ -1,10 +1,11 @@
 [Unit]
-Description=Run approved TL Auto Chestny enrichment batch
+Description=Run approved TL Auto Chestny enrichment batch overnight
 
 [Timer]
-OnCalendar=*-*-* 02:30:00 UTC
+## 00:00–06:40 Asia/Seoul = 15:00–21:40 UTC. Radar is least active in this window.
+OnCalendar=*-*-* 15,16,17,18,19,20,21:00,20,40:00 UTC
 Persistent=true
-RandomizedDelaySec=15m
+RandomizedDelaySec=2m
 Unit=tl-auto-chestny-enrichment.service
 
 [Install]

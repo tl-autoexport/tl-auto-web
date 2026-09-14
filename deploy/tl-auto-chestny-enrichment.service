@@ -9,12 +9,14 @@ User=ubuntu
 WorkingDirectory=/home/ubuntu/tl-auto
 EnvironmentFile=/home/ubuntu/tl-auto/.env
 Environment=CHESTNY_ENRICHMENT_RUN_ID=98b17628-1dab-460d-972b-f7f092fbcc42
-Environment=CHESTNY_ENRICHMENT_BATCH_SIZE=10
+Environment=CHESTNY_ENRICHMENT_BATCH_SIZE=50
 Environment=CHESTNY_ENRICHMENT_DELAY_MS=2000
-Environment=CHESTNY_ENRICHMENT_DRY_RUN=true
+Environment=CHESTNY_ENRICHMENT_DRY_RUN=false
 # Set CHESTNY_ENRICHMENT_PROXY_URL in /home/ubuntu/tl-auto/.env to keep this
 # batch workload off the Radar proxy. ENCAR_PROXY_URL is only a fallback.
 ExecStart=/usr/bin/flock -n /tmp/tl-auto-chestny-encar.lock /usr/bin/npm run enrich:chestny:queue
 TimeoutStartSec=1800
+Nice=10
+IOSchedulingClass=idle
 NoNewPrivileges=true
 PrivateTmp=false
