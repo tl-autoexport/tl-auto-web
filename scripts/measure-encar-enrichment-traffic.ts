@@ -1,4 +1,4 @@
-import { Client } from "pg";
+import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import { fetch as undiciFetch, ProxyAgent } from "undici";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
@@ -6,10 +6,11 @@ import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
-const dbUrl = process.env.SUPABASE_DB_URL;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 const runId = process.env.ENCAR_TRAFFIC_RUN_ID ?? "98b17628-1dab-460d-972b-f7f092fbcc42";
 const limit = Math.min(10, Math.max(1, Number(process.env.ENCAR_TRAFFIC_LIMIT ?? 10)));
-if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
+if (!supabaseUrl || !supabaseKey) throw new Error("TL Auto Supabase admin credentials are required");
 
 // Traffic measurement must reflect the approved VPS/proxy route. Fail closed
 // instead of accidentally sending direct requests from a developer machine.
@@ -40,20 +41,16 @@ async function request(path: string) {
 }
 
 async function main() {
-  const client = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
-  await client.connect();
+  const client = createClient(supabaseUrl!, supabaseKey!, { auth: { persistSession: false, autoRefreshToken: false } });
   try {
     const [queue, run] = await Promise.all([
-      client.query<QueueRow>(`
-      select source_listing_id,candidate_snapshot
-        from public.catalog_enrichment_queue
-       where run_id=$1 and status='queued'
-       order by created_at
-       limit $2
-      `, [runId, limit]),
-      client.query<{ candidate_count: number }>("select candidate_count from public.catalog_enrichment_runs where id=$1", [runId]),
+      client.from("catalog_enrichment_queue").select("source_listing_id,candidate_snapshot")
+        .eq("run_id", runId).eq("status", "queued").order("created_at").limit(limit),
+      client.from("catalog_enrichment_runs").select("candidate_count").eq("id", runId).maybeSingle(),
     ]);
-    const rows = queue.rows;
+    if (queue.error) throw new Error(queue.error.message);
+    if (run.error) throw new Error(run.error.message);
+    const rows = (queue.data ?? []) as QueueRow[];
     if (!rows.length) throw new Error(`No queued cards found for run ${runId}`);
     const requests: Array<{ sourceId: string; endpoint: string; status: number; bytes: number; milliseconds: number }> = [];
     for (const row of rows) {
@@ -92,7 +89,7 @@ async function main() {
     const activeCards = new Set(requests.filter((item) => item.endpoint.includes("/vehicle/") && item.status >= 200 && item.status < 300).map((item) => item.sourceId)).size;
     const detailBytes = requests.filter((item) => /\/vehicle\/\d+$/.test(item.endpoint)).reduce((sum, item) => sum + item.bytes, 0);
     const auxiliaryBytes = totalBytes - detailBytes;
-    const targetCards = run.rows[0]?.candidate_count ?? 3017;
+    const targetCards = run.data?.candidate_count ?? 3017;
     const projectedBytes = cardCount
       ? Math.round((detailBytes / cardCount) * targetCards + (activeCards ? auxiliaryBytes / activeCards : 0) * targetCards * (activeCards / cardCount))
       : 0;
@@ -120,10 +117,7 @@ async function main() {
       ])),
     };
     console.log(JSON.stringify(summary, null, 2));
-  } finally {
-    await client.end();
-    await agent?.close();
-  }
+  } finally { await agent?.close(); }
 }
 
 main().catch((error) => {
