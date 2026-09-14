@@ -55,6 +55,16 @@ function photoCategory(value: unknown) {
   return "photo";
 }
 
+function driveValues(value: unknown, key = ""): string[] {
+  if (Array.isArray(value)) return value.flatMap((item) => driveValues(item, key));
+  if (!value || typeof value !== "object") {
+    return /drive|traction|wheel|륜|구동|주행/i.test(key) && text(value) ? [text(value)!] : [];
+  }
+  return Object.entries(value as Record<string, unknown>).flatMap(([childKey, child]) =>
+    driveValues(child, childKey),
+  );
+}
+
 async function getJson<T>(requestUrl: string): Promise<T> {
   // Encar's public FEM card reads these endpoints directly.  Do not use the
   // legacy IP-verification helper here: it currently rejects our server IP
@@ -171,6 +181,7 @@ async function main() {
       const driveType = normalizeDrive([
         chestny?.drive_type, chestny?.trim, chestny?.generation, car.drive_type,
         text(category.gradeEnglishName), text(category.gradeDetailEnglishName),
+        ...driveValues(detail),
       ].filter(Boolean).join(" ")) ?? car.drive_type;
       const vehicleSpecs = { ...object(car.vehicle_specs), ...(seats && seats > 0 ? { seats } : {}) };
       const condition = object(detail.condition); const inspectionCondition = object(condition.inspection);
