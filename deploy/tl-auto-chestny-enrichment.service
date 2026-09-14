@@ -14,7 +14,9 @@ Environment=CHESTNY_ENRICHMENT_DELAY_MS=2000
 Environment=CHESTNY_ENRICHMENT_DRY_RUN=false
 # Set CHESTNY_ENRICHMENT_PROXY_URL in /home/ubuntu/tl-auto/.env to keep this
 # batch workload off the Radar proxy. ENCAR_PROXY_URL is only a fallback.
-ExecStart=/usr/bin/flock -n /tmp/tl-auto-chestny-encar.lock /usr/bin/npm run enrich:chestny:queue
+# Exit successfully when the TL Auto freshness worker owns the lock. A timer
+# slot is then deferred to the next five-minute interval without false alerts.
+ExecStart=/bin/sh -c '/usr/bin/flock -E 75 -n /tmp/tl-auto-chestny-encar.lock /usr/bin/npm run enrich:chestny:queue; result=$$?; test $$result -eq 75 && exit 0; exit $$result'
 TimeoutStartSec=1800
 Nice=10
 IOSchedulingClass=idle
