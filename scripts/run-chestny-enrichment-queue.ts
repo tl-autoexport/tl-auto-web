@@ -10,6 +10,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 const runId = process.env.CHESTNY_ENRICHMENT_RUN_ID ?? "98b17628-1dab-460d-972b-f7f092fbcc42";
 const batchSize = Math.min(50, Math.max(1, Number(process.env.CHESTNY_ENRICHMENT_BATCH_SIZE ?? 10)));
+const previewOffset = Math.max(0, Number(process.env.CHESTNY_ENRICHMENT_PREVIEW_OFFSET ?? 0));
 const delayMs = Math.max(1_000, Number(process.env.CHESTNY_ENRICHMENT_DELAY_MS ?? 2_000));
 const leaseMinutes = Math.max(5, Number(process.env.CHESTNY_ENRICHMENT_LEASE_MINUTES ?? 30));
 const write = process.env.CHESTNY_ENRICHMENT_DRY_RUN === "false";
@@ -96,7 +97,7 @@ async function main() {
       if (error) throw new Error(error.message);
       if (count === 0) await db.from("catalog_enrichment_runs").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", runId).eq("status", "running");
     }
-    console.log(JSON.stringify({ runId, write, batchSize, claimed: rows.length, succeeded: results.filter((x) => x.status === "succeeded").length, unavailable: results.filter((x) => x.status === "unavailable").length, failed: results.filter((x) => x.status === "failed").length, results }, null, 2));
+    console.log(JSON.stringify({ runId, write, batchSize, previewOffset: write ? undefined : previewOffset, claimed: rows.length, succeeded: results.filter((x) => x.status === "succeeded").length, unavailable: results.filter((x) => x.status === "unavailable").length, failed: results.filter((x) => x.status === "failed").length, results }, null, 2));
   } finally { await agent?.close(); }
 }
 
@@ -107,7 +108,7 @@ async function claim(db: DatabaseClient) {
 }
 
 async function preview(db: DatabaseClient) {
-  const { data, error } = await db.from("catalog_enrichment_queue").select("id,source_listing_id,source_url,candidate_snapshot").eq("run_id", runId).eq("status", "queued").order("created_at").limit(batchSize);
+  const { data, error } = await db.from("catalog_enrichment_queue").select("id,source_listing_id,source_url,candidate_snapshot").eq("run_id", runId).eq("status", "queued").order("created_at").range(previewOffset, previewOffset + batchSize - 1);
   if (error) throw new Error(error.message);
   return (data ?? []) as QueueRow[];
 }
