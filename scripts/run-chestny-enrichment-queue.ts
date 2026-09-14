@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import { fetch as undiciFetch, ProxyAgent } from "undici";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
 
 config({ path: ".env.local", quiet: true });
@@ -18,6 +19,9 @@ const write = process.env.CHESTNY_ENRICHMENT_DRY_RUN === "false";
 // uses its own proxy; legacy ENCAR_PROXY_URL remains a backward-compatible
 // fallback for the controlled manual waves already in progress.
 const proxyUrl = process.env.CHESTNY_ENRICHMENT_PROXY_URL?.trim() || process.env.ENCAR_PROXY_URL?.trim();
+const coordinationDirectory = process.env.ENCAR_COORDINATION_DIR ?? "/tmp/encar-coordination";
+const radarPriorityPath = `${coordinationDirectory}/radar-priority.json`;
+const enrichmentActivePath = `${coordinationDirectory}/enrichment-active.json`;
 
 if (!supabaseUrl || !supabaseKey) throw new Error("TL Auto Supabase admin credentials are required");
 if (!proxyUrl && process.env.CHESTNY_ENRICHMENT_ALLOW_DIRECT !== "true") throw new Error("CHESTNY_ENRICHMENT_PROXY_URL or ENCAR_PROXY_URL is required; direct enrichment is disabled");
@@ -34,6 +38,20 @@ const text = (value: unknown) => typeof value === "string" && value.trim() ? val
 const object = (value: unknown): JsonObject => value && typeof value === "object" ? value as JsonObject : {};
 const encarId = (row: QueueRow) => text(row.candidate_snapshot.encarId) ?? row.source_url.match(/[?&]carid=(\d+)/i)?.[1] ?? null;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function radarHasPriority() {
+  try {
+    const owner = JSON.parse(await readFile(radarPriorityPath, "utf8")) as { pid?: unknown };
+    if (!Number.isInteger(owner.pid) || Number(owner.pid) < 1) return false;
+    try { process.kill(Number(owner.pid), 0); return true; } catch { return false; }
+  } catch { return false; }
+}
+
+async function markEnrichmentActive() {
+  await mkdir(coordinationDirectory, { recursive: true });
+  await writeFile(enrichmentActivePath, JSON.stringify({ pid: process.pid, startedAt: new Date().toISOString() }), { mode: 0o600 });
+  return async () => { await rm(enrichmentActivePath, { force: true }); };
+}
 
 async function requestJson(url: string, attempts = 3): Promise<unknown> {
   let last: unknown;
@@ -52,6 +70,7 @@ async function requestJson(url: string, attempts = 3): Promise<unknown> {
 async function main() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = createClient<any>(supabaseUrl!, supabaseKey!, { auth: { persistSession: false, autoRefreshToken: false } });
+  const releaseEnrichmentActivity = write ? await markEnrichmentActive() : null;
   try {
     const { data: run, error: runError } = await db.from("catalog_enrichment_runs").select("status").eq("id", runId).maybeSingle();
     if (runError) throw new Error(runError.message);
@@ -62,7 +81,18 @@ async function main() {
     }
     const rows = write ? await claim(db) : await preview(db);
     const results: Array<Record<string, unknown>> = [];
-    for (const row of rows) {
+    let deferredToRadar = 0;
+    for (let index = 0; index < rows.length; index += 1) {
+      const row = rows[index]!;
+      if (write && await radarHasPriority()) {
+        const deferredRows = rows.slice(index);
+        const { error } = await db.from("catalog_enrichment_queue")
+          .update({ status: "queued", lease_until: null, updated_at: new Date().toISOString() })
+          .in("id", deferredRows.map((item) => item.id));
+        if (error) throw new Error(error.message);
+        deferredToRadar = deferredRows.length;
+        break;
+      }
       const id = encarId(row);
       try {
         if (!id) throw new Error("missing Encar id");
@@ -100,8 +130,8 @@ async function main() {
       if (error) throw new Error(error.message);
       if (count === 0) await db.from("catalog_enrichment_runs").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", runId).eq("status", "running");
     }
-    console.log(JSON.stringify({ runId, write, batchSize, previewOffset: write ? undefined : previewOffset, claimed: rows.length, succeeded: results.filter((x) => x.status === "succeeded").length, unavailable: results.filter((x) => x.status === "unavailable").length, failed: results.filter((x) => x.status === "failed").length, results }, null, 2));
-  } finally { await agent?.close(); }
+    console.log(JSON.stringify({ runId, write, batchSize, previewOffset: write ? undefined : previewOffset, claimed: rows.length, deferredToRadar, succeeded: results.filter((x) => x.status === "succeeded").length, unavailable: results.filter((x) => x.status === "unavailable").length, failed: results.filter((x) => x.status === "failed").length, results }, null, 2));
+  } finally { await releaseEnrichmentActivity?.(); await agent?.close(); }
 }
 
 async function claim(db: DatabaseClient) {
