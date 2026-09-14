@@ -1,0 +1,11 @@
+[Unit]
+Description=Run approved TL Auto Chestny enrichment batch
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 UTC
+Persistent=true
+RandomizedDelaySec=15m
+Unit=tl-auto-chestny-enrichment.service
+
+[Install]
+WantedBy=timers.target

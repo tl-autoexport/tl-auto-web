@@ -1,0 +1,18 @@
+[Unit]
+Description=TL Auto approved Chestny catalog Encar enrichment batch
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/tl-auto
+EnvironmentFile=/home/ubuntu/tl-auto/.env
+Environment=CHESTNY_ENRICHMENT_RUN_ID=98b17628-1dab-460d-972b-f7f092fbcc42
+Environment=CHESTNY_ENRICHMENT_BATCH_SIZE=10
+Environment=CHESTNY_ENRICHMENT_DELAY_MS=2000
+Environment=CHESTNY_ENRICHMENT_DRY_RUN=true
+ExecStart=/usr/bin/flock -n /tmp/tl-auto-chestny-encar.lock /usr/bin/npm run enrich:chestny:queue
+TimeoutStartSec=1800
+NoNewPrivileges=true
+PrivateTmp=false
