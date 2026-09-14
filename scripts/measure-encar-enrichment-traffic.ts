@@ -9,7 +9,7 @@ config({ path: ".env", quiet: true });
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 const runId = process.env.ENCAR_TRAFFIC_RUN_ID ?? "98b17628-1dab-460d-972b-f7f092fbcc42";
-const limit = Math.min(10, Math.max(1, Number(process.env.ENCAR_TRAFFIC_LIMIT ?? 10)));
+const limit = Math.min(10, Math.max(1, Number(process.env.ENCAR_TRAFFIC_LIMIT ?? 5)));
 if (!supabaseUrl || !supabaseKey) throw new Error("TL Auto Supabase admin credentials are required");
 
 // Traffic measurement must reflect the approved VPS/proxy route. Fail closed
@@ -43,14 +43,17 @@ async function request(path: string) {
 async function main() {
   const client = createClient(supabaseUrl!, supabaseKey!, { auth: { persistSession: false, autoRefreshToken: false } });
   try {
-    const [queue, run] = await Promise.all([
-      client.from("catalog_enrichment_queue").select("source_listing_id,candidate_snapshot")
-        .eq("run_id", runId).eq("status", "queued").order("created_at").limit(limit),
-      client.from("catalog_enrichment_runs").select("candidate_count").eq("id", runId).maybeSingle(),
-    ]);
-    if (queue.error) throw new Error(queue.error.message);
+    const run = await client.from("catalog_enrichment_runs").select("candidate_count").eq("id", runId).maybeSingle();
     if (run.error) throw new Error(run.error.message);
-    const rows = (queue.data ?? []) as QueueRow[];
+    const targetCards = run.data?.candidate_count ?? 3017;
+    // A queue built from a moving source can age unevenly. Sample its start,
+    // middle and end instead of declaring the entire run stale from one page.
+    const offsets = [...new Set([0, Math.max(0, Math.floor(targetCards / 2) - Math.floor(limit / 2)), Math.max(0, targetCards - limit)])];
+    const batches = await Promise.all(offsets.map((offset) => client.from("catalog_enrichment_queue")
+      .select("source_listing_id,candidate_snapshot").eq("run_id", runId).eq("status", "queued")
+      .order("created_at").range(offset, offset + limit - 1)));
+    for (const batch of batches) if (batch.error) throw new Error(batch.error.message);
+    const rows = [...new Map(batches.flatMap((batch) => (batch.data ?? []) as QueueRow[]).map((row) => [row.source_listing_id, row])).values()];
     if (!rows.length) throw new Error(`No queued cards found for run ${runId}`);
     const requests: Array<{ sourceId: string; endpoint: string; status: number; bytes: number; milliseconds: number }> = [];
     for (const row of rows) {
@@ -89,7 +92,6 @@ async function main() {
     const activeCards = new Set(requests.filter((item) => item.endpoint.includes("/vehicle/") && item.status >= 200 && item.status < 300).map((item) => item.sourceId)).size;
     const detailBytes = requests.filter((item) => /\/vehicle\/\d+$/.test(item.endpoint)).reduce((sum, item) => sum + item.bytes, 0);
     const auxiliaryBytes = totalBytes - detailBytes;
-    const targetCards = run.data?.candidate_count ?? 3017;
     const projectedBytes = cardCount
       ? Math.round((detailBytes / cardCount) * targetCards + (activeCards ? auxiliaryBytes / activeCards : 0) * targetCards * (activeCards / cardCount))
       : 0;
@@ -99,6 +101,7 @@ async function main() {
       activeCards,
       activeRate: cardCount ? Number((activeCards / cardCount).toFixed(3)) : 0,
       targetCards,
+      sampleOffsets: offsets,
       requests: requests.length,
       successfulResponses: requests.filter((item) => item.status >= 200 && item.status < 300).length,
       notFoundResponses: requests.filter((item) => item.status === 404 || item.status === 410).length,
