@@ -14,12 +14,13 @@ if (!supabaseUrl || !supabaseKey) throw new Error("TL Auto Supabase admin creden
 
 // Traffic measurement must reflect the approved VPS/proxy route. Fail closed
 // instead of accidentally sending direct requests from a developer machine.
-if (!process.env.ENCAR_PROXY_URL?.trim() && process.env.ENCAR_TRAFFIC_ALLOW_DIRECT !== "true") {
-  throw new Error("ENCAR_PROXY_URL is required; direct Encar measurement is disabled");
+const proxyUrl = process.env.CHESTNY_ENRICHMENT_PROXY_URL?.trim() || process.env.ENCAR_PROXY_URL?.trim();
+if (!proxyUrl && process.env.ENCAR_TRAFFIC_ALLOW_DIRECT !== "true") {
+  throw new Error("CHESTNY_ENRICHMENT_PROXY_URL or ENCAR_PROXY_URL is required; direct Encar measurement is disabled");
 }
 
-const agent = process.env.ENCAR_PROXY_URL?.trim()
-  ? new ProxyAgent(process.env.ENCAR_PROXY_URL.trim())
+const agent = proxyUrl
+  ? new ProxyAgent(proxyUrl)
   : undefined;
 const base = "https://api.encar.com/v1/readside";
 

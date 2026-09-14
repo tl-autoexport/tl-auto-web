@@ -14,10 +14,13 @@ const previewOffset = Math.max(0, Number(process.env.CHESTNY_ENRICHMENT_PREVIEW_
 const delayMs = Math.max(1_000, Number(process.env.CHESTNY_ENRICHMENT_DELAY_MS ?? 2_000));
 const leaseMinutes = Math.max(5, Number(process.env.CHESTNY_ENRICHMENT_LEASE_MINUTES ?? 30));
 const write = process.env.CHESTNY_ENRICHMENT_DRY_RUN === "false";
-const proxyUrl = process.env.ENCAR_PROXY_URL?.trim();
+// Keep the high-priority Radar route isolated. When configured, enrichment
+// uses its own proxy; legacy ENCAR_PROXY_URL remains a backward-compatible
+// fallback for the controlled manual waves already in progress.
+const proxyUrl = process.env.CHESTNY_ENRICHMENT_PROXY_URL?.trim() || process.env.ENCAR_PROXY_URL?.trim();
 
 if (!supabaseUrl || !supabaseKey) throw new Error("TL Auto Supabase admin credentials are required");
-if (!proxyUrl && process.env.CHESTNY_ENRICHMENT_ALLOW_DIRECT !== "true") throw new Error("ENCAR_PROXY_URL is required; direct enrichment is disabled");
+if (!proxyUrl && process.env.CHESTNY_ENRICHMENT_ALLOW_DIRECT !== "true") throw new Error("CHESTNY_ENRICHMENT_PROXY_URL or ENCAR_PROXY_URL is required; direct enrichment is disabled");
 
 type QueueRow = { id: string; source_listing_id: string; source_url: string; candidate_snapshot: Record<string, unknown> };
 type JsonObject = Record<string, unknown>;
