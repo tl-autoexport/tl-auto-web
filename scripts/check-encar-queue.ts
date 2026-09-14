@@ -2,6 +2,7 @@ import { config } from "dotenv";
 import { fetch as undiciFetch, ProxyAgent } from "undici";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { resolve } from "node:path";
 import { createSupabaseAdmin } from "../src/server/supabase/admin";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
 
@@ -111,7 +112,7 @@ async function main() {
     }
     let recalculation: unknown = null;
     if (!dryRun && priceChangedIds.length) {
-      const result = await execFileAsync("/usr/bin/npm", ["run", "recalculate:catalog:write"], {
+      const result = await execFileAsync(process.execPath, [resolve("node_modules/tsx/dist/cli.mjs"), "scripts/recalculate-active-catalog.ts"], {
         cwd: process.cwd(),
         env: { ...process.env, RECALCULATE_DRY_RUN: "false", RECALCULATE_FORCE: "true", RECALCULATE_IDS: priceChangedIds.join(","), RECALCULATE_SUMMARY: "true" },
         maxBuffer: 10 * 1024 * 1024,
