@@ -14,6 +14,10 @@ const batchSize = Math.min(50, Math.max(1, Number(process.env.CHESTNY_ENRICHMENT
 const previewOffset = Math.max(0, Number(process.env.CHESTNY_ENRICHMENT_PREVIEW_OFFSET ?? 0));
 const delayMs = Math.max(1_000, Number(process.env.CHESTNY_ENRICHMENT_DELAY_MS ?? 2_000));
 const leaseMinutes = Math.max(5, Number(process.env.CHESTNY_ENRICHMENT_LEASE_MINUTES ?? 30));
+// Network-level faults get a small, bounded second chance.  Terminal Encar
+// responses (404/410) are never retried, and a persistent technical error is
+// left visible as failed after this many attempts for manual review.
+const maxAttempts = Math.min(5, Math.max(1, Number(process.env.CHESTNY_ENRICHMENT_MAX_ATTEMPTS ?? 3)));
 const write = process.env.CHESTNY_ENRICHMENT_DRY_RUN === "false";
 // Keep the high-priority Radar route isolated. When configured, enrichment
 // uses its own proxy; legacy ENCAR_PROXY_URL remains a backward-compatible
@@ -79,6 +83,7 @@ async function main() {
       const { error } = await db.from("catalog_enrichment_runs").update({ status: "running", started_at: new Date().toISOString() }).eq("id", runId).eq("status", "approved");
       if (error) throw new Error(error.message);
     }
+    const retriesScheduled = write ? await requeueRetryableFailures(db) : 0;
     const rows = write ? await claim(db) : await preview(db);
     const results: Array<Record<string, unknown>> = [];
     let deferredToRadar = 0;
@@ -126,11 +131,11 @@ async function main() {
       await sleep(delayMs);
     }
     if (write) {
-      const { count, error } = await db.from("catalog_enrichment_queue").select("id", { count: "exact", head: true }).eq("run_id", runId).in("status", ["queued", "leased", "failed"]);
+      const { count, error } = await db.from("catalog_enrichment_queue").select("id", { count: "exact", head: true }).eq("run_id", runId).in("status", ["queued", "leased"]);
       if (error) throw new Error(error.message);
       if (count === 0) await db.from("catalog_enrichment_runs").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", runId).eq("status", "running");
     }
-    console.log(JSON.stringify({ runId, write, batchSize, previewOffset: write ? undefined : previewOffset, claimed: rows.length, deferredToRadar, succeeded: results.filter((x) => x.status === "succeeded").length, unavailable: results.filter((x) => x.status === "unavailable").length, failed: results.filter((x) => x.status === "failed").length, results }, null, 2));
+    console.log(JSON.stringify({ runId, write, batchSize, previewOffset: write ? undefined : previewOffset, retriesScheduled, claimed: rows.length, deferredToRadar, succeeded: results.filter((x) => x.status === "succeeded").length, unavailable: results.filter((x) => x.status === "unavailable").length, failed: results.filter((x) => x.status === "failed").length, results }, null, 2));
   } finally { await releaseEnrichmentActivity?.(); await agent?.close(); }
 }
 
@@ -138,6 +143,26 @@ async function claim(db: DatabaseClient) {
   const { data, error } = await db.rpc("claim_catalog_enrichment_queue", { p_run_id: runId, p_limit: batchSize, p_lease_minutes: leaseMinutes });
   if (error) throw new Error(error.message);
   return (data ?? []) as QueueRow[];
+}
+
+function isRetryableFailure(error: string | null) {
+  return Boolean(error && /fetch failed|abort|timeout|timed out|econn|eai_again|socket|proxy/i.test(error));
+}
+
+async function requeueRetryableFailures(db: DatabaseClient) {
+  const { data, error } = await db.from("catalog_enrichment_queue")
+    .select("id,last_error,attempt_count")
+    .eq("run_id", runId)
+    .eq("status", "failed")
+    .lt("attempt_count", maxAttempts);
+  if (error) throw new Error(error.message);
+  const ids = (data ?? []).filter((row) => isRetryableFailure(row.last_error)).map((row) => row.id);
+  if (!ids.length) return 0;
+  const { error: updateError } = await db.from("catalog_enrichment_queue")
+    .update({ status: "queued", lease_until: null, updated_at: new Date().toISOString() })
+    .in("id", ids);
+  if (updateError) throw new Error(updateError.message);
+  return ids.length;
 }
 
 async function preview(db: DatabaseClient) {
