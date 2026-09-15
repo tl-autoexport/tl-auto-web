@@ -31,7 +31,10 @@ async function main() {
         "primary_source, brand, fuel_type, price_rub, power_hp, source_url, source_updated_at, has_360_interior, vehicle_specs",
       )
       .eq("is_available", true)
-      .eq("primary_source", "encar")
+      // TL Auto's public catalogue is currently mirrored from the
+      // Chestny Prigon staging source. Keep Encar for legacy rows, but do
+      // not exclude the active Chestny source from the audit.
+      .in("primary_source", ["encar", "chestny_prigon"])
       .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
@@ -72,6 +75,7 @@ async function main() {
     total: cars.length,
     sources: {
       encar: sourceCount("encar"),
+      chestny_prigon: sourceCount("chestny_prigon"),
     },
     premiumBrands: {
       mercedes: brandCount("Mercedes-Benz"),
@@ -101,8 +105,8 @@ async function main() {
       `catalog has ${cars.length} cars, minimum is ${minimumCatalogSize}`,
     );
   }
-  if (!report.sources.encar) {
-    blockers.push("the required Encar source is empty");
+  if (!report.sources.encar && !report.sources.chestny_prigon) {
+    blockers.push("the public catalogue has no supported source rows");
   }
   if (
     !report.premiumBrands.mercedes ||
