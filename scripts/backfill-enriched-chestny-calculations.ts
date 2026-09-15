@@ -1,6 +1,7 @@
 import { Client } from "pg";
 import { config } from "dotenv";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
+import { getCbrCalcRates } from "../src/server/calc/rates";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -20,10 +21,27 @@ async function main() {
   const client = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await client.connect();
   try {
+    const rateSnapshot = await getCbrCalcRates();
     const { rows } = await client.query<{
       id: string; price_krw: number; price_rub: number; year: number; engine_cc: number; power_hp: number; fuel_type: string | null;
     }>(`select id,price_krw,price_rub,year,engine_cc,power_hp,fuel_type from public.cars where is_available=true and primary_source='chestny_prigon' and vehicle_specs->>'calculation_status'='calculated_from_local_enriched_staging'`);
-    const prepared = rows.map((car) => ({ car, calc: calculateRuVladivostok({ priceKrw: Number(car.price_krw), year: car.year, month: 6, engineCc: car.engine_cc, powerHp: car.power_hp, fuelType: fuel(car.fuel_type), destinationCity: "Владивосток" }) }));
+    const prepared = rows.map((car) => ({
+      car,
+      calc: calculateRuVladivostok({
+        priceKrw: Number(car.price_krw),
+        year: car.year,
+        month: 6,
+        engineCc: car.engine_cc,
+        powerHp: car.power_hp,
+        fuelType: fuel(car.fuel_type),
+        destinationCity: "Владивосток",
+        rates: rateSnapshot.rates,
+        customsRates: rateSnapshot.customsRates,
+        ratesAsOf: rateSnapshot.asOf,
+        ratesSource: rateSnapshot.source,
+        rateDetails: rateSnapshot.rateDetails,
+      }),
+    }));
     const mismatched = prepared.filter(({ car, calc }) => Math.round(calc.totalRub) !== Number(car.price_rub));
     if (mismatched.length) throw new Error(`Refusing to create mismatched snapshots: ${mismatched.length}`);
     if (!dryRun) {

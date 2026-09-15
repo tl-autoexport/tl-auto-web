@@ -2,12 +2,14 @@ import { Client } from "pg";
 import { config } from "dotenv";
 import { readFile } from "node:fs/promises";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
+import { getCbrCalcRates } from "../src/server/calc/rates";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
 const dbUrl = process.env.SUPABASE_DB_URL;
 const dryRun = process.env.CHESTNY_ENRICHED_PUBLISH_DRY_RUN !== "false";
+const publishStatus = process.env.CHESTNY_ENRICHED_PUBLISH_STATUS ?? "auto_candidate";
 if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
 
 type StageRow = {
@@ -16,6 +18,7 @@ type StageRow = {
   price_krw: number | null; engine_cc: number | null; fuel_type: string | null; transmission: string | null;
   drive_type: string | null; exterior_color: string | null; body_type: string | null; location: string | null;
   vin_masked: string | null; image_urls: unknown; raw_payload: Record<string, unknown> | null;
+  promotion_note: string | null;
 };
 
 type Spec = {
@@ -84,24 +87,49 @@ function bestFitPower(row: StageRow) {
 }
 
 async function main() {
-  const manifest = JSON.parse(await readFile("data/power-reference/manufacturer-korea-v1.json", "utf8")) as { specifications: Spec[] };
+  const manifestPath = process.env.MANUFACTURER_POWER_MANIFEST ?? "data/power-reference/manufacturer-korea-v1.json";
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as { specifications: Spec[] };
   const client = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await client.connect();
   try {
+    // One verified rate bundle is used for the complete publication batch.
+    // Never let this legacy path fall through to the static calculator defaults.
+    const rateSnapshot = await getCbrCalcRates();
     const { rows } = await client.query<StageRow>(`
       select source_listing_id,source_url,manufacturer,model,model_year,first_registration_date,mileage_km,
-        price_krw,engine_cc,fuel_type,transmission,drive_type,exterior_color,body_type,location,vin_masked,image_urls,raw_payload
+        price_krw,engine_cc,fuel_type,transmission,drive_type,exterior_color,body_type,location,vin_masked,image_urls,raw_payload,promotion_note
       from public.chestny_catalog_staging
-      where source_status='active' and promotion_status='auto_candidate' and raw_payload ? 'encar_enrichment'
+      where source_status='active' and promotion_status=$1 and raw_payload ? 'encar_enrichment'
       order by source_listing_id
-    `);
+    `, [publishStatus]);
     const prepared = rows.map((row) => {
       const spec = closestSpec(row, manifest.specifications);
-      const hp = spec?.power.value ?? bestFitPower(row);
+      // Confirmed staging rows carry the exact locally approved PS value in
+      // promotion_note. Use it only as an auditable fallback when the legacy
+      // manifest matcher cannot recognize a normalized model name.
+      const notePower = row.promotion_note?.match(/;\s*(\d+(?:\.\d+)?)\s*PS;/i)?.[1];
+      const hp = spec?.power.value ?? bestFitPower(row) ?? (notePower ? Number(notePower) : null);
       const images = imageList(row.image_urls);
-      const invalid = !row.price_krw || !row.model_year || !row.mileage_km && row.mileage_km !== 0 || !row.engine_cc || !row.fuel_type || !hp || !images.length;
+      const priceKrw = row.price_krw;
+      const modelYear = row.model_year;
+      const engineCc = row.engine_cc;
+      const hasMileage = row.mileage_km != null && row.mileage_km >= 0;
+      const invalid = !priceKrw || !modelYear || !hasMileage || !engineCc || !row.fuel_type || !hp || !images.length;
       if (invalid) return { row, error: "missing required source or power data" };
-      const calc = calculateRuVladivostok({ priceKrw: row.price_krw, year: row.model_year, month: 6, engineCc: row.engine_cc, powerHp: hp, fuelType: fuel(row.fuel_type) ?? undefined, destinationCity: "Владивосток" });
+      const calc = calculateRuVladivostok({
+        priceKrw,
+        year: modelYear,
+        month: 6,
+        engineCc,
+        powerHp: hp,
+        fuelType: fuel(row.fuel_type) ?? undefined,
+        destinationCity: "Владивосток",
+        rates: rateSnapshot.rates,
+        customsRates: rateSnapshot.customsRates,
+        ratesAsOf: rateSnapshot.asOf,
+        ratesSource: rateSnapshot.source,
+        rateDetails: rateSnapshot.rateDetails,
+      });
       return { row, hp: Math.round(hp), images, drive: driveFallback(row), spec, calc, priceRub: Math.round(calc.totalRub) };
     });
     const failures = prepared.filter((item): item is { row: StageRow; error: string } => "error" in item);
