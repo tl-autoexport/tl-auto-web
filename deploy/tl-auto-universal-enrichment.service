@@ -1,0 +1,21 @@
+[Unit]
+Description=TL Auto universal Encar enrichment worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/tl-auto
+EnvironmentFile=/home/ubuntu/tl-auto/.env
+EnvironmentFile=/etc/tl-auto/catalog-proxy.env
+Environment=ENCAR_UNIVERSAL_BATCH_SIZE=50
+Environment=ENCAR_UNIVERSAL_DELAY_MS=3000
+Environment=ENCAR_UNIVERSAL_DRY_RUN=false
+ExecStart=/usr/bin/flock -n -E 75 /tmp/tl-auto-encar-universal.lock /usr/bin/npm run run:encar:universal
+SuccessExitStatus=75
+TimeoutStartSec=1800
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=true
+PrivateTmp=false
