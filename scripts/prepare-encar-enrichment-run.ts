@@ -26,7 +26,7 @@ function required(name: string) {
 type Candidate = { source?: unknown; sourceListingId?: unknown; source_listing_id?: unknown; sourceUrl?: unknown; source_url?: unknown; task?: unknown; [key: string]: unknown };
 
 async function main() {
-  const parsed = JSON.parse(await readFile(resolve(input), "utf8")) as { candidates?: Candidate[]; rules?: unknown; summary?: unknown } | Candidate[];
+  const parsed = JSON.parse(await readFile(resolve(input!), "utf8")) as { candidates?: Candidate[]; rules?: unknown; summary?: unknown } | Candidate[];
   const candidates = Array.isArray(parsed) ? parsed : parsed.candidates ?? [];
   if (!candidates.length) throw new Error("Input has no candidates");
   const rows = candidates.map((candidate) => {

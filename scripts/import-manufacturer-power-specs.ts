@@ -2,13 +2,14 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { Client } from "pg";
 import { config } from "dotenv";
+import { evidenceTier } from "../src/server/power-resolution/evidence-tiers";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
 const dbUrl = process.env.SUPABASE_DB_URL;
 const dryRun = process.env.MANUFACTURER_POWER_IMPORT_DRY_RUN !== "false";
-const manifestPath = "data/power-reference/manufacturer-korea-v1.json";
+const manifestPath = process.env.MANUFACTURER_POWER_MANIFEST ?? "data/power-reference/manufacturer-korea-v1.json";
 if (!dbUrl && !dryRun) throw new Error("SUPABASE_DB_URL is required when MANUFACTURER_POWER_IMPORT_DRY_RUN=false");
 
 type Match = {
@@ -121,21 +122,38 @@ async function main() {
         continue;
       }
 
+      // The evidence trust level is derived from provenance at import time, so
+      // it does not have to be recomputed (and cannot drift) at audit time.
+      // T4 entries stay outside the approved set; T3 entries remain visible but
+      // carry a lower reliability so a T1/T2 corroboration is required before
+      // they may be published.
+      const tier = evidenceTier({
+        specKey: spec.specKey, sourceKind: "manufacturer_document",
+        sourceTitle: spec.source.title, sourceUri: spec.source.uri, note: spec.source.note,
+      });
+      const reliability = tier === "T1" || tier === "T2" ? "high" : tier === "T3" ? "medium" : "low";
+      const reviewStatus = tier === "T4" ? "draft" : "verified";
+      const verificationStatus = tier === "T4" ? "draft" : "approved";
+      const confidenceScore = tier === "T1" || tier === "T2" ? 95 : tier === "T3" ? 70 : 40;
+      const specStatus = tier === "T4" ? "draft" : "approved";
+      const tierNote = `Evidence tier ${tier} derived from source provenance at import.`;
+
       const evidence = await client.query<{ id: string }>(
         `insert into public.vehicle_power_evidence
            (batch_id, source_row_id, source_kind, source_uri, document_reference, captured_at,
             vehicle_category, brand, model, fuel_type, production_year_from, production_year_to,
             propulsion_type, dvs_power_kw, source_units, reliability, review_status, reviewed_by,
             reviewed_at, source_title, source_retrieved_at, confidence_score, evidence_note,
-            verification_status)
+            verification_status, review_note)
          values ($1, $2, 'manufacturer_document', $3, $4, $5::date,
-                 'M1', $6, $7, $8, $9, $10, 'ice', $11, $12, 'high', 'verified',
-                 'manufacturer-power-import-v1', now(), $13, $14::timestamptz, 95, $15, 'approved')
+                 'M1', $6, $7, $8, $9, $10, 'ice', $11, $12, $16, $17,
+                 'manufacturer-power-import-v1', now(), $13, $14::timestamptz, $18, $15, $19, $20)
          returning id`,
         [
           batchId, sourceRowId, spec.source.uri, spec.source.supportingUri ?? null, spec.source.retrievedAt,
           spec.brand, spec.model, spec.fuelType, spec.years[0], spec.years[1], spec.power.kw,
           spec.power.unit, spec.source.title, `${spec.source.retrievedAt}T00:00:00Z`, spec.source.note,
+          reliability, reviewStatus, confidenceScore, verificationStatus, tierNote,
         ],
       );
       const evidenceId = evidence.rows[0]?.id;
@@ -145,10 +163,10 @@ async function main() {
            (spec_key, version, status, vehicle_category, propulsion_type, engine_cc_from, engine_cc_to,
             dvs_power_kw, calculation_power_kw, evidence_id, approval_note, approved_by, approved_at,
             engine_power_hp, power_basis, source_priority)
-         values ($1, 1, 'approved', 'M1', 'ice', $2, $3, $4, $4, $5, $6,
+         values ($1, 1, $7, 'M1', 'ice', $2, $3, $4, $4, $5, $6,
                  'manufacturer-power-import-v1', now(), null, 'combustion_engine', 10)
          returning id`,
-        [spec.specKey, spec.engineCc, spec.engineCc, spec.power.kw, evidenceId, "Approved Korean manufacturer specification; exact kW calculated from the published PS value."],
+        [spec.specKey, spec.engineCc, spec.engineCc, spec.power.kw, evidenceId, "Approved Korean manufacturer specification; exact kW calculated from the published PS value.", specStatus],
       );
       const specId = specResult.rows[0]?.id;
       if (!specId) throw new Error(`Specification was not created for ${spec.specKey}`);

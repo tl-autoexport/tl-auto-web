@@ -1,0 +1,247 @@
+{
+  "version": "reserve-open-specs-v1",
+  "description": "Source-backed specifications for the current TL Auto reserve. Restricted by model, badge, year, fuel and displacement; no Encar access.",
+  "specifications": [
+    {
+      "specKey": "mercedes-c-class-c220d-2143-170ps-2016-2017",
+      "brand": "Mercedes-Benz", "model": "C-Class", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 2143,
+      "years": [2016, 2017], "power": {"value": 170, "unit": "PS", "kw": 125.0347875}, "powerBasis": "combustion_engine",
+      "source": {"title": "Mercedes-Benz C-Class W205 official technical data", "uri": "https://imprensa.mercedes-benz.com.br/releases/nova-mercedes-benz-classe-c-a-classe-c-melhor-do-que-nunca", "retrievedAt": "2026-09-16", "note": "Mercedes-Benz official W205 technical data lists C 220 BlueTEC at 2,143 cc and 125 kW/170 PS. Restricted to 2016–2017 C220 d/BlueTEC badges with this displacement; later 1,950 cc versions are excluded."},
+      "matches": [
+        {"trim": "C220 d Avantgarde", "badge": "C220 d Avantgarde", "yearFrom": 2016, "yearTo": 2017, "engineCcFrom": 2135, "engineCcTo": 2150},
+        {"trim": "C220 BlueTEC", "badge": "C220 BlueTEC", "yearFrom": 2016, "yearTo": 2017, "engineCcFrom": 2135, "engineCcTo": 2150}
+      ]
+    },
+    {
+      "specKey": "land-rover-discovery-sd6-2993-306ps-2019",
+      "brand": "Land Rover", "model": "Discovery", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 2993,
+      "years": [2019, 2019], "power": {"value": 306, "unit": "PS", "kw": 225.0626175}, "powerBasis": "combustion_engine",
+      "source": {"title": "Land Rover Discovery MY2019 official technical data", "uri": "https://media.jaguar.com/de-de/news/2019/11/land-rover-experience-tour-2019-ist-im-ziel-erlebnisreiche-reise-durch-das-abenteuer-afrika-0", "retrievedAt": "2026-09-16", "note": "Jaguar Land Rover official MY2019 data lists Discovery 3.0 SDV6/SD6 diesel at 225 kW/306 PS and 2,993 cc. Restricted to 2019 3.0 SD6/SDV6 trim badges; no inference applied to other Discovery diesel engines."},
+      "matches": [
+        {"trim": "3.0 SD6 SE", "badge": "3.0 SD6 SE", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 2980, "engineCcTo": 3005},
+        {"trim": "3.0 SD6 HSE", "badge": "3.0 SD6 HSE", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 2980, "engineCcTo": 3005},
+        {"trim": "3.0 SD6 HSE Luxury", "badge": "3.0 SD6 HSE Luxury", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 2980, "engineCcTo": 3005},
+        {"trim": "3.0 SD6 Landmark Edition", "badge": "3.0 SD6 Landmark Edition", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 2980, "engineCcTo": 3005}
+      ]
+    },
+    {
+      "specKey": "land-rover-discovery-sport-p250-1997-249ps-2020-2026",
+      "brand": "Land Rover", "model": "Discovery Sport", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1997,
+      "years": [2020, 2026], "power": {"value": 249, "unit": "PS", "kw": 183.13918875}, "powerBasis": "combustion_engine",
+      "source": {"title": "JLR Discovery Sport P250 official technical data", "uri": "https://media.jaguar.com/de-de/news/2019/05/der-neue-land-rover-discovery-sport-perfekter-alleskoenner-fuer-das-taegliche-familien", "retrievedAt": "2026-09-16", "note": "Jaguar Land Rover official technical release identifies the Discovery Sport P250 at 183 kW/249 PS, AWD and five seats. Restricted to 1,997 cc gasoline Discovery Sport P250 badges; no inference applied to other P-series engines."},
+      "matches": [
+        {"trim": "P250 S", "badge": "P250 S", "yearFrom": 2020, "yearTo": 2026, "engineCcFrom": 1988, "engineCcTo": 2005},
+        {"trim": "P250 SE", "badge": "P250 SE", "yearFrom": 2020, "yearTo": 2026, "engineCcFrom": 1988, "engineCcTo": 2005},
+        {"trim": "P250 Dynamic SE", "badge": "P250 Dynamic SE", "yearFrom": 2020, "yearTo": 2026, "engineCcFrom": 1988, "engineCcTo": 2005}
+      ]
+    },
+    {
+      "specKey": "mercedes-c-class-c200-1991-184ps-2016-2020",
+      "brand": "Mercedes-Benz", "model": "C-Class", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1991,
+      "years": [2016, 2020], "power": {"value": 184, "unit": "PS", "kw": 135.33177}, "powerBasis": "combustion_engine",
+      "source": {"title": "Mercedes-Benz C-Class official technical data (W205 C 200)", "uri": "https://imprensa.mercedes-benz.com.br/releases/novo-mercedes-benz-classe-c-chega-ao-brasil-com-inovacoes-a-cada-detalhe", "retrievedAt": "2026-09-16", "note": "Mercedes-Benz official press material lists the C 200 four-cylinder gasoline engine at 1,991 cc and 135 kW/184 PS. Restricted to W205-era C 200 badges and 1,991 cc gasoline cards from 2016–2020; no inference from displacement alone outside these badges."},
+      "matches": [
+        {"trim": "C200", "badge": "C200", "yearFrom": 2016, "yearTo": 2020, "engineCcFrom": 1985, "engineCcTo": 1997},
+        {"trim": "C200 Avantgarde", "badge": "C200 Avantgarde", "yearFrom": 2016, "yearTo": 2020, "engineCcFrom": 1985, "engineCcTo": 1997},
+        {"trim": "C200 Cabriolet", "badge": "C200 Cabriolet", "yearFrom": 2016, "yearTo": 2020, "engineCcFrom": 1985, "engineCcTo": 1997},
+        {"trim": "C200 Coupe", "badge": "C200 Coupe", "yearFrom": 2016, "yearTo": 2020, "engineCcFrom": 1985, "engineCcTo": 1997}
+      ]
+    },
+    {
+      "specKey": "renault-korea-sm6-tce260-1332-156ps-2020-2023",
+      "brand": "Renault Korea", "model": "SM6", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1332,
+      "years": [2020, 2023], "power": {"value": 156, "unit": "PS", "kw": 114.73780503}, "powerBasis": "combustion_engine",
+      "source": {"title": "Renault Korea SM6 TCe260 official announcement", "uri": "https://www.renault.co.kr/ko/inside/news_view.jsp?index=1436", "retrievedAt": "2026-09-16", "note": "Renault Korea identifies the SM6 TCe260 1.3 turbo direct-injection gasoline engine at 156 PS; matched to 1,332 cc gasoline cards from 2020–2023."},
+      "matches": [{"yearFrom": 2020, "yearTo": 2023, "engineCcFrom": 1325, "engineCcTo": 1340}]
+    },
+    {
+      "specKey": "renault-korea-qm6-20-gde-1997-144ps-2019-2024",
+      "brand": "Renault Korea", "model": "QM6", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1997,
+      "years": [2019, 2024], "power": {"value": 144, "unit": "PS", "kw": 105.91182002}, "powerBasis": "combustion_engine",
+      "source": {"title": "Renault Korea QM6 official catalogue", "uri": "https://renaultkoream.com/upload/asset/catalogue/catalogue_qm6_202401.pdf", "retrievedAt": "2026-09-16", "note": "Renault Korea official technical data lists QM6 2.0 GDe gasoline engine at 1,997 cc and 144 PS; the specification is 2WD."},
+      "matches": [{"yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1990, "engineCcTo": 2005}]
+    },
+    {
+      "specKey": "volkswagen-golf-8-2tdi-1968-150ps-2022-2024",
+      "brand": "Volkswagen", "model": "Golf", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 1968,
+      "years": [2022, 2024], "power": {"value": 150, "unit": "PS", "kw": 110.3248125}, "powerBasis": "combustion_engine",
+      "source": {"title": "Volkswagen Golf official technical data", "uri": "https://www.volkswagen-newsroom.com/en/the-new-golf-international-vehicle-presentation-5609/the-technical-data-of-the-new-golf-5626", "retrievedAt": "2026-09-16", "note": "Volkswagen official technical table lists Golf 2.0 TDI at 110 kW/150 PS; matched to 1,968 cc diesel Prestige cards from 2022–2024."},
+      "matches": [{"trim": "2.0 TDI Prestige", "badge": "2.0 TDI Prestige", "yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 1960, "engineCcTo": 1975}]
+    },
+    {
+      "specKey": "bmw-1-series-120i-m-sport-1998-178ps-2020-2023",
+      "brand": "BMW", "model": "1 Series", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1998,
+      "years": [2020, 2023], "power": {"value": 178, "unit": "PS", "kw": 130.91877753}, "powerBasis": "combustion_engine",
+      "source": {"title": "BMW 1 Series 120i official technical data", "uri": "https://www.press.bmwgroup.com/deutschland/article/detail/T0317546DE/modernizace-vyrobniho-programu-bmw-leto-2020", "retrievedAt": "2026-09-16", "note": "BMW Group official announcement specifies the BMW 120i four-cylinder petrol engine at 131 kW/178 PS; matched to 1,998 cc 120i M Sports cards."},
+      "matches": [{"trim": "120i M Sports", "badge": "120i M Sports", "yearFrom": 2020, "yearTo": 2023, "engineCcFrom": 1990, "engineCcTo": 2005}]
+    },
+    {
+      "specKey": "bmw-1-series-120i-sport-1998-178ps-2020-2023",
+      "brand": "BMW", "model": "1 Series", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1998,
+      "years": [2020, 2023], "power": {"value": 178, "unit": "PS", "kw": 130.91877753}, "powerBasis": "combustion_engine",
+      "source": {"title": "BMW 1 Series 120i official technical data", "uri": "https://www.press.bmwgroup.com/deutschland/article/detail/T0317546DE/modernizace-vyrobniho-programu-bmw-leto-2020", "retrievedAt": "2026-09-16", "note": "BMW Group official announcement specifies the BMW 120i four-cylinder petrol engine at 131 kW/178 PS; matched to 1,998 cc 120i Sports cards."},
+      "matches": [{"trim": "120i Sports", "badge": "120i Sports", "yearFrom": 2020, "yearTo": 2023, "engineCcFrom": 1990, "engineCcTo": 2005}]
+    },
+    {
+      "specKey": "land-rover-discovery-sd4-1999-240ps-2019",
+      "brand": "Land Rover", "model": "Discovery", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 1999,
+      "years": [2019, 2019], "power": {"value": 240, "unit": "PS", "kw": 176.51970004}, "powerBasis": "combustion_engine",
+      "source": {"title": "Land Rover Discovery MY2019 official technical data", "uri": "https://media.jaguar.com/de-de/news/2019/11/land-rover-experience-tour-2019-ist-im-ziel-erlebnis-abenteuer-0", "retrievedAt": "2026-09-16", "note": "Jaguar Land Rover official MY2019 data identifies Discovery 2.0 SD4 at 177 kW/240 PS; matched to 1,999 cc diesel 2.0 SD4 SE cards."},
+      "matches": [{"trim": "2.0 SD4 SE", "badge": "2.0 SD4 SE", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 1990, "engineCcTo": 2005}]
+    },
+    {
+      "specKey": "land-rover-discovery-sport-d150-1999-150ps-2020",
+      "brand": "Land Rover", "model": "Discovery Sport", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 1999,
+      "years": [2020, 2020], "power": {"value": 150, "unit": "PS", "kw": 110.3248125}, "powerBasis": "combustion_engine",
+      "source": {"title": "JLR Discovery Sport MY20 official technical data", "uri": "https://www.media.jaguar.com/de-de/image-packs/der-neue-land-rover-discovery-sport-details", "retrievedAt": "2026-09-16", "note": "Jaguar Land Rover technical data lists Discovery Sport D150 at 1,999 cc and 110 kW/150 PS; matched to the D150 S 2020 configuration."},
+      "matches": [{"trim": "D150 S", "badge": "D150 S", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1990, "engineCcTo": 2005}]
+    },
+    {
+      "specKey": "land-rover-discovery-sport-d180-1999-180ps-2020",
+      "brand": "Land Rover", "model": "Discovery Sport", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 1999,
+      "years": [2020, 2020], "power": {"value": 180, "unit": "PS", "kw": 132.38977503}, "powerBasis": "combustion_engine",
+      "source": {"title": "JLR Discovery Sport MY20 official technical data", "uri": "https://www.media.jaguar.com/de-de/image-packs/der-neue-land-rover-discovery-sport-details", "retrievedAt": "2026-09-16", "note": "Jaguar Land Rover technical data lists Discovery Sport D180 at 1,999 cc and 132 kW/180 PS; matched to the D180 SE 2020 configuration."},
+      "matches": [{"trim": "D180 SE", "badge": "D180 SE", "yearFrom": 2020, "yearTo": 2020, "engineCcFrom": 1990, "engineCcTo": 2005}]
+    },
+    {
+      "specKey": "mercedes-a-class-a250-sedan-1991-224ps-2018-2022",
+      "brand": "Mercedes-Benz", "model": "A-Class", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1991,
+      "years": [2018, 2022], "power": {"value": 224, "unit": "PS", "kw": 164.75172004}, "powerBasis": "combustion_engine",
+      "source": {"title": "Mercedes-Benz A-Class Sedan official technical data", "uri": "https://media.mercedes-benz.com/article/1df33fe1-a5b5-42b5-9f6c-2beb43deb52b", "retrievedAt": "2026-09-16", "note": "Mercedes-Benz technical table lists A 250 and A 250 4MATIC at 1,991 cc and 165 kW/224 PS; this rule is restricted to the A250 Sedan badge."},
+      "matches": [{"trim": "A250 Sedan", "badge": "A250 Sedan", "yearFrom": 2018, "yearTo": 2022, "engineCcFrom": 1985, "engineCcTo": 1997}]
+    },
+    {
+      "specKey": "mercedes-a-class-a250-4matic-sedan-1991-224ps-2018-2022",
+      "brand": "Mercedes-Benz", "model": "A-Class", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1991,
+      "years": [2018, 2022], "power": {"value": 224, "unit": "PS", "kw": 164.75172004}, "powerBasis": "combustion_engine",
+      "source": {"title": "Mercedes-Benz A-Class Sedan official technical data", "uri": "https://media.mercedes-benz.com/article/1df33fe1-a5b5-42b5-9f6c-2beb43deb52b", "retrievedAt": "2026-09-16", "note": "Mercedes-Benz technical table lists A 250 and A 250 4MATIC at 1,991 cc and 165 kW/224 PS; this rule is restricted to the A250 4MATIC Sedan badge."},
+      "matches": [{"trim": "A250 4MATIC Sedan", "badge": "A250 4MATIC Sedan", "yearFrom": 2018, "yearTo": 2022, "engineCcFrom": 1985, "engineCcTo": 1997}]
+    },
+    {
+      "specKey": "mercedes-a-class-a220-sedan-1991-190ps-2018-2025",
+      "brand": "Mercedes-Benz", "model": "A-Class", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1991,
+      "years": [2018, 2025], "power": {"value": 190, "unit": "PS", "kw": 139.7447625}, "powerBasis": "combustion_engine",
+      "source": {"title": "Mercedes-Benz A-Class official technical data", "uri": "https://media.mercedes-benz.be/fr/class-for-every-day-the-new-a-class/", "retrievedAt": "2026-09-16", "note": "Mercedes-Benz technical data lists A 220 at 1,991 cc and 140 kW/190 PS; this rule is restricted to the A220 Sedan badge."},
+      "matches": [{"trim": "A220 Sedan", "badge": "A220 Sedan", "yearFrom": 2018, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 1997}]
+    },
+    {
+      "specKey": "mercedes-a-class-a220-hatchback-1991-190ps-2018-2025",
+      "brand": "Mercedes-Benz", "model": "A-Class", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1991,
+      "years": [2018, 2025], "power": {"value": 190, "unit": "PS", "kw": 139.7447625}, "powerBasis": "combustion_engine",
+      "source": {"title": "Mercedes-Benz A-Class official technical data", "uri": "https://media.mercedes-benz.be/fr/class-for-every-day-the-new-a-class/", "retrievedAt": "2026-09-16", "note": "Mercedes-Benz technical data lists A 220 at 1,991 cc and 140 kW/190 PS; this rule is restricted to the A220 Hatchback badge."},
+      "matches": [{"trim": "A220 Hatchback", "badge": "A220 Hatchback", "yearFrom": 2018, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 1997}]
+    },
+    {
+      "specKey": "bmw-1-series-118d-1995-150ps-2016-2023",
+      "brand": "BMW", "model": "1 Series", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 1995,
+      "years": [2016, 2023], "power": {"value": 150, "unit": "PS", "kw": 110.3248125}, "powerBasis": "combustion_engine",
+      "source": {"title": "BMW 1 Series 118d official technical data", "uri": "https://www.press.bmwgroup.com/slovenia/article/attachment/T0200845SL/310471", "retrievedAt": "2026-09-16", "note": "BMW Group technical data lists the 118d four-cylinder diesel engine at 1,995 cc and 110 kW/150 PS; matched to 1 Series 1,995 cc diesel cards."},
+      "matches": [{"yearFrom": 2016, "yearTo": 2023, "engineCcFrom": 1988, "engineCcTo": 2002}]
+    },
+    {
+      "specKey": "mini-cooper-15t-1499-136ps-2019-2024",
+      "brand": "MINI", "model": "Cooper", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1499,
+      "years": [2019, 2024], "power": {"value": 136, "unit": "PS", "kw": 100.02789375}, "powerBasis": "combustion_engine",
+      "source": {"title": "MINI UK 3-door and 5-door Hatch official technical data (2023)", "uri": "https://www.mini.co.uk/content/dam/MINI/marketDSM_GB/mini_co_uk/brochures/2023/F55_F56_MINI_3-door_5-door_Hatch_Brochure_Jul_2023.pdf.asset.1688033407500.pdf", "retrievedAt": "2026-09-16", "note": "MINI official technical data specifies the Cooper 1.5-litre three-cylinder petrol engine at 1,499 cc and 136 hp."},
+      "matches": [{"yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1490, "engineCcTo": 1505}]
+    },
+    {
+      "specKey": "mini-countryman-15t-1499-136ps-2022-2024",
+      "brand": "MINI", "model": "Countryman", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1499,
+      "years": [2022, 2024], "power": {"value": 136, "unit": "PS", "kw": 100.02789375}, "powerBasis": "combustion_engine",
+      "source": {"title": "MINI UK Countryman official technical data (2023)", "uri": "https://www.mini.co.uk/content/dam/MINI/marketUK/mini_co_uk/en_GB/brochures/2023/MINI_Range_Resolute_Untold_Untamed_Apr_2023.pdf.asset.1684157574507.pdf", "retrievedAt": "2026-09-16", "note": "MINI official Countryman technical table lists the Cooper 1,499 cc petrol engine at 136 hp."},
+      "matches": [{"yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 1490, "engineCcTo": 1505}]
+    },
+    {
+      "specKey": "mini-clubman-15t-1499-136ps-2019-2024",
+      "brand": "MINI", "model": "Clubman", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1499,
+      "years": [2019, 2024], "power": {"value": 136, "unit": "PS", "kw": 100.02789375}, "powerBasis": "combustion_engine",
+      "source": {"title": "MINI UK Clubman official technical data (2023)", "uri": "https://www.mini.co.uk/content/dam/MINI/marketUK/mini_co_uk/en_GB/brochures/2023/F54_MINI_Clubman_Apr_2023.pdf.asset.1684157279296.pdf", "retrievedAt": "2026-09-16", "note": "MINI official Clubman technical table lists the Cooper 1,499 cc petrol engine at 136 hp."},
+      "matches": [{"yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1490, "engineCcTo": 1505}]
+    },
+    {
+      "specKey": "kgm-korando-16d-1597-136ps-2019-2022",
+      "brand": "KGM", "model": "Korando", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 1597,
+      "years": [2019, 2022], "power": {"value": 136, "unit": "PS", "kw": 100.02789375}, "powerBasis": "combustion_engine",
+      "source": {"title": "KGM Korando official powertrain specifications", "uri": "https://www.kgm-motors.co.uk/used/ssangyong-korando/", "retrievedAt": "2026-09-16", "note": "KGM describes the fourth-generation Korando 1.6-litre turbo-diesel engine as 136 hp; matched to 1,597 cc diesel cards from 2019–2022."},
+      "matches": [{"yearFrom": 2019, "yearTo": 2022, "engineCcFrom": 1590, "engineCcTo": 1605}]
+    },
+    {
+      "specKey": "kgm-tivoli-16d-1597-136ps-2019-2022",
+      "brand": "KGM", "model": "Tivoli", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 1597,
+      "years": [2019, 2022], "power": {"value": 136, "unit": "PS", "kw": 100.02789375}, "powerBasis": "combustion_engine",
+      "source": {"title": "KGM official diesel engine specifications", "uri": "https://www.kgm-motors.co.uk/used/ssangyong-korando/", "retrievedAt": "2026-09-16", "note": "KGM lists the 1.6-litre turbo-diesel powertrain at 136 hp; matched to 1,597 cc diesel Tivoli cards in the 2019–2022 range."},
+      "matches": [{"yearFrom": 2019, "yearTo": 2022, "engineCcFrom": 1590, "engineCcTo": 1605}]
+    },
+    {
+      "specKey": "kgm-tivoli-15t-1497-163ps-2019-2025",
+      "brand": "KGM", "model": "Tivoli", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1497,
+      "years": [2019, 2025], "power": {"value": 163, "unit": "PS", "kw": 119.88629625}, "powerBasis": "combustion_engine",
+      "source": {"title": "KGM Tivoli official brochure", "uri": "https://www.kgm-motors.co.uk/media/fgsc112z/kgm-tivoli-brochure.pdf", "retrievedAt": "2026-09-16", "note": "KGM manufacturer brochure lists the 1.5 GDi-Turbo petrol engine at 1,497 cc and 163 PS."},
+      "matches": [{"yearFrom": 2019, "yearTo": 2025, "engineCcFrom": 1485, "engineCcTo": 1505}]
+    },
+    {
+      "specKey": "chevrolet-trailblazer-13t-1341-156ps-2020-2025",
+      "brand": "Chevrolet", "model": "Trailblazer", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1341,
+      "years": [2020, 2025], "power": {"value": 156, "unit": "PS", "kw": 114.737805}, "powerBasis": "combustion_engine",
+      "source": {"title": "Chevrolet Korea Trailblazer official specifications", "uri": "https://www.chevrolet.co.kr/content/dam/chevrolet/as/kr/ko/index/e-catalogue-price-list/v2/price-list/TRAILBLAZER.pdf", "retrievedAt": "2026-09-16", "note": "Official Chevrolet Korea data lists the 1,341 cc E-Turbo gasoline engine at 156 PS; the same output is offered with 2WD and 4WD variants."},
+      "matches": [{"yearFrom": 2020, "yearTo": 2025, "engineCcFrom": 1335, "engineCcTo": 1348}]
+    },
+    {
+      "specKey": "chevrolet-malibu-13t-1341-156ps-2019-2023",
+      "brand": "Chevrolet", "model": "Malibu", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1341,
+      "years": [2019, 2023], "power": {"value": 156, "unit": "PS", "kw": 114.737805}, "powerBasis": "combustion_engine",
+      "source": {"title": "Chevrolet Korea Malibu official price and specifications", "uri": "https://www.chevrolet.co.kr/content/dam/chevrolet/as/kr/ko/index/finance/type-price/02-pdfs/03/2023%203%EC%9B%94%20전차종%20가격표.pdf", "retrievedAt": "2026-09-16", "note": "Official Chevrolet Korea model documentation identifies the Malibu 1.3 E-Turbo gasoline engine as 1,341 cc and 156 PS."},
+      "matches": [{"yearFrom": 2019, "yearTo": 2023, "engineCcFrom": 1335, "engineCcTo": 1348}]
+    },
+    {
+      "specKey": "volkswagen-tiguan-20tsi-1984-186ps-2022-2024",
+      "brand": "Volkswagen", "model": "Tiguan", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1984,
+      "years": [2022, 2024], "power": {"value": 186, "unit": "PS", "kw": 136.80276753}, "powerBasis": "combustion_engine",
+      "source": {"title": "Volkswagen Korea Tiguan Allspace official announcement (2022)", "uri": "https://www.volkswagen.co.kr/ko/promotion_news/news/news-2022/2022-08-23.html", "retrievedAt": "2026-09-16", "note": "Volkswagen Korea announcement specifies the Korean-market Tiguan Allspace 2.0 TSI at 186 PS; matched only to 1,984 cc gasoline cards from 2022–2024."},
+      "matches": [{"yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 1975, "engineCcTo": 1995}]
+    },
+    {
+      "specKey": "chevrolet-spark-m400-1.0-999-75ps-2021-2022",
+      "brand": "Chevrolet", "model": "Spark", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 999,
+      "years": [2019, 2022], "power": {"value": 75, "unit": "PS", "kw": 55.16240625}, "powerBasis": "combustion_engine",
+      "source": {"title": "Chevrolet Korea The New Spark technical specifications", "uri": "https://pp.chevrolet.co.kr/httpobject/file/pricelist/spark.pdf", "retrievedAt": "2026-09-16", "note": "Official Chevrolet Korea technical data lists 999 cc 1.0 gasoline engine and 75 PS."},
+      "matches": [{"yearFrom": 2019, "yearTo": 2022, "engineCcFrom": 995, "engineCcTo": 1005}]
+    },
+    {
+      "specKey": "renault-korea-xm3-16-gte-1598-123ps-2020-2024",
+      "brand": "Renault Korea", "model": "XM3", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1598,
+      "years": [2020, 2024], "power": {"value": 123, "unit": "PS", "kw": 90.46634625}, "powerBasis": "combustion_engine",
+      "source": {"title": "Renault Korea XM3 official catalogue", "uri": "https://www.renaultkoream.com/upload/asset/catalogue/catalogue_xm3_202311.pdf", "supportingUri": "https://www.renaultkoream.com/club/main/iframe/news_view.jsp?back=2&backurl=null&p_layout=2&searchfield=&searchvalue=&seq=1252", "retrievedAt": "2026-09-16", "note": "Renault Korea technical data lists the XM3 1.6 GTe MPI gasoline engine at 1,598 cc and 123 PS."},
+      "matches": [{"yearFrom": 2020, "yearTo": 2024, "engineCcFrom": 1590, "engineCcTo": 1605}]
+    },
+    {
+      "specKey": "mercedes-a-class-a220-1991-190ps-2021-2025",
+      "brand": "Mercedes-Benz", "model": "A-Class", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1991,
+      "years": [2021, 2025], "power": {"value": 190, "unit": "PS", "kw": 139.7447625}, "powerBasis": "combustion_engine",
+      "source": {"title": "Mercedes-Benz A-Class technical data: A 220 4MATIC", "uri": "https://media.mercedes-benz.be/fr/class-for-every-day-the-new-a-class/", "retrievedAt": "2026-09-16", "note": "Official Mercedes-Benz media technical table lists 1,991 cc and 140 kW/190 PS for A 220 4MATIC."},
+      "matches": [{"trim": "A220", "badge": "A220", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 1997}]
+    },
+    {
+      "specKey": "mercedes-c-class-c220d-1950-194ps-2019-2022",
+      "brand": "Mercedes-Benz", "model": "C-Class", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 1950,
+      "years": [2019, 2022], "power": {"value": 194, "unit": "PS", "kw": 142.6867575}, "powerBasis": "combustion_engine",
+      "source": {"title": "Mercedes-Benz C 220 d technical data", "uri": "https://presse.mercedes-benz.at/news-die-neue-c-klasse?id=68288&l=deutsch&menueid=10687", "retrievedAt": "2026-09-16", "note": "Official Mercedes-Benz Austria material lists 1,950 cc C 220 d and 143 kW/194 PS."},
+      "matches": [{"yearFrom": 2019, "yearTo": 2022, "engineCcFrom": 1940, "engineCcTo": 1960}]
+    },
+    {
+      "specKey": "audi-a4-35tdi-1968-163ps-2019-2024",
+      "brand": "Audi", "model": "A4", "fuelType": "diesel", "propulsionType": "ice", "engineCc": 1968,
+      "years": [2019, 2024], "power": {"value": 163, "unit": "PS", "kw": 119.88629625}, "powerBasis": "combustion_engine",
+      "source": {"title": "Audi A4 35 TDI official technical data", "uri": "https://www.audi-mediacenter.com/en/the-audi-a4-major-upgrade-for-the-bestseller-2019-11884/drive-and-suspension-11894", "retrievedAt": "2026-09-16", "note": "Official Audi technical table lists 1,968 cc, diesel and 120 kW/163 PS for A4 35 TDI."},
+      "matches": [{"trim": "35 TDI", "badge": "35 TDI", "yearFrom": 2019, "yearTo": 2024, "engineCcFrom": 1960, "engineCcTo": 1975}]
+    },
+    {
+      "specKey": "kgm-korando-15t-1497-163ps-2019-2025",
+      "brand": "KGM", "model": "Korando", "fuelType": "gasoline", "propulsionType": "ice", "engineCc": 1497,
+      "years": [2019, 2025], "power": {"value": 163, "unit": "PS", "kw": 119.88629625}, "powerBasis": "combustion_engine",
+      "source": {"title": "KGM Korando official specifications", "uri": "https://www.kgm.de/modelle/korando", "supportingUri": "https://kgm.ru/models/korando", "retrievedAt": "2026-09-16", "note": "KGM manufacturer specifications list 1,497 cc 1.5 T-GDI petrol engine at 120 kW/163 PS for 2WD and 4WD."},
+      "matches": [{"yearFrom": 2019, "yearTo": 2025, "engineCcFrom": 1485, "engineCcTo": 1505}]
+    }
+  ]
+}

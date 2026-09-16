@@ -5,6 +5,7 @@ import { readFile } from "node:fs/promises";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
 
 config({ path: ".env", quiet: true });
+/* eslint-disable @typescript-eslint/no-explicit-any -- the Supabase client generic is required for the untyped worker queue */
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim(); const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim(); const proxy = process.env.ENCAR_PROXY_URL?.trim();
 const batch = Math.min(50, Math.max(1, Number(process.env.ENCAR_UNIVERSAL_BATCH_SIZE ?? 50))); const delay = Math.max(1000, Number(process.env.ENCAR_UNIVERSAL_DELAY_MS ?? 3000));
 if (!url || !key || !proxy) throw new Error("Supabase credentials and ENCAR_PROXY_URL are required");

@@ -1,128 +1,214 @@
 import { Client } from "pg";
 import { config } from "dotenv";
-import { readFile } from "node:fs/promises";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
+import { canonicalCandidates, canonicalInput } from "../src/server/power-resolution/canonical";
+import { evidenceTier, type EvidenceTier } from "../src/server/power-resolution/evidence-tiers";
+import { decidePublication } from "../src/server/power-resolution/publication-gate";
+import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
 const dbUrl = process.env.SUPABASE_DB_URL;
 const dryRun = process.env.CHESTNY_ENRICHED_PUBLISH_DRY_RUN !== "false";
-const publishStatus = process.env.CHESTNY_ENRICHED_PUBLISH_STATUS ?? "auto_candidate";
+const publishStatus = process.env.CHESTNY_ENRICHED_PUBLISH_STATUS ?? "power_confirmed";
 if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
+
+/**
+ * Publisher contract.
+ *
+ * Power may only come from an approved, locally confirmed rule. Staging rows
+ * carry that binding in `raw_payload.power_confirmation`, written by
+ * `resolve-auto-candidate-power.ts`. This script never re-derives power from
+ * the legacy manifest or from a displacement map, and it never invents a drive
+ * axle: rows without a confirmed drive or registration month are excluded
+ * instead of being published with an assumption. Every exclusion is reported
+ * so a batch cannot silently shrink (decision D4).
+ */
 
 type StageRow = {
   source_listing_id: string; source_url: string | null; manufacturer: string | null; model: string | null;
+  generation: string | null; trim: string | null;
   model_year: number | null; first_registration_date: string | null; mileage_km: number | null;
   price_krw: number | null; engine_cc: number | null; fuel_type: string | null; transmission: string | null;
   drive_type: string | null; exterior_color: string | null; body_type: string | null; location: string | null;
   vin_masked: string | null; image_urls: unknown; raw_payload: Record<string, unknown> | null;
-  promotion_note: string | null;
 };
 
-type Spec = {
-  brand: string; model: string; fuelType?: string; engineCc?: number; years?: [number, number];
-  power: { value: number; unit: string }; source?: { title?: string };
+type RefRow = {
+  spec_id: string; spec_version: number; spec_key: string; calculation_power_kw: number; power_basis: string;
+  source_priority: number; evidence_id: string; evidence_kind: string; source_uri: string | null;
+  source_title: string | null; evidence_note: string | null; evidence_reliability: string | null;
+  match_id: string; match_priority: number; brand: string | null; model: string | null; generation: string | null;
+  trim: string | null; badge_normalized: string | null; model_code: string | null; engine_code: string | null;
+  fuel_type: string | null; drive_type: string | null; production_year_from: number | null;
+  production_year_to: number | null; engine_cc_from: number | null; engine_cc_to: number | null;
 };
 
+/** Model names kept for storage only; matching uses the canonical module. */
 const aliases: Record<string, string> = {
   canival: "Carnival", morning: "Morning", ray: "Ray", "1-series": "1 Series", "2-series": "2 Series",
-  avante: "AVANTE", "glb-class": "GLB-Class",
+  avante: "AVANTE", tiboli: "Tivoli", "glb-class": "GLB-Class",
 };
 const displayModel = (value: string | null) => aliases[(value ?? "").trim().toLowerCase()] ?? (value ?? "").trim();
-const normal = (value: string | null | undefined) => String(value ?? "").trim().toLowerCase().replace(/[\s_–—-]+/g, " ");
-const fuel = (value: string | null) => {
-  const text = normal(value);
-  if (text.includes("디젤") || text.includes("diesel")) return "diesel";
-  if (text.includes("lpg") || text.includes("газ")) return "lpg";
-  if (text.includes("전기") || text.includes("hybrid") || text.includes("하이브리드")) return "hybrid";
-  if (text.includes("가솔린") || text.includes("gasoline") || text.includes("бенз")) return "gasoline";
-  return text || null;
+
+/** External gallery only; duplicates and non-http entries are dropped, order kept. */
+const galleryUrls = (value: unknown) => {
+  if (!Array.isArray(value)) return [] as string[];
+  const seen = new Set<string>();
+  const urls: string[] = [];
+  for (const entry of value) {
+    const url = typeof entry === "string" ? entry : (entry as { url?: unknown } | null)?.url;
+    if (typeof url !== "string" || !/^https?:\/\//i.test(url)) continue;
+    if (seen.has(url)) continue;
+    seen.add(url);
+    urls.push(url);
+  }
+  return urls;
 };
-const imageList = (value: unknown) => Array.isArray(value)
-  ? value.filter((url): url is string => typeof url === "string" && /^https?:\/\//i.test(url)) : [];
 
-// The source records omit the axle for these cars. 2WD is intentionally kept
-// generic rather than inventing FWD/RWD; every fallback is auditable in metadata.
-const driveFallback = (row: StageRow) => row.drive_type || "2WD";
-
-function closestSpec(row: StageRow, specs: Spec[]) {
-  const brand = normal(row.manufacturer);
-  const model = normal(displayModel(row.model));
-  const rowFuel = fuel(row.fuel_type);
-  const engine = row.engine_cc ?? 0;
-  const year = row.model_year ?? 0;
-  const matches = specs.filter((spec) => normal(spec.brand) === brand && normal(spec.model) === model && (!rowFuel || !spec.fuelType || normal(spec.fuelType) === rowFuel));
-  const scored = matches.map((spec) => {
-    const enginePenalty = spec.engineCc == null ? 20_000 : Math.abs(spec.engineCc - engine);
-    const [from, to] = spec.years ?? [year, year];
-    const yearPenalty = year < from ? (from - year) * 120 : year > to ? (year - to) * 120 : 0;
-    return { spec, score: enginePenalty + yearPenalty };
-  }).filter(({ score }) => score <= 450);
-  scored.sort((a, b) => a.score - b.score);
-  return scored[0]?.spec ?? null;
+function registrationMonth(firstRegistrationDate: string | null, modelYear: number | null) {
+  if (!firstRegistrationDate) return null;
+  const date = new Date(firstRegistrationDate);
+  if (Number.isNaN(date.getTime())) return null;
+  const year = date.getUTCFullYear();
+  if (year < 1990 || year > new Date().getUTCFullYear() + 1) return null;
+  if (modelYear != null && year < modelYear - 1) return null;
+  return date.getUTCMonth() + 1;
 }
 
-// Narrow local fallbacks for configurations whose exact model-year row is not
-// yet present in the manufacturer manifest. These are configuration values,
-// never values inferred from displacement alone.
-function bestFitPower(row: StageRow) {
-  const brand = normal(row.manufacturer); const model = normal(displayModel(row.model));
-  const engine = row.engine_cc; const type = fuel(row.fuel_type);
-  const key = `${brand}|${model}|${engine}|${type}`;
-  const values: Record<string, number> = {
-    "audi|a4|1968|diesel": 150,
-    "bmw|1 series|1995|diesel": 150, "bmw|2 series|1998|gasoline": 204, "bmw|x1|1998|gasoline": 204,
-    "hyundai|avante|1580|hybrid": 141, "hyundai|avante|1598|gasoline": 123, "hyundai|avante|1998|gasoline": 160,
-    "hyundai|kona|1580|hybrid": 141, "hyundai|sonata|1999|hybrid": 195,
-    "hyundai|staria|3470|lpg": 240, "hyundai|tucson|1598|hybrid": 230, "hyundai|veloster|1998|gasoline": 149,
-    "kia|carnival|2151|gasoline": 202, "kia|carnival|1598|hybrid": 245, "kia|niro|1580|hybrid": 141,
-    "kia|sorento|1598|hybrid": 230, "kia|sportage|1598|hybrid": 230,
-    "mercedes benz|c class|2996|gasoline": 333, "mercedes benz|c class|1999|gasoline": 204,
-    "renault korea|xm3|1332|gasoline": 152, "renault korea|xm3|1598|gasoline": 123,
-    "volkswagen|golf|1984|gasoline": 245, "volkswagen|tiguan|1984|gasoline": 190,
-  };
-  return values[key] ?? null;
-}
+type PreparedItem = {
+  row: StageRow;
+  hp: number;
+  month: number;
+  images: string[];
+  drive: string;
+  fuel: string | null;
+  tier: EvidenceTier;
+  confidence: string;
+  specId: string;
+  evidenceId: string;
+  specKey: string;
+  specificationTitle: string | null;
+  calc: ReturnType<typeof calculateRuVladivostok>;
+  priceRub: number;
+};
 
 async function main() {
-  const manifestPath = process.env.MANUFACTURER_POWER_MANIFEST ?? "data/power-reference/manufacturer-korea-v1.json";
-  const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as { specifications: Spec[] };
   const client = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await client.connect();
   try {
     // One verified rate bundle is used for the complete publication batch.
-    // Never let this legacy path fall through to the static calculator defaults.
+    // Never let this path fall through to the static calculator defaults.
     const rateSnapshot = await getCbrCalcRates();
-    const { rows } = await client.query<StageRow>(`
-      select source_listing_id,source_url,manufacturer,model,model_year,first_registration_date,mileage_km,
-        price_krw,engine_cc,fuel_type,transmission,drive_type,exterior_color,body_type,location,vin_masked,image_urls,raw_payload,promotion_note
-      from public.chestny_catalog_staging
-      where source_status='active' and promotion_status=$1 and raw_payload ? 'encar_enrichment'
-      order by source_listing_id
-    `, [publishStatus]);
-    const prepared = rows.map((row) => {
-      const spec = closestSpec(row, manifest.specifications);
-      // Confirmed staging rows carry the exact locally approved PS value in
-      // promotion_note. Use it only as an auditable fallback when the legacy
-      // manifest matcher cannot recognize a normalized model name.
-      const notePower = row.promotion_note?.match(/;\s*(\d+(?:\.\d+)?)\s*PS;/i)?.[1];
-      const hp = spec?.power.value ?? bestFitPower(row) ?? (notePower ? Number(notePower) : null);
-      const images = imageList(row.image_urls);
-      const priceKrw = row.price_krw;
-      const modelYear = row.model_year;
-      const engineCc = row.engine_cc;
-      const hasMileage = row.mileage_km != null && row.mileage_km >= 0;
-      const invalid = !priceKrw || !modelYear || !hasMileage || !engineCc || !row.fuel_type || !hp || !images.length;
-      if (invalid) return { row, error: "missing required source or power data" };
+
+    const refs = await client.query<RefRow>(`select spec.id spec_id,spec.version spec_version,spec.spec_key,spec.calculation_power_kw,spec.power_basis,spec.source_priority,
+          evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.source_uri,evidence.source_title,evidence.evidence_note,evidence.reliability evidence_reliability,
+          matcher.id match_id,matcher.priority match_priority,matcher.brand,matcher.model,matcher.generation,matcher.trim,matcher.badge_normalized,matcher.model_code,matcher.engine_code,matcher.fuel_type,matcher.drive_type,matcher.production_year_from,matcher.production_year_to,matcher.engine_cc_from,matcher.engine_cc_to
+        from public.vehicle_power_specs spec
+        join public.vehicle_power_evidence evidence on evidence.id=spec.evidence_id
+        join public.vehicle_power_spec_matches matcher on matcher.spec_id=spec.id
+        where spec.status='approved' and evidence.verification_status='approved'`);
+    const rows = await client.query<StageRow>(`
+        select source_listing_id,source_url,manufacturer,model,generation,trim,model_year,first_registration_date,mileage_km,
+          price_krw,engine_cc,fuel_type,transmission,drive_type,exterior_color,body_type,location,vin_masked,image_urls,raw_payload
+        from public.chestny_catalog_staging
+        where source_status='active' and promotion_status=$1 and raw_payload ? 'encar_enrichment'
+        order by source_listing_id
+      `, [publishStatus]);
+
+    const refBySpecId = new Map<string, RefRow>();
+    for (const ref of refs.rows) if (!refBySpecId.has(ref.spec_id)) refBySpecId.set(ref.spec_id, ref);
+
+    const candidates: ApprovedPowerCandidate[] = canonicalCandidates(refs.rows.map((r) => ({
+      specId: r.spec_id, specVersion: Number(r.spec_version), calculationPowerKw: Number(r.calculation_power_kw),
+      powerBasis: r.power_basis as ApprovedPowerCandidate["powerBasis"], sourcePriority: Number(r.source_priority),
+      evidenceId: r.evidence_id, evidenceKind: r.evidence_kind as ApprovedPowerCandidate["evidenceKind"],
+      evidenceVerificationStatus: "approved",
+      evidenceReliability: (r.evidence_reliability ?? "unreviewed") as ApprovedPowerCandidate["evidenceReliability"],
+      match: { id: r.match_id, priority: Number(r.match_priority), brand: String(r.brand ?? ""), model: String(r.model ?? ""),
+        generation: r.generation, trim: r.trim, badgeNormalized: r.badge_normalized, modelCode: r.model_code,
+        engineCode: r.engine_code, fuelType: r.fuel_type, driveType: r.drive_type,
+        productionYearFrom: r.production_year_from, productionYearTo: r.production_year_to,
+        engineCcFrom: r.engine_cc_from, engineCcTo: r.engine_cc_to },
+    })));
+
+    const tierBySpecId = new Map<string, EvidenceTier>();
+    const kwBySpecId = new Map<string, number>();
+    for (const ref of refs.rows) {
+      tierBySpecId.set(ref.spec_id, evidenceTier({
+        specKey: ref.spec_key, sourceKind: ref.evidence_kind, sourceTitle: ref.source_title,
+        sourceUri: ref.source_uri, note: ref.evidence_note,
+      }));
+      kwBySpecId.set(ref.spec_id, Number(ref.calculation_power_kw));
+    }
+
+    const excludedByReason: Record<string, number> = {};
+    const sampleExclusions: Array<{ id: string; reason: string }> = [];
+    const exclude = (id: string, reason: string) => {
+      excludedByReason[reason] = (excludedByReason[reason] ?? 0) + 1;
+      if (sampleExclusions.length < 15) sampleExclusions.push({ id, reason });
+    };
+
+    const eligible: PreparedItem[] = [];
+    const tierBreakdown: Record<string, number> = { T1: 0, T2: 0, T3: 0, T4: 0 };
+
+    for (const row of rows.rows) {
+      const payload = (row.raw_payload ?? {}) as Record<string, unknown>;
+      const confirmation = payload.power_confirmation as Record<string, unknown> | undefined;
+      if (!confirmation || typeof confirmation !== "object") { exclude(row.source_listing_id, "no_power_confirmation"); continue; }
+
+      const enrichment = (payload.encar_enrichment ?? {}) as Record<string, unknown>;
+      const detail = (enrichment.detail ?? {}) as Record<string, unknown>;
+      const category = (detail.category ?? {}) as Record<string, unknown>;
+      const grade = category.gradeEnglishName ?? category.gradeName ?? row.trim;
+
+      // Re-resolve the card against the approved reference; the gate then
+      // requires the confirmed specification to remain the unique winner.
+      const input = canonicalInput({
+        brand: row.manufacturer, model: row.model, generation: row.generation, trim: grade,
+        fuelType: row.fuel_type, driveType: row.drive_type, year: row.model_year, engineCc: row.engine_cc,
+      });
+      const resolution = resolveApprovedPower(input, candidates);
+      const images = galleryUrls(row.image_urls);
+      const month = registrationMonth(row.first_registration_date, row.model_year);
+      const hasRequiredSourceData = Boolean(
+        row.price_krw && row.model_year && row.mileage_km != null && row.mileage_km >= 0 &&
+        row.engine_cc && input.fuelType,
+      );
+
+      const decision = decidePublication({
+        resolution,
+        confirmedSpecId: confirmation.spec_id == null ? null : String(confirmation.spec_id),
+        confirmedHp: confirmation.power_hp == null ? null : Number(confirmation.power_hp),
+        tierBySpecId, kwBySpecId,
+        driveType: input.driveType,
+        registrationMonth: month,
+        photoCount: images.length,
+        hasRequiredSourceData,
+      });
+      if (decision.status === "exclude") { exclude(row.source_listing_id, decision.reason); continue; }
+
+      const ref = refBySpecId.get(decision.specId);
+      if (!ref || !input.driveType || month == null) {
+        // The gate already validated these; keep a defensive guard so a future
+        // gate change cannot silently publish an incomplete card.
+        exclude(row.source_listing_id, "internal_gate_inconsistency");
+        continue;
+      }
+
+      const hp = decision.hp;
+      const drive = input.driveType;
+      const tier = decision.tier;
+
       const calc = calculateRuVladivostok({
-        priceKrw,
-        year: modelYear,
-        month: 6,
-        engineCc,
+        priceKrw: row.price_krw as number,
+        year: row.model_year as number,
+        month,
+        engineCc: row.engine_cc as number,
         powerHp: hp,
-        fuelType: fuel(row.fuel_type) ?? undefined,
+        fuelType: input.fuelType ?? undefined,
         destinationCity: "Владивосток",
         rates: rateSnapshot.rates,
         customsRates: rateSnapshot.customsRates,
@@ -130,69 +216,110 @@ async function main() {
         ratesSource: rateSnapshot.source,
         rateDetails: rateSnapshot.rateDetails,
       });
-      return { row, hp: Math.round(hp), images, drive: driveFallback(row), spec, calc, priceRub: Math.round(calc.totalRub) };
-    });
-    const failures = prepared.filter((item): item is { row: StageRow; error: string } => "error" in item);
-    const valid = prepared.filter((item): item is Exclude<typeof item, { row: StageRow; error: string }> => !("error" in item));
-    if (failures.length) throw new Error(`Refusing partial publish: ${failures.length} cards lack required local data (${failures.slice(0, 5).map((x) => x.row.source_listing_id).join(", ")})`);
 
-    if (!dryRun) {
+      const item: PreparedItem = {
+        row, hp, month, images, drive, fuel: input.fuelType, tier,
+        confidence: decision.confidence,
+        specId: decision.specId, evidenceId: ref.evidence_id, specKey: ref.spec_key,
+        specificationTitle: ref.source_title,
+        calc, priceRub: Math.round(calc.totalRub),
+      };
+      eligible.push(item);
+      tierBreakdown[tier] = (tierBreakdown[tier] ?? 0) + 1;
+    }
+
+    if (!dryRun && eligible.length) {
       await client.query("begin");
       try {
-        const carIds: Array<{ id: string; sourceId: string; images: string[]; calc: ReturnType<typeof calculateRuVladivostok>; row: StageRow; hp: number }> = [];
-        for (const item of valid) {
-          const { row, hp, drive, spec, priceRub, images } = item;
-          const model = displayModel(row.model);
+        const carIds: Array<{ id: string; item: PreparedItem }> = [];
+        for (const item of eligible) {
+          const { row, hp, drive, month, tier, confidence, specId, evidenceId, specKey, specificationTitle } = item;
           const metadata = {
-            source: "chestny_prigon", calculation_status: "calculated_from_local_enriched_staging",
-            power_resolution: spec ? "best_fit_local_manifest" : "best_fit_local_configuration", drive_resolution: row.drive_type ? "source" : "best_fit_2wd",
-            source_specification: spec?.source?.title ?? null,
+            source: "chestny_prigon",
+            calculation_status: "calculated_from_confirmed_local_evidence",
+            power_resolution: "approved_evidence_confirmation",
+            power_spec_key: specKey,
+            power_spec_id: specId,
+            power_evidence_id: evidenceId,
+            evidence_tier: tier,
+            drive_resolution: "source",
+            source_specification: specificationTitle,
+            registration_month_source: "first_registration_date",
           };
           const result = await client.query<{ id: string }>(`
             insert into public.cars(primary_source,source_kind,source_id,source_url,enrichment_status,is_available,sale_status,published_at,source_updated_at,last_seen_at,
-              brand,model,year,registration_year,registration_date,mileage_km,price_krw,price_rub,engine_cc,power_hp,power_source,power_confidence,power_resolution_note,
+              brand,model,year,registration_year,registration_date,registration_month,mileage_km,price_krw,price_rub,engine_cc,power_hp,power_source,power_confidence,power_resolution_note,
               fuel_type,transmission,drive_type,color,body_type,seller_region,vin_masked,vehicle_specs)
-            values ('chestny_prigon','chestny_prigon',$1,$2,'source_only',true,null,now(),now(),now(),$3,$4,$5,$5,$6,$7,$8,$9,$10,$11,
-              'tl_auto_best_fit_local','high','Локально сопоставлено по справочнику модели, года, объёма и топлива.',$12,$13,$14,$15,$16,$17,$18,$19)
+            values ('chestny_prigon','chestny_prigon',$1,$2,'source_only',true,null,now(),now(),now(),
+              $3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,'tl_auto_approved_reference',$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)
             on conflict(primary_source,source_id) do update set source_url=excluded.source_url,enrichment_status=excluded.enrichment_status,is_available=true,sale_status=null,published_at=coalesce(cars.published_at,now()),
               source_updated_at=excluded.source_updated_at,last_seen_at=excluded.last_seen_at,brand=excluded.brand,model=excluded.model,year=excluded.year,registration_year=excluded.registration_year,
-              registration_date=excluded.registration_date,mileage_km=excluded.mileage_km,price_krw=excluded.price_krw,price_rub=excluded.price_rub,engine_cc=excluded.engine_cc,power_hp=excluded.power_hp,
+              registration_date=excluded.registration_date,registration_month=excluded.registration_month,mileage_km=excluded.mileage_km,price_krw=excluded.price_krw,price_rub=excluded.price_rub,engine_cc=excluded.engine_cc,power_hp=excluded.power_hp,
               power_source=excluded.power_source,power_confidence=excluded.power_confidence,power_resolution_note=excluded.power_resolution_note,fuel_type=excluded.fuel_type,transmission=excluded.transmission,
               drive_type=excluded.drive_type,color=excluded.color,body_type=excluded.body_type,seller_region=excluded.seller_region,vin_masked=excluded.vin_masked,vehicle_specs=excluded.vehicle_specs,updated_at=now()
             returning id
-          `, [row.source_listing_id, row.source_url, row.manufacturer, model, row.model_year, row.first_registration_date, row.mileage_km, row.price_krw, priceRub, row.engine_cc, hp,
-            fuel(row.fuel_type), row.transmission, drive, row.exterior_color, row.body_type, row.location, row.vin_masked, JSON.stringify(metadata)]);
-          carIds.push({ id: result.rows[0].id, sourceId: row.source_listing_id, images, calc: item.calc, row, hp });
+          `, [row.source_listing_id, row.source_url, row.manufacturer, displayModel(row.model), row.model_year,
+            row.first_registration_date, month, row.mileage_km, row.price_krw, item.priceRub, row.engine_cc, hp,
+            confidence, `Подтверждено локальным справочником TL Auto: ${specKey}; tier=${tier}.`,
+            item.fuel, row.transmission, drive, row.exterior_color, row.body_type, row.location, row.vin_masked,
+            JSON.stringify(metadata)]);
+          carIds.push({ id: result.rows[0].id, item });
         }
-        const ids = carIds.map((car) => car.id);
+
+        const ids = carIds.map((entry) => entry.id);
         if (ids.length) await client.query(`delete from public.car_media where source='chestny_prigon' and car_id = any($1::uuid[])`, [ids]);
-        const media = carIds.flatMap((car) => car.images.map((url, index) => [car.id, url, index, index === 0]));
+        const media = carIds.flatMap(({ id, item }) => item.images.map((url, index) => [id, url, index, index === 0]));
         for (let i = 0; i < media.length; i += 500) {
           const values: unknown[] = [];
-          const tuples = media.slice(i, i + 500).map((item, index) => {
-            const base = index * 4; values.push(...item);
+          const tuples = media.slice(i, i + 500).map((entry, index) => {
+            const base = index * 4; values.push(...entry);
             return `($${base + 1},'chestny_prigon','image','outer',$${base + 2},$${base + 2},$${base + 3},$${base + 4},'external_url')`;
           });
           await client.query(`insert into public.car_media(car_id,source,media_type,category,url,thumbnail_url,sort_order,is_primary,legal_mode) values ${tuples.join(",")}`, values);
         }
+
         if (ids.length) await client.query(`delete from public.calc_snapshots where car_id = any($1::uuid[])`, [ids]);
         for (let offset = 0; offset < carIds.length; offset += 100) {
           const values: unknown[] = [];
-          const tuples = carIds.slice(offset, offset + 100).map((item, index) => {
-            const base = index * 12; const { calc, row, hp } = item;
-            values.push(item.id, calc.calcVersion,
-              JSON.stringify({ priceKrw: row.price_krw, year: row.model_year, month: 6, engineCc: row.engine_cc, powerHp: hp, fuelType: fuel(row.fuel_type), destinationCity: "Владивосток" }),
+          const tuples = carIds.slice(offset, offset + 100).map(({ id, item }, index) => {
+            const base = index * 12; const { calc, row, hp, month } = item;
+            values.push(id, calc.calcVersion,
+              JSON.stringify({ priceKrw: row.price_krw, year: row.model_year, month, engineCc: row.engine_cc, powerHp: hp, fuelType: item.fuel, destinationCity: "Владивосток" }),
               JSON.stringify({ ...calc.rates, details: calc.rateDetails }), JSON.stringify(calc), Math.round(calc.carPriceRub), Math.round(calc.dutyRub), Math.round(calc.feesRub), Math.round(calc.utilRub), Math.round(calc.freightRub), Math.round(calc.brokerRub), Math.round(calc.totalRub));
             return `($${base + 1},'RU','Владивосток','individual',$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8},$${base + 9},$${base + 10},$${base + 11},$${base + 12})`;
           });
           await client.query(`insert into public.calc_snapshots(car_id,country_code,destination_city,importer_type,calc_version,inputs,rates,result,car_price_rub,duty_rub,fees_rub,util_rub,freight_rub,broker_rub,total_rub) values ${tuples.join(",")}`, values);
         }
-        await client.query(`update public.chestny_catalog_staging set promotion_status='published', promotion_note='Published from local Encar-enriched staging; power and drive resolved locally.', updated_at=now() where source_listing_id = any($1::text[])`, [valid.map((item) => item.row.source_listing_id)]);
+
+        await client.query(`update public.chestny_catalog_staging set promotion_status='published', promotion_note='Published from locally confirmed power evidence; drive and month taken from source.', updated_at=now() where source_listing_id = any($1::text[])`,
+          [eligible.map((item) => item.row.source_listing_id)]);
         await client.query("commit");
-      } catch (error) { await client.query("rollback"); throw error; }
+      } catch (error) {
+        await client.query("rollback");
+        throw error;
+      }
     }
-    console.log(JSON.stringify({ dryRun, sourceRows: rows.length, prepared: valid.length, failed: failures.length, mediaRows: valid.reduce((sum, item) => sum + item.images.length, 0), powerResolution: "best_fit_local_manifest", encarRequests: 0, publicCatalogChanged: !dryRun }, null, 2));
-  } finally { await client.end(); }
+
+    console.log(JSON.stringify({
+      dryRun,
+      publishStatus,
+      sourceRows: rows.rowCount,
+      prepared: eligible.length,
+      eligible: eligible.length,
+      excluded: rows.rowCount == null ? 0 : rows.rowCount - eligible.length,
+      excludedByReason,
+      tierBreakdown,
+      sampleExclusions,
+      mediaRows: eligible.reduce((sum, item) => sum + item.images.length, 0),
+      powerResolution: "approved_evidence_confirmation",
+      legacyManifestUsed: false,
+      driveFallbackUsed: false,
+      encarRequests: 0,
+      publicCatalogChanged: !dryRun,
+    }, null, 2));
+  } finally {
+    await client.end();
+  }
 }
 
 main().catch((error) => { console.error(error); process.exitCode = 1; });

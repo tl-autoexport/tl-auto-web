@@ -2,6 +2,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 
+/* eslint-disable @typescript-eslint/no-explicit-any -- dynamic table names and untyped Supabase helpers */
+
 config({ path: ".env.local", quiet: true }); config({ path: ".env", quiet: true });
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
@@ -9,7 +11,7 @@ if (!url || !key) throw new Error("NEXT_PUBLIC_SUPABASE_URL and service-role key
 
 type Car = { id: string; source_id: string; source_url: string | null; primary_source: string; brand: string | null; model: string | null; year: number | null };
 const db = createClient<any>(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-async function all<T>(table: string, select: string, extra: (q: any) => any) { const out: T[] = []; for (let from = 0; ; from += 1000) { let q = extra(db.from(table).select(select).range(from, from + 999)); const { data, error } = await q; if (error) throw new Error(`${table}: ${error.message}`); out.push(...(data ?? [])); if (!data || data.length < 1000) return out; } }
+async function all<T>(table: string, select: string, extra: (q: any) => any) { const out: T[] = []; for (let from = 0; ; from += 1000) { const q = extra(db.from(table).select(select).range(from, from + 999)); const { data, error } = await q; if (error) throw new Error(`${table}: ${error.message}`); out.push(...(data ?? [])); if (!data || data.length < 1000) return out; } }
 async function main() {
   const cars = await all<Car>("cars", "id,source_id,source_url,primary_source,brand,model,year", (q) => q.eq("is_available", true).in("primary_source", ["encar", "chestny_prigon"]).order("source_id"));
   const ids = cars.map((c) => c.id); const reports = new Set<string>(); const options = new Set<string>(); const media = new Map<string, number>();

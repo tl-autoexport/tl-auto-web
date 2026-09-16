@@ -1,0 +1,577 @@
+{
+  "version": "confirmed-open-specs-v1",
+  "specifications": [
+    {
+      "specKey": "audi-q3-f3-35tdi-1968-150ps-2023",
+      "brand": "Audi",
+      "model": "Q3",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1968,
+      "years": [2023, 2023],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Audi Q3 35 TDI official technical data (2023) — 1,968 cc, 150 PS",
+        "uri": "https://www.audi-mediacenter.com/system/production/car_motorizations/1186/file_en/14f12d3cda05553457a7c98d7b821b09154db555/eTD-Audi-Q3-35-TDI-110kW_231005.pdf?1698933939=&disposition=attachment",
+        "retrievedAt": "2026-09-15",
+        "note": "Audi's official technical data dated 5 October 2023 specifies Q3 35 TDI at 1,968 cc and 110 kW/150 PS. It documents both front-wheel-drive and quattro variants; the rule therefore leaves drive unconstrained and is limited to 2023 diesel Q3 35 TDI cards."
+      },
+      "matches": [
+        { "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1960, "engineCcTo": 1975 }
+      ]
+    },
+    {
+      "specKey": "chevrolet-trax-crossover-1199-139ps-2023-2024",
+      "brand": "Chevrolet",
+      "model": "Trax",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1199,
+      "years": [2023, 2024],
+      "power": { "value": 139, "unit": "PS", "kw": 102.23432625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Chevrolet Korea Trax Crossover official launch specification — 1,199 cc, 139 PS",
+        "uri": "https://news.chevrolet.co.kr/ko/chevrolet/newsroom.detail.html/Pages/news/kr/ko/2023/march/0322_Redefining_Crossover_Chevrolet_Officially_Launches.html",
+        "supportingUri": "https://www.chevrolet.co.kr/content/dam/chevrolet/as/kr/ko/index/e-catalogue-price-list/2023/07-pdfs/all-line-up-pricelist-202311-trax-crossover-e-catalog.pdf",
+        "retrievedAt": "2026-09-15",
+        "note": "Chevrolet Korea specifies the Trax Crossover E-Turbo Prime gasoline engine at 1,199 cc and 139 PS. The official catalogue confirms FWD across LS/LT/ACTIV/RS. This rule is limited to 2023–2024 1.2 gasoline Trax cards."
+      },
+      "matches": [
+        { "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1190, "engineCcTo": 1210 },
+        { "trim": "LS", "badge": "LS", "driveType": "FWD", "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1190, "engineCcTo": 1210 },
+        { "trim": "LT", "badge": "LT", "driveType": "FWD", "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1190, "engineCcTo": 1210 },
+        { "trim": "ACTIV", "badge": "ACTIV", "driveType": "FWD", "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1190, "engineCcTo": 1210 },
+        { "trim": "RS", "badge": "RS", "driveType": "FWD", "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1190, "engineCcTo": 1210 }
+      ]
+    },
+    {
+      "specKey": "chevrolet-trailblazer-1341-156ps-2021-2025",
+      "brand": "Chevrolet",
+      "model": "Trailblazer",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1341,
+      "years": [2021, 2025],
+      "power": { "value": 156, "unit": "PS", "kw": 114.737805 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Chevrolet Korea Trailblazer official specification — 1,341 cc, 156 PS",
+        "uri": "https://www.chevrolet.co.kr/content/dam/chevrolet/as/kr/ko/index/e-catalogue-price-list/v2/price-list/TRAILBLAZER.pdf",
+        "supportingUri": "https://news.chevrolet.co.kr/ko/chevrolet/newsroom.detail.html/Pages/news/kr/ko/2025/may/0509_chevy_TRAILBLAZER.html",
+        "retrievedAt": "2026-09-15",
+        "note": "Chevrolet Korea's technical catalogue specifies the E-Turbo 1.35 gasoline engine at 1,341 cc and 156 PS for both FWD/CVT and AWD/9-speed configurations. The 2026 official release confirms the same output. Restricted to 2021–2025 gasoline Trailblazer cards."
+      },
+      "matches": [
+        { "driveType": "2WD", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1330, "engineCcTo": 1350 },
+        { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1330, "engineCcTo": 1350 }
+      ]
+    },
+    {
+      "specKey": "bmw-x1-u11-xdrive20i-1998-204ps-2023-2025",
+      "brand": "BMW",
+      "model": "X1",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2023, 2025],
+      "power": { "value": 204, "unit": "PS", "kw": 150.041745 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea X1 U11 xDrive20i official specification — 204 PS",
+        "uri": "https://www.bmw.co.kr/ko/all-models/x-series/x1/bmw-x1.html",
+        "retrievedAt": "2026-09-15",
+        "note": "BMW Korea states 204 hp / 150 kW for X1 xDrive20i. Exact trim matching excludes M35i and the previous F48 generation."
+      },
+      "matches": [
+        { "trim": "xDrive 20i xLine", "badge": "xDrive 20i xLine", "yearFrom": 2023, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "trim": "xDrive 20i M Sport", "badge": "xDrive 20i M Sport", "yearFrom": 2023, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "bmw-x1-u11-m35i-1998-317ps-2024-2025",
+      "brand": "BMW",
+      "model": "X1",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2024, 2025],
+      "power": { "value": 317, "unit": "PS", "kw": 233.15310375 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea X1 M35i xDrive official specification — 317 PS",
+        "uri": "https://www.bmw.co.kr/ko/all-models/m-series/x1-m35i/bmw-x1-m35i-xdrive-suv.html",
+        "retrievedAt": "2026-09-15",
+        "note": "BMW Korea lists X1 M35i xDrive at 317 hp / 233 kW. The match is intentionally restricted to the exact M35i trim."
+      },
+      "matches": [
+        { "trim": "M35i xDrive", "badge": "M35i xDrive", "yearFrom": 2024, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "bmw-x2-u10-xdrive20i-1998-204ps-2025",
+      "brand": "BMW",
+      "model": "X2",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2025, 2025],
+      "power": { "value": 204, "unit": "PS", "kw": 150.041745 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea X2 U10 xDrive20i official specification — 204 PS",
+        "uri": "https://www.bmw.co.kr/ko/all-models/x-series/x2/x2-2023-u10.html",
+        "retrievedAt": "2026-09-15",
+        "note": "BMW Korea states 204 hp for the U10 X2 xDrive20i. The rule is limited to the exact U10 xDrive20i trim, not the older F39 naming stored by one source field."
+      },
+      "matches": [
+        { "trim": "xDrive 20i M Sport", "badge": "xDrive 20i M Sport", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "land-rover-discovery-sport-p250-1997-249ps-2023-2024",
+      "brand": "Land Rover",
+      "model": "Discovery Sport",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1997,
+      "years": [2023, 2024],
+      "power": { "value": 249, "unit": "PS", "kw": 183.13918875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Land Rover Discovery Sport P250 official specification — 249 PS",
+        "uri": "https://jamaica.landrover.com/discovery/discovery-sport/overview",
+        "retrievedAt": "2026-09-15",
+        "note": "The manufacturer page identifies the P250 engine at 249 PS / 184 kW. Exact P250 trim matching excludes other 2.0-litre petrol variants."
+      },
+      "matches": [
+        { "trim": "P250 SE", "badge": "P250 SE", "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "trim": "P250 Dynamic SE", "badge": "P250 Dynamic SE", "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "trim": "P250 S", "badge": "P250 S", "yearFrom": 2023, "yearTo": 2024, "engineCcFrom": 1985, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "land-rover-evoque-p250-1997-249ps-2021-2025",
+      "brand": "Land Rover",
+      "model": "Range Rover Evoque",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1997,
+      "years": [2021, 2025],
+      "power": { "value": 249, "unit": "PS", "kw": 183.13918875 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Range Rover Evoque P250 official specification — 249 PS",
+        "uri": "https://jamaica.landrover.com/range-rover/range-rover-evoque/overview",
+        "retrievedAt": "2026-09-15",
+        "note": "The manufacturer page identifies the P250 engine at 249 PS / 184 kW. Exact P250 trim matching excludes P200/P300 variants."
+      },
+      "matches": [
+        { "trim": "P250 SE", "badge": "P250 SE", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "trim": "P250 R-Dynamic SE", "badge": "P250 R-Dynamic SE", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "trim": "P250 Dynamic SE", "badge": "P250 Dynamic SE", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 2005 },
+        { "trim": "P250 S", "badge": "P250 S", "yearFrom": 2021, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "volkswagen-golf-8-2tdi-1968-150ps-2025",
+      "brand": "Volkswagen",
+      "model": "Golf",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1968,
+      "years": [2025, 2025],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Volkswagen Korea Golf 2.0 TDI official specification — 150 PS",
+        "uri": "https://www.volkswagen.co.kr/ko/promotion_news/news/new-2025/2025-03-14.html",
+        "retrievedAt": "2026-09-15",
+        "note": "Volkswagen Korea states the 2.0 TDI / 7-speed DSG powertrain produces 150 hp. Exact Premium and Prestige trim rules replace the prior unsupported 200 PS draft."
+      },
+      "matches": [
+        { "trim": "2.0 TDI Premium", "badge": "2.0 TDI Premium", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1960, "engineCcTo": 1975 },
+        { "trim": "2.0 TDI Prestige", "badge": "2.0 TDI Prestige", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1960, "engineCcTo": 1975 }
+      ]
+    },
+    {
+      "specKey": "hyundai-sonata-the-edge-1.6t-1598-180ps-2025-2026",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2025, 2026],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Sonata The Edge Korean catalogue — 1.6 turbo, 1,598 cc, 180 PS",
+        "uri": "https://www.hyundai.com/contents/repn-car/catalog/sonata-the-edge-catalog.pdf",
+        "retrievedAt": "2026-09-15",
+        "note": "Hyundai's Korean catalogue lists the Smartstream 1.6 turbo at 1,598 cc and 180 PS. It is limited to the non-hybrid Exclusive and Inspiration trims in the stored cards."
+      },
+      "matches": [
+        { "trim": "Exclusive", "badge": "Exclusive", "yearFrom": 2025, "yearTo": 2026, "engineCcFrom": 1590, "engineCcTo": 1610 },
+        { "trim": "Inspiration", "badge": "Inspiration", "yearFrom": 2025, "yearTo": 2026, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.2d-2151-194ps-2026-4wd",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2026, 2026],
+      "power": { "value": 194, "unit": "PS", "kw": 142.6867575 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento Korean 2026 catalogue — 2.2 diesel, 2,151 cc, 194 PS",
+        "uri": "https://kwp1.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_mo_sorento.pdf",
+        "retrievedAt": "2026-09-15",
+        "note": "Kia's official 2026 Korean catalogue lists the 2.2 diesel at 2,151 cc and 194 PS. It is restricted to the single 2026 4WD card."
+      },
+      "matches": [
+        { "trim": "Signature", "badge": "Signature", "driveType": "4WD", "yearFrom": 2026, "yearTo": 2026, "engineCcFrom": 2140, "engineCcTo": 2165 }
+      ]
+    },
+    {
+      "specKey": "bmw-x1-f48-xdrive20i-korea-1998-192ps-2021-2022",
+      "brand": "BMW",
+      "model": "X1",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2021, 2022],
+      "power": { "value": 192, "unit": "PS", "kw": 141.21576 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW X1 F48 xDrive20i official technical data — 192 PS",
+        "uri": "https://www.press.bmwgroup.com/global/article/attachment/T0218922EN/340051",
+        "supportingUri": "https://www.bmw.co.kr/content/dam/bmw/marketKR/bmw_co_kr/discover/price-list/download/2022/price_list_202208.pdf.asset.1660096590933.pdf",
+        "retrievedAt": "2026-09-15",
+        "note": "BMW Group technical data lists the F48 X1 xDrive20i 1,998 cc at 141 kW / 192 PS. BMW Korea's August 2022 price list independently identifies the Korean xLine and M Sport xDrive20i trims. This rule does not use the later 178-PS European market calibration."
+      },
+      "matches": [
+        { "generation": "X1 (F48)", "trim": "xDrive 20i xLine", "badge": "xDrive 20i xLine", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "generation": "X1 (F48)", "trim": "xDrive 20i M Sport", "badge": "xDrive 20i M Sport", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mercedes-glb-x247-amg35-1991-306ps-2023-2025",
+      "brand": "Mercedes-Benz",
+      "model": "GLB",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1991,
+      "years": [2023, 2025],
+      "power": { "value": 306, "unit": "PS", "kw": 225.0626175 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz Korea GLB 35 4MATIC official launch specification — 306 PS",
+        "uri": "https://www.mercedes-benz.co.kr/passengercars/brand/news-events/news-story/2023/news-20231228.html",
+        "retrievedAt": "2026-09-15",
+        "note": "Mercedes-Benz Korea states that the facelifted Mercedes-AMG GLB 35 4MATIC has a 2.0-litre engine and 306 PS. The rule begins with the 2023 facelift introduction and is restricted to the exact AMG GLB35 badge."
+      },
+      "matches": [
+        { "trim": "AMG GLB35 4MATIC", "badge": "AMG GLB35 4MATIC", "yearFrom": 2023, "yearTo": 2025, "engineCcFrom": 1980, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "hyundai-kona-sx2-1.6t-1598-198ps-2024",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2024, 2024],
+      "power": { "value": 198, "unit": "PS", "kw": 145.6287525 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Korea all-new Kona SX2 official specification — 1.6 turbo, 1,598 cc, 198 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/kona-history/2023-the-all-new-kona",
+        "supportingUri": "https://www.hyundai.com/kr/en/suv/the-all-new-kona/price",
+        "retrievedAt": "2026-09-15",
+        "note": "Hyundai Korea lists the SX2 1.6 turbo at 1,598 cc and 198 PS. Its official price page dated 1 January 2024 confirms Premium and Inspiration grades for that same 1.6-turbo Kona."
+      },
+      "matches": [
+        { "generation": "코나 (SX2)", "trim": "Premium", "badge": "Premium", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1590, "engineCcTo": 1610 },
+        { "generation": "코나 (SX2)", "trim": "Inspiration", "badge": "Inspiration", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "audi-q3-f3-35tdi-1968-150ps-2025",
+      "brand": "Audi",
+      "model": "Q3",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1968,
+      "years": [2025, 2025],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Audi Q3 35 TDI model year 2025 official price list — 150 PS",
+        "uri": "https://www.audi-mediacenter.com/de/publikationen/preislisten/preisliste-audi-q3-audi-q3-sportback-modelljahr-2025-801/download",
+        "retrievedAt": "2026-09-15",
+        "note": "Audi's model-year 2025 Q3 price list specifies the 35 TDI at 1,968 cc and 110 kW / 150 PS. The rule is limited to F3 35 TDI Premium cards."
+      },
+      "matches": [
+        { "generation": "Q3 (F3)", "trim": "35 TDI Premium", "badge": "35 TDI Premium", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1960, "engineCcTo": 1975 }
+      ]
+    },
+    {
+      "specKey": "hyundai-sonata-the-edge-2.0-1999-160ps-2025",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2025, 2025],
+      "power": { "value": 160, "unit": "PS", "kw": 117.6798 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Sonata The Edge 2.0 official specification — 1,999 cc, 160 PS",
+        "uri": "https://www.hyundai.com/kr/ko/brand/brandstory/model/sonata-history/2023-sonata-the-edge",
+        "supportingUri": "https://www.hyundai.com/contents/repn-car/catalog/sonata-the-edge-2025-price.pdf",
+        "retrievedAt": "2026-09-15",
+        "note": "Hyundai specifies the Sonata The Edge Smartstream gasoline 2.0 at 1,999 cc and 160 PS. Hyundai's 2025 official price document confirms the continued gasoline 2.0 The Edge configuration; the rule is restricted to 2025 non-hybrid Exclusive cards."
+      },
+      "matches": [
+        { "generation": "쏘나타 디 엣지(DN8)", "trim": "Exclusive", "badge": "Exclusive", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "kia-sorento-mq4-2.2d-2151-194ps-2025-2026-4wd",
+      "brand": "Kia",
+      "model": "Sorento",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 2151,
+      "years": [2025, 2026],
+      "power": { "value": 194, "unit": "PS", "kw": 142.6867575 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Sorento Korean diesel catalogue — 2,151 cc, 194 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sorento.pdf",
+        "retrievedAt": "2026-09-15",
+        "note": "Kia's official Korean Sorento catalogue states 2.2 diesel, 2,151 cc, 194 PS and includes 4WD. It is limited to the stored 2025–2026 Signature and Signature X Line 4WD configurations."
+      },
+      "matches": [
+        { "generation": "더 뉴 쏘렌토 4세대", "trim": "Signature", "badge": "Signature", "driveType": "4WD", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 2140, "engineCcTo": 2165 },
+        { "generation": "더 뉴 쏘렌토 4세대", "trim": "Signature X Line", "badge": "Signature X Line", "driveType": "4WD", "yearFrom": 2025, "yearTo": 2026, "engineCcFrom": 2140, "engineCcTo": 2165 }
+      ]
+    },
+    {
+      "specKey": "hyundai-sonata-dn8-sensuous-1.6t-1598-180ps-2022",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2022, 2022],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Korea Sonata Sensuous 1.6 turbo official specification — 180 PS",
+        "uri": "https://www.hyundai.com/content/hyundai/kr/ko/vehicles/sonata/19fc/sonata-sensuous.html",
+        "retrievedAt": "2026-09-15",
+        "note": "Hyundai Korea explicitly specifies the Sonata Sensuous Smartstream gasoline 1.6 turbo at 180 PS. The matcher is limited to the DN8 2022 Premium Plus card with its recorded 1,598 cc petrol engine; it does not apply to the 2.0-litre or hybrid variants."
+      },
+      "matches": [
+        { "generation": "쏘나타 (DN8)", "trim": "Premium Plus", "badge": "Premium Plus", "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "kia-sportage-nq5-2d-1998-184ps-2024-4wd",
+      "brand": "Kia",
+      "model": "Sportage",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2024, 2024],
+      "power": { "value": 184, "unit": "PS", "kw": 135.33177 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia Korea Sportage NQ5 2.0 diesel official catalogue — 1,998 cc, 184 PS",
+        "uri": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "supportingUri": "https://cpo.kia.com/news/detail/?id=17",
+        "retrievedAt": "2026-09-15",
+        "note": "Kia's official NQ5 catalogue gives 1,998 cc and 184 PS for the 2.0 diesel, including 4WD. Kia's official The 2024 Sportage launch notice confirms that the 2.0-diesel NQ5 was still sold for model year 2024. The rule is limited to the exact 2024 Prestige 4WD configuration."
+      },
+      "matches": [
+        { "generation": "스포티지 5세대", "trim": "Prestige", "badge": "Prestige", "driveType": "4WD", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mercedes-glb-x247-amg35-1991-306ps-2022",
+      "brand": "Mercedes-Benz",
+      "model": "GLB",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1991,
+      "years": [2022, 2022],
+      "power": { "value": 306, "unit": "PS", "kw": 225.0626175 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz official GLB 35 4MATIC technical specification — 1,991 cc, 306 PS",
+        "uri": "https://media.mercedes-benz.at/news-der-neue-mercedes-benz-glb-und-der-neue-mercedes-amg-glb-35-4matic?id=95584&l=deutsch&menueid=24115",
+        "retrievedAt": "2026-09-15",
+        "note": "Mercedes-Benz's official launch technical data specifies the pre-facelift Mercedes-AMG GLB 35 4MATIC at 1,991 cc and 225 kW / 306 PS. The card is limited to the same X247 AMG GLB35 4MATIC configuration in 2022; no later facelift rule is reused."
+      },
+      "matches": [
+        { "generation": "GLB-클래스 X247", "trim": "AMG GLB35 4MATIC", "badge": "AMG GLB35 4MATIC", "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 1980, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "hyundai-tucson-nx4-1.6t-1598-180ps-2025-2wd",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2025, 2025],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai 2025 Tucson Korean specification — Smartstream 1.6 turbo, 180 PS",
+        "uri": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/tucson-catalog-eng.pdf",
+        "supportingUri": "https://www.hyundaimotorgroup.com/ko/amp/CONT0000000000164775",
+        "retrievedAt": "2026-09-15",
+        "note": "Hyundai's official Tucson catalogue specifies the Smartstream 1.6 turbo at 180 PS and explicitly lists 2WD. Hyundai Motor Group's official 2025 Tucson announcement confirms the 1.6-turbo Modern grade for model year 2025. The match is limited to this exact 2WD Modern configuration."
+      },
+      "matches": [
+        { "generation": "더 뉴 투싼 (NX4)", "trim": "Modern", "badge": "Modern", "driveType": "2WD", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "bmw-x1-u11-sdrive20i-korea-1998-204ps-2023",
+      "brand": "BMW",
+      "model": "X1",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2023, 2023],
+      "power": { "value": 204, "unit": "PS", "kw": 150.041745 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea new X1 sDrive20i official specification — 1,998 cc, 204 PS",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0412647KO/bmw-%EC%BD%94%EB%A6%AC%EC%95%84-%ED%94%84%EB%A6%AC%EB%AF%B8%EC%97%84-%EC%86%8C%ED%98%95-sav-%EB%89%B4-x1-%EB%B0%8F-%EB%89%B4-ix1-%EA%B3%B5%EC%8B%9D-%EC%B6%9C%EC%8B%9C",
+        "supportingUri": "https://www.bmw.co.kr/content/dam/bmw/marketKR/bmw_co_kr/Pricelist/BMW_December_pricelist_1214.pdf.asset.1702537746419.pdf",
+        "retrievedAt": "2026-09-15",
+        "note": "BMW Korea's U11 X1 sDrive20i launch specification gives 1,998 cc and 204 PS. BMW Korea's December 2023 price list names the local sDrive20i xLine and M Sport grades. This rule is strictly limited to those 2023 U11 grades."
+      },
+      "matches": [
+        { "generation": "X1 (U11)", "trim": "sDrive 20i xLine", "badge": "sDrive 20i xLine", "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "generation": "X1 (U11)", "trim": "sDrive 20i M Sport", "badge": "sDrive 20i M Sport", "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "hyundai-tucson-nx4-1.6t-1598-180ps-2022-4wd",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1598,
+      "years": [2022, 2022],
+      "power": { "value": 180, "unit": "PS", "kw": 132.389775 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai Tucson NX4 Korean official catalogue — Smartstream 1.6 turbo, 1,598 cc, 180 PS",
+        "uri": "https://www.hyundai.com/contents/repn-car/catalog_en/tucson-catalog.pdf",
+        "supportingUri": "https://certified.hyundai.com/",
+        "retrievedAt": "2026-09-15",
+        "note": "Hyundai's official NX4 catalogue gives the Smartstream gasoline 1.6 turbo at 1,598 cc and 180 PS. Hyundai Certified listings identify 2022 Tucson NX4 gasoline 1.6 turbo Inspiration variants. The rule remains restricted to the saved 2022 4WD Inspiration configuration."
+      },
+      "matches": [
+        { "generation": "투싼 (NX4)", "trim": "Inspiration", "badge": "Inspiration", "driveType": "4WD", "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 1590, "engineCcTo": 1610 }
+      ]
+    },
+    {
+      "specKey": "kia-morning-ja-1.0-998-76ps-2019",
+      "brand": "Kia",
+      "model": "Morning",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 998,
+      "years": [2019, 2019],
+      "power": { "value": 76, "unit": "PS", "kw": 55.897905 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Kia All New Morning (JA) official launch material — 1.0 Eco Prime, 76 PS",
+        "uri": "https://www.newswire.co.kr/newsRead.php?no=843638",
+        "supportingUri": "https://worldwide.kia.com/ko/brand/our-brand/heritage/vehicles/all-new-morning-3rd-gen",
+        "retrievedAt": "2026-09-15",
+        "note": "The source is Kia's own 2017 launch release distributed through Newswire: it identifies the All New Morning JA and its Kappa 1.0 Eco Prime petrol engine. Kia's heritage archive independently confirms the third-generation Morning has a 998 cc petrol engine. The rule is restricted to 2019 gasoline Luxury cards; turbo and LPG variants are excluded."
+      },
+      "matches": [
+        { "generation": "올 뉴 모닝 (JA)", "trim": "Luxury", "badge": "Luxury", "yearFrom": 2019, "yearTo": 2019, "engineCcFrom": 990, "engineCcTo": 1005 }
+      ]
+    },
+    {
+      "specKey": "mercedes-c-class-w206-c200-amg-line-1999-204ps-2026",
+      "brand": "Mercedes-Benz",
+      "model": "C-Class",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [2026, 2026],
+      "power": { "value": 204, "unit": "PS", "kw": 150.041745 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-Benz Korea C 200 AMG Line 26MY financing listing and official C 200 AMG Line specification — 204 PS",
+        "uri": "https://mercedes-benz-financial.co.kr/compact-car-202211-2/",
+        "supportingUri": "https://www.mercedes-benz.co.kr/passengercars/brand/news-events/news-story/2024/news-20240617.html",
+        "retrievedAt": "2026-09-15",
+        "note": "Mercedes-Benz Financial Services Korea explicitly lists C 200 AMG Line (26MY). Its financing page does not provide output, so this rule also requires Mercedes-Benz Korea's official W206 C 200 AMG Line specification: 4-cylinder gasoline engine, 204 PS and 9-speed transmission. The match is deliberately restricted to the saved 2026 C200 AMG Line 1,999 cc gasoline cards; it does not apply to any other C-Class engine or trim."
+      },
+      "matches": [
+        { "generation": "C-클래스 W206", "trim": "C200 AMG Line", "badge": "C200 AMG Line", "yearFrom": 2026, "yearTo": 2026, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "volkswagen-jetta-mk7-1.5-tsi-1498-160ps-2022-2024",
+      "brand": "Volkswagen",
+      "model": "Jetta",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1498,
+      "years": [2022, 2024],
+      "power": { "value": 160, "unit": "PS", "kw": 117.6798 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Volkswagen Korea Jetta 1.5 TSI official specification — 160 PS",
+        "uri": "https://www.volkswagen.co.kr/ko/promotion_news/news/news-2022/2022-10-14.html",
+        "supportingUri": "https://www.volkswagen.co.kr/idhub/content/dam/onehub_pkw/importers/kr/models/the-new-jetta/leafelt/Jetta_Price%20List_web_240502.pdf",
+        "retrievedAt": "2026-09-15",
+        "note": "Volkswagen Korea states the Jetta 1.5 TSI produces 160 PS. The rule is restricted to 1,495–1,505 cc gasoline Jetta cards from 2022–2024 and applies to Premium/Prestige trims." 
+      },
+      "matches": [
+        { "trim": "1.5 TSI Premium", "badge": "1.5 TSI Premium", "yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 1490, "engineCcTo": 1505 },
+        { "trim": "1.5 TSI Prestige", "badge": "1.5 TSI Prestige", "yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 1490, "engineCcTo": 1505 },
+        { "yearFrom": 2022, "yearTo": 2024, "engineCcFrom": 1490, "engineCcTo": 1505 }
+      ]
+    },
+    {
+      "specKey": "kgm-tivoli-x150-1497-163ps-2020-2024",
+      "brand": "KGM",
+      "model": "Tivoli",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1497,
+      "years": [2020, 2024],
+      "power": { "value": 163, "unit": "PS", "kw": 119.88629625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "KG Mobility official Tivoli specification — 1.5 GDI Turbo, 163 PS",
+        "uri": "https://m.kg-mobility.com/showroom/total_price/__icsFiles/afieldfile/2020/10/16/Total_price_201016_1.pdf",
+        "supportingUri": "https://www.kg-mobility.com/attached/contents/display/file/200000300010004/20250224102005784_YupcNy.pdf",
+        "retrievedAt": "2026-09-15",
+        "note": "KG Mobility's official technical sheets specify the Tivoli 1.5 GDI-turbo gasoline engine at 163 PS. The rule is restricted to 1,497 cc gasoline Tivoli/Tiboli cards from 2020–2024." 
+      },
+      "matches": [
+        { "yearFrom": 2020, "yearTo": 2024, "engineCcFrom": 1490, "engineCcTo": 1505 }
+      ]
+    }
+  ]
+}
