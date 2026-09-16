@@ -13,14 +13,14 @@ async function all<T>(table: string, select: string, extra: (q: any) => any) { c
 async function main() {
   const cars = await all<Car>("cars", "id,source_id,source_url,primary_source,brand,model,year", (q) => q.eq("is_available", true).in("primary_source", ["encar", "chestny_prigon"]).order("source_id"));
   const ids = cars.map((c) => c.id); const reports = new Set<string>(); const options = new Set<string>(); const media = new Map<string, number>();
-  for (let i = 0; i < ids.length; i += 500) {
-    const part = ids.slice(i, i + 500);
-    const [r, o, m] = await Promise.all([
-      db.from("car_condition_reports").select("car_id,report_type").in("car_id", part),
-      db.from("car_options").select("car_id").in("car_id", part),
-      db.from("car_media").select("car_id").in("car_id", part).eq("media_type", "image"),
-    ]);
-    if (r.error) throw new Error(r.error.message); if (o.error) throw new Error(o.error.message); if (m.error) throw new Error(m.error.message);
+  for (let i = 0; i < ids.length; i += 100) {
+    const part = ids.slice(i, i + 100);
+    const r = await db.from("car_condition_reports").select("car_id,report_type").in("car_id", part);
+    if (r.error) throw new Error(`car_condition_reports: ${r.error.message}`);
+    const o = await db.from("car_options").select("car_id").in("car_id", part);
+    if (o.error) throw new Error(`car_options: ${o.error.message}`);
+    const m = await db.from("car_media").select("car_id").in("car_id", part).eq("media_type", "image");
+    if (m.error) throw new Error(`car_media: ${m.error.message}`);
     for (const row of r.data ?? []) if (row.report_type === "encar_carhistory") reports.add(row.car_id);
     for (const row of o.data ?? []) options.add(row.car_id);
     for (const row of m.data ?? []) media.set(row.car_id, (media.get(row.car_id) ?? 0) + 1);
