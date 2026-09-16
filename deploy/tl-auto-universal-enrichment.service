@@ -12,7 +12,9 @@ EnvironmentFile=/etc/tl-auto/catalog-proxy.env
 Environment=ENCAR_UNIVERSAL_BATCH_SIZE=50
 Environment=ENCAR_UNIVERSAL_DELAY_MS=3000
 Environment=ENCAR_UNIVERSAL_DRY_RUN=false
-ExecStart=/usr/bin/flock -n -E 75 /tmp/tl-auto-encar-universal.lock /usr/bin/npm run run:encar:universal
+# Same lock as the Chestny VPS worker on this host: only one mass Encar
+# process may run at a time across both projects.
+ExecStart=/usr/bin/flock -n -E 75 /tmp/chestny-prigon-encar.lock /usr/bin/npm run run:encar:universal
 SuccessExitStatus=75
 TimeoutStartSec=1800
 Nice=10
