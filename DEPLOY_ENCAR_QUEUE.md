@@ -17,6 +17,11 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now tl-auto-encar-queue.timer
 ```
 
+Set `ENCAR_PROXY_URL` in `/home/ubuntu/tl-auto/.env` to the dedicated
+South-Korea Decodo catalog endpoint (the `:10002` endpoint). Keep the Radar
+endpoint separate (`:10001`) in the Radar project's own environment. Do not
+copy proxy credentials into Git or chat.
+
 The TL Auto service uses `/tmp/tl-auto-chestny-encar.lock`. Add the same
 non-waiting lock wrapper to the Chesty availability service on the VPS. This
 is a systemd-only change; the Chesty project code does not need to change:
@@ -31,6 +36,7 @@ Add:
 [Service]
 ExecStart=
 ExecStart=/usr/bin/flock -n /tmp/tl-auto-chestny-encar.lock /usr/bin/npm run catalog:monitor
+PrivateTmp=false
 ```
 
 Then reload both services:
@@ -40,6 +46,11 @@ sudo systemctl daemon-reload
 sudo systemctl restart catalog-availability-monitor.timer
 sudo systemctl restart tl-auto-encar-queue.timer
 ```
+
+The catalog worker is intentionally conservative: one request at a time with
+at least 2.5 seconds between cars. It stops treating only confirmed HTTP
+404/410 as unavailable; network errors remain retryable and do not deactivate
+the listing.
 
 The timer expression is in VPS UTC: `13:00` and `19:00 UTC`, which are
 `22:00` and `04:00` in Seoul. A busy lock makes the waiting project exit
