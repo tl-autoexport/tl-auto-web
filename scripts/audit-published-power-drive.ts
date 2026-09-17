@@ -133,9 +133,14 @@ async function main() {
       const category = (detail.category ?? {}) as Record<string, unknown>;
       const grade = category.gradeEnglishName ?? category.gradeName ?? car.staging_trim;
 
+      // A drive axle recorded by the legacy fallback is an assumption, not a
+      // source fact. Matching must treat it as unknown, otherwise a drive-based
+      // rule assigns a power the card never confirmed.
+      const assumedDrive = specs.drive_source === "assumed" || specs.drive_resolution === "assumed_2wd";
+
       const input = canonicalInput({
         brand: car.brand, model: car.model, generation: car.staging_generation, trim: grade,
-        fuelType: car.fuel_type, driveType: car.drive_type, year: car.year, engineCc: car.engine_cc,
+        fuelType: car.fuel_type, driveType: assumedDrive ? null : car.drive_type, year: car.year, engineCc: car.engine_cc,
       });
       const resolution = resolveApprovedPower(input, candidates);
       if (resolution.status !== "matched") {
