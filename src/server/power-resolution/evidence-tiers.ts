@@ -36,6 +36,18 @@ const THIRD_PARTY_HOSTS = [
   "car.naver.com",
 ];
 
+/**
+ * Open aggregators explicitly accepted by the project owner as a source of
+ * truth, so a rule built on them does not need T1/T2 corroboration. The
+ * acceptance was granted for the electric motor 30-minute rating, which the
+ * regulation requires and manufacturers publish only inside certification
+ * documents. Keep this list short and reviewed: every entry here can publish
+ * on its own.
+ */
+const ACCEPTED_AGGREGATOR_HOSTS = [
+  "drom.ru",
+];
+
 /** Manufacturer-hosted communication rather than core technical material. */
 const COMMUNICATION_HOSTS = [
   "press.bmwgroup.com",
@@ -94,6 +106,7 @@ export function evidenceTier(input: EvidenceTierInput): EvidenceTier {
   if (PROVISIONAL.test(haystack)) return "T4";
 
   const host = hostOf(input.sourceUri);
+  if (host && ACCEPTED_AGGREGATOR_HOSTS.some((value) => host.includes(value))) return "T2";
   if (host && THIRD_PARTY_HOSTS.some((value) => host.includes(value))) return "T3";
   if (host && COMMUNICATION_HOSTS.some((value) => host.includes(value))) return "T2";
   if (host && MANUFACTURER_HOSTS.some((value) => host.includes(value))) return "T1";

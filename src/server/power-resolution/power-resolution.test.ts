@@ -158,6 +158,8 @@ assert.equal(evidenceTier({ specKey: "x", note: "Do not treat this row as exact 
 assert.equal(evidenceTier({ specKey: "x", sourceUri: "https://autocatalogarchive.com/a.pdf" }), "T3");
 assert.equal(evidenceTier({ specKey: "x", sourceUri: "https://www.press.bmwgroup.com/a" }), "T2");
 assert.equal(evidenceTier({ specKey: "x", sourceUri: "https://www.hyundai.com/kr/spec" }), "T1");
+// Accepted aggregators publish on their own, by explicit owner decision.
+assert.equal(evidenceTier({ specKey: "x", sourceUri: "https://www.drom.ru/catalog/kia/ev6/500069/" }), "T2");
 assert.equal(evidenceTier({ specKey: "x", sourceUri: null }), "T4");
 assert.equal(tierFromStored("T3", { specKey: "x", sourceUri: "https://www.hyundai.com/a" }), "T3");
 assert.equal(tierFromStored(null, { specKey: "x", sourceUri: "https://www.hyundai.com/a" }), "T1");
