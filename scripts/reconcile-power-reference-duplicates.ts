@@ -40,36 +40,45 @@ const CASES = [
     keepKey: "mercedes-e-class-w213-e220d-1950-194ps-2021-2023",
     retireKey: "mercedes-e-class-w213-e220d-1950-194ps-2021-2022",
     widen: false,
+    unifyCcBand: false,
   },
   {
     name: "volkswagen-golf-8-2tdi-150ps-2025",
     keepKey: "volkswagen-golf-8-2tdi-1968-150ps-2025",
     retireKey: "volkswagen-golf-8-1968-150ps-2025",
     widen: true,
+    unifyCcBand: false,
   },
-  {
-    name: "volkswagen-tiguan-1968-150ps",
-    keepKey: "volkswagen-tiguan-ad-1968-150ps-2018-2024",
-    retireKey: "volkswagen-tiguan-2.0-tdi-1968-150ps-2019-2024",
-    widen: true,
-  },
+  // Volkswagen Tiguan 1968 150 PS is intentionally NOT merged. The pair looks
+  // equivalent, but the same displacement also carries a 200 PS specification
+  // for the `2.0 TDI Prestige` / `2.0 TDI Premium` trims. Retiring the second
+  // 150 PS rule removed the ambiguity that was protecting 29 published cards
+  // and replaced it with a confident 150 PS answer against a stored 200 PS, so
+  // the merge was reverted with `restore-retired-power-spec.ts`. Resolving that
+  // conflict needs a source decision on trim and drive, not a merge.
   {
     name: "kgm-tivoli-1497-163ps",
     keepKey: "kgm-tivoli-15t-1497-163ps-2019-2025",
     retireKey: "kgm-tivoli-x150-1497-163ps-2020-2024",
     widen: false,
+    unifyCcBand: false,
   },
   {
     name: "chevrolet-spark-999-75ps",
     keepKey: "chevrolet-spark-m400-1.0-999-75ps-2021-2022",
     retireKey: "chevrolet-spark-m400-1.0-999-75ps-2020",
     widen: false,
+    unifyCcBand: false,
   },
+  // The years are nested but the displacement bands differ (1988-2005 vs
+  // 1985-2005). Unifying the band on the surviving specification keeps every
+  // card covered and removes the ambiguity for 14 published cards.
   {
     name: "land-rover-discovery-sport-p250-249ps",
     keepKey: "land-rover-discovery-sport-p250-1997-249ps-2020-2026",
     retireKey: "land-rover-discovery-sport-p250-1997-249ps-2023-2024",
     widen: false,
+    unifyCcBand: true,
   },
 ];
 
@@ -131,8 +140,14 @@ async function main() {
         (keepIdentity.fuelType ?? null) === (retireIdentity.fuelType ?? null);
       const keepRange = rangeOf(keepRows);
       const retireRange = rangeOf(retireRows);
-      const contained = retireRange.years[0] >= keepRange.years[0] && retireRange.years[1] <= keepRange.years[1] &&
+      const yearsContained = retireRange.years[0] >= keepRange.years[0] && retireRange.years[1] <= keepRange.years[1];
+      const ccOverlap = keepRange.cc[0] <= retireRange.cc[1] && retireRange.cc[0] <= keepRange.cc[1];
+      const contained = yearsContained && ccOverlap &&
         retireRange.cc[0] >= keepRange.cc[0] && retireRange.cc[1] <= keepRange.cc[1];
+      const unifiable = item.unifyCcBand && yearsContained && ccOverlap && !contained;
+      const unifiedCc = unifiable
+        ? [Math.min(keepRange.cc[0], retireRange.cc[0]), Math.max(keepRange.cc[1], retireRange.cc[1])]
+        : null;
 
       // Retiring must not lose trim coverage: every trim the retired
       // specification constrains has to exist in the kept one, and a broad row
@@ -146,11 +161,11 @@ async function main() {
       const trimsCovered = missingTrims.length === 0;
       const broadCovered = !retireBroad || keepBroad || item.widen;
 
-      if (!samePower || !sameIdentity || !contained || !trimsCovered || !broadCovered) {
+      if (!samePower || !sameIdentity || !(contained || unifiable) || !trimsCovered || !broadCovered) {
         report.push({
           case: item.name, status: "aborted",
           reason: "equivalence_check_failed",
-          samePower, sameIdentity, contained, trimsCovered, broadCovered, missingTrims,
+          samePower, sameIdentity, contained, unifiable, trimsCovered, broadCovered, missingTrims,
           keepRange, retireRange,
         });
         continue;
@@ -166,7 +181,19 @@ async function main() {
         powerKw: Number(keep.calculation_power_kw), keepRange, retireRange,
         keepMatcherRows: keepRows.length, retireMatcherRows: retireRows.length,
         broadRowAdded: needsBroadRow,
+        ccBandUnified: unifiedCc,
       });
+
+      if (unifiedCc) {
+        actions.push(async () => {
+          await db.query(
+            `update public.vehicle_power_spec_matches
+                set engine_cc_from=$2, engine_cc_to=$3
+              where spec_id=$1 and engine_cc_from=$4 and engine_cc_to=$5`,
+            [keep.id, unifiedCc[0], unifiedCc[1], keepRange.cc[0], keepRange.cc[1]],
+          );
+        });
+      }
 
       if (needsBroadRow) {
         actions.push(async () => {
