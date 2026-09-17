@@ -525,7 +525,11 @@ export async function getCatalogMetrics(): Promise<CatalogMetrics> {
 
 async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
   const [cars, under160Cars, passableCars, electricCars] = await Promise.all([
-    getCatalogCars({ limit: 16 }),
+    // The homepage "Новые автомобили" shelf is a mileage-defined category:
+    // only listings with a known odometer reading up to 1,000 km belong here.
+    // The repository filter also excludes null mileage values at the database
+    // level, so the shelf cannot silently fall back to arbitrary fresh cars.
+    getCatalogCars({ limit: 16, maxMileageKm: 1000 }),
     getCatalogCars({ limit: 16, maxPowerHp: 160 }),
     getCatalogCars({ limit: 12, passable: true }),
     getCatalogCars({ limit: 16, fuelType: "electric" }),
@@ -536,7 +540,7 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
 
 const getCachedHomeCatalogData = unstable_cache(
   fetchHomeCatalogData,
-  ["home-catalog-showcases-v3", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  ["home-catalog-showcases-v4-mileage-new", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
   { revalidate: 60 },
 );
 

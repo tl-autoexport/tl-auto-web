@@ -9,7 +9,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import {
-  getCatalogCars,
   getCatalogFacetCars,
   getHomeCatalogData,
   type CatalogCar,
@@ -21,12 +20,9 @@ import { ContactLocations } from "@/components/home/ContactLocations";
 
 export const revalidate = 60;
 
-const prototypeSourceId = "42554713";
-
 export default async function Home() {
-  const [homeDataResult, prototypeResult, facetResult] = await Promise.allSettled([
+  const [homeDataResult, facetResult] = await Promise.allSettled([
     getHomeCatalogData(),
-    getCatalogCars({ sourceId: prototypeSourceId, limit: 1 }),
     getCatalogFacetCars(),
   ]);
   const { cars, under160Cars, electricCars } =
@@ -37,11 +33,7 @@ export default async function Home() {
   const under160 = selectShelfCars(under160Cars, usedCarIds);
   const electric = selectShelfCars(electricCars, usedCarIds);
   const newArrivals = selectShelfCars(cars, usedCarIds);
-  const prototypeCar = prototypeResult.status === "fulfilled" ? prototypeResult.value[0] : undefined;
   const facetCars = facetResult.status === "fulfilled" ? facetResult.value : [];
-  const newArrivalCards = prototypeCar
-    ? [prototypeCar, ...newArrivals.filter((car) => car.id !== prototypeCar.id).slice(0, 3)]
-    : newArrivals;
 
   return (
     <main className="min-h-screen bg-[#f5f6f8] text-[#101827]">
@@ -119,9 +111,9 @@ export default async function Home() {
         id="new-arrivals"
         eyebrow="Свежие поступления"
         title="Новые автомобили"
-        description="Недавно добавленные объявления, которые можно изучить и сразу рассчитать."
-        href="/catalog?sort=fresh"
-        cars={newArrivalCards}
+        description="Автомобили с пробегом до 1 000 км, которые можно изучить и сразу рассчитать."
+        href="/catalog?mileageMax=1000&sort=fresh"
+        cars={newArrivals}
         empty="Свежие поступления появятся в этой витрине после обновления каталога."
       />
 
