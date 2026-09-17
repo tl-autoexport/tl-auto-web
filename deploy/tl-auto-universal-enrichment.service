@@ -14,7 +14,10 @@ Environment=ENCAR_UNIVERSAL_DELAY_MS=3000
 Environment=ENCAR_UNIVERSAL_DRY_RUN=false
 # Same lock as the Chestny VPS worker on this host: only one mass Encar
 # process may run at a time across both projects.
-ExecStart=/usr/bin/flock -n -E 75 /tmp/chestny-prigon-encar.lock /usr/bin/npm run run:encar:universal
+# Wait for the shared catalog lock instead of losing the entire five-minute
+# slot when Chestny report retry or catalog refresh is finishing a batch.
+# Radar priority is still enforced by the worker's coordination marker.
+ExecStart=/usr/bin/flock -w 240 -E 75 /tmp/chestny-prigon-encar.lock /usr/bin/npm run run:encar:universal
 SuccessExitStatus=75
 TimeoutStartSec=1800
 Nice=10
