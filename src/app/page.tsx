@@ -89,9 +89,8 @@ export default async function Home() {
       <div className="bg-[#f5f6f8]">
       <VehicleShelf
         id="under-160"
-        eyebrow="Подборка"
         title="Автомобили до 160 л.с."
-        description="Автомобили с доступной мощностью и рассчитанной стоимостью до Владивостока."
+        description="Автомобиль с льготным утилизационным сбором"
         href="/catalog?shelf=under-160"
         cars={under160}
         empty="В текущей витрине ещё нет подходящих автомобилей."
@@ -99,7 +98,6 @@ export default async function Home() {
 
       <VehicleShelf
         id="electric"
-        eyebrow="Электромобили"
         title="Электромобили из Кореи"
         description="Свежие объявления из Кореи. Итоговую стоимость рассчитываем индивидуально после подтверждения тарифа ввоза."
         href="/catalog?fuel=electric"
@@ -109,7 +107,6 @@ export default async function Home() {
 
       <VehicleShelf
         id="new-arrivals"
-        eyebrow="Свежие поступления"
         title="Новые автомобили"
         description="Автомобили с пробегом до 1 000 км, которые можно изучить и сразу рассчитать."
         href="/catalog?mileageMax=1000&sort=fresh"
@@ -125,9 +122,9 @@ export default async function Home() {
       >
         <div className="mx-auto max-w-7xl px-5 py-14 md:py-18">
           <div className="flex items-center justify-between gap-4">
-            <p className="text-sm font-semibold text-[#956f2c]">
+            <h2 className="text-2xl font-semibold sm:text-3xl">
               Отзывы и истории
-            </p>
+            </h2>
             <Link href="#reviews" className="hidden shrink-0 items-center gap-2 text-sm font-semibold text-[#101827] sm:inline-flex">
               Смотреть все <ArrowRight size={16} />
             </Link>
@@ -221,7 +218,6 @@ function VehicleShelf({
   cars,
   description,
   empty,
-  eyebrow,
   href,
   id,
   title,
@@ -229,7 +225,6 @@ function VehicleShelf({
   cars: CatalogCar[];
   description: string;
   empty: string;
-  eyebrow: string;
   href: string;
   id: string;
   title: string;
@@ -238,7 +233,6 @@ function VehicleShelf({
     <section id={id} className="mx-auto max-w-7xl px-4 py-4 sm:px-5 sm:py-10">
       <div className="flex flex-col justify-between gap-2 md:flex-row md:items-end md:gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#956f2c]">{eyebrow}</p>
           <h2 className="text-2xl font-semibold sm:text-3xl">{title}</h2>
           <p className="mt-1 text-sm leading-5 text-[#647084] sm:mt-2 sm:leading-6">{description}</p>
         </div>

@@ -61,8 +61,7 @@ export function ContactLocations() {
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-5 sm:py-14">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-semibold text-[#956f2c]">Контакты и адреса</p>
-            <h2 className="mt-2 text-3xl font-semibold leading-tight sm:text-4xl">Мы на связи в России и Корее</h2>
+            <h2 className="text-2xl font-semibold leading-tight sm:text-3xl">Контакты и адреса</h2>
           </div>
           <div
             className="inline-flex self-start rounded-2xl border border-[#dfe4eb] bg-[#f3f5f8] p-1 shadow-[0_6px_18px_rgba(16,24,39,0.06)]"
