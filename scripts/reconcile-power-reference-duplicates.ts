@@ -1,5 +1,6 @@
 import { Client } from "pg";
 import { config } from "dotenv";
+import { canonicalCandidate } from "../src/server/power-resolution/canonical";
 
 /**
  * Reconciles duplicate approved specifications that describe the same
@@ -46,6 +47,30 @@ const CASES = [
     retireKey: "volkswagen-golf-8-1968-150ps-2025",
     widen: true,
   },
+  {
+    name: "volkswagen-tiguan-1968-150ps",
+    keepKey: "volkswagen-tiguan-ad-1968-150ps-2018-2024",
+    retireKey: "volkswagen-tiguan-2.0-tdi-1968-150ps-2019-2024",
+    widen: true,
+  },
+  {
+    name: "kgm-tivoli-1497-163ps",
+    keepKey: "kgm-tivoli-15t-1497-163ps-2019-2025",
+    retireKey: "kgm-tivoli-x150-1497-163ps-2020-2024",
+    widen: false,
+  },
+  {
+    name: "chevrolet-spark-999-75ps",
+    keepKey: "chevrolet-spark-m400-1.0-999-75ps-2021-2022",
+    retireKey: "chevrolet-spark-m400-1.0-999-75ps-2020",
+    widen: false,
+  },
+  {
+    name: "land-rover-discovery-sport-p250-249ps",
+    keepKey: "land-rover-discovery-sport-p250-1997-249ps-2020-2026",
+    retireKey: "land-rover-discovery-sport-p250-1997-249ps-2023-2024",
+    widen: false,
+  },
 ];
 
 const rangeOf = (rows: MatchRow[]) => ({
@@ -85,18 +110,48 @@ async function main() {
         continue;
       }
       const samePower = Math.abs(Number(keep.calculation_power_kw) - Number(retire.calculation_power_kw)) <= 0.5;
-      const sameIdentity = keepRows[0].brand === retireRows[0].brand && keepRows[0].model === retireRows[0].model &&
-        keepRows[0].fuel_type === retireRows[0].fuel_type;
+      // Identity is compared in canonical form: the same car is often stored
+      // under a different spelling on the two sides, and matching already
+      // collapses those spellings, so a raw string comparison would refuse a
+      // merge that is in fact safe.
+      const identityOf = (row: MatchRow) => canonicalCandidate({
+        specId: row.spec_id, specVersion: 1, calculationPowerKw: 0, powerBasis: "combustion_engine",
+        sourcePriority: row.priority, evidenceId: "", evidenceKind: "manufacturer_document",
+        evidenceVerificationStatus: "approved", evidenceReliability: "high",
+        match: { id: row.id, priority: row.priority, brand: String(row.brand ?? ""), model: String(row.model ?? ""),
+          generation: row.generation, trim: row.trim, badgeNormalized: row.badge_normalized, modelCode: row.model_code,
+          engineCode: row.engine_code, fuelType: row.fuel_type, driveType: row.drive_type,
+          productionYearFrom: row.production_year_from, productionYearTo: row.production_year_to,
+          engineCcFrom: row.engine_cc_from, engineCcTo: row.engine_cc_to },
+      }).match;
+      const keepIdentity = identityOf(keepRows[0]);
+      const retireIdentity = identityOf(retireRows[0]);
+      const sameIdentity = keepIdentity.brand === retireIdentity.brand &&
+        keepIdentity.model === retireIdentity.model &&
+        (keepIdentity.fuelType ?? null) === (retireIdentity.fuelType ?? null);
       const keepRange = rangeOf(keepRows);
       const retireRange = rangeOf(retireRows);
       const contained = retireRange.years[0] >= keepRange.years[0] && retireRange.years[1] <= keepRange.years[1] &&
         retireRange.cc[0] >= keepRange.cc[0] && retireRange.cc[1] <= keepRange.cc[1];
 
-      if (!samePower || !sameIdentity || !contained) {
+      // Retiring must not lose trim coverage: every trim the retired
+      // specification constrains has to exist in the kept one, and a broad row
+      // must survive on either side.
+      const trimsOf = (rows: MatchRow[]) => new Set(rows.map((row) => row.trim).filter((value): value is string => Boolean(value)));
+      const keepTrims = trimsOf(keepRows);
+      const retireTrims = trimsOf(retireRows);
+      const keepBroad = keepRows.some((row) => !row.trim && !row.badge_normalized);
+      const retireBroad = retireRows.some((row) => !row.trim && !row.badge_normalized);
+      const missingTrims = [...retireTrims].filter((trim) => !keepTrims.has(trim));
+      const trimsCovered = missingTrims.length === 0;
+      const broadCovered = !retireBroad || keepBroad || item.widen;
+
+      if (!samePower || !sameIdentity || !contained || !trimsCovered || !broadCovered) {
         report.push({
           case: item.name, status: "aborted",
           reason: "equivalence_check_failed",
-          samePower, sameIdentity, keepRange, retireRange,
+          samePower, sameIdentity, contained, trimsCovered, broadCovered, missingTrims,
+          keepRange, retireRange,
         });
         continue;
       }
