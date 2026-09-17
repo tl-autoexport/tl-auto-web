@@ -2,7 +2,9 @@
 Description=Run TL Auto universal Encar enrichment every five minutes
 
 [Timer]
-OnCalendar=*-*-* *:0/5:00
+# Start two minutes after the Radar five-minute cycle boundary so the
+# background worker gets a usable window while Radar remains first priority.
+OnCalendar=*-*-* *:2/5:00
 Persistent=true
 AccuracySec=30s
 Unit=tl-auto-universal-enrichment.service
