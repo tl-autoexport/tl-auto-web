@@ -1,0 +1,400 @@
+{
+  "kind": "expert_notes",
+  "notAmanifest": true,
+  "description": "Free-text customer remarks about the 30-minute electric rating. Not importable: the importer reads manifests only. Each note points back to a source row so a rule can cite it. WARNING: `kilowatts` is the first kW figure found in the text; when a note discusses several variants it may belong to another one (the Nissan Serena note quotes 110 kW for the non-hybrid while the 30-minute value is 70 kW). Always re-read `text` before using a value.",
+  "generatedFrom": "public.vehicle_power_source_rows",
+  "notes": [
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 10
+      },
+      "subject": "Toyota Harrier",
+      "text": "AXUP85 -  совокупная с 30ти минуткой 205кВт",
+      "kilowatts": 205,
+      "hp": 279,
+      "qualifiers": [
+        "combined_with_ice"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 44
+      },
+      "subject": "Nissan Serena 1.2",
+      "text": "С27 - это обычная не гибридная серена . 110квт.  бензин. Если гибрид , возможно вам нужна HC27 - 70квт 30минутная мощность . электричка",
+      "kilowatts": 110,
+      "hp": 150,
+      "qualifiers": []
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 56
+      },
+      "subject": "Lexus RZ300e",
+      "text": "73кВт 30минутка, электродвигатель",
+      "kilowatts": 73,
+      "hp": 99,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 89
+      },
+      "subject": "Byd LCOCE4CB7R4040834 \n\nByd6433SBEV2 с этой кодировкой",
+      "text": "65кВт 30минутка, электро",
+      "kilowatts": 65,
+      "hp": 88,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 92
+      },
+      "subject": "Lexus RZ300E",
+      "text": "73квт 30минутка, электродвигатель",
+      "kilowatts": 73,
+      "hp": 99,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 93
+      },
+      "subject": "Lexus RZ450E",
+      "text": "132квт 30минутка, электро",
+      "kilowatts": 132,
+      "hp": 179,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 96
+      },
+      "subject": null,
+      "text": "30кВт 30минутка, электродвигатель",
+      "kilowatts": 30,
+      "hp": 41,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 97
+      },
+      "subject": "MG ES5 \nLSJWS4036SZ694552",
+      "text": "55кВт 30минутка, электродвигатель",
+      "kilowatts": 55,
+      "hp": 75,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 98
+      },
+      "subject": "MG ES5",
+      "text": "СБКТС нет на данную кодировку, уточните ещё у лаборатории, 55кВт 30минутка . электродвигатель",
+      "kilowatts": 55,
+      "hp": 75,
+      "qualifiers": [
+        "electric_motor",
+        "needs_confirmation"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 111
+      },
+      "subject": null,
+      "text": "есть один СБКТС на данную кодировку, 60кВт 30минутка, электродвигатель",
+      "kilowatts": 60,
+      "hp": 82,
+      "qualifiers": [
+        "electric_motor",
+        "needs_confirmation"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 121
+      },
+      "subject": null,
+      "text": "тут на шилдике 30 минутка - 68 квт, тоже у лабы уточнить, сможет ли она выпустить по такой",
+      "kilowatts": 68,
+      "hp": 92,
+      "qualifiers": [
+        "needs_confirmation"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 122
+      },
+      "subject": "Все ZEEKR 8x и 9x, можете смело считать по максимаке) 30-минутка там ничем не поможет. Ставьте 500 квт. бензин - к примеру",
+      "text": "Все ZEEKR 8x и 9x, можете смело считать по максимаке) 30-минутка там ничем не поможет. Ставьте 500 квт. бензин - к примеру",
+      "kilowatts": 500,
+      "hp": 680,
+      "qualifiers": [
+        "use_peak_instead"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 123
+      },
+      "subject": "zeekr 9",
+      "text": "Все ZEEKR 8x и 9x, можете смело считать по максимаке) 30-минутка там ничем не поможет. Ставьте 500 квт. бензин - к примеру",
+      "kilowatts": 500,
+      "hp": 680,
+      "qualifiers": [
+        "use_peak_instead"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 126
+      },
+      "subject": null,
+      "text": "последовательный гибрид. считаем как электро 100квт 30минутка",
+      "kilowatts": 100,
+      "hp": 136,
+      "qualifiers": [
+        "electric_motor",
+        "sequential_hybrid_as_electric"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 128
+      },
+      "subject": "KIA PV5\n\nKNASB811FTA006942",
+      "text": "40кВт 30минутка, М1",
+      "kilowatts": 40,
+      "hp": 54,
+      "qualifiers": []
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 129
+      },
+      "subject": null,
+      "text": "88кВт 30минутка, электро",
+      "kilowatts": 88,
+      "hp": 120,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 131
+      },
+      "subject": "TOYOTA C+POD (2022)\n\nRMV12-1001473",
+      "text": "пиковая 9,2квт , 30минутка - 2,6кВт. Электро",
+      "kilowatts": 9.2,
+      "hp": 13,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 133
+      },
+      "subject": null,
+      "text": "есть 1 СБКТС 70кВт 30минутка, электро",
+      "kilowatts": 70,
+      "hp": 95,
+      "qualifiers": [
+        "electric_motor",
+        "needs_confirmation"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 137
+      },
+      "subject": "KIA PV5\n\nKNASB811FTA006942",
+      "text": "40кВт 30минутка, М1",
+      "kilowatts": 40,
+      "hp": 54,
+      "qualifiers": []
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 140
+      },
+      "subject": "SNFE0-250395 - 90кВт 30минутка, электро\nNISSAN ARIYA (2024)",
+      "text": "SNFE0-250395 - 90кВт 30минутка, электро\nNISSAN ARIYA (2024)",
+      "kilowatts": 90,
+      "hp": 122,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 141
+      },
+      "subject": "FE0-150275 - 45кВт 30минутка, электро\nNISSAN ARIYA (2024)",
+      "text": "FE0-150275 - 45кВт 30минутка, электро\nNISSAN ARIYA (2024)",
+      "kilowatts": 45,
+      "hp": 61,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 143
+      },
+      "subject": null,
+      "text": "140кВт 30минутка, электро",
+      "kilowatts": 140,
+      "hp": 190,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 144
+      },
+      "subject": null,
+      "text": "250кВт 30минутка, электро",
+      "kilowatts": 250,
+      "hp": 340,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 145
+      },
+      "subject": null,
+      "text": "в СБКТС ставят 36квт 30минутка, электро",
+      "kilowatts": 36,
+      "hp": 49,
+      "qualifiers": [
+        "electric_motor",
+        "needs_confirmation"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 149
+      },
+      "subject": "BYD YUAN PRO\nBYD7003BEV11\nLC0CE4CC8P1177188",
+      "text": "35кВт 30минутка, электродвигатель",
+      "kilowatts": 35,
+      "hp": 48,
+      "qualifiers": [
+        "electric_motor"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 150
+      },
+      "subject": null,
+      "text": "Увы, нет ни СБКТС, ни 30-минутки. 120 кВт, электричка",
+      "kilowatts": 120,
+      "hp": 163,
+      "qualifiers": [
+        "needs_confirmation"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 170
+      },
+      "subject": null,
+      "text": "есть один СБКТС на данную кодировку, 60кВт 30минутка, электродвигатель",
+      "kilowatts": 60,
+      "hp": 82,
+      "qualifiers": [
+        "electric_motor",
+        "needs_confirmation"
+      ]
+    },
+    {
+      "source": {
+        "batchId": "c69dd8d6-7992-4958-876f-14b57eb19731",
+        "sheet": "свежие запросы от 02.2026",
+        "rowNumber": 188
+      },
+      "subject": "L6T795ND5TN144553\nzeekr 9",
+      "text": "Все ZEEKR 8x и 9x, можете смело считать по максимаке) 30-минутка там ничем не поможет. Ставьте 500 квт. бензин - к примеру",
+      "kilowatts": 500,
+      "hp": 680,
+      "qualifiers": [
+        "use_peak_instead"
+      ]
+    }
+  ]
+}
