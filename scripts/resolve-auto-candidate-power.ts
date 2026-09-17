@@ -60,7 +60,7 @@ async function main() {
         from public.vehicle_power_specs spec
         join public.vehicle_power_evidence evidence on evidence.id=spec.evidence_id
         join public.vehicle_power_spec_matches matcher on matcher.spec_id=spec.id
-        where spec.status='approved' and evidence.verification_status='approved'`),
+        where spec.status='approved' and evidence.verification_status='approved' and spec.customs_power_hp is not null`),
       db.query(`select distinct on (s.source_listing_id)
           s.source_listing_id,s.manufacturer,s.model,s.generation,s.trim,s.model_year,s.first_registration_date,s.engine_cc,s.fuel_type,s.drive_type,s.raw_payload
         from public.chestny_catalog_staging s

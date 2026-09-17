@@ -111,7 +111,7 @@ async function main() {
         from public.vehicle_power_specs spec
         join public.vehicle_power_evidence evidence on evidence.id=spec.evidence_id
         join public.vehicle_power_spec_matches matcher on matcher.spec_id=spec.id
-        where spec.status='approved' and evidence.verification_status='approved'`);
+        where spec.status='approved' and evidence.verification_status='approved' and spec.customs_power_hp is not null`);
     const rows = await client.query<StageRow>(`
         select source_listing_id,source_url,manufacturer,model,generation,trim,model_year,first_registration_date,mileage_km,
           price_krw,engine_cc,fuel_type,transmission,drive_type,exterior_color,body_type,location,vin_masked,image_urls,raw_payload
