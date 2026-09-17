@@ -1,7 +1,7 @@
 import { Client } from "pg";
 import { config } from "dotenv";
 import { canonicalCandidates, canonicalInput } from "../src/server/power-resolution/canonical";
-import { evidenceTier } from "../src/server/power-resolution/evidence-tiers";
+import { tierFromStored } from "../src/server/power-resolution/evidence-tiers";
 import { hpFromKw } from "../src/server/power-resolution/publication-gate";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
 
@@ -24,8 +24,9 @@ const top = (map: Record<string, number>, limit = 10) =>
 type CarRow = {
   id: string; source_id: string; brand: string | null; model: string | null; year: number | null;
   engine_cc: number | null; fuel_type: string | null; drive_type: string | null; power_hp: number | null;
-  power_source: string | null; power_confidence: string | null; registration_month: number | null;
+  power_source: string | null; power_confidence: string | null;   registration_month: number | null;
   registration_date: string | null;
+  published_at: string | null;
   vehicle_specs: Record<string, unknown> | null;
   staging_generation: string | null; staging_trim: string | null; staging_payload: Record<string, unknown> | null;
 };
@@ -47,8 +48,8 @@ async function main() {
     await db.query("begin read only");
     const readOnly = await db.query<{ ro: string }>("select current_setting('transaction_read_only') as ro");
 
-    const refs = await db.query(`select spec.id spec_id,spec.version spec_version,spec.spec_key,spec.calculation_power_kw,spec.power_basis,spec.source_priority,
-        evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.source_uri,evidence.source_title,evidence.evidence_note,evidence.reliability,
+    const refs = await db.query(`select spec.id spec_id,spec.version spec_version,spec.spec_key,spec.calculation_power_kw,spec.power_basis,spec.source_priority,spec.created_at spec_created_at,
+        evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.source_uri,evidence.source_title,evidence.evidence_note,evidence.reliability,evidence.evidence_tier,
         matcher.id match_id,matcher.priority match_priority,matcher.brand,matcher.model,matcher.generation,matcher.trim,matcher.badge_normalized,matcher.model_code,matcher.engine_code,matcher.fuel_type,matcher.drive_type,matcher.production_year_from,matcher.production_year_to,matcher.engine_cc_from,matcher.engine_cc_to
       from public.vehicle_power_specs spec
       join public.vehicle_power_evidence evidence on evidence.id=spec.evidence_id
@@ -56,7 +57,7 @@ async function main() {
       where spec.status='approved' and evidence.verification_status='approved'`);
 
     const cars = await db.query<CarRow>(`select c.id,c.source_id,c.brand,c.model,c.year,c.engine_cc,c.fuel_type,c.drive_type,c.power_hp,
-        c.power_source,c.power_confidence,c.registration_month,c.registration_date,c.vehicle_specs,
+        c.power_source,c.power_confidence,c.registration_month,c.registration_date,c.published_at,c.vehicle_specs,
         s.generation staging_generation,s.trim staging_trim,s.raw_payload staging_payload
       from public.cars c
       left join public.chestny_catalog_staging s on s.source_listing_id=c.source_id
@@ -81,9 +82,16 @@ async function main() {
     })));
     const tierBySpecId = new Map<string, string>();
     for (const ref of refs.rows) {
-      tierBySpecId.set(ref.spec_id, evidenceTier({ specKey: ref.spec_key, sourceKind: ref.evidence_kind,
+      tierBySpecId.set(ref.spec_id, tierFromStored(ref.evidence_tier, { specKey: ref.spec_key, sourceKind: ref.evidence_kind,
         sourceTitle: ref.source_title, sourceUri: ref.source_uri, note: ref.evidence_note }));
     }
+    // Relaxed reference sets name the blocker for cards with no safe match.
+    const relax = (patch: Partial<ApprovedPowerCandidate["match"]>) =>
+      canonicalCandidates(candidates.map((candidate) => ({ ...candidate, match: { ...candidate.match, ...patch } })));
+    const withoutGeneration = relax({ generation: null });
+    const withoutBadge = relax({ trim: null, badgeNormalized: null });
+    const withoutGenerationAndBadge = relax({ generation: null, trim: null, badgeNormalized: null });
+    const withoutDrive = relax({ driveType: null });
 
     const report = {
       scope: { source: "chestny_prigon", activeCars: cars.rowCount ?? 0 },
@@ -96,6 +104,8 @@ async function main() {
         resolved: 0, mismatched: 0, unresolved: 0, bySource: {} as Record<string, number>,
         byConfidence: {} as Record<string, number>, byBrand: {} as Record<string, number>,
         mismatchSamples: [] as Array<Record<string, unknown>>,
+        unresolvedReasons: {} as Record<string, number>,
+        unresolvedSamples: [] as Array<Record<string, unknown>>,
       },
       month: { snapshotInputs: snapshots.rows, fixedJuneSnapshots: 0, registrationMonthMissing: 0, juneButDifferentMonth: 0 },
     };
@@ -128,7 +138,41 @@ async function main() {
         fuelType: car.fuel_type, driveType: car.drive_type, year: car.year, engineCc: car.engine_cc,
       });
       const resolution = resolveApprovedPower(input, candidates);
-      if (resolution.status !== "matched") { report.power.unresolved++; continue; }
+      if (resolution.status !== "matched") {
+        report.power.unresolved++;
+        const probe = (set: ApprovedPowerCandidate[]) => {
+          const outcome = resolveApprovedPower(input, set);
+          return outcome.status === "matched" ? outcome.candidate : null;
+        };
+        let reason = "no_rule_anywhere";
+        let related: ApprovedPowerCandidate | null = null;
+        if (resolution.candidates.length > 1) {
+          reason = "ambiguous_multiple_rules";
+        } else {
+          related = probe(withoutDrive) ?? probe(withoutGeneration) ?? probe(withoutBadge) ?? probe(withoutGenerationAndBadge);
+          if (related) reason = "rule_exists_but_not_matching";
+        }
+        // Whether the rule appeared after the card was published separates a
+        // historical gap from a defect of the current process.
+        const specCreatedAt = related
+          ? refs.rows.find((r) => r.spec_id === related?.specId)?.spec_created_at ?? null
+          : null;
+        const timing = related
+          ? (specCreatedAt && car.published_at && String(specCreatedAt) > String(car.published_at)
+            ? "_rule_added_after_publication"
+            : "_rule_existed_before_publication")
+          : "";
+        bump(report.power.unresolvedReasons, `${reason}${timing}`);
+        if (report.power.unresolvedSamples.length < 20) {
+          report.power.unresolvedSamples.push({
+            sourceId: car.source_id, brand: car.brand, model: car.model, year: car.year,
+            engineCc: car.engine_cc, fuel: car.fuel_type, drive: car.drive_type, trim: grade ?? null,
+            publishedAt: car.published_at, reason, timing: timing || null,
+            relatedSpecKey: related ? refs.rows.find((r) => r.spec_id === related?.specId)?.spec_key ?? null : null,
+          });
+        }
+        continue;
+      }
       report.power.resolved++;
 
       const referenceHp = hpFromKw(Number(resolution.candidate.calculationPowerKw));

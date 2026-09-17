@@ -1,7 +1,8 @@
 import { Client } from "pg";
 import { config } from "dotenv";
 import { canonicalCandidates, canonicalInput } from "../src/server/power-resolution/canonical";
-import { evidenceTier, isPublishableTier } from "../src/server/power-resolution/evidence-tiers";
+import { classifyDriveState } from "../src/server/power-resolution/drive-state";
+import { isPublishableTier, tierFromStored } from "../src/server/power-resolution/evidence-tiers";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
 
 config({ path: ".env.local", override: true, quiet: true });
@@ -54,7 +55,7 @@ async function main() {
   try {
     const [refs, cards] = await Promise.all([
       db.query(`select spec.id spec_id,spec.version spec_version,spec.spec_key,spec.calculation_power_kw,spec.power_basis,spec.source_priority,
-          evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.source_uri,evidence.source_title,evidence.evidence_note,evidence.verification_status,evidence.reliability,
+          evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.source_uri,evidence.source_title,evidence.evidence_note,evidence.verification_status,evidence.reliability,evidence.evidence_tier,
           matcher.id match_id,matcher.priority match_priority,matcher.brand,matcher.model,matcher.generation,matcher.trim,matcher.badge_normalized,matcher.model_code,matcher.engine_code,matcher.fuel_type,matcher.drive_type,matcher.production_year_from,matcher.production_year_to,matcher.engine_cc_from,matcher.engine_cc_to
         from public.vehicle_power_specs spec
         join public.vehicle_power_evidence evidence on evidence.id=spec.evidence_id
@@ -81,10 +82,10 @@ async function main() {
         productionYearTo: r.production_year_to, engineCcFrom: r.engine_cc_from, engineCcTo: r.engine_cc_to },
     })));
 
-    const tierBySpecId = new Map<string, ReturnType<typeof evidenceTier>>();
+    const tierBySpecId = new Map<string, ReturnType<typeof tierFromStored>>();
     const kWBySpecId = new Map<string, number>();
     for (const row of refs.rows) {
-      tierBySpecId.set(row.spec_id, evidenceTier({
+      tierBySpecId.set(row.spec_id, tierFromStored(row.evidence_tier, {
         specKey: row.spec_key, sourceKind: row.evidence_kind, sourceTitle: row.source_title,
         sourceUri: row.source_uri, note: row.evidence_note,
       }));
@@ -120,7 +121,10 @@ async function main() {
 
       const kw = kWBySpecId.get(specId) ?? result.candidate.calculationPowerKw;
       const registration = monthFromRegistration(row.first_registration_date, row.model_year);
-      const hold = input.driveType == null ? "drive_pending" : registration.month == null ? "month_pending" : null;
+      const driveState = classifyDriveState(result.candidate.match.driveType, input.driveType);
+      const hold = driveState !== "drive_confirmed"
+        ? driveState
+        : registration.month == null ? "month_pending" : null;
 
       const confirmation = {
         spec_id: specId,
@@ -134,10 +138,11 @@ async function main() {
         power_hp: hpFromKw(kw),
         calculation_power_kw: kw,
         match_fields: matchFields(result.candidate),
+        drive_state: driveState,
         resolved_at: new Date().toISOString(),
       };
 
-      if (hold === "drive_pending") summary.heldDrive++;
+      if (hold === "drive_pending" || hold === "drive_conflict") summary.heldDrive++;
       else if (hold === "month_pending") summary.heldMonth++;
       else summary.confirmedReady++;
 

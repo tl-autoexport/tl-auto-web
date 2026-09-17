@@ -8,6 +8,7 @@
  */
 
 import { driveTypesCompatible } from "../normalization/vehicles";
+import { canonicalCandidate, canonicalInput } from "./canonical";
 
 export type PowerConfidence = "official" | "high" | "automatic";
 export type PowerBasis = "combustion_engine" | "electric_30min" | "parallel_sum";
@@ -142,8 +143,14 @@ export function resolveApprovedPower(
   input: PowerReferenceInput,
   candidates: ApprovedPowerCandidate[],
 ): PowerResolutionResult {
-  const approved = candidates.filter(
-    (candidate) => candidate.evidenceVerificationStatus === "approved" && matchesInput(candidate, input),
+  // Both sides are canonicalised here, once, so every caller matches through the
+  // same representation and a caller cannot drift by skipping it. Applying it
+  // twice is a no-op, so canonicalising at the call site stays harmless.
+  const card = canonicalInput(input);
+  const reference = candidates.map(canonicalCandidate);
+
+  const approved = reference.filter(
+    (candidate) => candidate.evidenceVerificationStatus === "approved" && matchesInput(candidate, card),
   );
   if (!approved.length) {
     return {

@@ -9,7 +9,8 @@
 
 import assert from "node:assert/strict";
 import { canonicalCandidates, canonicalGeneration, canonicalInput, canonicalModel } from "./canonical";
-import { evidenceTier, isPublishableTier } from "./evidence-tiers";
+import { classifyDriveState } from "./drive-state";
+import { evidenceTier, isPublishableTier, tierFromStored } from "./evidence-tiers";
 import { decidePublication } from "./publication-gate";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "./resolver";
 
@@ -158,6 +159,15 @@ assert.equal(evidenceTier({ specKey: "x", sourceUri: "https://autocatalogarchive
 assert.equal(evidenceTier({ specKey: "x", sourceUri: "https://www.press.bmwgroup.com/a" }), "T2");
 assert.equal(evidenceTier({ specKey: "x", sourceUri: "https://www.hyundai.com/kr/spec" }), "T1");
 assert.equal(evidenceTier({ specKey: "x", sourceUri: null }), "T4");
+assert.equal(tierFromStored("T3", { specKey: "x", sourceUri: "https://www.hyundai.com/a" }), "T3");
+assert.equal(tierFromStored(null, { specKey: "x", sourceUri: "https://www.hyundai.com/a" }), "T1");
+
+// --- 5b. Drive states --------------------------------------------------------
+assert.equal(classifyDriveState("4WD", "4WD"), "drive_confirmed");
+assert.equal(classifyDriveState("4WD", "2WD"), "drive_conflict");
+assert.equal(classifyDriveState(null, "2WD"), "drive_confirmed");
+assert.equal(classifyDriveState("4WD", null), "drive_pending");
+assert.equal(classifyDriveState(null, null), "drive_pending");
 assert.equal(isPublishableTier("T1", false), true);
 assert.equal(isPublishableTier("T2", false), true);
 assert.equal(isPublishableTier("T3", false), false);
@@ -208,7 +218,7 @@ assert.equal(isPublishableTier("T4", true), false);
     tierBySpecId: tierMap([["spec-a220", "T2"]]),
     kwBySpecId: kwMap([["spec-a220", KW_190PS]]),
   }));
-  assert.deepEqual(published, { status: "publish", specId: "spec-a220", hp: 190, tier: "T2", confidence: "high" });
+  assert.deepEqual(published, { status: "publish", specId: "spec-a220", hp: 190, tier: "T2", confidence: "high", driveState: "drive_confirmed" });
 
   // The legacy 224 PS value must not be published for this card: the approved
   // specification states 190 PS, so the stored confirmation is rejected.

@@ -144,16 +144,16 @@ async function main() {
             vehicle_category, brand, model, fuel_type, production_year_from, production_year_to,
             propulsion_type, dvs_power_kw, source_units, reliability, review_status, reviewed_by,
             reviewed_at, source_title, source_retrieved_at, confidence_score, evidence_note,
-            verification_status, review_note)
+            verification_status, review_note, evidence_tier, evidence_tier_source)
          values ($1, $2, 'manufacturer_document', $3, $4, $5::date,
                  'M1', $6, $7, $8, $9, $10, 'ice', $11, $12, $16, $17,
-                 'manufacturer-power-import-v1', now(), $13, $14::timestamptz, $18, $15, $19, $20)
+                 'manufacturer-power-import-v1', now(), $13, $14::timestamptz, $18, $15, $19, $20, $21, 'derived_from_provenance_v1')
          returning id`,
         [
           batchId, sourceRowId, spec.source.uri, spec.source.supportingUri ?? null, spec.source.retrievedAt,
           spec.brand, spec.model, spec.fuelType, spec.years[0], spec.years[1], spec.power.kw,
           spec.power.unit, spec.source.title, `${spec.source.retrievedAt}T00:00:00Z`, spec.source.note,
-          reliability, reviewStatus, confidenceScore, verificationStatus, tierNote,
+          reliability, reviewStatus, confidenceScore, verificationStatus, tierNote, tier,
         ],
       );
       const evidenceId = evidence.rows[0]?.id;

@@ -12,13 +12,14 @@
  */
 
 import { isPublishableTier, type EvidenceTier } from "./evidence-tiers";
+import { classifyDriveState, type DriveState } from "./drive-state";
 import type { PowerResolutionResult } from "./resolver";
 
 export const KW_TO_PS = 1.359621617;
 export const hpFromKw = (kw: number) => Math.round(kw * KW_TO_PS);
 
 export type PublicationDecision =
-  | { status: "publish"; specId: string; hp: number; tier: EvidenceTier; confidence: string }
+  | { status: "publish"; specId: string; hp: number; tier: EvidenceTier; confidence: string; driveState: DriveState }
   | { status: "exclude"; reason: string };
 
 export type PublicationInput = {
@@ -62,9 +63,12 @@ export function decidePublication(input: PublicationInput): PublicationDecision 
   }
 
   if (!input.driveType) return { status: "exclude", reason: "drive_pending" };
+  const driveState = classifyDriveState(resolution.candidate.match.driveType, input.driveType);
+  if (driveState === "drive_pending") return { status: "exclude", reason: "drive_pending" };
+  if (driveState === "drive_conflict") return { status: "exclude", reason: "drive_conflict" };
   if (input.registrationMonth == null) return { status: "exclude", reason: "month_pending" };
   if (input.photoCount === 0) return { status: "exclude", reason: "no_valid_photos" };
   if (!input.hasRequiredSourceData) return { status: "exclude", reason: "missing_source_data" };
 
-  return { status: "publish", specId, hp, tier, confidence: resolution.confidence };
+  return { status: "publish", specId, hp, tier, confidence: resolution.confidence, driveState };
 }

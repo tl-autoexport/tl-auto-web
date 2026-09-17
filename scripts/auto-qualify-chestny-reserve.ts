@@ -1,6 +1,7 @@
 import { Client } from "pg";
 import { config } from "dotenv";
 import { readFile } from "node:fs/promises";
+import { canonicalCandidates, canonicalInput } from "../src/server/power-resolution/canonical";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
 
 config({ path: ".env.local", quiet: true });
@@ -32,7 +33,7 @@ async function main() {
       c.query(`select spec.id spec_id,spec.version spec_version,spec.calculation_power_kw,spec.power_basis,spec.source_priority,evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.verification_status evidence_verification_status,evidence.reliability evidence_reliability,matcher.id match_id,matcher.priority match_priority,matcher.brand,matcher.model,matcher.generation,matcher.trim,matcher.badge_normalized,matcher.model_code,matcher.engine_code,matcher.fuel_type,matcher.drive_type,matcher.production_year_from,matcher.production_year_to,matcher.engine_cc_from,matcher.engine_cc_to from public.vehicle_power_specs spec join public.vehicle_power_evidence evidence on evidence.id=spec.evidence_id join public.vehicle_power_spec_matches matcher on matcher.spec_id=spec.id where spec.status='approved' and evidence.verification_status='approved'`),
       c.query<{ source_id: string; brand: string }>(`select source_id,brand from public.cars where is_available = true and primary_source in ('encar','chestny_prigon')`),
     ]);
-    const powerRefs: ApprovedPowerCandidate[] = refs.rows.map((r) => ({ specId: r.spec_id, specVersion: r.spec_version, calculationPowerKw: Number(r.calculation_power_kw), powerBasis: r.power_basis, sourcePriority: r.source_priority, evidenceId: r.evidence_id, evidenceKind: r.evidence_kind, evidenceVerificationStatus: r.evidence_verification_status, evidenceReliability: r.evidence_reliability, match: { id: r.match_id, priority: r.match_priority, brand: r.brand, model: r.model, generation: r.generation, trim: r.trim, badgeNormalized: r.badge_normalized, modelCode: r.model_code, engineCode: r.engine_code, fuelType: r.fuel_type, driveType: r.drive_type, productionYearFrom: r.production_year_from, productionYearTo: r.production_year_to, engineCcFrom: r.engine_cc_from, engineCcTo: r.engine_cc_to } }));
+    const powerRefs: ApprovedPowerCandidate[] = canonicalCandidates(refs.rows.map((r) => ({ specId: r.spec_id, specVersion: r.spec_version, calculationPowerKw: Number(r.calculation_power_kw), powerBasis: r.power_basis, sourcePriority: r.source_priority, evidenceId: r.evidence_id, evidenceKind: r.evidence_kind, evidenceVerificationStatus: r.evidence_verification_status, evidenceReliability: r.evidence_reliability, match: { id: r.match_id, priority: r.match_priority, brand: r.brand, model: r.model, generation: r.generation, trim: r.trim, badgeNormalized: r.badge_normalized, modelCode: r.model_code, engineCode: r.engine_code, fuelType: r.fuel_type, driveType: r.drive_type, productionYearFrom: r.production_year_from, productionYearTo: r.production_year_to, engineCcFrom: r.engine_cc_from, engineCcTo: r.engine_cc_to } })));
     const activeIds = new Set(active.rows.map((x) => x.source_id));
     const seen = new Set<string>();
     const eligible: Array<StagingRow & { brand: string; modelName: string; powerHp: number | null; priority: number; imageCount: number; seatCount: number | null }> = [];
@@ -47,7 +48,7 @@ async function main() {
       // facts block a local candidate; missing enrichment fields are queued for the
       // next stage and must not trigger an Encar request here.
       if (!row.source_url) reasons.push("source_url"); if (!row.model_year || row.model_year < 2015) reasons.push("year"); if (row.mileage_km == null || row.mileage_km < 0) reasons.push("mileage"); if (!row.price_krw || row.price_krw <= 0) reasons.push("price"); if (!row.engine_cc || row.engine_cc <= 0) reasons.push("engine_cc");
-      const match = resolveApprovedPower({ brand, model: modelName, year: row.model_year, engineCc: row.engine_cc, fuelType, driveType: row.drive_type }, powerRefs);
+      const match = resolveApprovedPower(canonicalInput({ brand, model: modelName, year: row.model_year, engineCc: row.engine_cc, fuelType, driveType: row.drive_type }), powerRefs);
       const powerHp = match.status === "matched" ? Math.round(match.candidate.calculationPowerKw * 1.35962 * 10) / 10 : null;
       if (reasons.length) { hold.push({ row, reasons }); continue; }
       eligible.push({ ...row, brand, modelName, powerHp, priority: powerHp != null ? (powerHp <= 160 ? 10 : 30) : 50, imageCount: images.length, seatCount }); seen.add(row.source_listing_id);

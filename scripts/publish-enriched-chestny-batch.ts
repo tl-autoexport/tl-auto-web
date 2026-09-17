@@ -3,7 +3,7 @@ import { config } from "dotenv";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
 import { canonicalCandidates, canonicalInput } from "../src/server/power-resolution/canonical";
-import { evidenceTier, type EvidenceTier } from "../src/server/power-resolution/evidence-tiers";
+import { tierFromStored, type EvidenceTier } from "../src/server/power-resolution/evidence-tiers";
 import { decidePublication } from "../src/server/power-resolution/publication-gate";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
 
@@ -40,6 +40,7 @@ type RefRow = {
   spec_id: string; spec_version: number; spec_key: string; calculation_power_kw: number; power_basis: string;
   source_priority: number; evidence_id: string; evidence_kind: string; source_uri: string | null;
   source_title: string | null; evidence_note: string | null; evidence_reliability: string | null;
+  evidence_tier: string | null;
   match_id: string; match_priority: number; brand: string | null; model: string | null; generation: string | null;
   trim: string | null; badge_normalized: string | null; model_code: string | null; engine_code: string | null;
   fuel_type: string | null; drive_type: string | null; production_year_from: number | null;
@@ -84,6 +85,7 @@ type PreparedItem = {
   month: number;
   images: string[];
   drive: string;
+  driveState: string;
   fuel: string | null;
   tier: EvidenceTier;
   confidence: string;
@@ -104,7 +106,7 @@ async function main() {
     const rateSnapshot = await getCbrCalcRates();
 
     const refs = await client.query<RefRow>(`select spec.id spec_id,spec.version spec_version,spec.spec_key,spec.calculation_power_kw,spec.power_basis,spec.source_priority,
-          evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.source_uri,evidence.source_title,evidence.evidence_note,evidence.reliability evidence_reliability,
+          evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.source_uri,evidence.source_title,evidence.evidence_note,evidence.reliability evidence_reliability,evidence.evidence_tier,
           matcher.id match_id,matcher.priority match_priority,matcher.brand,matcher.model,matcher.generation,matcher.trim,matcher.badge_normalized,matcher.model_code,matcher.engine_code,matcher.fuel_type,matcher.drive_type,matcher.production_year_from,matcher.production_year_to,matcher.engine_cc_from,matcher.engine_cc_to
         from public.vehicle_power_specs spec
         join public.vehicle_power_evidence evidence on evidence.id=spec.evidence_id
@@ -137,7 +139,7 @@ async function main() {
     const tierBySpecId = new Map<string, EvidenceTier>();
     const kwBySpecId = new Map<string, number>();
     for (const ref of refs.rows) {
-      tierBySpecId.set(ref.spec_id, evidenceTier({
+      tierBySpecId.set(ref.spec_id, tierFromStored(ref.evidence_tier, {
         specKey: ref.spec_key, sourceKind: ref.evidence_kind, sourceTitle: ref.source_title,
         sourceUri: ref.source_uri, note: ref.evidence_note,
       }));
@@ -220,6 +222,7 @@ async function main() {
       const item: PreparedItem = {
         row, hp, month, images, drive, fuel: input.fuelType, tier,
         confidence: decision.confidence,
+        driveState: decision.driveState,
         specId: decision.specId, evidenceId: ref.evidence_id, specKey: ref.spec_key,
         specificationTitle: ref.source_title,
         calc, priceRub: Math.round(calc.totalRub),
@@ -243,6 +246,7 @@ async function main() {
             power_evidence_id: evidenceId,
             evidence_tier: tier,
             drive_resolution: "source",
+            drive_state: item.driveState,
             source_specification: specificationTitle,
             registration_month_source: "first_registration_date",
           };

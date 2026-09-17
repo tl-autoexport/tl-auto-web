@@ -120,3 +120,14 @@ export function tierReason(tier: EvidenceTier, corroborated: boolean) {
   if (tier === "T3") return corroborated ? null : "tier_T3_uncorroborated";
   return null;
 }
+
+/**
+ * Prefers the level stored in `vehicle_power_evidence.evidence_tier`. The
+ * derivation is only a fallback for rows written before the column existed, so
+ * every script reads the same reviewed value instead of recomputing it.
+ */
+export function tierFromStored(stored: unknown, fallback: EvidenceTierInput): EvidenceTier {
+  const value = String(stored ?? "").trim().toUpperCase();
+  if (value === "T1" || value === "T2" || value === "T3" || value === "T4") return value;
+  return evidenceTier(fallback);
+}

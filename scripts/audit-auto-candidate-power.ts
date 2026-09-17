@@ -6,7 +6,7 @@ import {
   configurationKey,
   type CanonicalVehicleInput,
 } from "../src/server/power-resolution/canonical";
-import { evidenceTier, isPublishableTier, type EvidenceTier } from "../src/server/power-resolution/evidence-tiers";
+import { isPublishableTier, tierFromStored, type EvidenceTier } from "../src/server/power-resolution/evidence-tiers";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
 
 /**
@@ -74,7 +74,7 @@ async function main() {
         order by s.source_listing_id`, [runId, promotionStatus]);
     const refs = await db.query(`select spec.id spec_id,spec.version spec_version,spec.spec_key,spec.calculation_power_kw,spec.power_basis,spec.source_priority,
           evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.source_uri,evidence.source_title,evidence.evidence_note,
-          evidence.verification_status,evidence.reliability,
+          evidence.verification_status,evidence.reliability,evidence.evidence_tier,
           matcher.id match_id,matcher.priority match_priority,matcher.brand,matcher.model,matcher.generation,matcher.trim,
           matcher.badge_normalized,matcher.model_code,matcher.engine_code,matcher.fuel_type,matcher.drive_type,
           matcher.production_year_from,matcher.production_year_to,matcher.engine_cc_from,matcher.engine_cc_to
@@ -111,12 +111,17 @@ async function main() {
     const withoutGenerationAndBadge = canonicalCandidates(
       refs.rows.map((r) => toCandidate({ ...r, generation: null, trim: null, badge_normalized: null })),
     );
+    // Relaxing the axle names a drive conflict instead of reporting a generic
+    // "no rule", because the resolver treats a missing axle as compatible.
+    const withoutDrive = canonicalCandidates(
+      refs.rows.map((r) => toCandidate({ ...r, drive_type: null })),
+    );
 
     const tierBySpecId = new Map<string, EvidenceTier>();
     const refBySpecId = new Map<string, (typeof refs.rows)[number]>();
     for (const ref of refs.rows) {
       refBySpecId.set(ref.spec_id, ref);
-      tierBySpecId.set(ref.spec_id, evidenceTier({
+      tierBySpecId.set(ref.spec_id, tierFromStored(ref.evidence_tier, {
         specKey: ref.spec_key, sourceKind: ref.evidence_kind, sourceTitle: ref.source_title,
         sourceUri: ref.source_uri, note: ref.evidence_note,
       }));
@@ -143,7 +148,7 @@ async function main() {
       },
       noSafeMatchReasons: {
         no_rule_anywhere: 0, generation_mismatch: 0, badge_mismatch: 0,
-        generation_and_badge_mismatch: 0, ambiguous_multiple_rules: 0,
+        generation_and_badge_mismatch: 0, drive_conflict: 0, ambiguous_multiple_rules: 0,
       },
       queues: {
         exact_match: 0, high_confidence: 0, source_review: 0, drive_pending: 0,
@@ -223,6 +228,8 @@ async function main() {
           reason = "badge_mismatch";
         } else if (resolveApprovedPower(input, withoutGenerationAndBadge).status === "matched") {
           reason = "generation_and_badge_mismatch";
+        } else if (resolveApprovedPower(input, withoutDrive).status === "matched") {
+          reason = "drive_conflict";
         } else {
           reason = "no_rule_anywhere";
         }
