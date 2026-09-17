@@ -88,6 +88,7 @@
     "prepare:encar:enrichment": "tsx scripts/prepare-encar-enrichment-run.ts",
     "export:tl-auto:enrichment-candidates": "tsx scripts/export-tl-auto-enrichment-candidates.ts",
     "run:encar:universal": "tsx scripts/run-universal-encar-enrichment.ts",
+    "screen:tl-auto:enrichment": "tsx scripts/screen-tl-auto-enrichment.ts",
     "retry:encar:reports": "tsx scripts/run-encar-report-retry.ts",
     "enrich:chestny:queue": "tsx scripts/run-chestny-enrichment-queue.ts",
     "audit:reserve-queue": "tsx scripts/audit-chestny-reserve-queue.ts",
