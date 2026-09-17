@@ -29,14 +29,16 @@ const ready = (q: Queue, block: string) => {
 async function main() {
   const queue = await page<Queue>("encar_enrichment_queue", "source_listing_id,status,task,result", (q) => q.eq("run_id", runId));
   const staging = await page<Stage>("encar_enrichment_staging", "source_listing_id,status,raw_payload,normalized", (q) => q.eq("run_id", runId));
-  const cars = await page<Car>("cars", "id,source_id,primary_source,is_available", (q) => q.eq("primary_source", "encar").eq("is_available", true));
+  // Published TL Auto rows may have a project-specific primary_source. Match
+  // only active cars by the exact source_id, without assuming that value.
+  const cars = await page<Car>("cars", "id,source_id,primary_source,is_available", (q) => q.eq("is_available", true));
   const carBySource = new Map(cars.map((car) => [car.source_id, car]));
   const stageBySource = new Map(staging.map((row) => [row.source_listing_id, row]));
   const eligible = queue.filter((q) => q.status === "succeeded" && q.source_listing_id && stageBySource.get(q.source_listing_id)?.raw_payload);
   const matched = eligible.filter((q) => carBySource.has(q.source_listing_id));
   const unmatched = eligible.filter((q) => !carBySource.has(q.source_listing_id)).map((q) => q.source_listing_id);
   const blocks = { insurance: matched.filter((q) => q.task.insurance && ready(q, "insurance")).length, options: matched.filter((q) => q.task.options && ready(q, "options")).length, gallery: matched.filter((q) => q.task.gallery && ready(q, "gallery")).length };
-  const report = { generatedAt: new Date().toISOString(), runId, readOnly: true, encarRequests: 0, databaseWrites: 0, sourcePolicy: "existing active cars only", queueSucceeded: queue.filter((q) => q.status === "succeeded").length, stagingRows: staging.length, activeEncarCars: cars.length, eligibleSucceededWithPayload: eligible.length, matchedExistingCars: matched.length, unmatchedExistingCars: unmatched.length, blocks, unmatched: unmatched.slice(0, 100) };
+  const report = { generatedAt: new Date().toISOString(), runId, readOnly: true, encarRequests: 0, databaseWrites: 0, sourcePolicy: "existing active cars only; exact source_id match", queueSucceeded: queue.filter((q) => q.status === "succeeded").length, stagingRows: staging.length, activeCarsScanned: cars.length, eligibleSucceededWithPayload: eligible.length, matchedExistingCars: matched.length, unmatchedExistingCars: unmatched.length, blocks, unmatched: unmatched.slice(0, 100) };
   await mkdir("output", { recursive: true });
   await writeFile("output/tl-auto-enrichment-apply-plan.json", `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify({ ...report, output: "output/tl-auto-enrichment-apply-plan.json" }, null, 2));
