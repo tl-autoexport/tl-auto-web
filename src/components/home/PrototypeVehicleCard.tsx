@@ -11,6 +11,7 @@ import { useDestination } from "@/components/site/DestinationProvider";
 import { vehicleClientMessage, whatsappContactUrl } from "@/lib/contact";
 import { publicCarPath } from "@/lib/car-url";
 import { translateFuel, translateTransmission } from "@/server/normalization/display";
+import { showcasePhotoUrl } from "@/lib/showcase-photo";
 import type { CatalogCar } from "@/server/cars/repository";
 
 const rub = new Intl.NumberFormat("ru-RU");
@@ -46,10 +47,8 @@ function daysOnSale(car: CatalogCar) {
 
 export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
   const { country, city } = useDestination();
-  const photos = useMemo(
-    () => (car.car_media ?? [])
-      .filter((media) => media.media_type === "image")
-      .sort((left, right) => Number(right.is_primary) - Number(left.is_primary) || left.sort_order - right.sort_order),
+  const showcasePhoto = useMemo(
+    () => showcasePhotoUrl(car.car_media),
     [car.car_media],
   );
   const [shareNotice, setShareNotice] = useState("");
@@ -105,8 +104,8 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
       <Link aria-label={`Открыть карточку ${title}`} className="absolute inset-0 z-0" href={detailsHref} prefetch={false} />
 
       <div className="pointer-events-none relative z-10 aspect-[2.25/1] overflow-hidden bg-[#e8edf3]">
-        {photos[0] ? (
-          <RemoteImage alt={title} className="object-cover" decoding="sync" fill loading="eager" sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)" src={photos[0].url} />
+        {showcasePhoto ? (
+          <RemoteImage alt={title} className="object-cover" decoding="sync" fill loading="eager" sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)" src={showcasePhoto} />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-[#647084]">Фото временно недоступно</div>
         )}
