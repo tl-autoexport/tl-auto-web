@@ -44,15 +44,16 @@ function showcasePhotoScore(media: ShowcaseMedia) {
   // influence showcase selection; the exterior-frame sequence is reliable.
   const primaryBonus = 0;
   if (["outside", "outside_image", "exterior", "outer"].includes(category)) {
-    // Encar's exterior sequence starts with the front/three-quarter views;
-    // later frames are commonly rear, interior or detail shots.
+    // Encar's regular exterior sequence is: 001 front three-quarter,
+    // 002 rear three-quarter, 003 front, 004 rear. Prefer the two front
+    // views and keep rear angles only as a fallback.
     const angleBonus =
-      fileCode === 2 ? 120 :
-      fileCode === 1 ? 112 :
-      fileCode === 3 ? 96 :
-      fileCode === 4 ? 78 :
-      fileCode === 5 ? 58 :
-      fileCode === 6 ? 45 :
+      fileCode === 1 ? 140 :
+      fileCode === 3 ? 130 :
+      fileCode === 5 ? 90 :
+      fileCode === 6 ? 75 :
+      fileCode === 2 ? 25 :
+      fileCode === 4 ? 15 :
       Number.isFinite(fileCode) && fileCode <= 8 ? 30 : 0;
     return 400 + angleBonus + primaryBonus;
   }
