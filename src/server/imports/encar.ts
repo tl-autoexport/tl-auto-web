@@ -226,6 +226,28 @@ type EncarHistoryPayload = {
   ownerHistoryResponse?: Array<Record<string, unknown>> | null;
 };
 
+type EncarRecordOpenPayload = {
+  openData?: boolean;
+  carNo?: string | null;
+  accidents?: Array<{
+    type?: string | null;
+    date?: string | null;
+    insuranceBenefit?: number | null;
+    partCost?: number | null;
+    laborCost?: number | null;
+    paintingCost?: number | null;
+  }> | null;
+  accidentCnt?: number | null;
+  myAccidentCnt?: number | null;
+  otherAccidentCnt?: number | null;
+  ownerChanges?: unknown[] | null;
+  notJoinDate1?: string | null;
+  notJoinDate2?: string | null;
+  notJoinDate3?: string | null;
+  notJoinDate4?: string | null;
+  notJoinDate5?: string | null;
+};
+
 type EncarHistoryResult =
   | { status: "available"; payload: EncarHistoryPayload }
   | { status: "unavailable"; reason: string };
@@ -276,6 +298,7 @@ type ImportOptions = {
   dryRun?: boolean;
   replaceCatalog?: boolean;
   maxListingAgeDays?: number;
+  allowedModels?: string[];
   brandMinimums?: Record<string, number>;
   modelMinimums?: Record<string, number>;
   priorityBrandPages?: Record<string, number>;
@@ -452,7 +475,7 @@ async function fetchJson<T>(url: string, attempts = 3): Promise<T> {
   let lastError: unknown;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      return await encarClient.request<T>(url, {}, 1);
+      return await encarClient.publicRequest<T>(url, {}, 1);
     } catch (error) {
       lastError = error;
       if (attempt < attempts) await sleep(750 * attempt);
@@ -461,7 +484,7 @@ async function fetchJson<T>(url: string, attempts = 3): Promise<T> {
   throw lastError;
 }
 
-async function fetchEncarHistory(
+async function fetchLegacyEncarHistory(
   vehicleNo: string,
 ): Promise<EncarHistoryResult> {
   const url = new URL("https://api.encar.com/v1/vehicle/resume");
@@ -496,7 +519,79 @@ async function fetchEncarHistory(
   throw lastError;
 }
 
-async function fetchDetail(vehicleId: string): Promise<EncarDetail> {
+function normalizeRecordOpenPayload(
+  payload: EncarRecordOpenPayload,
+): EncarHistoryPayload {
+  const accidents = (payload.accidents ?? []).map((event) => ({
+    accidentDate: event.date ?? null,
+    accidentType: event.type ?? null,
+    repairCost: event.insuranceBenefit ?? 0,
+    partCost: event.partCost ?? 0,
+    laborCost: event.laborCost ?? 0,
+    paintingCost: event.paintingCost ?? 0,
+  }));
+  const periods = [
+    payload.notJoinDate1,
+    payload.notJoinDate2,
+    payload.notJoinDate3,
+    payload.notJoinDate4,
+    payload.notJoinDate5,
+  ]
+    .filter((value): value is string => Boolean(value?.trim()))
+    .map((period) => ({ period }));
+  const owners = (payload.ownerChanges ?? []).map((date) => ({ date }));
+  return {
+    accidentHistoryResponse: accidents,
+    nonInsurancePeriodResponse: periods,
+    ownerHistoryResponse: owners,
+  };
+}
+
+/**
+ * Browser-compatible insurance history flow observed in the Encar card HAR.
+ * The card's public record endpoint contains both availability and the actual
+ * accident/payout data. `/resume/valid` is deliberately not required here: it
+ * is an authenticated browser preflight and returns 401 without its hidden
+ * access token, while `record/.../open` responds publicly.
+ */
+export async function fetchEncarHistory(
+  vehicleNo: string,
+  vehicleId?: string,
+): Promise<EncarHistoryResult> {
+  if (!vehicleId) return fetchLegacyEncarHistory(vehicleNo);
+
+  const encodedVehicleNo = encodeURIComponent(vehicleNo);
+  try {
+    const recordUrl =
+      `https://api.encar.com/v1/readside/record/vehicle/${encodeURIComponent(vehicleId)}/open?vehicleNo=${encodedVehicleNo}`;
+    const recordResponse = await encarClient.publicResponse(recordUrl, {}, 1);
+    if (recordResponse.status === 400 || recordResponse.status === 404) {
+      await recordResponse.arrayBuffer();
+      return { status: "unavailable", reason: `encar_history_http_${recordResponse.status}` };
+    }
+    if (!recordResponse.ok) {
+      const text = await recordResponse.text();
+      throw new Error(
+        `Encar record history HTTP ${recordResponse.status}: ${text.slice(0, 180)}`,
+      );
+    }
+    const payload = (await recordResponse.json()) as EncarRecordOpenPayload;
+    return {
+      status: "available",
+      payload: normalizeRecordOpenPayload(payload),
+    };
+  } catch (error) {
+    // Keep the previous token-based endpoint as a compatibility fallback for
+    // cards whose public record endpoint is unavailable or changes shape.
+    try {
+      return await fetchLegacyEncarHistory(vehicleNo);
+    } catch {
+      throw error;
+    }
+  }
+}
+
+export async function fetchDetail(vehicleId: string): Promise<EncarDetail> {
   const url = `https://api.encar.com/v1/readside/vehicle/${vehicleId}`;
   const data = await fetchJson<EncarDetailPayload>(url);
   const spec = data.spec ?? {};
@@ -766,7 +861,7 @@ function sanitizeOwnerHistory(value: Record<string, unknown>) {
   };
 }
 
-function buildEncarHistoryReport(
+export function buildEncarHistoryReport(
   payload: EncarHistoryPayload,
 ): EncarConditionReport {
   const accidents = (payload.accidentHistoryResponse ?? []).map(
@@ -995,7 +1090,7 @@ async function mapCar(
           reason: "bulk_fast_import",
         })
       : detail?.vehicleNo
-        ? fetchEncarHistory(detail.vehicleNo)
+        ? fetchEncarHistory(detail.vehicleNo, sourceId)
         : Promise.resolve<EncarHistoryResult>({
             status: "unavailable",
             reason: "vehicle_number_missing",
@@ -1204,6 +1299,11 @@ export async function importEncar(options: ImportOptions = {}) {
   const maxListingAgeDays =
     options.maxListingAgeDays ??
     positiveInt(process.env.CATALOG_MAX_LISTING_AGE_DAYS, 30);
+  const allowedModels = new Set(
+    (options.allowedModels ?? [])
+      .map((value) => value.trim().toLowerCase().replace(/[^a-zа-яё0-9]+/gi, ""))
+      .filter(Boolean),
+  );
   const brandMinimums: Record<string, number> = {};
   for (const [brand, configuredMinimum] of Object.entries(
     options.brandMinimums ?? {},
@@ -1365,6 +1465,12 @@ export async function importEncar(options: ImportOptions = {}) {
       isFreshListing(item.Photos?.[0]?.updatedDate, maxListingAgeDays),
     )
     .filter((item) => {
+      if (allowedModels.size) {
+        const identity = `${normalizeBrand(item.Manufacturer) ?? ""}${normalizeModel(item.Model) ?? ""}`
+          .toLowerCase()
+          .replace(/[^a-zа-яё0-9]+/gi, "");
+        if (!allowedModels.has(identity)) return false;
+      }
       const fuel = normalizeFuel(item.FuelType);
       return (
         fuel === "gasoline" ||
@@ -1884,7 +1990,10 @@ export async function refreshEncarHistories(
 
       try {
         const historyResult = car.vehicle_no_masked
-          ? await fetchEncarHistory(String(car.vehicle_no_masked))
+          ? await fetchEncarHistory(
+              String(car.vehicle_no_masked),
+              String(car.source_id),
+            )
           : ({
               status: "unavailable",
               reason: "vehicle_number_missing",

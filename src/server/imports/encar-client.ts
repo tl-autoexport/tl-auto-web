@@ -1,3 +1,5 @@
+import { fetch as undiciFetch, ProxyAgent } from "undici";
+
 const ENCAR_IP_CHECK_URL =
   "https://api.encar.com/international/communication/validate-request-ip";
 const ENCAR_VERIFY_URL = "https://api.encar.com/pass/user/verify";
@@ -13,6 +15,25 @@ export const ENCAR_HEADERS = {
   Referer: "https://fem.encar.com/",
   Origin: "https://fem.encar.com",
 };
+
+let proxyAgent: ProxyAgent | undefined;
+let configuredProxyUrl: string | null = null;
+
+function getEncarFetch() {
+  const proxyUrl = process.env.ENCAR_PROXY_URL?.trim() || null;
+  if (proxyUrl !== configuredProxyUrl) {
+    proxyAgent?.close();
+    proxyAgent = proxyUrl ? new ProxyAgent(proxyUrl) : undefined;
+    configuredProxyUrl = proxyUrl;
+  }
+  if (process.env.ENCAR_PROXY_REQUIRED === "true" && !proxyAgent) {
+    throw new Error("ENCAR_PROXY_URL is required; direct Encar requests are disabled");
+  }
+  return proxyAgent
+    ? (url: string, init: RequestInit = {}) =>
+        (undiciFetch(url, { ...init, dispatcher: proxyAgent } as never) as unknown as Promise<Response>)
+    : (url: string, init: RequestInit = {}) => fetch(url, init);
+}
 
 type IpCheckResponse = { ipAddress?: string; ip?: string };
 type VerifyResponse = { status?: string };
@@ -31,7 +52,8 @@ export class EncarClient {
   private async verify() {
     let ip = process.env.ENCAR_PUBLIC_IP?.trim();
     if (!ip) {
-      const ipResponse = await fetch(ENCAR_IP_CHECK_URL, {
+      const requestFetch = getEncarFetch();
+      const ipResponse = await requestFetch(ENCAR_IP_CHECK_URL, {
         headers: ENCAR_HEADERS,
         signal: AbortSignal.timeout(10_000),
       });
@@ -48,7 +70,8 @@ export class EncarClient {
       );
     }
 
-    const response = await fetch(ENCAR_VERIFY_URL, {
+    const requestFetch = getEncarFetch();
+    const response = await requestFetch(ENCAR_VERIFY_URL, {
       method: "POST",
       headers: { ...ENCAR_HEADERS, "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -78,6 +101,7 @@ export class EncarClient {
   }
 
   private async ensureVerified() {
+    if (process.env.ENCAR_SKIP_IP_VERIFY === "true") return;
     if (!this.verification) {
       this.verification = this.verify().catch((error) => {
         this.verification = null;
@@ -87,19 +111,25 @@ export class EncarClient {
     await this.verification;
   }
 
-  async response(url: string, init: RequestInit = {}, attempts = 3): Promise<Response> {
+  private async responseWithVerification(
+    url: string,
+    init: RequestInit = {},
+    attempts = 3,
+    verify = true,
+  ): Promise<Response> {
     let lastError: unknown;
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       try {
-        await this.ensureVerified();
-        const response = await fetch(url, {
+        if (verify) await this.ensureVerified();
+        const requestFetch = getEncarFetch();
+        const response = await requestFetch(url, {
           ...init,
           headers: { ...ENCAR_HEADERS, ...(init.headers ?? {}) },
           signal: init.signal ?? AbortSignal.timeout(15_000),
         });
 
         if (response.status === 401 || response.status === 407) {
-          this.verification = null;
+          if (verify) this.verification = null;
           if (attempt < attempts) {
             await response.arrayBuffer();
             continue;
@@ -114,8 +144,30 @@ export class EncarClient {
     throw lastError;
   }
 
+  async response(url: string, init: RequestInit = {}, attempts = 3): Promise<Response> {
+    return this.responseWithVerification(url, init, attempts, true);
+  }
+
+  /**
+   * Public card endpoints used by fem.encar.com do not call the separate
+   * validate-request-ip service. Keep that service out of this path so a
+   * missing internal Bearer token cannot block normal card data requests.
+   */
+  async publicResponse(url: string, init: RequestInit = {}, attempts = 3): Promise<Response> {
+    return this.responseWithVerification(url, init, attempts, false);
+  }
+
   async request<T>(url: string, init: RequestInit = {}, attempts = 3): Promise<T> {
     const response = await this.response(url, init, attempts);
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Encar HTTP ${response.status}: ${responsePreview(text)}`);
+    }
+    return (await response.json()) as T;
+  }
+
+  async publicRequest<T>(url: string, init: RequestInit = {}, attempts = 3): Promise<T> {
+    const response = await this.publicResponse(url, init, attempts);
     if (!response.ok) {
       const text = await response.text();
       throw new Error(`Encar HTTP ${response.status}: ${responsePreview(text)}`);
