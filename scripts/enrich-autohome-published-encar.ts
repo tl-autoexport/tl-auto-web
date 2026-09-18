@@ -20,7 +20,12 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 function result<T>(value: { data: T; error: { message: string } | null }): T { if (value.error) throw new Error(value.error.message); return value.data; }
 
 async function main() {
-  const staging = result(await db.from("chestny_catalog_staging").select("source_listing_id,raw_payload").eq("source_status", "active").eq("promotion_status", "published").filter("raw_payload->autohome_power_candidate->>review_status", "eq", "approved")) as StagingRow[];
+  const stagingRows = result(await db.from("chestny_catalog_staging").select("source_listing_id,raw_payload").eq("source_status", "active").eq("promotion_status", "published")) as StagingRow[];
+  const staging = stagingRows.filter((row) => {
+    const payload = (row.raw_payload ?? {}) as Record<string, unknown>;
+    const candidate = payload.autohome_power_candidate as Record<string, unknown> | undefined;
+    return candidate?.review_status === "approved";
+  });
   const ids = staging.map((row) => row.source_listing_id);
   const cars = ids.length ? result(await db.from("cars").select("id,source_id,vehicle_no_masked,vehicle_specs").eq("primary_source", "chestny_prigon").eq("is_available", true).in("source_id", ids)) as CarRow[] : [];
   const carBySource = new Map(cars.map((car) => [car.source_id, car]));
