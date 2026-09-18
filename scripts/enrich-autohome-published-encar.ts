@@ -22,7 +22,9 @@ function result<T>(value: { data: T; error: { message: string } | null }): T { i
 async function main() {
   const stagingRows = result(await db.from("chestny_catalog_staging").select("source_listing_id,raw_payload").eq("source_status", "active").eq("promotion_status", "published")) as StagingRow[];
   const staging = stagingRows.filter((row) => {
-    const payload = (row.raw_payload ?? {}) as Record<string, unknown>;
+    const payload = typeof row.raw_payload === "string"
+      ? JSON.parse(row.raw_payload) as Record<string, unknown>
+      : (row.raw_payload ?? {}) as Record<string, unknown>;
     const candidate = payload.autohome_power_candidate as Record<string, unknown> | undefined;
     return candidate?.review_status === "approved";
   });
@@ -69,6 +71,6 @@ async function main() {
     }
   };
   await Promise.all(Array.from({ length: concurrency }, () => worker()));
-  console.log(JSON.stringify({ dryRun: !write, concurrency, ...stats, encarRequests: stats.detailsOk + stats.historiesAvailable + stats.historiesUnavailable, databaseWrites: write, publicCatalogChanged: write }, null, 2));
+  console.log(JSON.stringify({ dryRun: !write, concurrency, stagingRows: stagingRows.length, approvedRows: staging.length, ...stats, encarRequests: stats.detailsOk + stats.historiesAvailable + stats.historiesUnavailable, databaseWrites: write, publicCatalogChanged: write }, null, 2));
 }
 main().catch((error) => { console.error(error); process.exit(1); });
