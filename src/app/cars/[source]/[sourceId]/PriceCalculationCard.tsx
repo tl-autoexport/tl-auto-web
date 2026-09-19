@@ -367,7 +367,7 @@ function RuPriceCalculationCard({
         </div>
       </aside>
 
-      <div className="fixed inset-x-0 bottom-0 z-50 flex items-center gap-2 border-t border-[#dce2eb] bg-white/95 px-3 pt-2 shadow-[0_-8px_24px_rgba(16,24,39,0.12)] backdrop-blur sm:hidden" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
+      <div className="mt-3 flex items-center gap-2 border-t border-[#dce2eb] bg-white px-3 pt-2 shadow-[0_-4px_16px_rgba(16,24,39,0.08)] sm:hidden" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
         <a
           className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white shadow-sm transition-colors active:bg-[#3f9855]"
           href="tel:+821076260741"
@@ -611,7 +611,7 @@ function KzRow({ label, value }: { label: string; value: number }) {
 }
 
 function MobileContactBar({ leadWhatsAppUrl }: { leadWhatsAppUrl: string }) {
-  return <div className="fixed inset-x-0 bottom-0 z-50 flex items-center gap-2 border-t border-[#dce2eb] bg-white/95 px-3 pt-2 shadow-[0_-8px_24px_rgba(16,24,39,0.12)] backdrop-blur sm:hidden" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}><a className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white" href="tel:+821076260741"><Phone size={21} />Позвонить</a><a aria-label="Написать в WhatsApp" className="flex size-14 items-center justify-center rounded-xl bg-[#4caf64] text-white" href={leadWhatsAppUrl} rel="noopener noreferrer" target="_blank"><MessageCircle size={24} /></a></div>;
+  return <div className="mt-3 flex items-center gap-2 border-t border-[#dce2eb] bg-white px-3 pt-2 shadow-[0_-4px_16px_rgba(16,24,39,0.08)] sm:hidden" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}><a className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white" href="tel:+821076260741"><Phone size={21} />Позвонить</a><a aria-label="Написать в WhatsApp" className="flex size-14 items-center justify-center rounded-xl bg-[#4caf64] text-white" href={leadWhatsAppUrl} rel="noopener noreferrer" target="_blank"><MessageCircle size={24} /></a></div>;
 }
 
 function resultObject(result: unknown, key: string): Record<string, unknown> | null {
