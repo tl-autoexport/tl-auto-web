@@ -17,6 +17,7 @@ import { CLIENT_CONTACT, whatsappContactUrl, vehicleClientMessage } from "@/lib/
 import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
 import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
 import { useDestination } from "@/components/site/DestinationProvider";
+import { InfoHint } from "@/components/site/InfoHint";
 
 type CalculationSnapshot = {
   total_rub: number | null;
@@ -341,6 +342,9 @@ function RuPriceCalculationCard({
             <span className="sm:hidden">Расчёт</span>
             <span className="hidden sm:inline">Показать расчёт цены</span>
           </button>
+          <p className="flex items-center gap-1.5 text-xs leading-5 text-[#647084]">
+            Предварительный расчёт <InfoHint label="О предварительном расчёте" text="Итоговая стоимость зависит от комплектации автомобиля, курса валют, даты оформления и фактических расходов. Для точного расчёта свяжитесь с менеджером." />
+          </p>
         </div>
         <div className="mt-2 hidden grid-cols-2 gap-2 sm:mt-3 sm:grid">
           <a
