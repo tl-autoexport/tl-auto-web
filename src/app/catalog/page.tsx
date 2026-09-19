@@ -13,12 +13,11 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import {
-  getCatalogCars,
+  getCatalogCardPage,
   getCatalogCount,
   getCatalogFacetCars,
   getPassoStagingCars,
   getPassoStagingCount,
-  type CatalogCar,
   type CatalogFilters,
   type StagingCatalogType,
 } from "@/server/cars/repository";
@@ -26,13 +25,11 @@ import { translateFuel, translateTransmission } from "@/server/normalization/dis
 import { MobileCatalogFilters } from "./MobileCatalogFilters";
 import { BrandModelFields } from "@/components/catalog/BrandModelFields";
 import { LiveCatalogCount } from "./LiveCatalogCount";
-import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import { PassoCatalogCard } from "@/components/catalog/PassoCatalogCard";
 import { sourceDisplayName } from "@/lib/source-url";
 import { CatalogSearchBar } from "./CatalogSearchBar";
-
-const pageSize = 24;
+import { CatalogInfiniteGrid } from "./CatalogInfiniteGrid";
 
 export const metadata: Metadata = {
   title: "Каталог автомобилей из Кореи",
@@ -86,7 +83,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const passable = value("passable") === "1" || shelf === "passable";
   const sortValue = value("sort");
   const sort = isSort(sortValue) ? sortValue : "fresh";
-  const requestedPage = positiveInteger(value("page")) ?? 1;
 
   const filters: CatalogFilters = {
     brand: value("brand") || undefined,
@@ -118,17 +114,12 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     sort,
   };
 
-  const [totalCars, optionCars] = await Promise.all([
+  const [totalCars, optionCars, initialPage] = await Promise.all([
     getCatalogCount(filters),
     getCatalogFacetCars(),
+    getCatalogCardPage(filters),
   ]);
-  const totalPages = Math.max(1, Math.ceil(totalCars / pageSize));
-  const currentPage = Math.min(requestedPage, totalPages);
-  const shownCars = await getCatalogCars({
-    ...filters,
-    limit: pageSize,
-    offset: (currentPage - 1) * pageSize,
-  });
+  const shownCars = initialPage.cars;
   const brands = unique(optionCars.map((car) => car.brand));
   const modelsByBrand = optionCars.reduce<Record<string, string[]>>((groups, car) => {
     if (!car.brand || !car.model) return groups;
@@ -150,6 +141,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   }, {});
   const activeCount = catalogActiveFilterCount(rawParams);
   const currentQuery = catalogQueryString(rawParams);
+  const feedQuery = catalogFeedQueryString(rawParams);
   const activeChips = buildActiveFilterChips(rawParams);
   const filterFormProps = {
     brands,
@@ -198,6 +190,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                     href={selected
                       ? catalogFilterHref(rawParams, { brand: null, model: null, page: null })
                       : catalogFilterHref(rawParams, { brand, model: null, page: null })}
+                    prefetch={false}
                     key={brand}
                   >
                     {brand}
@@ -243,13 +236,12 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           </div>
         ) : null}
         <div className="mb-5 flex flex-col gap-3 border-b border-[#dce2eb] pb-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2 text-sm text-[#647084]"><SlidersHorizontal size={17} /><span>{shownCars.length ? `Показано ${((currentPage - 1) * pageSize) + 1}–${Math.min(currentPage * pageSize, totalCars)} из ${totalCars}` : "Ничего не найдено"}</span></div>
+          <div className="flex items-center gap-2 text-sm text-[#647084]"><SlidersHorizontal size={17} /><span>{shownCars.length ? `Найдено ${totalCars} автомобилей` : "Ничего не найдено"}</span></div>
           <p className="inline-flex items-center gap-2 text-sm font-medium text-[#3f4b5e]"><ChevronDown size={16} /> {sortLabels[sort]}</p>
         </div>
 
         {shownCars.length ? <>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{shownCars.map((car) => <CatalogResultCard key={car.id} car={car} />)}</div>
-          {totalPages > 1 ? <Pagination currentPage={currentPage} rawParams={rawParams} totalPages={totalPages} /> : null}
+          <CatalogInfiniteGrid initialCars={shownCars} initialCursor={initialPage.nextCursor} query={feedQuery} />
         </> : <EmptyState />}
       </section>
       </div>
@@ -417,10 +409,6 @@ function CatalogFilterForm({
   );
 }
 
-function CatalogResultCard({ car }: { car: CatalogCar }) {
-  return <PrototypeVehicleCard car={car} />;
-}
-
 function FilterSelect({ label, name, options, placeholder, translate, value }: { label: string; name: string; options: string[]; placeholder: string; translate?: (item: string) => string; value: string }) {
   const active = Boolean(value);
   return <label className="grid gap-1.5 text-sm text-[#647084]"><span>{label}</span><span className="relative"><select className={`h-11 w-full appearance-none rounded-md border px-3 pr-9 text-sm font-medium outline-none transition ${active ? "border-[#c7a55a] bg-[#fbf7ed] text-[#7b5a22]" : "border-[#d7dee8] bg-white text-[#273246]"} focus:border-[#101827]`} defaultValue={value} name={name}><option value="">{placeholder}</option>{options.map((item) => <option key={item} value={item}>{translate ? translate(item) : item}</option>)}</select>{active ? <Check className="pointer-events-none absolute right-8 top-3 text-[#c7a55a]" size={17} /> : null}<ChevronDown className="pointer-events-none absolute right-3 top-3 text-[#647084]" size={17} /></span></label>;
@@ -465,6 +453,14 @@ function catalogQueryString(rawParams: Record<string, string | string[] | undefi
     if (typeof rawValue === "string" && rawValue) params.set(key, rawValue);
     if (Array.isArray(rawValue)) rawValue.filter(Boolean).forEach((item) => params.append(key, item));
   }
+  return params.toString();
+}
+
+function catalogFeedQueryString(rawParams: Record<string, string | string[] | undefined>) {
+  const params = new URLSearchParams(catalogQueryString(rawParams));
+  params.delete("page");
+  params.delete("cursor");
+  params.delete("limit");
   return params.toString();
 }
 

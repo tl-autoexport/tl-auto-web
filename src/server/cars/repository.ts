@@ -46,6 +46,11 @@ export type CatalogCar = {
   has_thermal_images: boolean;
   data_confidence: number | null;
   source_updated_at: string | null;
+  /** Compact catalogue fields.  Full media remains available only on a detail page. */
+  primary_image_url?: string | null;
+  primary_thumbnail_url?: string | null;
+  media_count?: number | null;
+  seats?: number | null;
   vehicle_specs?: Record<string, unknown>;
   car_media?: Array<{
     source: string;
@@ -58,8 +63,23 @@ export type CatalogCar = {
   }>;
 };
 
+export type CatalogCardSummary = Omit<CatalogCar, "vehicle_specs" | "car_media"> & {
+  primary_image_url: string | null;
+  primary_thumbnail_url: string | null;
+  media_count: number;
+  seats: number | null;
+};
+
+export type CatalogPageResult = {
+  cars: CatalogCardSummary[];
+  nextCursor: string | null;
+};
+
 const CATALOG_CAR_SELECT =
   "id, primary_source, source_kind, source_id, source_url, published_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(source, url, thumbnail_url, media_type, category, is_primary, sort_order)";
+
+const CATALOG_CARD_SELECT =
+  "id, primary_source, source_kind, source_id, source_url, published_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, primary_image_url, primary_thumbnail_url, media_count, seats";
 
 export type CarDetail = CatalogCar & {
   car_options?: Array<{
@@ -138,10 +158,10 @@ export type CatalogMetrics = {
 };
 
 export type HomeCatalogData = {
-  cars: CatalogCar[];
-  under160Cars: CatalogCar[];
-  passableCars: CatalogCar[];
-  electricCars: CatalogCar[];
+  cars: CatalogCardSummary[];
+  under160Cars: CatalogCardSummary[];
+  passableCars: CatalogCardSummary[];
+  electricCars: CatalogCardSummary[];
 };
 
 export type LatestCalculation = {
@@ -289,6 +309,126 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     color: normalizeColor(car.color),
     drive_type: normalizeDrive(car.drive_type),
   })) as CatalogCar[];
+}
+
+/**
+ * Cursor based public catalogue query.  It intentionally selects no JSON
+ * payload and no nested relations: a list card needs one precomputed cover,
+ * while the full gallery belongs to the detail page.
+ */
+export async function getCatalogCardPage(
+  filters: CatalogFilters = {},
+  cursor: string | null = null,
+  requestedLimit = 24,
+): Promise<CatalogPageResult> {
+  if (buildWithoutCatalog) return { cars: [], nextCursor: null };
+  const limit = Math.min(Math.max(requestedLimit, 1), 48);
+  const sort = filters.sort ?? "fresh";
+  const supabase = createSupabaseServerRead();
+  let query = supabase
+    .from("cars")
+    .select(CATALOG_CARD_SELECT)
+    .eq("is_available", true)
+    .in("primary_source", ["encar", "chestny_prigon"])
+    .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
+    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
+
+  if (filters.source) query = query.eq("primary_source", filters.source);
+  if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
+  if (filters.search) query = query.or(catalogSearchExpression(filters.search));
+  if (filters.brand) query = query.eq("brand", filters.brand);
+  if (filters.model) query = !filters.brand && /\s/.test(filters.model)
+    ? query.or(catalogSearchExpression(filters.model))
+    : query.eq("model", filters.model);
+  if (filters.fuelType) query = query.eq("fuel_type", filters.fuelType);
+  if (filters.transmission) query = query.in("transmission", transmissionValues(filters.transmission));
+  if (filters.minEngineCc) query = query.gte("engine_cc", filters.minEngineCc);
+  if (filters.maxEngineCc) query = query.lte("engine_cc", filters.maxEngineCc);
+  if (filters.minYear) query = query.gte("year", filters.minYear);
+  if (filters.maxYear) query = query.lte("year", filters.maxYear);
+  if (filters.registrationMonth) query = query.eq("registration_month", filters.registrationMonth);
+  if (filters.trim) query = query.eq("trim", filters.trim);
+  if (filters.bodyType) query = query.in("body_type", bodyTypeValues(filters.bodyType));
+  if (filters.driveType) query = query.eq("drive_type", filters.driveType);
+  if (filters.color) query = query.eq("color", filters.color);
+  if (filters.minOwners) query = query.gte("owners_count", filters.minOwners);
+  if (filters.maxOwners) query = query.lte("owners_count", filters.maxOwners);
+  if (filters.minMileageKm) query = query.gte("mileage_km", filters.minMileageKm);
+  if (filters.maxMileageKm) query = query.lte("mileage_km", filters.maxMileageKm);
+  if (filters.minPriceRub) query = query.gte("price_rub", filters.minPriceRub);
+  if (filters.maxPriceRub) query = query.lte("price_rub", filters.maxPriceRub);
+  if (filters.noAccidents) query = query.eq("accident_count", 0);
+  if (filters.noInsurance) query = query.eq("insurance_payout_count", 0);
+  if (filters.minInsurancePayoutKrw) query = query.gte("insurance_payout_total_krw", filters.minInsurancePayoutKrw);
+  if (filters.maxInsurancePayoutKrw) query = query.lte("insurance_payout_total_krw", filters.maxInsurancePayoutKrw);
+  if (filters.passable) query = query.or(passableFilterExpression());
+  if (filters.sourceId) query = query.eq("source_id", filters.sourceId);
+
+  const sortConfig = catalogSortConfig(sort);
+  const decodedCursor = cursor ? decodeCatalogCursor(cursor, sort) : null;
+  if (decodedCursor) {
+    query = query.or(cursorExpression(sortConfig.column, sortConfig.ascending, decodedCursor));
+  }
+
+  const { data, error } = await query
+    .order(sortConfig.column, { ascending: sortConfig.ascending, nullsFirst: false })
+    .order("id", { ascending: true })
+    .limit(limit + 1);
+  if (error) {
+    console.error("[cars] Catalogue card page query failed", error);
+    throw error;
+  }
+
+  const rows = (data ?? []) as CatalogCardSummary[];
+  const hasMore = rows.length > limit;
+  const cars = rows.slice(0, limit).map((car) => ({
+    ...car,
+    vehicle_type: "car" as const,
+    color: normalizeColor(car.color),
+    drive_type: normalizeDrive(car.drive_type),
+  }));
+  const last = cars.at(-1);
+  const lastValue = last ? last[sortConfig.column] : null;
+  return {
+    cars,
+    nextCursor: hasMore && last && (typeof lastValue === "string" || typeof lastValue === "number")
+      ? encodeCatalogCursor({ id: last.id, value: lastValue })
+      : null,
+  };
+}
+
+function catalogSortConfig(sort: NonNullable<CatalogFilters["sort"]>) {
+  return {
+    fresh: { column: "source_updated_at", ascending: false },
+    price_asc: { column: "price_rub", ascending: true },
+    price_desc: { column: "price_rub", ascending: false },
+    mileage_asc: { column: "mileage_km", ascending: true },
+    year_desc: { column: "year", ascending: false },
+  }[sort] as { column: "source_updated_at" | "price_rub" | "mileage_km" | "year"; ascending: boolean };
+}
+
+type DecodedCatalogCursor = { id: string; value: string | number };
+
+function encodeCatalogCursor(cursor: DecodedCatalogCursor) {
+  return Buffer.from(JSON.stringify(cursor)).toString("base64url");
+}
+
+function decodeCatalogCursor(value: string, sort: NonNullable<CatalogFilters["sort"]>): DecodedCatalogCursor | null {
+  try {
+    const decoded = JSON.parse(Buffer.from(value, "base64url").toString("utf8")) as Partial<DecodedCatalogCursor>;
+    if (typeof decoded.id !== "string" || !/^[0-9a-f-]{36}$/i.test(decoded.id)) return null;
+    const numericSort = sort !== "fresh";
+    if ((numericSort && typeof decoded.value !== "number") || (!numericSort && typeof decoded.value !== "string")) return null;
+    return decoded as DecodedCatalogCursor;
+  } catch {
+    return null;
+  }
+}
+
+function cursorExpression(column: string, ascending: boolean, cursor: DecodedCatalogCursor) {
+  const comparator = ascending ? "gt" : "lt";
+  const value = String(cursor.value).replace(/[(),]/g, "");
+  return `${column}.${comparator}.${value},and(${column}.eq.${value},id.gt.${cursor.id})`;
 }
 
 export async function getCatalogCount(filters: CatalogFilters = {}): Promise<number> {
@@ -529,13 +669,18 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
     // only listings with a known odometer reading up to 1,000 km belong here.
     // The repository filter also excludes null mileage values at the database
     // level, so the shelf cannot silently fall back to arbitrary fresh cars.
-    getCatalogCars({ limit: 16, maxMileageKm: 1000 }),
-    getCatalogCars({ limit: 16, maxPowerHp: 160 }),
-    getCatalogCars({ limit: 12, passable: true }),
-    getCatalogCars({ limit: 16, fuelType: "electric" }),
+    getCatalogCardPage({ maxMileageKm: 1000 }, null, 16),
+    getCatalogCardPage({ maxPowerHp: 160 }, null, 16),
+    getCatalogCardPage({ passable: true }, null, 12),
+    getCatalogCardPage({ fuelType: "electric" }, null, 16),
   ]);
 
-  return { cars, under160Cars, passableCars, electricCars };
+  return {
+    cars: cars.cars,
+    under160Cars: under160Cars.cars,
+    passableCars: passableCars.cars,
+    electricCars: electricCars.cars,
+  };
 }
 
 const getCachedHomeCatalogData = unstable_cache(
@@ -647,12 +792,23 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
   // report kinds need their raw JSON for the body map, Eye report and
   // insurance-event details. Keeping the raw payload out of the relation
   // prevents unrelated diagnostic blobs from being sent on every card view.
-  const { data: rawReports, error: rawReportsError } = await supabase
-    .from("car_condition_reports")
-    .select("report_type, raw_payload")
-    .eq("car_id", data.id)
-    .in("report_type", ["carhistory", "encar_carhistory", "encar_inspection"]);
-
+  const [rawReportsResult, latestSnapshotResult] = await Promise.all([
+    supabase
+      .from("car_condition_reports")
+      .select("report_type, raw_payload")
+      .eq("car_id", data.id)
+      .in("report_type", ["carhistory", "encar_carhistory", "encar_inspection"]),
+    supabase
+      .from("calc_snapshots")
+      .select(
+        "total_rub, car_price_rub, duty_rub, fees_rub, util_rub, freight_rub, broker_rub, calculated_at, result",
+      )
+      .eq("car_id", data.id)
+      .order("calculated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  const { data: rawReports, error: rawReportsError } = rawReportsResult;
   if (rawReportsError) {
     console.error("[cars] Diagnostic payload query failed", { source, sourceId, rawReportsError });
     throw rawReportsError;
@@ -664,15 +820,7 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
 
   // The card uses only the current published calculation. Loading the entire
   // calculation history for every public visit wastes database egress.
-  const { data: latestSnapshot, error: latestSnapshotError } = await supabase
-    .from("calc_snapshots")
-    .select(
-      "total_rub, car_price_rub, duty_rub, fees_rub, util_rub, freight_rub, broker_rub, calculated_at, result",
-    )
-    .eq("car_id", data.id)
-    .order("calculated_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const { data: latestSnapshot, error: latestSnapshotError } = latestSnapshotResult;
 
   if (latestSnapshotError) {
     console.error("[cars] Latest calculation query failed", { source, sourceId, latestSnapshotError });

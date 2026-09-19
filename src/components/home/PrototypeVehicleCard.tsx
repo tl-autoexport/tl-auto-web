@@ -12,7 +12,7 @@ import { vehicleClientMessage, whatsappContactUrl } from "@/lib/contact";
 import { publicCarPath } from "@/lib/car-url";
 import { translateFuel, translateTransmission } from "@/server/normalization/display";
 import { showcasePhotoUrl } from "@/lib/showcase-photo";
-import type { CatalogCar } from "@/server/cars/repository";
+import type { CatalogCar, CatalogCardSummary } from "@/server/cars/repository";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const engine = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -29,8 +29,10 @@ const BODY_SHAPE_BY_MODEL: Record<string, string> = {
   Elantra: "Седан",
 };
 
-function bodyShapeForCard(car: CatalogCar) {
-  const storedShape = car.vehicle_specs?.body_shape;
+type VehicleCardData = CatalogCar | CatalogCardSummary;
+
+function bodyShapeForCard(car: VehicleCardData) {
+  const storedShape = "vehicle_specs" in car ? car.vehicle_specs?.body_shape : null;
   if (typeof storedShape === "string" && storedShape.trim()) return storedShape;
   if (car.body_type === "SUV") return "Кроссовер";
   if (car.body_type === "Минивэн") return "Минивэн";
@@ -45,18 +47,18 @@ function daysOnSale(car: CatalogCar) {
   return Math.max(0, elapsed);
 }
 
-export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
+export function PrototypeVehicleCard({ car, priorityImage = false }: { car: VehicleCardData; priorityImage?: boolean }) {
   const { country, city } = useDestination();
-  const showcasePhoto = useMemo(
-    () => showcasePhotoUrl(car.car_media),
-    [car.car_media],
-  );
+  const showcasePhoto = useMemo(() =>
+    car.primary_thumbnail_url ?? car.primary_image_url ?? ("car_media" in car ? showcasePhotoUrl(car.car_media) : null),
+  [car]);
   const [shareNotice, setShareNotice] = useState("");
   const title = [car.brand, car.model].filter(Boolean).join(" ") || "Автомобиль из Кореи";
   const detailsHref = publicCarPath(car.primary_source, car.source_id);
   const message = vehicleClientMessage({ source: car.primary_source, sourceId: car.source_id, title });
-  const seats = typeof car.vehicle_specs?.seats === "number" && car.vehicle_specs.seats > 0
-    ? `${car.vehicle_specs.seats} мест`
+  const seatsValue = car.seats ?? ("vehicle_specs" in car && typeof car.vehicle_specs?.seats === "number" ? car.vehicle_specs.seats : null);
+  const seats = typeof seatsValue === "number" && seatsValue > 0
+    ? `${seatsValue} мест`
     : null;
   const primaryFacts = [
     car.brand,
@@ -105,7 +107,7 @@ export function PrototypeVehicleCard({ car }: { car: CatalogCar }) {
 
       <div className="pointer-events-none relative z-10 aspect-[2.25/1] overflow-hidden bg-[#e8edf3]">
         {showcasePhoto ? (
-          <RemoteImage alt={title} className="object-cover" decoding="sync" fill loading="eager" sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)" src={showcasePhoto} />
+          <RemoteImage alt={title} className="object-cover" decoding="async" fill loading={priorityImage ? "eager" : "lazy"} priority={priorityImage} sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)" src={showcasePhoto} />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-[#647084]">Фото временно недоступно</div>
         )}

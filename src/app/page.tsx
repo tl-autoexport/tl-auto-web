@@ -11,7 +11,7 @@ import {
 import {
   getCatalogFacetCars,
   getHomeCatalogData,
-  type CatalogCar,
+  type CatalogCardSummary,
 } from "@/server/cars/repository";
 import { CatalogQuickNav } from "@/components/home/CatalogQuickNav";
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
@@ -222,7 +222,7 @@ function VehicleShelf({
   id,
   title,
 }: {
-  cars: CatalogCar[];
+  cars: CatalogCardSummary[];
   description: string;
   empty: string;
   href: string;
@@ -245,9 +245,9 @@ function VehicleShelf({
       </div>
       {cars.length ? (
         <div className="scrollbar-none -mr-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 pr-4 sm:mr-0 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:p-0 xl:grid-cols-4">
-          {cars.map((car) => (
+          {cars.map((car, index) => (
             <div className="w-[calc(100%-44px)] shrink-0 snap-start sm:w-auto sm:shrink" key={car.id}>
-              <PrototypeVehicleCard car={car} />
+              <PrototypeVehicleCard car={car} priorityImage={index < 3} />
             </div>
           ))}
         </div>
@@ -261,11 +261,11 @@ function VehicleShelf({
 }
 
 function selectShelfCars(
-  candidates: CatalogCar[],
+  candidates: CatalogCardSummary[],
   usedCarIds: Set<string>,
   limit = 4,
 ) {
-  const selected: CatalogCar[] = [];
+  const selected: CatalogCardSummary[] = [];
   const usedModels = new Set<string>();
 
   for (const car of candidates) {

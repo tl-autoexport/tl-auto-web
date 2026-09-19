@@ -153,6 +153,17 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // Cursor feed contains only public catalogue summaries.  A short CDN
+        // cache removes repeated database reads while keeping freshness.
+        source: "/api/catalog/feed",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=30, stale-while-revalidate=300",
+          },
+        ],
+      },
     ];
   },
   images: {
