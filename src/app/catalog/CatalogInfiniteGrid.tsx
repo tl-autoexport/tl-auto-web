@@ -27,7 +27,9 @@ export function CatalogInfiniteGrid({ initialCars, initialCursor, query }: Props
 
   const loadMore = useCallback(async () => {
     if (!cursor || loading || requestRef.current) return;
-    requestRef.current = new AbortController();
+    const controller = new AbortController();
+    requestRef.current = controller;
+    const timeout = window.setTimeout(() => controller.abort(), 12_000);
     setLoading(true);
     setError(false);
     try {
@@ -35,7 +37,7 @@ export function CatalogInfiniteGrid({ initialCars, initialCursor, query }: Props
       params.set("cursor", cursor);
       params.set("limit", "24");
       const response = await fetch(`/api/catalog/feed?${params.toString()}`, {
-        signal: requestRef.current.signal,
+        signal: controller.signal,
       });
       if (!response.ok) throw new Error(`Catalogue feed returned ${response.status}`);
       const next = await response.json() as FeedResponse;
@@ -48,6 +50,7 @@ export function CatalogInfiniteGrid({ initialCars, initialCursor, query }: Props
     } catch (cause) {
       if ((cause as Error).name !== "AbortError") setError(true);
     } finally {
+      window.clearTimeout(timeout);
       requestRef.current = null;
       setLoading(false);
     }
@@ -101,12 +104,12 @@ export function CatalogInfiniteGrid({ initialCars, initialCursor, query }: Props
     <>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {cars.map((car, index) => (
-          <div className="[content-visibility:auto] [contain-intrinsic-size:auto_430px]" key={car.id}>
+          <div className="lg:[content-visibility:auto] lg:[contain-intrinsic-size:auto_430px]" key={car.id}>
             <PrototypeVehicleCard car={car} priorityImage={index < 3} />
           </div>
         ))}
       </div>
-      <div className="mt-7 flex min-h-12 items-center justify-center" ref={sentinelRef}>
+      <div className={`mt-7 flex items-center justify-center ${loading ? "min-h-[100vh]" : "min-h-12"}`} ref={sentinelRef}>
         {loading ? <span className="inline-flex items-center gap-2 text-sm text-[#647084]"><LoaderCircle className="animate-spin" size={18} /> Загружаем ещё автомобили</span> : null}
         {error ? <button className="rounded-md border border-[#c7a55a] bg-white px-4 py-2 text-sm font-semibold text-[#7b5a22]" onClick={() => void loadMore()} type="button">Повторить загрузку</button> : null}
         {!cursor && cars.length > 0 ? <span className="text-sm text-[#647084]">Все подходящие автомобили показаны</span> : null}
