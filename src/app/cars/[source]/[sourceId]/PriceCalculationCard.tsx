@@ -52,7 +52,7 @@ type PriceCalculationCardProps = {
   fuel: string;
   mileageKm: number | null;
   powerHp: number | null;
-  powerConfidence?: "official" | "high" | "automatic" | null;
+  powerConfidence?: "official" | "high" | "medium" | "approximate" | "automatic" | null;
   priceKrw: number | null;
   source: string;
   sourceId: string;
@@ -118,8 +118,7 @@ function wholeRate(value: number) {
 
 export function PriceCalculationCard(props: PriceCalculationCardProps) {
   const { country, city } = useDestination();
-  if (country.countryCode === "KZ" && city.id === "almaty") return <KzPriceCalculationCard {...props} />;
-  if (country.countryCode !== "RU" || !["vladivostok", "ussuriysk", "moscow"].includes(city.id)) return <PendingDestinationCard {...props} />;
+  if (country.countryCode !== "RU" || !["vladivostok", "ussuriysk"].includes(city.id)) return <PendingDestinationCard {...props} />;
   return <RuPriceCalculationCard {...props} />;
 }
 

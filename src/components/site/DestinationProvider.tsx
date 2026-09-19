@@ -14,14 +14,18 @@ type Value = State & {
 const STORAGE_KEY = "tl-auto-destination-v1";
 const Context = createContext<Value | null>(null);
 
+function isEnabledDestination(state: State) {
+  return state.countryCode === "RU" && (state.cityId === "vladivostok" || state.cityId === "ussuriysk");
+}
+
 function readState(): State {
   const params = new URLSearchParams(window.location.search);
   const countryCode = params.get("country") as CountryCode | null;
   const cityId = params.get("city");
-  if (countryCode && cityId) return { countryCode, cityId };
+  if (countryCode && cityId && isEnabledDestination({ countryCode, cityId })) return { countryCode, cityId };
   try {
     const stored = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "null") as State | null;
-    if (stored?.countryCode && stored.cityId) return stored;
+    if (stored?.countryCode && stored.cityId && isEnabledDestination(stored)) return stored;
   } catch {
     // Use the default when storage is unavailable or invalid.
   }
@@ -37,10 +41,12 @@ export function DestinationProvider({ children }: { children: React.ReactNode })
       ...state,
       country: resolved.country,
       city: resolved.city,
-      calculationReady: (state.countryCode === "RU" && ["vladivostok", "ussuriysk", "moscow"].includes(resolved.city.id)) || (state.countryCode === "KZ" && resolved.city.id === "almaty"),
+      calculationReady: state.countryCode === "RU" && ["vladivostok", "ussuriysk"].includes(resolved.city.id),
       setDestination: (countryCode, cityId) => {
         const resolvedNext = getDestination(countryCode, cityId);
-        const next = { countryCode: resolvedNext.country.countryCode, cityId: resolvedNext.city.id };
+        const next = isEnabledDestination({ countryCode: resolvedNext.country.countryCode, cityId: resolvedNext.city.id })
+          ? { countryCode: resolvedNext.country.countryCode, cityId: resolvedNext.city.id }
+          : DEFAULT_DESTINATION;
         setState(next);
         try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* optional persistence */ }
         const url = new URL(window.location.href);
