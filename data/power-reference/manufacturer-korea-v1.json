@@ -2806,6 +2806,156 @@
       "matches": [
         { "driveType": "4WD", "yearFrom": 2021, "yearTo": 2022, "engineCcFrom": 2940, "engineCcTo": 2975 }
       ]
+    },
+    {
+      "specKey": "mercedes-glb-x247-glb220-1991-190ps-2021-kr",
+      "brand": "Mercedes-Benz",
+      "model": "GLB",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1991,
+      "years": [2021, 2021],
+      "power": { "value": 190, "unit": "PS", "kw": 139.7447625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Korean-market Mercedes-Benz GLB 220 KR2 2021 specification — 1,991 cc, 190 PS",
+        "uri": "https://www.carwiki.co.kr/model/10519_2021/GLB%ED%81%B4%EB%9E%98%EC%8A%A4_X247",
+        "supportingUri": "https://m.kbchachacha.com/public/web/car/detail.kbc?carSeq=28770677",
+        "retrievedAt": "2026-09-18",
+        "note": "Korean-market catalogue data identifies GLB 220 KR1/KR2 as a 2021 gasoline 1,991 cc configuration with 190 PS. The supporting Korean listing confirms the same GLB 220, 2021, gasoline and 1,991 cc combination. This is a T3 regional-market rule pending OEM corroboration; it must not be published as manufacturer-confirmed evidence yet."
+      },
+      "matches": [
+        { "generation": "glb 클래스 x247", "trim": "glb220", "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 1985, "engineCcTo": 2000 }
+      ]
+    },
+    {
+      "specKey": "volkswagen-golf-8-gti-1984-245ps-2024-kr",
+      "brand": "Volkswagen",
+      "model": "Golf",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1984,
+      "years": [2024, 2024],
+      "power": { "value": 245, "unit": "PS", "kw": 180.19719375 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Volkswagen Korea Golf GTI 2024 official specification — 2.0 TSI, 245 PS",
+        "uri": "https://www.volkswagen.co.kr/ko/promotion_news/news/new-2024/2024-01-15.html",
+        "supportingUri": "https://www.volkswagen.co.kr/idhub/content/dam/onehub_pkw/importers/kr/models/golf-gti/leafelt/Golf%20GTI_Price%20List_web_240129.pdf",
+        "retrievedAt": "2026-09-18",
+        "note": "Volkswagen Korea states that the Korean Golf GTI uses the 2.0 TSI engine and produces 245 PS. The Korean price list identifies the same powertrain and front-wheel-drive 7-speed DSG configuration; matcher is restricted to 2024 Golf 8 2.0 GTI rows."
+      },
+      "matches": [
+        { "generation": "골프 8세대", "trim": "2.0 gti", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1975, "engineCcTo": 1995 }
+      ]
+    },
+    {
+      "specKey": "mercedes-amg-a-class-w177-a45s-1991-421ps-2025",
+      "brand": "Mercedes-Benz",
+      "model": "A-Class",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1991,
+      "years": [2025, 2025],
+      "power": { "value": 421, "unit": "PS", "kw": 309.64497375 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-AMG A 45 S 4MATIC+ official specification — 1,991 cc, 421 PS",
+        "uri": "https://mercedes-benz-media.co.uk/releases/1494",
+        "supportingUri": "https://www.autohome.com.cn/drive/202101/1097726-5.html",
+        "retrievedAt": "2026-09-18",
+        "note": "Mercedes-Benz official media lists the A 45 S 4MATIC+ at 310 kW/421 hp with a 1,991 cc engine; AutoHome independently lists the same 1991 cc, 310 kW, 421 PS and 4MATIC configuration. Restricted to 2025 A-Class W177 AMG A45 S 4MATIC+ Hatchback rows."
+      },
+      "matches": [
+        { "generation": "A-클래스 W177", "trim": "AMG A45 S 4MATIC+ Hatchback", "driveType": "4WD", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1985, "engineCcTo": 2000 }
+      ]
+    },
+    {
+      "specKey": "mercedes-amg-glb-x247-glb35-1991-306ps-2021",
+      "brand": "Mercedes-Benz",
+      "model": "GLB",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1991,
+      "years": [2021, 2021],
+      "power": { "value": 306, "unit": "PS", "kw": 225.0626175 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Mercedes-AMG GLB 35 4MATIC official specification — 1,991 cc, 306 PS",
+        "uri": "https://media.mercedes-benz.fr/nouveau-mercedes-amg-glb-35-4matic/",
+        "supportingUri": "https://www.autohome.com.cn/news/202203/1239386.html",
+        "retrievedAt": "2026-09-18",
+        "note": "Mercedes-Benz official technical release specifies the GLB 35 4MATIC 2.0-litre engine at 1,991 cc and 306 PS (225 kW), with AMG Performance 4MATIC all-wheel drive. Matcher is restricted to 2021 Korean GLB X247 AMG GLB35 4MATIC listings. AutoHome is retained only as supporting market data."
+      },
+      "matches": [
+        { "generation": "GLB-클래스 X247", "trim": "AMG GLB35 4MATIC", "driveType": "4WD", "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 1985, "engineCcTo": 2000 }
+      ]
+    },
+    {
+      "specKey": "audi-q3-f3-40-tfsi-quattro-1984-190ps-2025",
+      "brand": "Audi",
+      "model": "Q3",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1984,
+      "years": [2025, 2025],
+      "power": { "value": 190, "unit": "PS", "kw": 139.7447625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Audi Q3 40 TFSI quattro official technical data — 1,984 cc, 190 PS",
+        "uri": "https://uploads.audi-mediacenter.com/system/production/car_motorizations/1245/file_en/eeac1506a8560e5cd2dda924150f9ed6334fb84f/eTD-Audi-Q3-Sportback-40-TFSI-quattro-S_tronic-140kW_250605.pdf",
+        "supportingUri": "https://www.audi.com/en/audi-q3-57",
+        "retrievedAt": "2026-09-18",
+        "note": "Audi technical data specifies the F3 Q3 40 TFSI quattro at 1,984 cc and 140 kW/190 PS. The rule is restricted to 2025 gasoline Q3 (F3) quattro listings and both Encar trim spellings used for this configuration."
+      },
+      "matches": [
+        { "generation": "Q3 (F3)", "trim": "40 TFSI Quattro", "driveType": "4WD", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1975, "engineCcTo": 1995 },
+        { "generation": "Q3 (F3)", "trim": "40 TFSI Quattro Premium", "driveType": "4WD", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1975, "engineCcTo": 1995 }
+      ]
+    },
+    {
+      "specKey": "chevrolet-trailblazer-1.35t-1341-156ps-2022",
+      "brand": "Chevrolet",
+      "model": "Trailblazer",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1341,
+      "years": [2022, 2022],
+      "power": { "value": 156, "unit": "PS", "kw": 114.737805 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Chevrolet Korea Trailblazer 2022 official specification — 1,341 cc, 156 PS",
+        "uri": "https://www.chevrolet.co.kr/content/dam/chevrolet/as/kr/ko/index/finance/type-price/02-pdfs/2022%EB%85%84%2012%EC%9B%94%20%EC%A0%84%EC%B0%A8%EC%A2%85%20%EA%B0%80%EA%B2%A9%ED%91%9C.pdf",
+        "supportingUri": "https://news.chevrolet.co.kr/ko/chevrolet/newsroom.detail.html/Pages/news/kr/ko/2023/july/0719_The_New_Trailblazer.html",
+        "retrievedAt": "2026-09-18",
+        "note": "Chevrolet Korea's 2022 price/specification document lists the 1.341-litre E-Turbo gasoline engine at 1,341 cc and 156 PS, with both FWD and AWD configurations. Matcher is restricted to 2022 Trailblazer RS rows and both recorded drive types."
+      },
+      "matches": [
+        { "generation": "트레일블레이저", "trim": "RS", "driveType": "2WD", "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 1335, "engineCcTo": 1348 },
+        { "generation": "트레일블레이저", "trim": "RS", "driveType": "4WD", "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 1335, "engineCcTo": 1348 }
+      ]
+    },
+    {
+      "specKey": "kgm-tivoli-x100-1597-126ps-2024",
+      "brand": "KGM",
+      "model": "Tivoli",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1597,
+      "years": [2024, 2024],
+      "power": { "value": 126, "unit": "PS", "kw": 92.6728425 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "KGM Korea New Tivoli 2024 official specification — 1,597 cc, 126 PS",
+        "uri": "https://m.kg-mobility.com/showroom/TIVOLI/price/__icsFiles/afieldfile/2024/09/27/newtivoli_price_2410_1.pdf",
+        "supportingUri": "https://m.kg-mobility.com/showroom/total_price/__icsFiles/afieldfile/2024/11/29/Total_price_2412_1.pdf",
+        "retrievedAt": "2026-09-18",
+        "note": "KGM Korea's 2024 New Tivoli price/specification lists the naturally aspirated 1,597 cc gasoline engine at 126 PS and 2WD. The rule is restricted to 2024 Korean New Tivoli V3 2WD listings; the separate 1.5 turbo/163 PS engine is not inferred."
+      },
+      "matches": [
+        { "generation": "더 뉴 티볼리", "trim": "V3", "driveType": "2WD", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1588, "engineCcTo": 1605 },
+        { "generation": "더 뉴 티볼리", "trim": "1.6 2WD", "driveType": "2WD", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1588, "engineCcTo": 1605 }
+      ]
     }
   ]
 }

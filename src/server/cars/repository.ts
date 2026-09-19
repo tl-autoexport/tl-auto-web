@@ -27,7 +27,7 @@ export type CatalogCar = {
   price_rub: number | null;
   engine_cc: number | null;
   power_hp: number | null;
-  power_confidence?: "official" | "high" | "automatic" | null;
+  power_confidence?: "official" | "high" | "medium" | "approximate" | "automatic" | null;
   power_resolution_note?: string | null;
   fuel_type: string | null;
   transmission: string | null;

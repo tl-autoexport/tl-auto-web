@@ -35,6 +35,14 @@ const MODEL_ALIASES: Record<string, string> = {
   골프: "Golf",
   제타: "Jetta",
   말리부: "Malibu",
+  "ioniq5": "Ioniq 5",
+  "ioniq 5": "Ioniq 5",
+  "ioniq6": "Ioniq 6",
+  "ioniq 6": "Ioniq 6",
+  "ev 5": "EV5",
+  "ev5": "EV5",
+  "st 1": "ST1",
+  "st1": "ST1",
 };
 
 const GENERATION_CODE = /^[A-Z]{1,4}\d{1,4}[A-Z]{0,2}$/;

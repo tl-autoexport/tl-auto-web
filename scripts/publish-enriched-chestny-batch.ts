@@ -13,6 +13,7 @@ config({ path: ".env", quiet: true });
 const dbUrl = process.env.SUPABASE_DB_URL;
 const dryRun = process.env.CHESTNY_ENRICHED_PUBLISH_DRY_RUN !== "false";
 const publishStatus = process.env.CHESTNY_ENRICHED_PUBLISH_STATUS ?? "power_confirmed";
+const autoHomeApprovedOnly = process.env.CHESTNY_ENRICHED_PUBLISH_AUTOHOME_APPROVED_ONLY === "true";
 if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
 
 /**
@@ -117,8 +118,12 @@ async function main() {
           price_krw,engine_cc,fuel_type,transmission,drive_type,exterior_color,body_type,location,vin_masked,image_urls,raw_payload
         from public.chestny_catalog_staging
         where source_status='active' and promotion_status=$1 and raw_payload ? 'encar_enrichment'
+          and ($2::boolean = false or (
+            raw_payload ? 'autohome_power_candidate'
+            and raw_payload->'autohome_power_candidate'->>'review_status' = 'approved'
+          ))
         order by source_listing_id
-      `, [publishStatus]);
+      `, [publishStatus, autoHomeApprovedOnly]);
 
     const refBySpecId = new Map<string, RefRow>();
     for (const ref of refs.rows) if (!refBySpecId.has(ref.spec_id)) refBySpecId.set(ref.spec_id, ref);
@@ -172,7 +177,47 @@ async function main() {
         brand: row.manufacturer, model: row.model, generation: row.generation, trim: grade,
         fuelType: row.fuel_type, driveType: row.drive_type, year: row.model_year, engineCc: row.engine_cc,
       });
-      const resolution = resolveApprovedPower(input, candidates);
+      let resolution = resolveApprovedPower(input, candidates);
+      // An alternative public source may be explicitly approved by the
+      // project owner. In that case the stored confirmation is the reviewed
+      // binding: validate the card against that one approved specification
+      // instead of rejecting it merely because another broad rule overlaps.
+      const confirmationConfidence = String(confirmation.confidence ?? "");
+      if (
+        confirmation.spec_id &&
+        (confirmationConfidence === "exact_autohome_configuration" ||
+          confirmationConfidence === "owner_approved_alternative_autohome")
+      ) {
+        const confirmedCandidates = candidates.filter((candidate) => candidate.specId === String(confirmation.spec_id));
+        const confirmedInput = canonicalInput({
+          brand: row.manufacturer, model: row.model, generation: row.generation, trim: row.trim,
+          fuelType: row.fuel_type, driveType: row.drive_type, year: row.model_year, engineCc: row.engine_cc,
+        });
+        const confirmedResolution = resolveApprovedPower(confirmedInput, confirmedCandidates);
+        if (confirmedResolution.status === "matched") {
+          resolution = confirmedResolution;
+        } else if (confirmedCandidates.length) {
+          const fields = (confirmation.match_fields ?? {}) as Record<string, unknown>;
+          const years = Array.isArray(fields.years) ? fields.years.map(Number) : [];
+          const engineRange = Array.isArray(fields.engine_cc) ? fields.engine_cc.map(Number) : [];
+          const exactStoredBinding =
+            String(fields.generation ?? "") === String(row.generation ?? "") &&
+            String(fields.trim ?? "") === String(row.trim ?? "") &&
+            String(fields.fuel_type ?? "") === String(row.fuel_type ?? "") &&
+            String(fields.drive_type ?? "") === String(row.drive_type ?? "") &&
+            years.length === 2 && row.model_year != null && row.model_year >= years[0] && row.model_year <= years[1] &&
+            engineRange.length === 2 && row.engine_cc != null && row.engine_cc >= engineRange[0] && row.engine_cc <= engineRange[1];
+          if (exactStoredBinding) {
+            resolution = {
+              status: "matched",
+              confidence: "high",
+              candidate: confirmedCandidates[0],
+              candidates: confirmedCandidates,
+              reason: "owner_approved_alternative_source_binding",
+            };
+          }
+        }
+      }
       const images = galleryUrls(row.image_urls);
       const month = registrationMonth(row.first_registration_date, row.model_year);
       const hasRequiredSourceData = Boolean(
@@ -255,7 +300,7 @@ async function main() {
               brand,model,year,registration_year,registration_date,registration_month,mileage_km,price_krw,price_rub,engine_cc,power_hp,power_source,power_confidence,power_resolution_note,
               fuel_type,transmission,drive_type,color,body_type,seller_region,vin_masked,vehicle_specs)
             values ('chestny_prigon','chestny_prigon',$1,$2,'source_only',true,null,now(),now(),now(),
-              $3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,'tl_auto_approved_reference',$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)
+              $3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,'tl_auto_approved_reference',$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
             on conflict(primary_source,source_id) do update set source_url=excluded.source_url,enrichment_status=excluded.enrichment_status,is_available=true,sale_status=null,published_at=coalesce(cars.published_at,now()),
               source_updated_at=excluded.source_updated_at,last_seen_at=excluded.last_seen_at,brand=excluded.brand,model=excluded.model,year=excluded.year,registration_year=excluded.registration_year,
               registration_date=excluded.registration_date,registration_month=excluded.registration_month,mileage_km=excluded.mileage_km,price_krw=excluded.price_krw,price_rub=excluded.price_rub,engine_cc=excluded.engine_cc,power_hp=excluded.power_hp,
@@ -318,6 +363,7 @@ async function main() {
       powerResolution: "approved_evidence_confirmation",
       legacyManifestUsed: false,
       driveFallbackUsed: false,
+      autoHomeApprovedOnly,
       encarRequests: 0,
       publicCatalogChanged: !dryRun,
     }, null, 2));

@@ -46,6 +46,10 @@ const THIRD_PARTY_HOSTS = [
  */
 const ACCEPTED_AGGREGATOR_HOSTS = [
   "drom.ru",
+  // The project owner explicitly approved AutoHome for the narrowly scoped
+  // ICE configurations promoted by `promote-autohome-strict-candidates.ts`.
+  // It remains a reviewed aggregator rather than a manufacturer document.
+  "autohome.com.cn",
 ];
 
 /** Manufacturer-hosted communication rather than core technical material. */
