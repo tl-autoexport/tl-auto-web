@@ -36,8 +36,7 @@ import type { ThermalEntry, ThermalReference } from "./thermalTypes";
 import { PriceCalculationCard } from "./PriceCalculationCard";
 import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
 import { publicCarPath } from "@/lib/car-url";
-import { InfoHint } from "@/components/site/InfoHint";
-import type { ReactNode } from "react";
+import { PowerKeyFact } from "./PowerKeyFact";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const getCachedCarDetail = cache(getCarDetail);
@@ -194,10 +193,7 @@ export default async function CarDetailPage({
                   label="Двигатель"
                   value={formatEngineCapacity(car.engine_cc)}
                 />
-                <KeyFact
-                  label={<span className="inline-flex items-center gap-1">Мощность <InfoHint label="О данных о мощности" text="Мощность указана по открытым источникам и может отличаться от фактических данных автомобиля." /></span>}
-                  value={car.power_hp ? `${car.power_hp} л.с.` : "-"}
-                />
+                <PowerKeyFact value={car.power_hp ? `${car.power_hp} л.с.` : "-"} />
               </div>
               <div className="mt-3 grid gap-2.5 text-[13px] sm:mt-4 sm:gap-3 sm:text-sm">
                 <Spec label="Топливо" value={translateFuel(car.fuel_type)} />
@@ -268,10 +264,10 @@ function Spec({ label, value }: { label: string; value: string }) {
   );
 }
 
-function KeyFact({ label, value }: { label: ReactNode; value: string }) {
+function KeyFact({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 rounded bg-[#f7f9fb] px-3 py-2.5 ring-1 ring-[#e8ecf2]">
-      <span className="block text-[11px] text-[#647084] sm:text-xs">{label}</span>
+      <span className="block truncate text-[11px] text-[#647084] sm:text-xs">{label}</span>
       <strong className="mt-1 block truncate text-sm font-semibold tabular-nums sm:text-base">{value}</strong>
     </div>
   );

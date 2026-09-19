@@ -342,7 +342,7 @@ function RuPriceCalculationCard({
             <span className="sm:hidden">Расчёт</span>
             <span className="hidden sm:inline">Показать расчёт цены</span>
           </button>
-          <p className="flex items-center gap-1.5 text-xs leading-5 text-[#647084]">
+          <p className="flex flex-wrap items-center gap-x-1.5 text-xs leading-5 text-[#647084]">
             Предварительный расчёт <InfoHint label="О предварительном расчёте" text="Итоговая стоимость зависит от комплектации автомобиля, курса валют, даты оформления и фактических расходов. Для точного расчёта свяжитесь с менеджером." />
           </p>
         </div>
