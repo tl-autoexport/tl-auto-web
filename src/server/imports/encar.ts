@@ -1056,12 +1056,9 @@ async function mapCar(
     );
     return null;
   }
-  if (!isPureElectric && !power) {
-    onReject?.(
-      `power:${brand ?? "unknown"}:${model ?? "unknown"}:${detail?.gradeEnglish ?? listCar.Badge ?? "unknown"}:${engineCc ?? "unknown"}`,
-    );
-    return null;
-  }
+  // Keep the listing in the enrichment pool when the first-pass reference
+  // cannot resolve power. AutoHome/EncarRus/Drom or the card fallback may
+  // resolve it after normalization; only the publication gate decides later.
   // Keep the displacement-based fallback used by Autoexport when Encar does
   // not expose a verified trim power; the warning below preserves provenance.
   const powerHp = power?.powerHp ?? null;
@@ -1135,7 +1132,6 @@ async function mapCar(
         })
       : null;
   if (
-    (!usesStandardTksPayments && !calc) ||
     !photos.some(
       (photo) => photo.category === "outer" || photo.category === "thumbnail",
     )

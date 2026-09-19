@@ -20,7 +20,7 @@ async function publishedCount() {
 }
 
 async function publishWave(fuel: string, since: string) {
-  const { data, error } = await db.from("cars").select("id").eq("primary_source", "encar").eq("is_available", true).eq("fuel_type", fuel).is("published_at", null).gte("created_at", since);
+  const { data, error } = await db.from("cars").select("id").eq("primary_source", "encar").eq("is_available", true).eq("fuel_type", fuel).is("published_at", null).not("price_rub", "is", null).not("power_hp", "is", null).not("engine_cc", "is", null).gte("created_at", since);
   if (error) throw error;
   const ids = (data ?? []).map((row) => row.id);
   if (!ids.length) return 0;
