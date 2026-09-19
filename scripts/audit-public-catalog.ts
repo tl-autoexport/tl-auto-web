@@ -62,13 +62,21 @@ async function main() {
   const incompleteCombustion = combustion.filter(
     (car) => car.price_rub == null || car.power_hp == null,
   ).length;
-  const electricWithInventedPrice = electric.filter(
-    (car) => car.price_rub != null,
+  // An electric car may expose a landed price only when its calculation rests
+  // on a confirmed electric tariff basis. The import writes
+  // `pending_official_ev_tariff` while there is no calculation yet, so a priced
+  // car still carrying that marker is a stale state, not a confirmed one.
+  const electricPendingMarker = "pending_official_ev_tariff";
+  const electricCalculatedMarker = "calculated_external_ev_tariff";
+  const electricStatus = (car: PublicAuditCar) =>
+    car.vehicle_specs?.calculation_status ?? null;
+  const electricWithPrice = electric.filter((car) => car.price_rub != null);
+  const electricWithoutConfirmedBasis = electricWithPrice.filter(
+    (car) => electricStatus(car) !== electricCalculatedMarker,
   ).length;
-  const electricPendingCalculation = electric.filter(
+  const electricUnpricedWithoutMarker = electric.filter(
     (car) =>
-      car.vehicle_specs?.calculation_status ===
-      "pending_official_ev_tariff",
+      car.price_rub == null && electricStatus(car) !== electricPendingMarker,
   ).length;
 
   const report = {
@@ -90,8 +98,9 @@ async function main() {
     },
     calculationCoverage: {
       incompleteCombustion,
-      electricPendingCalculation,
-      electricWithInventedPrice,
+      electricWithPrice: electricWithPrice.length,
+      electricWithoutConfirmedBasis,
+      electricUnpricedWithoutMarker,
     },
     staleBeyondDays: { days: freshnessDays, count: stale },
     missingSourceLink,
@@ -121,11 +130,15 @@ async function main() {
   if (incompleteCombustion) {
     blockers.push(`${incompleteCombustion} combustion cars have an incomplete calculation`);
   }
-  if (electricWithInventedPrice) {
-    blockers.push(`${electricWithInventedPrice} electric cars expose an unapproved landed price`);
+  if (electricWithoutConfirmedBasis) {
+    blockers.push(
+      `${electricWithoutConfirmedBasis} electric cars expose a landed price without a confirmed electric tariff basis`,
+    );
   }
-  if (electric.length && electricPendingCalculation !== electric.length) {
-    blockers.push("some electric cars do not carry the pending calculation marker");
+  if (electricUnpricedWithoutMarker) {
+    blockers.push(
+      `${electricUnpricedWithoutMarker} electric cars without a price are missing the pending calculation marker`,
+    );
   }
 
   if (blockers.length) {

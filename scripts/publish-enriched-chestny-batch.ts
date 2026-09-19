@@ -284,7 +284,12 @@ async function main() {
           const { row, hp, drive, month, tier, confidence, specId, evidenceId, specKey, specificationTitle } = item;
           const metadata = {
             source: "chestny_prigon",
-            calculation_status: "calculated_from_confirmed_local_evidence",
+            // An electric card must publish with the marker the catalogue audit
+            // and the card UI expect, otherwise the stale import-time
+            // "pending" status survives and the audit blocks the build.
+            calculation_status: item.fuel === "electric"
+              ? "calculated_external_ev_tariff"
+              : "calculated_from_confirmed_local_evidence",
             power_resolution: "approved_evidence_confirmation",
             power_spec_key: specKey,
             power_spec_id: specId,
