@@ -247,11 +247,15 @@ function RuPriceCalculationCard({
   return (
     <>
       <aside className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
-        <div>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <p className="whitespace-nowrap text-[30px] font-semibold leading-none tracking-tight text-[#121722] tabular-nums sm:text-3xl">
             {money(total)}
           </p>
-          <span className="mt-1.5 block text-xs text-[#647084] sm:text-sm">
+          <InfoHint
+            label="О предварительном расчёте"
+            text="Итоговая стоимость зависит от комплектации автомобиля, курса валют, даты оформления и фактических расходов. Для точного расчёта свяжитесь с менеджером."
+          />
+          <span className="mt-1.5 block basis-full text-xs text-[#647084] sm:text-sm">
             Цена под ключ до {city.label}
           </span>
         </div>
@@ -341,9 +345,6 @@ function RuPriceCalculationCard({
             <span className="sm:hidden">Расчёт</span>
             <span className="hidden sm:inline">Показать расчёт цены</span>
           </button>
-          <p className="flex flex-wrap items-center gap-x-1.5 text-xs leading-5 text-[#647084]">
-            Предварительный расчёт <InfoHint label="О предварительном расчёте" text="Итоговая стоимость зависит от комплектации автомобиля, курса валют, даты оформления и фактических расходов. Для точного расчёта свяжитесь с менеджером." />
-          </p>
         </div>
         <div className="mt-2 hidden grid-cols-2 gap-2 sm:mt-3 sm:grid">
           <a
