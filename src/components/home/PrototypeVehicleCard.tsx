@@ -42,10 +42,13 @@ function bodyShapeForCard(car: VehicleCardData) {
 }
 
 function daysOnSale(car: CatalogCar) {
-  const listedAt = car.published_at ?? car.source_updated_at ?? car.created_at;
+  // Prefer Encar's first-advertised date. If it is unavailable, count from
+  // the moment the card entered TL Auto, but never show an incorrect zero-day
+  // value for a card that has just been imported.
+  const listedAt = car.published_at ?? car.created_at;
   if (!listedAt) return null;
   const elapsed = Math.floor((Date.now() - new Date(listedAt).getTime()) / day);
-  return Math.max(0, elapsed);
+  return Math.max(1, elapsed);
 }
 
 export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage = false }: { car: VehicleCardData; enableGallery?: boolean; priorityImage?: boolean }) {
