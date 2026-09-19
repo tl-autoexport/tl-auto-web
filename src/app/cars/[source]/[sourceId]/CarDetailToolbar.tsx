@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, ChevronRight, Copy, Heart, Share2 } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { readSavedCatalogUrl } from "@/lib/catalog-state";
 
 const rub = new Intl.NumberFormat("ru-RU");
 
@@ -20,6 +21,10 @@ function catalogLink(brand?: string | null, model?: string | null) {
   if (model) search.set("model", model);
   const query = search.toString();
   return query ? `/catalog?${query}` : "/catalog";
+}
+
+function savedCatalogUrl() {
+  return readSavedCatalogUrl();
 }
 
 export function CarDetailToolbar({ brand, model, priceRub, title }: CarDetailToolbarProps) {
@@ -46,12 +51,18 @@ export function CarDetailToolbar({ brand, model, priceRub, title }: CarDetailToo
   }, [shareOpen]);
 
   function goBack() {
-    const referrer = document.referrer;
-    if (referrer.startsWith(window.location.origin) && new URL(referrer).pathname.startsWith("/catalog")) {
+    // `document.referrer` reflects the last real document load, not a client-side
+    // transition, so it could not tell whether the user came from the catalogue.
+    // Next tracks its own history index instead: if there is an in-app previous
+    // entry, go back to it and keep the user's filters and scroll position.
+    const index = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (index > 0) {
       router.back();
       return;
     }
-    router.push(fallbackCatalogHref);
+    // Opened directly (no in-app history): restore the saved listing when
+    // available, otherwise fall back to the brand and model links.
+    router.push(savedCatalogUrl() ?? fallbackCatalogHref);
   }
 
   function shareUrl() {

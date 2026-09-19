@@ -129,6 +129,14 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  experimental: {
+    // The catalogue is a dynamic route and, because it defines a loading.tsx,
+    // its client router cache entry is off by default (staleTimes.dynamic is 0
+    // since Next 15). That made every Back navigation hit the server and show
+    // the loading skeleton. A short window keeps the return instant while the
+    // cold-load skeleton stays in place.
+    staleTimes: { dynamic: 30 },
+  },
   async rewrites() {
     return [{
       source: "/cars/korea/:sourceId",
