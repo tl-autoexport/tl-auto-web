@@ -1,10 +1,12 @@
 import { config } from "dotenv";
 import { createSupabasePublic } from "../src/server/supabase/public";
+import { evaluatePublication, type PublicationCandidate } from "../src/server/cars/calculation-contract";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
 type PublicAuditCar = {
+  id: string;
   primary_source: string;
   brand: string | null;
   fuel_type: string | null;
@@ -14,6 +16,13 @@ type PublicAuditCar = {
   source_updated_at: string | null;
   has_360_interior: boolean;
   vehicle_specs: Record<string, unknown> | null;
+  calculation_power_status: string | null;
+  calculation_power_kw: number | null;
+  power_basis: string | null;
+  power_resolution_source: string | null;
+  calculation_month: number | null;
+  hybrid_dvs_power_hp: number | null;
+  legacy_calculation_status: string | null;
 };
 
 async function main() {
@@ -28,7 +37,7 @@ async function main() {
     const { data, error } = await supabase
       .from("cars")
       .select(
-        "primary_source, brand, fuel_type, price_rub, power_hp, source_url, source_updated_at, has_360_interior, vehicle_specs",
+        "id, primary_source, brand, fuel_type, price_rub, power_hp, source_url, source_updated_at, has_360_interior, vehicle_specs, calculation_power_status, calculation_power_kw, power_basis, power_resolution_source, calculation_month, hybrid_dvs_power_hp, legacy_calculation_status",
       )
       .eq("is_available", true)
       // TL Auto's public catalogue is currently mirrored from the
@@ -47,6 +56,45 @@ async function main() {
 
   const sourceCount = (source: string) =>
     cars.filter((car) => car.primary_source === source).length;
+
+  // The publication contract needs to know which cards actually have a stored
+  // calculation snapshot. The public policy exposes snapshots for available cars.
+  const snapshotCarIds = new Set<string>();
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await supabase
+      .from("calc_snapshots")
+      .select("car_id")
+      .order("car_id", { ascending: true })
+      .range(offset, offset + pageSize - 1);
+    if (error) throw error;
+    const batch = (data ?? []) as Array<{ car_id: string }>;
+    for (const row of batch) snapshotCarIds.add(row.car_id);
+    if (batch.length < pageSize) break;
+  }
+
+  const gateFailures = new Map<string, number>();
+  let gateChecked = 0;
+  for (const car of cars) {
+    // An unpriced card simply shows no landed price; the contract only has to
+    // hold once a price is exposed.
+    if (car.price_rub == null) continue;
+    gateChecked++;
+    const candidate: PublicationCandidate = {
+      priceRub: car.price_rub,
+      hasSnapshot: snapshotCarIds.has(car.id),
+      calculationPowerStatus: car.calculation_power_status,
+      calculationPowerKw: car.calculation_power_kw,
+      powerBasis: car.power_basis,
+      powerResolutionSource: car.power_resolution_source,
+      calculationMonth: car.calculation_month,
+      fuelType: car.fuel_type,
+      hybridDvsPowerHp: car.hybrid_dvs_power_hp,
+      legacyCalculationStatus: car.legacy_calculation_status,
+    };
+    const verdict = evaluatePublication(candidate);
+    if (verdict.ok) continue;
+    for (const blocker of verdict.blockers) gateFailures.set(blocker, (gateFailures.get(blocker) ?? 0) + 1);
+  }
   const brandCount = (brand: string) =>
     cars.filter((car) => car.brand === brand).length;
   const stale = cars.filter((car) => {
@@ -62,22 +110,12 @@ async function main() {
   const incompleteCombustion = combustion.filter(
     (car) => car.price_rub == null || car.power_hp == null,
   ).length;
-  // An electric car may expose a landed price only when its calculation rests
-  // on a confirmed electric tariff basis. The import writes
-  // `pending_official_ev_tariff` while there is no calculation yet, so a priced
-  // car still carrying that marker is a stale state, not a confirmed one.
-  const electricPendingMarker = "pending_official_ev_tariff";
-  const electricCalculatedMarker = "calculated_external_ev_tariff";
-  const electricStatus = (car: PublicAuditCar) =>
-    car.vehicle_specs?.calculation_status ?? null;
-  const electricWithPrice = electric.filter((car) => car.price_rub != null);
-  const electricWithoutConfirmedBasis = electricWithPrice.filter(
-    (car) => electricStatus(car) !== electricCalculatedMarker,
-  ).length;
-  const electricUnpricedWithoutMarker = electric.filter(
-    (car) =>
-      car.price_rub == null && electricStatus(car) !== electricPendingMarker,
-  ).length;
+  // An electric car is covered by the publication contract above: it must be on
+  // the 30-minute basis, carry no ICE power fields and expose a price only with
+  // a resolved status. The import-time free-form marker is history now and is no
+  // longer read as the current status.
+  const electricWithPrice = electric.filter((car) => car.price_rub != null).length;
+  const electricWithoutPrice = electric.length - electricWithPrice;
 
   const report = {
     total: cars.length,
@@ -98,12 +136,16 @@ async function main() {
     },
     calculationCoverage: {
       incompleteCombustion,
-      electricWithPrice: electricWithPrice.length,
-      electricWithoutConfirmedBasis,
-      electricUnpricedWithoutMarker,
+      electricWithPrice,
+      electricWithoutPrice,
     },
     staleBeyondDays: { days: freshnessDays, count: stale },
     missingSourceLink,
+    publicationContract: {
+      checked: gateChecked,
+      withSnapshot: snapshotCarIds.size,
+      failures: Object.fromEntries(gateFailures),
+    },
   };
 
   console.log(JSON.stringify(report, null, 2));
@@ -130,15 +172,12 @@ async function main() {
   if (incompleteCombustion) {
     blockers.push(`${incompleteCombustion} combustion cars have an incomplete calculation`);
   }
-  if (electricWithoutConfirmedBasis) {
-    blockers.push(
-      `${electricWithoutConfirmedBasis} electric cars expose a landed price without a confirmed electric tariff basis`,
-    );
+  if (electricWithoutPrice) {
+    console.warn(`Warning: ${electricWithoutPrice} electric cars show no landed price yet`);
   }
-  if (electricUnpricedWithoutMarker) {
-    blockers.push(
-      `${electricUnpricedWithoutMarker} electric cars without a price are missing the pending calculation marker`,
-    );
+  if (gateFailures.size) {
+    const detail = [...gateFailures.entries()].map(([reason, count]) => `${reason}=${count}`).join(", ");
+    blockers.push(`publication contract is violated (${detail})`);
   }
 
   if (blockers.length) {

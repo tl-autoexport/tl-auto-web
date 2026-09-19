@@ -32,7 +32,7 @@ async function main() {
   try {
     const { rows } = await db.query<Row>(`
       select id, source_id, brand, model, year, price_rub,
-             vehicle_specs->>'calculation_status' as status
+             legacy_calculation_status as status
       from public.cars
       where is_available = true and fuel_type = 'electric' and price_rub is not null
       order by source_id`);
@@ -46,10 +46,9 @@ async function main() {
       try {
         const result = await db.query(
           `update public.cars
-              set vehicle_specs = coalesce(vehicle_specs, '{}'::jsonb) || jsonb_build_object('calculation_status', $1),
-                  updated_at = now()
+              set legacy_calculation_status = $1, updated_at = now()
             where is_available = true and fuel_type = 'electric' and price_rub is not null
-              and coalesce(vehicle_specs->>'calculation_status', '') <> $1`,
+              and coalesce(legacy_calculation_status, '') <> $1`,
           [CALCULATED],
         );
         written = result.rowCount ?? 0;

@@ -24,7 +24,7 @@ async function main() {
     const rateSnapshot = await getCbrCalcRates();
     const { rows } = await client.query<{
       id: string; price_krw: number; price_rub: number; year: number; engine_cc: number; power_hp: number; fuel_type: string | null;
-    }>(`select id,price_krw,price_rub,year,engine_cc,power_hp,fuel_type from public.cars where is_available=true and primary_source='chestny_prigon' and vehicle_specs->>'calculation_status'='calculated_from_local_enriched_staging'`);
+    }>(`select id,price_krw,price_rub,year,engine_cc,power_hp,fuel_type from public.cars where is_available=true and primary_source='chestny_prigon' and legacy_calculation_status='calculated_from_local_enriched_staging'`);
     const prepared = rows.map((car) => ({
       car,
       calc: calculateRuVladivostok({

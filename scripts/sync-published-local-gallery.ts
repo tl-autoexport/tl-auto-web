@@ -5,7 +5,7 @@ const target = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.S
 const source = createClient(process.env.CHESTNY_SUPABASE_URL!, process.env.CHESTNY_SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
 const write = process.env.CHESTNY_LOCAL_GALLERY_WRITE === "true";
 async function main() {
-  const { data: cars, error } = await target.from("cars").select("id,source_id").eq("primary_source", "chestny_prigon").eq("is_available", true).eq("vehicle_specs->>calculation_status", "calculated_from_local_enriched_staging");
+  const { data: cars, error } = await target.from("cars").select("id,source_id").eq("primary_source", "chestny_prigon").eq("is_available", true).eq("legacy_calculation_status", "calculated_from_local_enriched_staging");
   if (error) throw error;
   const bySource = new Map((cars ?? []).map((car) => [car.source_id, car.id])); const media: Array<Record<string, unknown>> = [];
   for (let i = 0; i < bySource.size; i += 200) {

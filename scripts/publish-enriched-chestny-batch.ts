@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
 import { canonicalCandidates, canonicalInput } from "../src/server/power-resolution/canonical";
+import { evaluatePublication } from "../src/server/cars/calculation-contract";
 import { tierFromStored, type EvidenceTier } from "../src/server/power-resolution/evidence-tiers";
 import { decidePublication } from "../src/server/power-resolution/publication-gate";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
@@ -91,6 +92,9 @@ type PreparedItem = {
   tier: EvidenceTier;
   confidence: string;
   specId: string;
+  specVersion: number;
+  specPowerBasis: string;
+  calculationPowerKw: number | null;
   evidenceId: string;
   specKey: string;
   specificationTitle: string | null;
@@ -248,6 +252,7 @@ async function main() {
       const hp = decision.hp;
       const drive = input.driveType;
       const tier = decision.tier;
+      const calculationPowerKw = kwBySpecId.get(decision.specId) ?? null;
 
       const calc = calculateRuVladivostok({
         priceKrw: row.price_krw as number,
@@ -264,11 +269,32 @@ async function main() {
         rateDetails: rateSnapshot.rateDetails,
       });
 
+      // Final contract check with the real price: the publisher must not create a
+      // card the catalogue audit would reject.
+      const contractVerdict = evaluatePublication({
+        priceRub: Math.round(calc.totalRub),
+        hasSnapshot: true,
+        calculationPowerStatus: "approved",
+        calculationPowerKw,
+        powerBasis: ref.power_basis,
+        powerResolutionSource: `tl_auto_approved_reference:${tier}`,
+        calculationMonth: month,
+        fuelType: input.fuelType,
+        hybridDvsPowerHp: null,
+        legacyCalculationStatus: null,
+      });
+      if (!contractVerdict.ok) {
+        exclude(row.source_listing_id, `contract_${contractVerdict.blockers[0]}`);
+        continue;
+      }
+
       const item: PreparedItem = {
         row, hp, month, images, drive, fuel: input.fuelType, tier,
         confidence: decision.confidence,
         driveState: decision.driveState,
-        specId: decision.specId, evidenceId: ref.evidence_id, specKey: ref.spec_key,
+        specId: decision.specId, specVersion: ref.spec_version, specPowerBasis: ref.power_basis,
+        calculationPowerKw,
+        evidenceId: ref.evidence_id, specKey: ref.spec_key,
         specificationTitle: ref.source_title,
         calc, priceRub: Math.round(calc.totalRub),
       };
@@ -284,12 +310,6 @@ async function main() {
           const { row, hp, drive, month, tier, confidence, specId, evidenceId, specKey, specificationTitle } = item;
           const metadata = {
             source: "chestny_prigon",
-            // An electric card must publish with the marker the catalogue audit
-            // and the card UI expect, otherwise the stale import-time
-            // "pending" status survives and the audit blocks the build.
-            calculation_status: item.fuel === "electric"
-              ? "calculated_external_ev_tariff"
-              : "calculated_from_confirmed_local_evidence",
             power_resolution: "approved_evidence_confirmation",
             power_spec_key: specKey,
             power_spec_id: specId,
@@ -303,20 +323,27 @@ async function main() {
           const result = await client.query<{ id: string }>(`
             insert into public.cars(primary_source,source_kind,source_id,source_url,enrichment_status,is_available,sale_status,published_at,source_updated_at,last_seen_at,
               brand,model,year,registration_year,registration_date,registration_month,mileage_km,price_krw,price_rub,engine_cc,power_hp,power_source,power_confidence,power_resolution_note,
-              fuel_type,transmission,drive_type,color,body_type,seller_region,vin_masked,vehicle_specs)
+              fuel_type,transmission,drive_type,color,body_type,seller_region,vin_masked,vehicle_specs,
+              calculation_power_status,calculation_power_spec_id,calculation_power_spec_version,calculation_power_kw,power_basis,power_resolution_source,calculation_month,calculation_month_source)
             values ('chestny_prigon','chestny_prigon',$1,$2,'source_only',true,null,now(),now(),now(),
-              $3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,'tl_auto_approved_reference',$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
+              $3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,'tl_auto_approved_reference',$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,
+              'approved',$23,$24,$25,$26,$27,$7,'registration_date')
             on conflict(primary_source,source_id) do update set source_url=excluded.source_url,enrichment_status=excluded.enrichment_status,is_available=true,sale_status=null,published_at=coalesce(cars.published_at,now()),
               source_updated_at=excluded.source_updated_at,last_seen_at=excluded.last_seen_at,brand=excluded.brand,model=excluded.model,year=excluded.year,registration_year=excluded.registration_year,
               registration_date=excluded.registration_date,registration_month=excluded.registration_month,mileage_km=excluded.mileage_km,price_krw=excluded.price_krw,price_rub=excluded.price_rub,engine_cc=excluded.engine_cc,power_hp=excluded.power_hp,
               power_source=excluded.power_source,power_confidence=excluded.power_confidence,power_resolution_note=excluded.power_resolution_note,fuel_type=excluded.fuel_type,transmission=excluded.transmission,
-              drive_type=excluded.drive_type,color=excluded.color,body_type=excluded.body_type,seller_region=excluded.seller_region,vin_masked=excluded.vin_masked,vehicle_specs=excluded.vehicle_specs,updated_at=now()
+              drive_type=excluded.drive_type,color=excluded.color,body_type=excluded.body_type,seller_region=excluded.seller_region,vin_masked=excluded.vin_masked,vehicle_specs=excluded.vehicle_specs,
+              calculation_power_status=excluded.calculation_power_status,calculation_power_spec_id=excluded.calculation_power_spec_id,calculation_power_spec_version=excluded.calculation_power_spec_version,
+              calculation_power_kw=excluded.calculation_power_kw,power_basis=excluded.power_basis,power_resolution_source=excluded.power_resolution_source,
+              calculation_month=excluded.calculation_month,calculation_month_source=excluded.calculation_month_source,updated_at=now()
             returning id
           `, [row.source_listing_id, row.source_url, row.manufacturer, displayModel(row.model), row.model_year,
             row.first_registration_date, month, row.mileage_km, row.price_krw, item.priceRub, row.engine_cc, hp,
             confidence, `Подтверждено локальным справочником TL Auto: ${specKey}; tier=${tier}.`,
             item.fuel, row.transmission, drive, row.exterior_color, row.body_type, row.location, row.vin_masked,
-            JSON.stringify(metadata)]);
+            JSON.stringify(metadata),
+            specId, item.specVersion, item.calculationPowerKw, item.specPowerBasis,
+            `tl_auto_approved_reference:${tier}`]);
           carIds.push({ id: result.rows[0].id, item });
         }
 

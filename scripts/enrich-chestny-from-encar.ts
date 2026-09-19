@@ -109,7 +109,7 @@ async function main() {
   const cars: Car[] = [];
   for (let from = 0; from < limit; from += 1000) {
     let query = db.from("cars").select("id,source_id,source_url,brand,model,fuel_type,drive_type,color,vehicle_specs").eq("primary_source", "chestny_prigon").eq("is_available", true).order("source_id").range(from, Math.min(from + 999, limit - 1));
-    if (enrichedBatchOnly) query = query.eq("vehicle_specs->>calculation_status", "calculated_from_local_enriched_staging");
+    if (enrichedBatchOnly) query = query.eq("legacy_calculation_status", "calculated_from_local_enriched_staging");
     if (requestedIds.length) query = query.in("source_id", requestedIds);
     const { data, error } = await query; if (error) throw error;
     cars.push(...((data ?? []) as Car[])); if (!data || data.length < 1000 || requestedIds.length) break;
