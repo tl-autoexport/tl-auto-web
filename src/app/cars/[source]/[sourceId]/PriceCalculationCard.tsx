@@ -367,24 +367,7 @@ function RuPriceCalculationCard({
         </div>
       </aside>
 
-      <div className="mt-3 flex items-center gap-2 border-t border-[#dce2eb] bg-white px-3 pt-2 shadow-[0_-4px_16px_rgba(16,24,39,0.08)] sm:hidden" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
-        <a
-          className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white shadow-sm transition-colors active:bg-[#3f9855]"
-          href="tel:+821076260741"
-        >
-          <Phone size={21} />
-          Позвонить
-        </a>
-        <a
-          aria-label="Написать в WhatsApp"
-          className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-[#4caf64] text-white shadow-sm transition-colors active:bg-[#3f9855]"
-          href={leadWhatsAppUrl}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <MessageCircle size={24} />
-        </a>
-      </div>
+      <MobileCallBar />
 
       {isModalOpen && createPortal(
         <div
@@ -519,7 +502,6 @@ function KzPriceCalculationCard(props: PriceCalculationCardProps) {
   const [calculation, setCalculation] = useState<KzLiveCalculation | null>(null);
   const [message, setMessage] = useState("Получаем актуальный расчёт…");
   const [isLoading, setLoading] = useState(true);
-  const leadWhatsAppUrl = whatsappContactUrl(vehicleClientMessage({ source: props.source, sourceId: props.sourceId, title: props.title }));
 
   const loadCalculation = useCallback(async () => {
     if (!props.priceKrw || !props.year || !props.engineCc || !props.powerHp) {
@@ -595,23 +577,22 @@ function KzPriceCalculationCard(props: PriceCalculationCardProps) {
         <button className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded bg-[#111827] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isLoading} onClick={() => void loadCalculation()} type="button"><RefreshCw className={isLoading ? "animate-spin" : ""} size={16} />{isLoading ? "Обновляем" : "Обновить расчёт"}</button>
         <p className="mt-4 text-xs leading-5 text-[#647084]">{calculation?.disclaimer ?? "Числовой итог появится после подтверждения коммерческих тарифов TL Auto."}</p>
       </aside>
-      <MobileContactBar leadWhatsAppUrl={leadWhatsAppUrl} />
+      <MobileCallBar />
     </>
   );
 }
 
 function PendingDestinationCard(props: PriceCalculationCardProps) {
   const { country, city } = useDestination();
-  const leadWhatsAppUrl = whatsappContactUrl(vehicleClientMessage({ source: props.source, sourceId: props.sourceId, title: props.title }));
-  return <><aside className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]"><div className="flex items-center gap-2 text-sm font-semibold text-[#956f2c]"><BadgeCheck size={18} />Источник Encar</div><h1 className="mt-3 text-2xl font-semibold text-[#121722]">{props.title}</h1><div className="mt-4 flex gap-2"><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{country.countryLabel}</span><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{city.label}</span></div><p className="mt-5 text-2xl font-semibold">Расчёт уточняется</p><p className="mt-2 text-sm leading-6 text-[#647084]">Тарифы доставки и оформления для выбранного направления ещё не подтверждены.</p></aside><MobileContactBar leadWhatsAppUrl={leadWhatsAppUrl} /></>;
+  return <><aside className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]"><div className="flex items-center gap-2 text-sm font-semibold text-[#956f2c]"><BadgeCheck size={18} />Источник Encar</div><h1 className="mt-3 text-2xl font-semibold text-[#121722]">{props.title}</h1><div className="mt-4 flex gap-2"><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{country.countryLabel}</span><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{city.label}</span></div><p className="mt-5 text-2xl font-semibold">Расчёт уточняется</p><p className="mt-2 text-sm leading-6 text-[#647084]">Тарифы доставки и оформления для выбранного направления ещё не подтверждены.</p></aside><MobileCallBar /></>;
+}
+
+function MobileCallBar() {
+  return <div className="fixed inset-x-0 bottom-0 z-[60] flex items-center border-t border-[#dce2eb] bg-white/95 px-3 pt-2 pr-[4.75rem] shadow-[0_-8px_24px_rgba(16,24,39,0.12)] backdrop-blur sm:hidden" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}><a className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white shadow-sm transition-colors active:bg-[#3f9855]" href="tel:+821076260741"><Phone size={21} />Позвонить</a></div>;
 }
 
 function KzRow({ label, value }: { label: string; value: number }) {
   return <div className="flex justify-between gap-4 border-b border-dashed border-[#cbd3df] pb-3"><span className="text-[#647084]">{label}</span><strong className="whitespace-nowrap tabular-nums">{tenge(value)}</strong></div>;
-}
-
-function MobileContactBar({ leadWhatsAppUrl }: { leadWhatsAppUrl: string }) {
-  return <div className="mt-3 flex items-center gap-2 border-t border-[#dce2eb] bg-white px-3 pt-2 shadow-[0_-4px_16px_rgba(16,24,39,0.08)] sm:hidden" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}><a className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white" href="tel:+821076260741"><Phone size={21} />Позвонить</a><a aria-label="Написать в WhatsApp" className="flex size-14 items-center justify-center rounded-xl bg-[#4caf64] text-white" href={leadWhatsAppUrl} rel="noopener noreferrer" target="_blank"><MessageCircle size={24} /></a></div>;
 }
 
 function resultObject(result: unknown, key: string): Record<string, unknown> | null {
