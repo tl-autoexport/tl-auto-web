@@ -10,12 +10,22 @@ const runId = process.env.ENCAR_SUCCESS_RUN_ID ?? "98b17628-1dab-460d-972b-f7f09
 const input = process.env.AUTOHOME_BEST_FIT_INPUT ?? "/tmp/tl-auto-autohome-ice-best-fit-years-badge3.json";
 const sourceBase = "https://www.autohome.com.cn/web-main/car/series/getspeclistresponse";
 
+type KeyFields = {
+  manufacturer?: string | null; model?: string | null; generation?: string | null; trim?: string | null;
+  model_year?: number | null; engine_cc?: number | null; fuel_type?: string | null; drive_type?: string | null;
+};
+type StagingRow = KeyFields & { source_listing_id: string };
+type CandidateSpec = { powerHp?: number | string | null; year?: number | null; specId?: string | null; name?: string | null; drive?: string | null };
+type Candidate = KeyFields & {
+  seriesId?: string | number | null; selectedPowerHp?: number | string | null; decision?: string; candidates?: CandidateSpec[];
+};
+
 function equalField(field: string, value: unknown) { return value == null ? `${field} is null` : `${field} = $VALUE`; }
-function key(row: any) { return [row.manufacturer,row.model,row.generation,row.trim,row.model_year,row.engine_cc,row.fuel_type,row.drive_type].map((x) => x ?? "<null>").join("|"); }
+function key(row: KeyFields) { return [row.manufacturer,row.model,row.generation,row.trim,row.model_year,row.engine_cc,row.fuel_type,row.drive_type].map((x) => x ?? "<null>").join("|"); }
 
 async function main() {
   const report = JSON.parse(await readFile(input, "utf8"));
-  const accepted = report.accepted as any[];
+  const accepted = report.accepted as Candidate[];
   const sourceSha = createHash("sha256").update(JSON.stringify(report)).digest("hex");
   const db = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await db.connect();
@@ -28,7 +38,7 @@ try {
   const batchId = batchResult.rows[0]?.id;
   if (!batchId) throw new Error("AutoHome source batch was not created");
 
-  const cards = await db.query<any>(`select s.source_listing_id,s.manufacturer,s.model,s.generation,s.trim,s.model_year,s.engine_cc,s.fuel_type,s.drive_type
+  const cards = await db.query<StagingRow>(`select s.source_listing_id,s.manufacturer,s.model,s.generation,s.trim,s.model_year,s.engine_cc,s.fuel_type,s.drive_type
     from public.chestny_catalog_staging s join public.catalog_enrichment_queue q on q.source_listing_id=s.source_listing_id
       and q.run_id=$1 and q.status='succeeded'
     where s.source_status='active' and s.promotion_status='auto_candidate' and s.fuel_type in ('가솔린','디젤')`, [runId]);
@@ -40,7 +50,7 @@ try {
     if (!candidate) continue;
     const selected = Number(candidate.selectedPowerHp);
     if (!Number.isFinite(selected) || selected <= 0) continue;
-    const spec = candidate.candidates?.find((x: any) => Number(x.powerHp) === selected) ?? candidate.candidates?.[0];
+    const spec = candidate.candidates?.find((x: CandidateSpec) => Number(x.powerHp) === selected) ?? candidate.candidates?.[0];
     const year = candidate.model_year ?? spec?.year ?? new Date().getUTCFullYear();
     const sourceUri = `${sourceBase}?seriesid=${candidate.seriesId}&tagid=${year}&tagname=${encodeURIComponent(`${year}款`)}&cityid=110100`;
     const record = { source: "AutoHome", source_uri: sourceUri, series_id: candidate.seriesId, spec_id: spec?.specId ?? null, source_year: year, power_hp: selected, decision: candidate.decision, source_spec_name: spec?.name ?? null, source_drive: spec?.drive ?? null, review_status: "draft", recorded_at: new Date().toISOString() };

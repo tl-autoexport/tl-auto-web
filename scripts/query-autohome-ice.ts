@@ -32,8 +32,19 @@ const SERIES: Record<string, number> = {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function flattenSpecs(payload: any) {
-  const out: any[] = [];
+// The AutoHome specification payload is external and untyped. The shapes below
+// describe only the fields this script reads, so no `any` is needed.
+type AutoHomeRawSpec = { name?: string; year?: number | string | null; mali?: number | string | null; drivemodename?: string | null; fueltypedetail?: string | null; transmission?: string | null; id?: number | string | null };
+type SpeclistGroup = { year?: number | string | null; name?: string | null; speclist?: AutoHomeRawSpec[] };
+type SpeclistYear = { yearspeclist?: SpeclistGroup[] };
+type YearListEntry = { yearname?: string; yearvalue?: number | string | null };
+type AutoHomePayload = { result?: { specinfo?: { speclist?: SpeclistYear[]; yearlist?: YearListEntry[] } } };
+type FlatSpec = { seriesYear: unknown; name: unknown; year: unknown; engineGroup: unknown; powerHp: unknown; drive: unknown; fuel: unknown; transmission: unknown; specId: unknown };
+type RequestLog = { year: number; ok: boolean; count?: number; error?: string; elapsedMs: number };
+type SeriesResult = { key: string; seriesId: number; groups: Group[]; specs: FlatSpec[]; requests: RequestLog[]; ok: boolean };
+
+function flattenSpecs(payload: AutoHomePayload) {
+  const out: FlatSpec[] = [];
   for (const year of payload?.result?.specinfo?.speclist ?? []) {
     for (const group of year?.yearspeclist ?? []) {
       for (const spec of group?.speclist ?? []) {
@@ -81,7 +92,7 @@ async function main() {
     }
   }
 
-  const results: any[] = [];
+  const results: SeriesResult[] = [];
   for (const [key, item] of series) {
     const candidateYears = [...new Set(item.groups.map((g) => g.model_year).filter((y): y is number => Number.isFinite(y)))];
     const availableYears = new Set<number>();
@@ -94,8 +105,8 @@ async function main() {
       }
     } catch { /* individual series is handled by the year requests below */ }
     const years = [...new Set([...candidateYears, ...availableYears].filter((y) => y >= 2016 && y <= 2026))].sort();
-    const specs: any[] = [];
-    const requests: any[] = [];
+    const specs: FlatSpec[] = [];
+    const requests: RequestLog[] = [];
     for (const year of years) {
       const url = `https://www.autohome.com.cn/web-main/car/series/getspeclistresponse?seriesid=${item.seriesId}&tagid=${year}&tagname=${encodeURIComponent(`${year}款`)}&cityid=110100`;
       const started = Date.now();

@@ -28,10 +28,15 @@ function hasBadgeHint(trim: string | null) {
   return /(?:\b(?:gti|tdi|tfsi|td4|all4|xdrive|sdrive)\b|\b[a-z]{1,3}\s?\d{2,3}[a-z]*\b|\b[dp]\d{3}\b)/i.test(trim ?? "");
 }
 
-const rows: any[] = [];
+// The AutoHome payload is external and untyped; the fields below are always
+// populated for the series that reach this script, exactly as assumed before.
+type AutoHomeSpec = { year: number | string | null; name: string; engineGroup: string; drive: string | null; powerHp: number | string | null; specId: string | null };
+type MatchRow = { status: string; cards: number; [key: string]: unknown };
+
+const rows: MatchRow[] = [];
 for (const series of data.series) {
   for (const group of series.groups) {
-    const candidates = (series.specs as any[]).filter((spec) => {
+    const candidates = (series.specs as AutoHomeSpec[]).filter((spec) => {
       if (group.model_year && spec.year && Math.abs(Number(spec.year) - Number(group.model_year)) > 1) return false;
       if (group.engine_cc) {
         const cc = ccFrom(`${spec.engineGroup ?? ""} ${spec.name ?? ""}`);

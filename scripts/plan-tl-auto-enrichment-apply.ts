@@ -11,10 +11,15 @@ const db = createClient(url, key, { auth: { persistSession: false, autoRefreshTo
 type Queue = { source_listing_id: string; status: string; task: Record<string, boolean>; result: Record<string, unknown> | null };
 type Stage = { source_listing_id: string; status: string; raw_payload: Record<string, unknown> | null; normalized: Record<string, unknown> | null };
 type Car = { id: string; source_id: string; primary_source: string | null; is_available: boolean | null };
-async function page<T>(table: string, select: string, filter: (q: any) => any) {
+// Table names are dynamic here, so the filter is typed from the client itself
+// instead of the generated database types.
+type SelectedRows = ReturnType<ReturnType<typeof db.from>["select"]>;
+type RowFilter = (query: SelectedRows) => SelectedRows;
+
+async function page<T>(table: string, select: string, filter: RowFilter) {
   const out: T[] = [];
   for (let from = 0; ; from += 1000) {
-    let q = filter(db.from(table).select(select));
+    const q = filter(db.from(table).select(select));
     const { data, error } = await q.range(from, from + 999);
     if (error) throw new Error(error.message);
     out.push(...((data ?? []) as T[]));

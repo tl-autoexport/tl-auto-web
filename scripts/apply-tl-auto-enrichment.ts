@@ -21,7 +21,12 @@ const ready = (q: Queue, task: string) => {
   return obj(obj(q.result).probes)[probe] && obj(obj(q.result).probes)[probe] instanceof Object
     && obj(obj(obj(q.result).probes)[probe]).classification === "ready";
 };
-async function pages<T>(table: string, columns: string, filter: (query: any) => any) {
+// Table names are dynamic here, so the filter is typed from the client itself
+// instead of the generated database types.
+type SelectedRows = ReturnType<ReturnType<typeof db.from>["select"]>;
+type RowFilter = (query: SelectedRows) => SelectedRows;
+
+async function pages<T>(table: string, columns: string, filter: RowFilter) {
   const rows: T[] = [];
   for (let from = 0; ; from += 1000) {
     const { data, error } = await filter(db.from(table).select(columns)).range(from, from + 999);
