@@ -367,8 +367,6 @@ function RuPriceCalculationCard({
         </div>
       </aside>
 
-      <MobileCallBar />
-
       {isModalOpen && createPortal(
         <div
           ref={dialogRef}
@@ -577,39 +575,13 @@ function KzPriceCalculationCard(props: PriceCalculationCardProps) {
         <button className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded bg-[#111827] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isLoading} onClick={() => void loadCalculation()} type="button"><RefreshCw className={isLoading ? "animate-spin" : ""} size={16} />{isLoading ? "Обновляем" : "Обновить расчёт"}</button>
         <p className="mt-4 text-xs leading-5 text-[#647084]">{calculation?.disclaimer ?? "Числовой итог появится после подтверждения коммерческих тарифов TL Auto."}</p>
       </aside>
-      <MobileCallBar />
     </>
   );
 }
 
 function PendingDestinationCard(props: PriceCalculationCardProps) {
   const { country, city } = useDestination();
-  return <><aside className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]"><div className="flex items-center gap-2 text-sm font-semibold text-[#956f2c]"><BadgeCheck size={18} />Источник Encar</div><h1 className="mt-3 text-2xl font-semibold text-[#121722]">{props.title}</h1><div className="mt-4 flex gap-2"><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{country.countryLabel}</span><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{city.label}</span></div><p className="mt-5 text-2xl font-semibold">Расчёт уточняется</p><p className="mt-2 text-sm leading-6 text-[#647084]">Тарифы доставки и оформления для выбранного направления ещё не подтверждены.</p></aside><MobileCallBar /></>;
-}
-
-function MobileCallBar() {
-  return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-[max(12px,env(safe-area-inset-bottom))] z-[75] px-3 sm:hidden">
-      <div className="pointer-events-auto mx-auto flex max-w-md items-center gap-2 rounded-2xl border border-white/80 bg-white/95 p-1.5 shadow-[0_10px_30px_rgba(16,24,39,0.18)] backdrop-blur">
-        <a
-          className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white shadow-sm transition-colors active:bg-[#3f9855]"
-          href="tel:+821076260741"
-        >
-          <Phone size={21} />
-          Позвонить
-        </a>
-        <a
-          aria-label="Открыть MAX"
-          className="grid size-12 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,#5367f5,#8d37d8)] text-sm font-black tracking-[-0.08em] text-white shadow-sm transition-transform active:scale-95"
-          href={CLIENT_CONTACT.maxUrl}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          MAX
-        </a>
-      </div>
-    </div>
-  );
+  return <aside className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]"><div className="flex items-center gap-2 text-sm font-semibold text-[#956f2c]"><BadgeCheck size={18} />Источник Encar</div><h1 className="mt-3 text-2xl font-semibold text-[#121722]">{props.title}</h1><div className="mt-4 flex gap-2"><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{country.countryLabel}</span><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{city.label}</span></div><p className="mt-5 text-2xl font-semibold">Расчёт уточняется</p><p className="mt-2 text-sm leading-6 text-[#647084]">Тарифы доставки и оформления для выбранного направления ещё не подтверждены.</p></aside>;
 }
 
 function KzRow({ label, value }: { label: string; value: number }) {
