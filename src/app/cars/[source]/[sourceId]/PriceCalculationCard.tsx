@@ -588,7 +588,28 @@ function PendingDestinationCard(props: PriceCalculationCardProps) {
 }
 
 function MobileCallBar() {
-  return <div className="fixed inset-x-0 bottom-0 z-[60] flex items-center border-t border-[#dce2eb] bg-white/95 px-3 pt-2 pr-[4.75rem] shadow-[0_-8px_24px_rgba(16,24,39,0.12)] backdrop-blur sm:hidden" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}><a className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white shadow-sm transition-colors active:bg-[#3f9855]" href="tel:+821076260741"><Phone size={21} />Позвонить</a></div>;
+  return (
+    <div className="pointer-events-none fixed inset-x-0 bottom-[max(12px,env(safe-area-inset-bottom))] z-[75] px-3 sm:hidden">
+      <div className="pointer-events-auto mx-auto flex max-w-md items-center gap-2 rounded-2xl border border-white/80 bg-white/95 p-1.5 shadow-[0_10px_30px_rgba(16,24,39,0.18)] backdrop-blur">
+        <a
+          className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#4caf64] px-4 text-base font-semibold text-white shadow-sm transition-colors active:bg-[#3f9855]"
+          href="tel:+821076260741"
+        >
+          <Phone size={21} />
+          Позвонить
+        </a>
+        <a
+          aria-label="Открыть MAX"
+          className="grid size-12 shrink-0 place-items-center rounded-xl bg-[linear-gradient(135deg,#5367f5,#8d37d8)] text-sm font-black tracking-[-0.08em] text-white shadow-sm transition-transform active:scale-95"
+          href={CLIENT_CONTACT.maxUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          MAX
+        </a>
+      </div>
+    </div>
+  );
 }
 
 function KzRow({ label, value }: { label: string; value: number }) {

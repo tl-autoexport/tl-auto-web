@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { CLIENT_CONTACT, GENERAL_CLIENT_MESSAGE, telegramContactUrl, whatsappContactUrl } from "@/lib/contact";
 
 type Messenger = "telegram" | "max" | "whatsapp";
@@ -20,6 +21,7 @@ function MessengerIcon({ messenger }: { messenger: Messenger }) {
 }
 
 export function FloatingMessengerWidget() {
+  const pathname = usePathname();
   const [activeIndex, setActiveIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -44,6 +46,8 @@ export function FloatingMessengerWidget() {
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
+
+  if (pathname.startsWith("/cars/")) return null;
 
   return (
     <>
