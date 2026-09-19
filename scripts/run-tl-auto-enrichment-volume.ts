@@ -30,7 +30,8 @@ async function publishWave(fuel: string, since: string) {
 }
 
 async function main() {
-  let completed = await publishedCount();
+  const baseline = await publishedCount();
+  let completed = 0;
   let waveNumber = 0;
   while (completed < target) {
     const fuel = fuels[waveNumber % fuels.length];
@@ -41,10 +42,10 @@ async function main() {
     process.stdout.write(result.stdout);
     const published = await publishWave(fuel, since);
     completed += published;
-    console.log(JSON.stringify({ wave: waveNumber, fuel, published, completed, target }));
+    console.log(JSON.stringify({ wave: waveNumber, fuel, published, completed, baseline, catalogPublished: baseline + completed, target }));
     if (published === 0) throw new Error(`Wave ${waveNumber} produced no publishable candidates`);
   }
-  console.log(JSON.stringify({ status: "complete", completed, target, waves: waveNumber }));
+  console.log(JSON.stringify({ status: "complete", completed, baseline, catalogPublished: baseline + completed, target, waves: waveNumber }));
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : error); process.exit(1); });
