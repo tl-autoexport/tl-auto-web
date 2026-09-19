@@ -60,25 +60,6 @@ const socialLinks = [
   { label: "VK", href: null, kind: "vk" },
 ] as const;
 
-const CONTACT_PROMPT_SESSION_KEY = "tl-auto-contact-prompt-v1-shown";
-const CONTACT_PROMPT_DELAY_MS = 45_000;
-
-function contactPromptWasShown() {
-  try {
-    return window.sessionStorage.getItem(CONTACT_PROMPT_SESSION_KEY) === "true";
-  } catch {
-    return false;
-  }
-}
-
-function markContactPromptShown() {
-  try {
-    window.sessionStorage.setItem(CONTACT_PROMPT_SESSION_KEY, "true");
-  } catch {
-    // The contact flow must keep working when storage is unavailable.
-  }
-}
-
 function SocialIcon({ kind, size = 17 }: { kind: SocialKind; size?: number }) {
   const commonProps = {
     "aria-hidden": true,
@@ -153,37 +134,7 @@ export function SiteHeader() {
 
   const openContact = () => {
     setContactOpen(true);
-    markContactPromptShown();
   };
-
-  useEffect(() => {
-    if (pathname !== "/" || contactPromptWasShown() || window.matchMedia("(max-width: 767px)").matches) return;
-
-    let timer: number | undefined;
-    const startTimer = () => {
-      if (document.visibilityState !== "visible" || timer !== undefined) return;
-      timer = window.setTimeout(() => {
-        setContactOpen(true);
-        markContactPromptShown();
-      }, CONTACT_PROMPT_DELAY_MS);
-    };
-    const pauseTimer = () => {
-      if (timer === undefined) return;
-      window.clearTimeout(timer);
-      timer = undefined;
-    };
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "visible") startTimer();
-      else pauseTimer();
-    };
-
-    startTimer();
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => {
-      pauseTimer();
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-    };
-  }, [pathname]);
 
   useEffect(() => {
     if (!mobileOpen) return;
