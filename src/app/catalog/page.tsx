@@ -23,7 +23,6 @@ import {
   type StagingCatalogType,
 } from "@/server/cars/repository";
 import { translateFuel, translateTransmission } from "@/server/normalization/display";
-import { MobileCatalogFilters } from "./MobileCatalogFilters";
 import { LiveCatalogCount } from "./LiveCatalogCount";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import { PassoCatalogCard } from "@/components/catalog/PassoCatalogCard";
@@ -31,6 +30,7 @@ import { sourceDisplayName } from "@/lib/source-url";
 import { CatalogSearchBar } from "./CatalogSearchBar";
 import { CatalogInfiniteGrid } from "./CatalogInfiniteGrid";
 import { GenerationCascade } from "./GenerationCascade";
+import { MobileCatalogExperience } from "./MobileCatalogExperience";
 
 export const metadata: Metadata = {
   title: "Каталог автомобилей из Кореи",
@@ -141,7 +141,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     if (car.brand) counts[car.brand] = (counts[car.brand] ?? 0) + 1;
     return counts;
   }, {});
-  const activeCount = catalogActiveFilterCount(rawParams);
   const currentQuery = catalogQueryString(rawParams);
   const feedQuery = catalogFeedQueryString(rawParams);
   const [generationLabels, presetCounts] = await Promise.all([getGenerationLabelMap(), getQuickPresetCounts()]);
@@ -214,25 +213,15 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       <section id="filters" className="border-b border-[#dce2eb] bg-white">
         <div className="mx-auto max-w-7xl px-3 pb-5 sm:px-5 md:pb-8">
           <div className="rounded-2xl border border-[#dce2eb] bg-[#f7f8fa] p-3 shadow-[0_12px_32px_rgba(16,24,39,0.05)] sm:p-4 md:p-5">
-            <GenerationCascade
-              brand={filters.brand}
-              currentQuery={currentQuery}
-              generation={filters.generation}
-              model={filters.model}
-              totalCars={totalCars}
-            />
-
-            <div className="mt-3 md:hidden">
-              <MobileCatalogFilters
-                activeCount={activeCount}
+            <div className="md:hidden">
+              <MobileCatalogExperience
                 currentQuery={currentQuery}
-                sort={sort}
+                options={{ bodies, colors, fuels, transmissions, trims }}
                 sortOptions={Object.entries(sortLabels).map(([optionValue, label]) => ({ value: optionValue, label }))}
                 totalCars={totalCars}
-              >
-                <CatalogFilterForm {...filterFormProps} mobile />
-              </MobileCatalogFilters>
+              />
             </div>
+            <div className="hidden md:block"><GenerationCascade brand={filters.brand} currentQuery={currentQuery} generation={filters.generation} model={filters.model} totalCars={totalCars} /></div>
             <div className="mt-4 hidden border-t border-[#dce2eb] pt-4 md:block">
               <CatalogFilterForm {...filterFormProps} />
             </div>
@@ -512,46 +501,6 @@ function catalogFilterHref(
   }
   const query = params.toString();
   return `/catalog${query ? `?${query}` : ""}#catalog-results`;
-}
-
-function catalogActiveFilterCount(rawParams: Record<string, string | string[] | undefined>) {
-  const filterKeys = [
-    "search",
-    "brand",
-    "model",
-    "generation",
-    "fuel",
-    "transmission",
-    "engineMin",
-    "engineMax",
-    "yearMin",
-    "yearMax",
-    "priceMin",
-    "priceMax",
-    "mileageMax",
-    "mileageMin",
-    "powerMax",
-    "trim",
-    "body",
-    "color",
-    "month",
-    "ownersMin",
-    "ownersMax",
-    "insuranceMin",
-    "insuranceMax",
-    "noInsurance",
-    "source",
-    "number",
-    "under160",
-    "passable",
-    "eye",
-    "clean",
-    "shelf",
-  ];
-  return filterKeys.reduce((count, key) => {
-    const rawValue = rawParams[key];
-    return count + (typeof rawValue === "string" && rawValue ? 1 : 0);
-  }, 0);
 }
 
 function buildActiveFilterChips(rawParams: Record<string, string | string[] | undefined>, generationLabels: Record<string, string> = {}) {

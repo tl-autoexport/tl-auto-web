@@ -8,6 +8,7 @@ export async function GET(request: Request) {
   const filters: CatalogFilters = {
     search: params.get("search") || undefined,
     brand: params.get("brand") || undefined,
+    generation: params.get("generation") || undefined,
     model: params.get("model") || undefined,
     fuelType: params.get("fuel") || undefined,
     transmission: params.get("transmission") || undefined,
