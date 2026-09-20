@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Search, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 
 type Option = { value: string; label: string; cars: number };
 type Facets = { total: number; axes: Record<string, Option[]> };
@@ -106,6 +106,15 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     setCountQuery("");
   }
 
+  function resetAll() {
+    setDraft(new URLSearchParams());
+    setFacets(null);
+    setFacetsQuery("");
+    setCount(totalCars);
+    setCountQuery("");
+    router.replace("/catalog#catalog-results", { scroll: false });
+  }
+
   function choose(axis: "brand" | "model" | "generation", option: Option) {
     if (axis === "brand") { patch({ brand: option.value, model: null, generation: null }); setScreen("model"); }
     if (axis === "model") { patch({ model: selected("model") === option.value ? null : option.value, generation: null }); }
@@ -114,14 +123,15 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
 
   function changeSort(value: string) { patch({ sort: value }); apply(); }
   const chips = [selected("brand"), selected("model"), generationLabel(selected("generation"), currentFacets)].filter(Boolean);
+  const hasAppliedFilters = chips.length > 0 || activeParameters > 0;
 
   return <div className="md:hidden">
-    <div className="sticky top-[112px] z-30 -mx-3 bg-[#f5f6f8] px-3 py-2 shadow-[0_5px_14px_rgba(16,24,39,0.06)] sm:-mx-5 sm:px-5">
+    <div className="bg-[#f5f6f8] px-3 py-2 sm:px-5">
       <div className="grid grid-cols-2 gap-2">
         <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d7dee8] bg-white px-3 text-sm font-semibold" onClick={() => setScreen("parameters")} type="button"><SlidersHorizontal size={16} />Фильтры{activeParameters ? <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[10px]">{activeParameters}</span> : null}</button>
         <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d7dee8] bg-white px-3 text-sm font-semibold" onClick={() => setScreen("sort")} type="button">Сортировка<ChevronRight size={16} className="text-[#7a8798]" /></button>
       </div>
-      {chips.length ? <div className="scrollbar-none mt-2 flex gap-1.5 overflow-x-auto">{chips.map((chip) => <span className="shrink-0 rounded-full bg-[#101827] px-2.5 py-1 text-[11px] font-semibold text-white" key={chip}>{chip}</span>)}</div> : null}
+      {hasAppliedFilters ? <div className="scrollbar-none mt-2 flex items-center gap-1.5 overflow-x-auto">{chips.map((chip) => <span className="shrink-0 rounded-full bg-[#101827] px-2.5 py-1 text-[11px] font-semibold text-white" key={chip}>{chip}</span>)}<button className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#657287]" onClick={resetAll} type="button"><RotateCcw size={14} />Сбросить всё</button></div> : null}
     </div>
 
     {screen !== "home" ? <div aria-modal="true" className="fixed inset-x-0 top-0 z-[130] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#f4f6f9] pt-[env(safe-area-inset-top)]" role="dialog">
