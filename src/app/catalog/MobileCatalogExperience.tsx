@@ -116,7 +116,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   const chips = [selected("brand"), selected("model"), generationLabel(selected("generation"), currentFacets)].filter(Boolean);
 
   return <div className="md:hidden">
-    <div className="sticky top-[68px] z-30 -mx-3 bg-[#f5f6f8] px-3 py-2 shadow-[0_5px_14px_rgba(16,24,39,0.06)] sm:-mx-5 sm:px-5">
+    <div className="sticky top-[112px] z-30 -mx-3 bg-[#f5f6f8] px-3 py-2 shadow-[0_5px_14px_rgba(16,24,39,0.06)] sm:-mx-5 sm:px-5">
       <div className="grid grid-cols-2 gap-2">
         <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d7dee8] bg-white px-3 text-sm font-semibold" onClick={() => setScreen("parameters")} type="button"><SlidersHorizontal size={16} />Фильтры{activeParameters ? <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[10px]">{activeParameters}</span> : null}</button>
         <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d7dee8] bg-white px-3 text-sm font-semibold" onClick={() => setScreen("sort")} type="button">Сортировка<ChevronRight size={16} className="text-[#7a8798]" /></button>

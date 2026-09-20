@@ -176,12 +176,13 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
               <p className="hidden text-xs font-semibold text-[#956f2c] sm:text-sm md:block">Корея</p>
               <h1 className="mt-0 text-[25px] font-semibold leading-tight tracking-normal sm:mt-2 sm:text-4xl">Каталог автомобилей</h1>
               <p className="mt-1.5 max-w-2xl text-[12px] leading-4 text-[#647084] sm:mt-3 sm:text-sm sm:leading-6">Подбор по реальным данным источника с расчётом цены до Владивостока.</p>
+              <p className="mt-2 text-sm font-semibold text-[#273246] md:hidden">{totalCars.toLocaleString("ru-RU")} автомобилей</p>
             </div>
             <div className="hidden items-center gap-2 self-start rounded-full bg-[#fbf7ed] px-3 py-2 text-xs text-[#7b5a22] md:inline-flex md:gap-3 md:rounded-none md:border-l-2 md:border-[#c7a55a] md:bg-transparent md:pl-4 md:text-sm"><CarFront size={18} className="text-[#c7a55a] md:size-5" /><span><strong className="mr-1 text-base text-[#101827] md:block md:text-xl">{totalCars}</strong><span className="text-[#647084]">автомобилей найдено</span></span></div>
           </div>
 
           {popularBrands.length ? (
-            <div className="scrollbar-none mt-6 flex items-center gap-5 overflow-x-auto sm:mt-8 sm:flex-wrap sm:gap-x-7 sm:gap-y-3">
+            <div className="scrollbar-none mt-6 hidden items-center gap-5 overflow-x-auto sm:mt-8 md:flex md:flex-wrap md:gap-x-7 md:gap-y-3">
               {popularBrands.map((brand) => {
                 const selected = filters.brand === brand;
                 return (
@@ -222,6 +223,10 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       </section>
 
       <section id="catalog-results" className="mx-auto max-w-7xl scroll-mt-4 px-3 pb-12 pt-2 sm:px-5 md:pb-12 md:pt-7">
+        {popularBrands.length ? <div className="scrollbar-none sticky top-[68px] z-40 -mx-3 flex gap-4 overflow-x-auto border-y border-[#dce2eb] bg-white px-3 py-2.5 shadow-[0_5px_12px_rgba(15,31,49,0.06)] sm:-mx-5 sm:px-5 md:hidden">{popularBrands.map((brand) => {
+          const selected = filters.brand === brand;
+          return <Link aria-current={selected ? "page" : undefined} className={`inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold ${selected ? "text-[#956f2c]" : "text-[#273246]"}`} href={selected ? catalogFilterHref(rawParams, { brand: null, model: null, page: null }) : catalogFilterHref(rawParams, { brand, model: null, page: null })} key={brand} prefetch={false}>{brand}<span className="text-[#7a8798]">{brandCounts[brand] ?? 0}</span>{selected ? <span aria-hidden="true">×</span> : null}</Link>;
+        })}</div> : null}
         <div className="md:hidden">
           <MobileCatalogExperience
             currentQuery={currentQuery}
@@ -230,7 +235,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
             totalCars={totalCars}
           />
         </div>
-        <div className="scrollbar-none mb-3 flex gap-2 overflow-x-auto">
+        <div className="scrollbar-none mb-3 hidden gap-2 overflow-x-auto md:flex">
           {([
             { key: "under160", label: "До 160 л.с.", patch: { under160: "1", page: null }, count: presetCounts.under160 },
             { key: "electric", label: "Электромобили", patch: { fuel: "electric", page: null }, count: presetCounts.electric },
@@ -260,7 +265,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
             <Link className="inline-flex min-h-8 shrink-0 items-center gap-1.5 px-2 text-xs font-semibold text-[#647084]" href="/catalog"><RotateCcw size={14} /> Сбросить все</Link>
           </div>
         ) : null}
-        <div className="mb-5 flex flex-col gap-3 border-b border-[#dce2eb] pb-4 md:flex-row md:items-center md:justify-between">
+        <div className="mb-5 hidden flex-col gap-3 border-b border-[#dce2eb] pb-4 md:flex md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2 text-sm text-[#647084]"><SlidersHorizontal size={17} /><span>{shownCars.length ? `Найдено ${totalCars} автомобилей` : "Ничего не найдено"}</span></div>
           <p className="hidden items-center gap-2 text-sm font-medium text-[#3f4b5e] md:inline-flex"><ChevronDown size={16} /> {sortLabels[sort]}</p>
         </div>
