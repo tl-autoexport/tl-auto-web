@@ -122,6 +122,8 @@ export type CatalogFilters = {
   /** Free-text make/model search from the quick search control. */
   search?: string;
   brand?: string;
+  /** Canonical generation code from catalog_generation_dictionary. */
+  generation?: string;
   model?: string;
   fuelType?: string;
   transmission?: string;
@@ -217,6 +219,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     maxPowerHp,
     search,
     brand,
+    generation,
     model,
     fuelType,
     transmission,
@@ -256,6 +259,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   if (maxPowerHp) query = query.lte("power_hp", maxPowerHp);
   if (search) query = query.or(catalogSearchExpression(search));
   if (brand) query = query.eq("brand", brand);
+  if (generation) query = query.eq("generation_code", generation);
   if (model) {
     // Keep old shared links with a combined `model=Kia K7` value working.
     // A model selected in the advanced form remains an exact filter.
@@ -337,6 +341,7 @@ export async function getCatalogCardPage(
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
   if (filters.search) query = query.or(catalogSearchExpression(filters.search));
   if (filters.brand) query = query.eq("brand", filters.brand);
+  if (filters.generation) query = query.eq("generation_code", filters.generation);
   if (filters.model) query = !filters.brand && /\s/.test(filters.model)
     ? query.or(catalogSearchExpression(filters.model))
     : query.eq("model", filters.model);
@@ -446,6 +451,7 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
   if (filters.search) query = query.or(catalogSearchExpression(filters.search));
   if (filters.brand) query = query.eq("brand", filters.brand);
+  if (filters.generation) query = query.eq("generation_code", filters.generation);
   if (filters.model) {
     query = !filters.brand && /\s/.test(filters.model)
       ? query.or(catalogSearchExpression(filters.model))
