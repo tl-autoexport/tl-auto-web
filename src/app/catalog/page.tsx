@@ -16,8 +16,10 @@ import {
   getCatalogCardPage,
   getCatalogCount,
   getCatalogFacetCars,
+  getGenerationLabelMap,
   getPassoStagingCars,
   getPassoStagingCount,
+  getQuickPresetCounts,
   type CatalogFilters,
   type StagingCatalogType,
 } from "@/server/cars/repository";
@@ -144,7 +146,8 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const activeCount = catalogActiveFilterCount(rawParams);
   const currentQuery = catalogQueryString(rawParams);
   const feedQuery = catalogFeedQueryString(rawParams);
-  const activeChips = buildActiveFilterChips(rawParams);
+  const [generationLabels, presetCounts] = await Promise.all([getGenerationLabelMap(), getQuickPresetCounts()]);
+  const activeChips = buildActiveFilterChips(rawParams, generationLabels);
   const filterFormProps = {
     brands,
     modelsByBrand,
@@ -226,6 +229,25 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       </section>
 
       <section id="catalog-results" className="scroll-mt-4 px-3 pb-12 sm:px-0 md:pb-12">
+        <div className="scrollbar-none mb-3 flex gap-2 overflow-x-auto">
+          {([
+            { key: "under160", label: "До 160 л.с.", patch: { under160: "1", page: null }, count: presetCounts.under160 },
+            { key: "electric", label: "Электромобили", patch: { fuel: "electric", page: null }, count: presetCounts.electric },
+            { key: "fourWheelDrive", label: "4WD", patch: { drive: "4WD", page: null }, count: presetCounts.fourWheelDrive },
+            { key: "noAccident", label: "Без ДТП", patch: { clean: "1", page: null }, count: presetCounts.noAccident },
+            { key: "noInsurance", label: "Без страховых", patch: { noInsurance: "1", page: null }, count: presetCounts.noInsurance },
+          ] as const).map((preset) => (
+            <Link
+              className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-full border border-[#d7dee8] bg-white px-3 text-xs font-semibold text-[#273246] transition hover:border-[#a98239]"
+              href={catalogFilterHref(rawParams, preset.patch)}
+              key={preset.key}
+              prefetch={false}
+            >
+              {preset.label}
+              <span className="text-[#647084]">{preset.count ?? 0}</span>
+            </Link>
+          ))}
+        </div>
         {activeChips.length ? (
           <div className="scrollbar-none mb-4 flex gap-2 overflow-x-auto">
             {activeChips.map((chip) => (
@@ -527,15 +549,19 @@ function catalogActiveFilterCount(rawParams: Record<string, string | string[] | 
   }, 0);
 }
 
-function buildActiveFilterChips(rawParams: Record<string, string | string[] | undefined>) {
+function buildActiveFilterChips(rawParams: Record<string, string | string[] | undefined>, generationLabels: Record<string, string> = {}) {
   const value = (name: string) => typeof rawParams[name] === "string" ? rawParams[name] : "";
   const chips: Array<{ key: string; label: string; href: string }> = [];
   const add = (key: string, label: string, remove: Record<string, string | null> = { [key]: null, page: null }) => {
     chips.push({ key, label, href: catalogFilterHref(rawParams, remove) });
   };
 
-  if (value("brand")) add("brand", value("brand"), { brand: null, model: null, page: null });
+  if (value("brand")) add("brand", value("brand"), { brand: null, model: null, generation: null, page: null });
   if (value("model")) add("model", value("model"));
+  // The generation is shown in Russian from the approved dictionary; the URL
+  // keeps the stable code.
+  if (value("generation")) add("generation", generationLabels[value("generation")] ?? value("generation"));
+  if (value("drive")) add("drive", `Привод: ${value("drive")}`);
   if (value("search")) add("search", value("search"));
   if (value("fuel")) add("fuel", translateFuel(value("fuel")));
   if (value("transmission")) add("transmission", translateTransmission(value("transmission")));

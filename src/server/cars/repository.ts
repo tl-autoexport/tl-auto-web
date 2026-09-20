@@ -743,6 +743,71 @@ export async function getCatalogFacetCars(): Promise<CatalogFacetCar[]> {
   return getCachedCatalogFacetCars();
 }
 
+/**
+ * Approved generation labels by code, for rendering a selected generation in
+ * Russian instead of showing the raw code from the URL.
+ */
+async function fetchGenerationLabelMap(): Promise<Record<string, string>> {
+  const supabase = createSupabaseServerRead();
+  const { data, error } = await supabase
+    .from("catalog_generation_dictionary")
+    .select("code, label_ru")
+    .eq("status", "approved");
+  if (error) {
+    console.error("[cars] Generation label query failed", error);
+    return {};
+  }
+  const labels: Record<string, string> = {};
+  for (const row of (data ?? []) as Array<{ code: string | null; label_ru: string | null }>) {
+    if (row.code && row.label_ru) labels[row.code] = row.label_ru;
+  }
+  return labels;
+}
+
+const getCachedGenerationLabelMap = unstable_cache(
+  fetchGenerationLabelMap,
+  ["catalog-generation-labels-v1"],
+  { revalidate: 3600 },
+);
+
+export async function getGenerationLabelMap(): Promise<Record<string, string>> {
+  if (buildWithoutCatalog) return {};
+  return getCachedGenerationLabelMap();
+}
+
+/**
+ * Counters for the customer quick presets, taken from the same facet function
+ * the cascade uses, so a preset shows the number of cars it will actually list.
+ */
+async function fetchQuickPresetCounts(): Promise<Record<string, number>> {
+  const supabase = createSupabaseServerRead();
+  const { data, error } = await supabase.rpc("catalog_facets", { f: {} });
+  if (error) {
+    console.error("[cars] Preset facet query failed", error);
+    return {};
+  }
+  const rows = (data ?? []) as Array<{ axis: string; value: string; cars: number }>;
+  const pick = (axis: string, value: string) => rows.find((row) => row.axis === axis && row.value === value)?.cars ?? 0;
+  return {
+    under160: pick("power_band", "up_to_160"),
+    electric: pick("fuel", "electric"),
+    fourWheelDrive: pick("drive", "4WD"),
+    noAccident: pick("no_accident", "confirmed"),
+    noInsurance: pick("no_insurance", "confirmed"),
+  };
+}
+
+const getCachedQuickPresetCounts = unstable_cache(
+  fetchQuickPresetCounts,
+  ["catalog-quick-presets-v1"],
+  { revalidate: 300 },
+);
+
+export async function getQuickPresetCounts(): Promise<Record<string, number>> {
+  if (buildWithoutCatalog) return {};
+  return getCachedQuickPresetCounts();
+}
+
 export async function getSitemapCars(): Promise<SitemapCar[]> {
   if (buildWithoutCatalog) return [];
   const supabase = createSupabaseServerRead();
