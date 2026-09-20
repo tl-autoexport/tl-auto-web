@@ -221,8 +221,13 @@ function BrandModelPanel({ brand, brands, model, models, setBrand, setModel }: {
   const availableBrands = [...new Set([...popularBrands, ...brands])];
   const availableModels = models.filter((item) => !brand || item.brand === brand).map((item) => item.model).filter((item, index, values) => values.indexOf(item) === index);
   const [step, setStep] = useState<"brand" | "model">(brand ? "model" : "brand");
-  if (step === "brand") return <div className="space-y-3"><div className="flex items-center justify-between"><h3 className="text-sm font-semibold text-[#101827]">Марка</h3>{brand ? <button className="text-xs font-semibold text-[#956f2c]" onClick={() => { setBrand(""); setModel(""); }} type="button">Сбросить</button> : null}</div><div className="grid max-h-[calc(100vh-250px)] gap-1 overflow-y-auto rounded-xl border border-[#dce2eb] bg-white">{availableBrands.map((item) => <button className={`flex min-h-12 items-center justify-between border-b border-[#edf0f4] px-4 text-left text-base last:border-b-0 ${brand === item ? "bg-[#f5f0e4] font-semibold text-[#5c4317]" : "text-[#263247]"}`} key={item} onClick={() => { setBrand(item); setModel(""); setStep("model"); }} type="button">{item}<ChevronRight className="text-[#a4adba]" size={19} /></button>)}</div></div>;
-  return <div className="space-y-3"><button className="inline-flex items-center gap-1 text-sm font-semibold text-[#956f2c]" onClick={() => setStep("brand")} type="button"><ChevronRight className="rotate-180" size={17} /> Все марки</button><div className="flex items-center justify-between"><h3 className="text-sm font-semibold text-[#101827]">Модель {brand ? `· ${brand}` : ""}</h3>{model ? <button className="text-xs font-semibold text-[#956f2c]" onClick={() => setModel("")} type="button">Сбросить</button> : null}</div><div className="grid max-h-[calc(100vh-250px)] gap-1 overflow-y-auto rounded-xl border border-[#dce2eb] bg-white">{availableModels.length ? availableModels.map((item) => <button className={`flex min-h-12 items-center justify-between border-b border-[#edf0f4] px-4 text-left text-base last:border-b-0 ${model === item ? "bg-[#f5f0e4] font-semibold text-[#5c4317]" : "text-[#263247]"}`} key={item} onClick={() => setModel(model === item ? "" : item)} type="button">{item}{model === item ? <Check size={18} /> : <ChevronRight className="text-[#a4adba]" size={19} />}</button>) : <p className="p-4 text-sm text-[#68758a]">Для этой марки нет доступных моделей.</p>}</div></div>;
+  useEffect(() => {
+    const onPopState = () => setStep("brand");
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+  if (step === "brand") return <div className="space-y-3"><h3 className="text-sm font-semibold text-[#101827]">Марка</h3><div className="grid max-h-[calc(100vh-210px)] gap-1 overflow-y-auto rounded-xl border border-[#dce2eb] bg-white">{availableBrands.map((item) => <button className={`flex min-h-12 items-center gap-3 border-b border-[#edf0f4] px-4 text-left text-base last:border-b-0 ${brand === item ? "bg-[#f5f0e4] font-semibold text-[#5c4317]" : "text-[#263247]"}`} key={item} onClick={() => { setBrand(item); setModel(""); window.history.pushState({ filterStep: "model" }, ""); setStep("model"); }} type="button"><span className="min-w-0 flex-1">{item}</span><span aria-hidden="true" className={`grid size-6 place-items-center rounded-md border ${brand === item ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}><Check size={16} /></span></button>)}</div></div>;
+  return <div className="space-y-3"><h3 className="text-sm font-semibold text-[#101827]">Модель · {brand}</h3><div className="grid max-h-[calc(100vh-210px)] gap-1 overflow-y-auto rounded-xl border border-[#dce2eb] bg-white">{availableModels.length ? availableModels.map((item) => <button className={`flex min-h-12 items-center justify-between border-b border-[#edf0f4] px-4 text-left text-base last:border-b-0 ${model === item ? "bg-[#f5f0e4] font-semibold text-[#5c4317]" : "text-[#263247]"}`} key={item} onClick={() => setModel(model === item ? "" : item)} type="button"><span>{item}</span>{model === item ? <Check size={18} /> : <ChevronRight className="text-[#a4adba]" size={19} />}</button>) : <p className="p-4 text-sm text-[#68758a]">Для этой марки нет доступных моделей.</p>}</div></div>;
 }
 
 function RegionPanel({ countryCode, cityId, onSelect }: { countryCode: CountryCode; cityId: string; onSelect: (countryCode: CountryCode, cityId?: string) => void }) {
@@ -251,14 +256,14 @@ function WheelField({ label, value, options, onChange }: { label: string; value:
 }
 
 function WheelSelect({ value, options, placeholder, onChange }: { value: string; options: string[]; placeholder: string; onChange: (value: string) => void }) {
-  return <select className="h-12 w-full appearance-none rounded-xl border border-[#d7dee8] bg-white px-3 text-[15px] text-[#273246]" onChange={(event) => onChange(event.target.value)} value={value}><option value="">{placeholder}</option>{options.map((option) => <option key={option} value={option}>{option}</option>)}</select>;
+  return <select className="h-12 w-full appearance-none rounded-xl border border-[#d7dee8] bg-white px-3 text-[15px] text-[#273246]" onChange={(event) => onChange(event.target.value)} value={value}><option value="">{placeholder}</option>{options.map((option) => <option key={option} value={option}>{option === "160" ? "160 л.с. — рекомендуем" : option}</option>)}</select>;
 }
 
 function numberOptions(kind: "price" | "year" | "mileage" | "power") {
   if (kind === "price") return Array.from({ length: 80 }, (_, index) => String((index + 1) * 250_000));
   if (kind === "year") return Array.from({ length: 37 }, (_, index) => String(new Date().getFullYear() - index));
   if (kind === "mileage") return Array.from({ length: 31 }, (_, index) => String(index * 10_000));
-  return Array.from({ length: 39 }, (_, index) => String(50 + index * 25));
+  return [...new Set(["160", ...Array.from({ length: 19 }, (_, index) => String(50 + index * 25))])].sort((a, b) => Number(a) - Number(b));
 }
 
 function SelectField({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: string[][] }) {
