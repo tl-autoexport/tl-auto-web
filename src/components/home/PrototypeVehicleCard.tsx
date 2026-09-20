@@ -150,9 +150,17 @@ export function PrototypeVehicleCard({ car, priorityImage = false }: { car: Vehi
       </div>
 
       <div className="pointer-events-none relative z-10 px-2.5 py-1.5 text-[11px] text-[#7a8798] sm:px-4 sm:py-3 sm:text-xs">
-        <span>{saleDays != null ? `В продаже ${saleDays} дней` : "Срок продажи уточняется"}</span>
+        <span>{saleDays != null ? `В продаже ${saleDays} ${pluralDays(saleDays)} в Корее` : "Срок продажи уточняется"}</span>
       </div>
       {shareNotice ? <span aria-live="polite" className="sr-only">{shareNotice}</span> : null}
     </article>
   );
+}
+
+function pluralDays(value: number) {
+  const remainder = value % 100;
+  if (remainder >= 11 && remainder <= 14) return "дней";
+  if (value % 10 === 1) return "день";
+  if (value % 10 >= 2 && value % 10 <= 4) return "дня";
+  return "дней";
 }
