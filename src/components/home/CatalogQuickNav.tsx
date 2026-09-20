@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { useDestination } from "@/components/site/DestinationProvider";
 import { VISIBLE_DESTINATIONS, type CountryCode } from "@/lib/destinations";
-import { MobileCatalogExperience } from "@/app/catalog/MobileCatalogExperience";
 
 type PanelName = "parameters" | "brandModel" | "region" | "transport" | "sort" | null;
 const sortOptions = [
@@ -57,7 +56,7 @@ function normalizeSearch(value: string) {
   return value.toLocaleLowerCase("ru-RU").replace(/ё/g, "е").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 }
 
-export function CatalogQuickNav({ brands = [], models = [], totalCars = 0 }: { brands?: string[]; models?: Array<{ brand: string; model: string }>; totalCars?: number }) {
+export function CatalogQuickNav({ brands = [], models = [] }: { brands?: string[]; models?: Array<{ brand: string; model: string }> }) {
   const [panel, setPanel] = useState<PanelName>(null);
   const [search, setSearch] = useState("");
   const [brand, setBrand] = useState("");
@@ -82,13 +81,20 @@ export function CatalogQuickNav({ brands = [], models = [], totalCars = 0 }: { b
     return query;
   }, [parameters]);
 
+  const activeQuery = useMemo(() => {
+    const query = new URLSearchParams(parameterQuery);
+    if (brand.trim()) query.set("brand", brand.trim());
+    if (model.trim()) query.set("model", model.trim());
+    return query;
+  }, [brand, model, parameterQuery]);
+
   useEffect(() => {
-    if (panel !== "parameters") return;
+    if (panel !== "parameters" && panel !== "brandModel") return;
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       setCountLoading(true);
       try {
-        const response = await fetch(`/api/catalog/count?${parameterQuery.toString()}`, { signal: controller.signal });
+        const response = await fetch(`/api/catalog/count?${activeQuery.toString()}`, { signal: controller.signal });
         if (response.ok) {
           const payload = await response.json() as { count?: number };
           setResultCount(typeof payload.count === "number" ? payload.count : null);
@@ -103,7 +109,7 @@ export function CatalogQuickNav({ brands = [], models = [], totalCars = 0 }: { b
       window.clearTimeout(timer);
       controller.abort();
     };
-  }, [panel, parameterQuery]);
+  }, [activeQuery, panel]);
 
   useEffect(() => {
     if (!panel) return;
@@ -143,6 +149,12 @@ export function CatalogQuickNav({ brands = [], models = [], totalCars = 0 }: { b
     setResultCount(null);
   };
 
+  const resetBrandModel = () => {
+    setBrand("");
+    setModel("");
+    setResultCount(null);
+  };
+
   const selectDestination = (countryCode: CountryCode, cityId?: string) => {
     setDestination(countryCode, cityId);
     if (cityId) setPanel(null);
@@ -158,19 +170,13 @@ export function CatalogQuickNav({ brands = [], models = [], totalCars = 0 }: { b
             <input aria-label="Поиск по модели или номеру лота" className="h-11 w-full rounded-2xl border border-[#d7dee8] bg-white py-2 pl-10 pr-4 text-base text-[#101827] outline-none transition placeholder:text-[#7a8798] focus:border-[#956f2c] focus:ring-2 focus:ring-[#c7a55a]/20 md:h-10 md:rounded-full md:text-sm" enterKeyHint="search" inputMode="search" onChange={(event) => setSearch(event.target.value)} placeholder="Поиск по марке или модели" value={search} />
             {suggestions.length ? <div className="absolute inset-x-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-[#dce2eb] bg-white shadow-[0_12px_30px_rgba(16,24,39,0.14)]">{suggestions.map((item) => <button className="block w-full px-4 py-2.5 text-left text-sm hover:bg-[#f7f8fa]" key={item.query} onClick={() => { setSearch(item.query); window.location.assign(`/catalog?search=${encodeURIComponent(item.query)}`); }} type="button">{item.label}</button>)}</div> : null}
           </form>
-          <div className="hidden scrollbar-none w-full min-w-0 items-center gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none] md:flex">
+          <div className="scrollbar-none flex w-full min-w-0 items-center gap-2 overflow-x-auto overscroll-x-contain pb-0.5 [scrollbar-width:none]">
             <QuickButton icon={SlidersHorizontal} label="Параметры" mobileLabel="Параметры" onClick={() => setPanel(panel === "parameters" ? null : "parameters")} open={panel === "parameters"} />
             <QuickButton label="Марка и модель" mobileLabel="Марка, модель" onClick={() => setPanel(panel === "brandModel" ? null : "brandModel")} open={panel === "brandModel"} />
             <QuickButton label={city.label} onClick={() => setPanel(panel === "region" ? null : "region")} open={panel === "region"} />
             <QuickButton label="Авто" onClick={() => setPanel(panel === "transport" ? null : "transport")} open={panel === "transport"} />
             <QuickButton icon={ListFilter} label="Сортировка" mobileLabel="Сортировка" onClick={() => setPanel(panel === "sort" ? null : "sort")} open={panel === "sort"} />
           </div>
-          <MobileCatalogExperience
-            currentQuery=""
-            options={{ bodies: ["Седан", "Хэтчбек", "Кроссовер", "Универсал", "Минивэн"], colors: [], fuels: ["gasoline", "diesel", "electric"], transmissions: ["automatic", "manual", "cvt", "dct"], trims: [] }}
-            sortOptions={sortOptions.map((option) => ({ ...option }))}
-            totalCars={totalCars}
-          />
         </div>
       </div>
 
@@ -179,10 +185,10 @@ export function CatalogQuickNav({ brands = [], models = [], totalCars = 0 }: { b
       {panel ? (
         <div className="fixed inset-0 z-[70] bg-[#101827]/25 p-0 sm:flex sm:items-start sm:justify-center sm:p-4 sm:pt-[132px]">
           <div className="flex h-full w-full flex-col overflow-hidden bg-white shadow-[0_18px_45px_rgba(16,24,39,0.18)] sm:h-auto sm:max-h-[calc(100vh-148px)] sm:w-[min(560px,calc(100vw-32px))] sm:rounded-3xl sm:border sm:border-[#dce2eb]">
-            <PanelHeader panel={panel} onClose={() => setPanel(null)} onReset={panel === "parameters" ? resetParameters : undefined} />
+            <PanelHeader panel={panel} onClose={() => setPanel(null)} onReset={panel === "parameters" ? resetParameters : panel === "brandModel" ? resetBrandModel : undefined} />
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-4 sm:px-5">
               {panel === "parameters" ? <ParametersPanel parameters={parameters} setParameters={setParameters} count={resultCount} loading={countLoading} /> : null}
-              {panel === "brandModel" ? <BrandModelPanel brand={brand} model={model} setBrand={setBrand} setModel={setModel} onSubmit={submitBrandModel} /> : null}
+              {panel === "brandModel" ? <BrandModelPanel brand={brand} brands={brands} count={resultCount} loading={countLoading} model={model} models={models} setBrand={setBrand} setModel={setModel} onSubmit={submitBrandModel} /> : null}
               {panel === "region" ? <RegionPanel countryCode={country.countryCode} cityId={city.id} onSelect={selectDestination} /> : null}
               {panel === "transport" ? <TransportPanel /> : null}
               {panel === "sort" ? <SortPanel /> : null}
@@ -209,8 +215,10 @@ function ParametersPanel({ parameters, setParameters, count, loading }: { parame
   return <div className="space-y-5"><div className="grid grid-cols-2 gap-3"><RangeInput label="Цена, ₽" min={parameters.priceMin} max={parameters.priceMax} onMin={(value) => update("priceMin", value)} onMax={(value) => update("priceMax", value)} /><RangeInput label="Год выпуска" min={parameters.yearMin} max={parameters.yearMax} onMin={(value) => update("yearMin", value)} onMax={(value) => update("yearMax", value)} /></div><Field label="Пробег до, км" value={parameters.mileageMax} onChange={(value) => update("mileageMax", value)} placeholder="Например, 80 000" /><Field label="Мощность до, л.с." value={parameters.powerMax} onChange={(value) => update("powerMax", value)} placeholder="Например, 160" /><div className="grid gap-3 sm:grid-cols-3"><SelectField label="Кузов" value={parameters.body} onChange={(value) => update("body", value)} options={[["", "Любой"], ["Седан", "Седан"], ["Хэтчбек", "Хэтчбек"], ["Кроссовер", "Кроссовер"], ["Универсал", "Универсал"], ["Минивэн", "Минивэн"]]} /><SelectField label="Топливо" value={parameters.fuel} onChange={(value) => update("fuel", value)} options={[["", "Любое"], ["gasoline", "Бензин"], ["diesel", "Дизель"], ["electric", "Электро"]]} /><SelectField label="КПП" value={parameters.transmission} onChange={(value) => update("transmission", value)} options={[["", "Любая"], ["automatic", "Автомат"], ["manual", "Механика"], ["cvt", "Вариатор"], ["dct", "Робот"]]} /></div><p className="text-xs text-[#68758a]">{loading ? "Обновляем количество предложений…" : count === null ? "Заполните параметры, чтобы увидеть количество предложений." : `${count.toLocaleString("ru-RU")} предложений`}</p></div>;
 }
 
-function BrandModelPanel({ brand, model, setBrand, setModel, onSubmit }: { brand: string; model: string; setBrand: (value: string) => void; setModel: (value: string) => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
-  return <form className="space-y-4" onSubmit={onSubmit}><Field label="Марка" value={brand} onChange={setBrand} placeholder="Например, Kia" /><div className="flex flex-wrap gap-2">{popularBrands.map((item) => <button className={`rounded-full border px-3 py-2 text-sm ${brand === item ? "border-[#111827] bg-[#111827] text-white" : "border-[#dce2eb] text-[#263247]"}`} key={item} onClick={() => setBrand(item)} type="button">{item}</button>)}</div><Field label="Модель" value={model} onChange={setModel} placeholder="Например, K7" /><button className="h-11 w-full rounded-xl bg-[#111827] text-sm font-semibold text-white" type="submit">Показать объявления</button></form>;
+function BrandModelPanel({ brand, brands, count, loading, model, models, setBrand, setModel, onSubmit }: { brand: string; brands: string[]; count: number | null; loading: boolean; model: string; models: Array<{ brand: string; model: string }>; setBrand: (value: string) => void; setModel: (value: string) => void; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
+  const availableBrands = [...new Set([...popularBrands, ...brands])];
+  const availableModels = models.filter((item) => !brand || item.brand === brand).map((item) => item.model).filter((item, index, values) => values.indexOf(item) === index);
+  return <form className="space-y-5" onSubmit={onSubmit}><section><div className="mb-2 flex items-center justify-between"><h3 className="text-sm font-semibold text-[#101827]">Марка</h3>{brand ? <button className="text-xs font-semibold text-[#956f2c]" onClick={() => { setBrand(""); setModel(""); }} type="button">Изменить</button> : null}</div><div className="grid max-h-56 gap-1 overflow-y-auto rounded-xl border border-[#dce2eb] bg-white">{availableBrands.map((item) => <button className={`flex min-h-11 items-center justify-between border-b border-[#edf0f4] px-3 text-left text-sm last:border-b-0 ${brand === item ? "bg-[#f5f0e4] font-semibold text-[#5c4317]" : "text-[#263247]"}`} key={item} onClick={() => { setBrand(item); setModel(""); }} type="button">{item}{brand === item ? <Check size={16} /> : <ChevronRight size={16} className="text-[#a4adba]" />}</button>)}</div></section><section><div className="mb-2 flex items-center justify-between"><h3 className="text-sm font-semibold text-[#101827]">Модель</h3>{model ? <button className="text-xs font-semibold text-[#956f2c]" onClick={() => setModel("")} type="button">Сбросить</button> : null}</div><div className={`grid max-h-64 gap-1 overflow-y-auto rounded-xl border border-[#dce2eb] bg-white ${!brand ? "opacity-50" : ""}`}>{availableModels.length ? availableModels.map((item) => <button className={`flex min-h-11 items-center justify-between border-b border-[#edf0f4] px-3 text-left text-sm last:border-b-0 ${model === item ? "bg-[#f5f0e4] font-semibold text-[#5c4317]" : "text-[#263247]"}`} disabled={!brand} key={item} onClick={() => setModel(model === item ? "" : item)} type="button">{item}{model === item ? <Check size={16} /> : <ChevronRight size={16} className="text-[#a4adba]" />}</button>) : <p className="p-3 text-sm text-[#68758a]">Сначала выберите марку.</p>}</div></section><p className="text-xs text-[#68758a]">{loading ? "Обновляем количество предложений…" : count === null ? "Выберите марку или модель." : `${count.toLocaleString("ru-RU")} предложений`}</p><button className="h-11 w-full rounded-xl bg-[#111827] text-sm font-semibold text-white disabled:opacity-50" disabled={!brand || loading} type="submit">{loading ? "Считаем предложения…" : `Показать ${count ?? ""} объявлений`}</button></form>;
 }
 
 function RegionPanel({ countryCode, cityId, onSelect }: { countryCode: CountryCode; cityId: string; onSelect: (countryCode: CountryCode, cityId?: string) => void }) {
