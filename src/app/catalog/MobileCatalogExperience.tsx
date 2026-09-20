@@ -22,19 +22,24 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   const [screen, setScreen] = useState<Screen>("home");
   const [draft, setDraft] = useState(() => cleanParams(currentQuery));
   const [facets, setFacets] = useState<Facets | null>(null);
+  const [facetsQuery, setFacetsQuery] = useState("");
   const [count, setCount] = useState(totalCars);
+  const [countQuery, setCountQuery] = useState(() => cleanParams(currentQuery).toString());
   const [loading, setLoading] = useState(false);
   const [find, setFind] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const query = useMemo(() => draft.toString(), [draft]);
+  const currentFacets = facetsQuery === query ? facets : null;
+  const hasCurrentCount = countQuery === query;
   const selected = (name: string) => draft.get(name) || "";
-  const selectedSummary = [selected("brand"), selected("model"), generationLabel(selected("generation"), facets)].filter(Boolean).join(", ");
+  const selectedSummary = [selected("brand"), selected("model"), generationLabel(selected("generation"), currentFacets)].filter(Boolean).join(", ");
   const activeParameters = PARAM_KEYS.filter((key) => draft.has(key)).length;
 
   useEffect(() => {
     if (screen === "home") return;
     const controller = new AbortController();
+    setLoading(true);
     const timer = window.setTimeout(async () => {
       setLoading(true);
       try {
@@ -43,8 +48,14 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
           fetch(`/api/catalog/facets${suffix}`, { signal: controller.signal }),
           fetch(`/api/catalog/count${suffix}`, { signal: controller.signal }),
         ]);
-        if (facetResponse.ok) setFacets(await facetResponse.json());
-        if (countResponse.ok) setCount((await countResponse.json()).count ?? 0);
+        if (facetResponse.ok) {
+          setFacets(await facetResponse.json());
+          setFacetsQuery(query);
+        }
+        if (countResponse.ok) {
+          setCount((await countResponse.json()).count ?? 0);
+          setCountQuery(query);
+        }
       } catch {
         // A cancelled request is expected while the customer changes a filter.
       } finally {
@@ -90,7 +101,9 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
       return next;
     });
     setFacets(null);
-    setCount(screen === "model" && retainedBrand ? facets?.axes.brand?.find((item) => item.value === retainedBrand)?.cars ?? totalCars : totalCars);
+    setFacetsQuery("");
+    setCount(screen === "model" && retainedBrand ? currentFacets?.axes.brand?.find((item) => item.value === retainedBrand)?.cars ?? totalCars : totalCars);
+    setCountQuery("");
   }
 
   function choose(axis: "brand" | "model" | "generation", option: Option) {
@@ -100,7 +113,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   }
 
   function changeSort(value: string) { patch({ sort: value }); apply(); }
-  const chips = [selected("brand"), selected("model"), generationLabel(selected("generation"), facets)].filter(Boolean);
+  const chips = [selected("brand"), selected("model"), generationLabel(selected("generation"), currentFacets)].filter(Boolean);
 
   return <div className="md:hidden">
     <div className="grid gap-2">
@@ -123,12 +136,12 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
         <button aria-label="Сбросить фильтры" className="min-w-11 px-1 text-xs font-semibold text-[#956f2c]" onClick={reset} type="button">Сбросить</button>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-28">
-        {(["brand", "model", "generation"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation"} facets={facets} find={find} inputRef={inputRef} loading={loading} onChoose={choose} onFind={setFind} selectedValue={selected(screen)} /> : null}
-        {screen === "parameters" ? <Parameters generationLabel={generationLabel(selected("generation"), facets)} onSelectLevel={setScreen} options={options} patch={patch} selected={selected} /> : null}
+        {(["brand", "model", "generation"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation"} facets={currentFacets} find={find} inputRef={inputRef} loading={loading} onChoose={choose} onFind={setFind} selectedValue={selected(screen)} /> : null}
+        {screen === "parameters" ? <Parameters generationLabel={generationLabel(selected("generation"), currentFacets)} onSelectLevel={setScreen} options={options} patch={patch} selected={selected} /> : null}
         {screen === "year" || screen === "price" ? <Range title={screen === "year" ? "Год выпуска" : "Цена до Владивостока, ₽"} minKey={screen === "year" ? "yearMin" : "priceMin"} maxKey={screen === "year" ? "yearMax" : "priceMax"} patch={patch} selected={selected} /> : null}
         {screen === "sort" ? <div className="overflow-hidden rounded-2xl bg-white">{sortOptions.map((option) => <button className={`flex min-h-14 w-full items-center justify-between border-b border-[#edf0f4] px-4 text-left text-sm ${selected("sort") === option.value ? "font-semibold text-[#956f2c]" : "text-[#273246]"}`} key={option.value} onClick={() => changeSort(option.value)} type="button">{option.label}<span>{selected("sort") === option.value ? "✓" : ""}</span></button>)}</div> : null}
       </div>
-      {screen !== "sort" ? <div className="border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading} onClick={apply} type="button">Показать {count} {pluralCars(count)}</button></div> : null}
+      {screen !== "sort" ? <div className="border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount} onClick={apply} type="button">{loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button></div> : null}
     </div> : null}
   </div>;
 }
