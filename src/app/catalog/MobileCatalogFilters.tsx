@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useRef, useState } from "react";
-import { ChevronDown, Filter, RotateCcw, X } from "lucide-react";
+import { ChevronDown, SlidersHorizontal, RotateCcw, X } from "lucide-react";
 import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
 
 type SortOption = {
@@ -45,30 +45,21 @@ export function MobileCatalogFilters({
 
   return (
     <>
-      <div className="grid grid-cols-[1fr_minmax(150px,1fr)] gap-2">
-        <button
-          className={`flex min-h-11 items-center justify-center gap-2 rounded-md border px-3 text-sm font-semibold ${
-            activeCount
-              ? "border-[#c7a55a] bg-[#fbf7ed] text-[#d71927]"
-              : "border-[#d7dee8] bg-white text-[#273246]"
-          }`}
-          onClick={() => setOpen(true)}
-          type="button"
-        >
-          <Filter size={17} />
-          Фильтры
-          {activeCount ? (
-            <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[11px] text-[#15130f]">
-              {activeCount}
-            </span>
-          ) : null}
-        </button>
+      <div className="grid gap-2">
+        <div className="grid grid-cols-[0.8fr_0.8fr_1.4fr] overflow-hidden rounded-xl border border-[#d7dee8] bg-white">
+          <button className="min-h-12 border-r border-[#e1e5eb] text-sm font-semibold text-[#273246]" onClick={() => setOpen(true)} type="button">Год</button>
+          <button className="min-h-12 border-r border-[#e1e5eb] text-sm font-semibold text-[#273246]" onClick={() => setOpen(true)} type="button">Цена</button>
+          <button className="flex min-h-12 items-center justify-center gap-2 text-sm font-semibold text-[#273246]" onClick={() => setOpen(true)} type="button">
+            <SlidersHorizontal size={17} /> Параметры
+            {activeCount ? <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[11px] text-[#15130f]">{activeCount}</span> : null}
+          </button>
+        </div>
 
-        <label className="relative">
+        <label className="relative ml-auto w-full max-w-[230px]">
           <span className="sr-only">Сортировка</span>
           <select
             aria-label="Сортировка"
-            className="h-11 w-full appearance-none rounded-md border border-[#d7dee8] bg-white px-3 pr-8 text-[12px] font-semibold text-[#273246]"
+            className="h-9 w-full appearance-none rounded-lg border border-[#d7dee8] bg-white px-3 pr-8 text-[11px] font-semibold text-[#647084]"
             onChange={(event) => changeSort(event.target.value)}
             value={sort}
           >
@@ -80,8 +71,8 @@ export function MobileCatalogFilters({
           </select>
           <ChevronDown
             aria-hidden="true"
-            className="pointer-events-none absolute right-2.5 top-3 text-[#647084]"
-            size={17}
+            className="pointer-events-none absolute right-2.5 top-2.5 text-[#647084]"
+            size={15}
           />
         </label>
       </div>

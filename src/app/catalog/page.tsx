@@ -7,7 +7,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Filter,
   RotateCcw,
   Search,
   SlidersHorizontal,
@@ -25,7 +24,6 @@ import {
 } from "@/server/cars/repository";
 import { translateFuel, translateTransmission } from "@/server/normalization/display";
 import { MobileCatalogFilters } from "./MobileCatalogFilters";
-import { BrandModelFields } from "@/components/catalog/BrandModelFields";
 import { LiveCatalogCount } from "./LiveCatalogCount";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import { PassoCatalogCard } from "@/components/catalog/PassoCatalogCard";
@@ -149,6 +147,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const [generationLabels, presetCounts] = await Promise.all([getGenerationLabelMap(), getQuickPresetCounts()]);
   const activeChips = buildActiveFilterChips(rawParams, generationLabels);
   const filterFormProps = {
+    brand: value("brand"),
+    generation: value("generation"),
+    model: value("model"),
     brands,
     modelsByBrand,
     fuels,
@@ -210,25 +211,36 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl md:grid md:grid-cols-[280px_minmax(0,1fr)] md:items-start md:gap-7 md:px-5">
-      <section id="filters" className="px-3 py-4 sm:px-0 md:sticky md:top-24 md:px-0 md:py-7">
-        <div className="md:hidden">
-          <MobileCatalogFilters
-            activeCount={activeCount}
-            currentQuery={currentQuery}
-            sort={sort}
-            sortOptions={Object.entries(sortLabels).map(([optionValue, label]) => ({ value: optionValue, label }))}
-            totalCars={totalCars}
-          >
-            <CatalogFilterForm {...filterFormProps} mobile />
-          </MobileCatalogFilters>
-        </div>
-        <div className="hidden md:block">
-          <CatalogFilterForm {...filterFormProps} />
+      <section id="filters" className="border-b border-[#dce2eb] bg-white">
+        <div className="mx-auto max-w-7xl px-3 pb-5 sm:px-5 md:pb-8">
+          <div className="rounded-2xl border border-[#dce2eb] bg-[#f7f8fa] p-3 shadow-[0_12px_32px_rgba(16,24,39,0.05)] sm:p-4 md:p-5">
+            <GenerationCascade
+              brand={filters.brand}
+              currentQuery={currentQuery}
+              generation={filters.generation}
+              model={filters.model}
+              totalCars={totalCars}
+            />
+
+            <div className="mt-3 md:hidden">
+              <MobileCatalogFilters
+                activeCount={activeCount}
+                currentQuery={currentQuery}
+                sort={sort}
+                sortOptions={Object.entries(sortLabels).map(([optionValue, label]) => ({ value: optionValue, label }))}
+                totalCars={totalCars}
+              >
+                <CatalogFilterForm {...filterFormProps} mobile />
+              </MobileCatalogFilters>
+            </div>
+            <div className="mt-4 hidden border-t border-[#dce2eb] pt-4 md:block">
+              <CatalogFilterForm {...filterFormProps} />
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="catalog-results" className="scroll-mt-4 px-3 pb-12 sm:px-0 md:pb-12">
+      <section id="catalog-results" className="mx-auto max-w-7xl scroll-mt-4 px-3 pb-12 pt-5 sm:px-5 md:pb-12 md:pt-7">
         <div className="scrollbar-none mb-3 flex gap-2 overflow-x-auto">
           {([
             { key: "under160", label: "До 160 л.с.", patch: { under160: "1", page: null }, count: presetCounts.under160 },
@@ -261,23 +273,13 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         ) : null}
         <div className="mb-5 flex flex-col gap-3 border-b border-[#dce2eb] pb-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2 text-sm text-[#647084]"><SlidersHorizontal size={17} /><span>{shownCars.length ? `Найдено ${totalCars} автомобилей` : "Ничего не найдено"}</span></div>
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
-            <GenerationCascade
-              brand={filters.brand}
-              currentQuery={currentQuery}
-              generation={filters.generation}
-              model={filters.model}
-              totalCars={totalCars}
-            />
-            <p className="inline-flex items-center gap-2 text-sm font-medium text-[#3f4b5e]"><ChevronDown size={16} /> {sortLabels[sort]}</p>
-          </div>
+          <p className="hidden items-center gap-2 text-sm font-medium text-[#3f4b5e] md:inline-flex"><ChevronDown size={16} /> {sortLabels[sort]}</p>
         </div>
 
         {shownCars.length ? <>
           <CatalogInfiniteGrid initialCars={shownCars} initialCursor={initialPage.nextCursor} key={feedQuery} query={feedQuery} />
         </> : <EmptyState />}
       </section>
-      </div>
     </main>
   );
 }
@@ -326,8 +328,9 @@ async function StagingCatalogPage({ category, page }: { category: StagingCatalog
 }
 
 type CatalogFilterFormProps = {
-  brands: string[];
-  modelsByBrand: Record<string, string[]>;
+  brand: string;
+  generation: string;
+  model: string;
   fuels: string[];
   transmissions: string[];
   trims: string[];
@@ -343,11 +346,12 @@ type CatalogFilterFormProps = {
 };
 
 function CatalogFilterForm({
-  brands,
+  brand,
   clean,
   fuels,
+  generation,
   mobile = false,
-  modelsByBrand,
+  model,
   passable,
   sort,
   totalCars,
@@ -360,12 +364,6 @@ function CatalogFilterForm({
 }: CatalogFilterFormProps) {
   const mainFields = (
     <>
-      <BrandModelFields
-        brands={brands}
-        initialBrand={value("brand")}
-        initialModel={value("model")}
-        modelsByBrand={modelsByBrand}
-      />
       <RangeField label="Год выпуска" maxName="yearMax" maxValue={value("yearMax")} minName="yearMin" minValue={value("yearMin")} />
       <RangeField label="Цена до Владивостока, ₽" maxName="priceMax" maxValue={value("priceMax")} minName="priceMin" minValue={value("priceMin")} />
     </>
@@ -373,8 +371,6 @@ function CatalogFilterForm({
 
   const additionalFields = (
     <>
-      <FilterSelect label="Топливо" name="fuel" options={fuels} placeholder="Любое" translate={translateFuel} value={value("fuel")} />
-      <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} />
       <RangeField label="Объём двигателя, см³" maxName="engineMax" maxValue={value("engineMax")} minName="engineMin" minValue={value("engineMin")} />
       <FilterInput inputMode="numeric" label="Пробег до, км" name="mileageMax" placeholder="Например, 80 000" value={value("mileageMax")} />
       <FilterInput inputMode="numeric" label="Пробег от, км" name="mileageMin" placeholder="Например, 10 000" value={value("mileageMin")} />
@@ -389,20 +385,18 @@ function CatalogFilterForm({
   );
 
   return (
-    <form action="/catalog" className={mobile ? "min-h-full bg-[#f4f6f9] pb-24" : "rounded-md border border-[#dce2eb] bg-white p-4 shadow-sm"}>
+    <form action="/catalog" className={mobile ? "min-h-full bg-[#f4f6f9] pb-24" : ""}>
+      {brand ? <input name="brand" type="hidden" value={brand} /> : null}
+      {model ? <input name="model" type="hidden" value={model} /> : null}
+      {generation ? <input name="generation" type="hidden" value={generation} /> : null}
       {mobile ? <input name="sort" type="hidden" value={sort} /> : null}
-      <div className={mobile ? "grid gap-4 p-4" : "grid gap-4 md:grid-cols-1"}>
-        {!mobile ? (
-          <div className="flex items-center gap-3">
-            <Filter className="text-[#956f2c]" size={20} />
-            <div>
-              <h2 className="font-semibold">Подбор автомобиля</h2>
-              <p className="text-xs text-[#7a8798]">Параметры сохраняются в ссылке</p>
-            </div>
-            <Link className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-[#647084]" href="/catalog"><RotateCcw size={16} /> Сбросить</Link>
-          </div>
-        ) : null}
-        {mainFields}
+      <div className={mobile ? "grid gap-4 p-4" : "grid gap-4"}>
+        <div className={mobile ? "grid gap-4" : "grid gap-3 lg:grid-cols-[1fr_1.15fr_0.9fr_0.9fr_auto] lg:items-end"}>
+          {mainFields}
+          <FilterSelect label="Топливо" name="fuel" options={fuels} placeholder="Любое" translate={translateFuel} value={value("fuel")} />
+          <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} />
+          {!mobile ? <LiveCatalogCount initialCount={totalCars} /> : null}
+        </div>
         {mobile ? (
           <details className="group border-t border-[#dce2eb] pt-2">
             <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-sm font-semibold text-[#273246] [&::-webkit-details-marker]:hidden">
@@ -411,7 +405,15 @@ function CatalogFilterForm({
             </summary>
             <div className="grid gap-4 pb-2 pt-3">{additionalFields}</div>
           </details>
-        ) : additionalFields}
+        ) : (
+          <details className="group rounded-xl border border-[#dce2eb] bg-white">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 text-sm font-semibold text-[#273246] [&::-webkit-details-marker]:hidden">
+              <span className="inline-flex items-center gap-2"><SlidersHorizontal size={17} /> Дополнительные параметры</span>
+              <ChevronDown className="transition group-open:rotate-180" size={18} />
+            </summary>
+            <div className="grid gap-4 border-t border-[#e8ecf2] p-4 sm:grid-cols-2 lg:grid-cols-4">{additionalFields}</div>
+          </details>
+        )}
         <div className={mobile ? "grid grid-cols-2 gap-2 border-t border-[#dce2eb] pt-4" : "grid gap-2"}>
           <FilterCheck checked={under160} label="До 160 л.с." name="under160" value="1" />
           <FilterCheck checked={passable} label="Проходные 3–5 лет" name="passable" value="1" />
@@ -419,7 +421,8 @@ function CatalogFilterForm({
           <FilterCheck checked={value("noInsurance") === "1"} label="Без страховых выплат" name="noInsurance" value="1" />
         </div>
         {!mobile ? (
-          <div className="grid gap-3">
+          <div className="flex flex-wrap items-end justify-between gap-3 border-t border-[#dce2eb] pt-4">
+            <div className="min-w-64">
             <label className="grid min-w-64 gap-1.5 text-sm text-[#647084]">
               <span>Сортировка</span>
               <span className="relative">
@@ -429,7 +432,8 @@ function CatalogFilterForm({
                 <ChevronDown className="pointer-events-none absolute right-3 top-3 text-[#647084]" size={17} />
               </span>
             </label>
-            <LiveCatalogCount initialCount={totalCars} />
+            </div>
+            <Link className="inline-flex min-h-11 items-center gap-1.5 px-2 text-sm font-semibold text-[#647084] hover:text-[#273246]" href="/catalog"><RotateCcw size={16} /> Сбросить все</Link>
           </div>
         ) : null}
       </div>
@@ -515,6 +519,7 @@ function catalogActiveFilterCount(rawParams: Record<string, string | string[] | 
     "search",
     "brand",
     "model",
+    "generation",
     "fuel",
     "transmission",
     "engineMin",
