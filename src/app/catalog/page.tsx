@@ -30,6 +30,7 @@ import { PassoCatalogCard } from "@/components/catalog/PassoCatalogCard";
 import { sourceDisplayName } from "@/lib/source-url";
 import { CatalogSearchBar } from "./CatalogSearchBar";
 import { CatalogInfiniteGrid } from "./CatalogInfiniteGrid";
+import { GenerationCascade } from "./GenerationCascade";
 
 export const metadata: Metadata = {
   title: "Каталог автомобилей из Кореи",
@@ -86,6 +87,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
   const filters: CatalogFilters = {
     brand: value("brand") || undefined,
+    generation: value("generation") || undefined,
     model: value("model") || undefined,
     search: value("search") || undefined,
     fuelType: value("fuel") || undefined,
@@ -237,11 +239,20 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         ) : null}
         <div className="mb-5 flex flex-col gap-3 border-b border-[#dce2eb] pb-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2 text-sm text-[#647084]"><SlidersHorizontal size={17} /><span>{shownCars.length ? `Найдено ${totalCars} автомобилей` : "Ничего не найдено"}</span></div>
-          <p className="inline-flex items-center gap-2 text-sm font-medium text-[#3f4b5e]"><ChevronDown size={16} /> {sortLabels[sort]}</p>
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+            <GenerationCascade
+              brand={filters.brand}
+              currentQuery={currentQuery}
+              generation={filters.generation}
+              model={filters.model}
+              totalCars={totalCars}
+            />
+            <p className="inline-flex items-center gap-2 text-sm font-medium text-[#3f4b5e]"><ChevronDown size={16} /> {sortLabels[sort]}</p>
+          </div>
         </div>
 
         {shownCars.length ? <>
-          <CatalogInfiniteGrid initialCars={shownCars} initialCursor={initialPage.nextCursor} query={feedQuery} />
+          <CatalogInfiniteGrid initialCars={shownCars} initialCursor={initialPage.nextCursor} key={feedQuery} query={feedQuery} />
         </> : <EmptyState />}
       </section>
       </div>
