@@ -133,6 +133,7 @@ async function main() {
         last_seen_at: new Date().toISOString(),
         brand: r.manufacturer,
         model: model(r.model),
+        generation: r.generation,
         year: r.model_year,
         registration_year: r.model_year,
         registration_date: r.first_registration_date,

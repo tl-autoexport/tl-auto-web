@@ -61,12 +61,20 @@ async function main() {
       select 'fuel_type', coalesce(fuel_type,'<null>'), count(*)::int from public.cars where is_available = true group by 1,2
       order by kind, cars desc`);
 
+    const catalogSide = await db.query<{ cars: number; with_generation: number; without_generation: number; distinct_values: number }>(`
+      select count(*)::int as cars,
+             count(*) filter (where generation is not null)::int as with_generation,
+             count(*) filter (where generation is null)::int as without_generation,
+             count(distinct generation)::int as distinct_values
+      from public.cars where is_available = true`);
+
     await db.query("rollback");
     console.log(JSON.stringify({
       readOnlyTransaction: true,
       encarRequests: 0,
       databaseWrites: 0,
       coverage: totals.rows[0],
+      catalogSide: catalogSide.rows[0],
       distinctGenerations: distinct.rowCount,
       topGenerations: distinct.rows.slice(0, 25),
       unmatchedSample: unmatchedSample.rows,
