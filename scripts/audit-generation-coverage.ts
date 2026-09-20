@@ -117,11 +117,22 @@ async function main() {
       bySource[row.primary_source] = entry;
     }
 
+    const dictionarySide = await db.query<{ status: string; rows: number; cars: number }>(`
+      select status, count(*)::int as rows, coalesce(sum(cars_count), 0)::int as cars
+      from public.catalog_generation_dictionary group by 1 order by 2 desc`);
+
+    const codeSide = await db.query<{ with_code: number; without_code: number }>(`
+      select count(*) filter (where generation_code is not null)::int as with_code,
+             count(*) filter (where generation_code is null)::int as without_code
+      from public.cars where is_available = true`);
+
     await db.query("rollback");
     console.log(JSON.stringify({
       readOnlyTransaction: true,
       encarRequests: 0,
       databaseWrites: 0,
+      dictionary: dictionarySide.rows,
+      generationCode: codeSide.rows[0],
       coverage: {
         cars: rows.length,
         matched,
