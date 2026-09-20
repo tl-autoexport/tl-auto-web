@@ -41,17 +41,21 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
 
   useEffect(() => {
     if (!open) return;
-    let cancelled = false;
-    fetch(`/api/catalog/facets${query}`)
+    const controller = new AbortController();
+    fetch(`/api/catalog/facets${query}`, { signal: controller.signal })
       .then((response) => response.ok ? response.json() : Promise.reject(new Error(String(response.status))))
-      .then((json: FacetsResponse) => { if (!cancelled) setLoaded({ query, data: json }); })
-      .catch(() => { if (!cancelled) setLoaded({ query, data: { total: 0, axes: {} } }); });
-    return () => { cancelled = true; };
+      .then((json: FacetsResponse) => setLoaded({ query, data: json }))
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        if (!controller.signal.aborted) setLoaded({ query, data: { total: 0, axes: {} } });
+      });
+    return () => controller.abort();
   }, [open, query]);
 
   const options = level === "brand" ? data?.axes.brand ?? [] : level === "model" ? data?.axes.model ?? [] : data?.axes.generation ?? [];
   const generationLabel = data?.axes.generation?.find((item) => item.value === selection.generation)?.label ?? selection.generation?.toUpperCase();
   const summary = [selection.brand, selection.model, generationLabel].filter(Boolean).join(", ");
+  const needsGeneration = Boolean(selection.brand && selection.model && !selection.generation);
 
   function show(nextLevel: Level) {
     if (nextLevel === "model" && !selection.brand) return;
@@ -65,8 +69,7 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
       setSelection({ brand: option.value });
       setLevel("model");
     } else if (level === "model") {
-      setSelection({ brand: selection.brand, model: option.value });
-      setLevel("generation");
+      setSelection(selection.model === option.value ? { brand: selection.brand } : { brand: selection.brand, model: option.value });
     } else {
       setSelection((current) => ({ ...current, generation: option.value }));
     }
@@ -101,6 +104,7 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
               <span className="min-w-0">
                 <span className="block text-xs text-[#7a8798]">{LEVEL_LABEL[item]}</span>
                 <span className="mt-1 block truncate text-sm font-semibold text-[#273246]">{shownValue || `Все ${item === "brand" ? "марки" : item === "model" ? "модели" : "поколения"}`}</span>
+                {item === "model" && needsGeneration ? <span className="mt-0.5 block truncate text-xs text-[#7a8798]">Указать поколение</span> : null}
               </span>
               <ChevronDown className="ml-3 text-[#647084]" size={18} />
             </button>
@@ -133,13 +137,13 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
                 <p className="flex items-center gap-2 p-4 text-sm text-[#647084]"><LoaderCircle className="animate-spin" size={17} /> Загружаем варианты</p>
               ) : options.length ? options.map((option) => {
                 const selected = selection[level] === option.value;
-                return <button className={`flex min-h-12 w-full items-center justify-between gap-3 border-b border-[#eef1f5] px-4 text-left text-sm transition md:border-r ${selected ? "bg-[#fbf7ed]" : "hover:bg-[#f7f9fc]"}`} key={`${level}-${option.value}`} onClick={() => pick(option)} type="button"><span className="truncate font-medium text-[#273246]">{option.label}</span><span className="shrink-0 text-xs text-[#7a8798]">{option.cars}</span></button>;
+                return <button className={`flex min-h-12 w-full items-center justify-between gap-3 border-b border-[#eef1f5] px-4 text-left text-sm transition md:border-r ${selected ? "bg-[#fbf7ed]" : "hover:bg-[#f7f9fc]"}`} key={`${level}-${option.value}`} onClick={() => pick(option)} type="button"><span className="min-w-0 truncate font-medium text-[#273246]">{option.label}</span>{level === "model" ? <span aria-hidden="true" className={`grid size-5 shrink-0 place-items-center rounded border text-xs ${selected ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span> : <span className="shrink-0 text-xs text-[#7a8798]">{option.cars}</span>}</button>;
               }) : <p className="p-4 text-sm text-[#647084]">{level === "generation" ? "Для этой модели подтверждённых поколений нет." : "Нет вариантов для текущего отбора."}</p>}
             </div>
 
             <div className="mt-4 flex items-center gap-3">
               <button className="inline-flex min-h-11 items-center gap-1.5 px-2 text-sm font-semibold text-[#647084]" onClick={reset} type="button"><RotateCcw size={15} /> Сбросить</button>
-              <button className="ml-auto min-h-12 rounded-xl bg-[#101827] px-5 text-sm font-semibold text-white md:min-w-56" onClick={apply} type="button">Показать {data?.total ?? totalCars}</button>
+              <button className="ml-auto min-h-12 rounded-xl bg-[#101827] px-5 text-sm font-semibold text-white disabled:cursor-wait disabled:opacity-60 md:min-w-56" disabled={loading} onClick={apply} type="button">{loading ? "Пересчитываем…" : `Показать ${data?.total ?? totalCars}`}</button>
             </div>
           </div>
         </div>
