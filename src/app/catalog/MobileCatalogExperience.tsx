@@ -118,16 +118,14 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   const chips = [selected("brand"), selected("model"), generationLabel(selected("generation"), currentFacets)].filter(Boolean);
 
   return <div className="md:hidden">
-    <div className="grid gap-2">
+    <div className="sticky top-0 z-30 -mx-3 bg-[#f5f6f8] px-3 py-2 sm:-mx-5 sm:px-5">
       <button className="flex min-h-14 items-center justify-between rounded-xl border border-[#d7dee8] bg-white px-4 text-left" onClick={() => setScreen(selected("brand") ? "parameters" : "brand")} type="button">
         <span className="min-w-0"><span className="block truncate text-[15px] font-semibold text-[#101827]">{selectedSummary || "Марка и модель"}</span>{needsGeneration ? <span className="mt-0.5 block truncate text-xs text-[#7a8798]">Указать поколение</span> : null}</span><ChevronRight className="shrink-0 text-[#647084]" size={20} />
       </button>
-      <div className="grid grid-cols-3 overflow-hidden rounded-xl border border-[#d7dee8] bg-white">
-        <button className="min-h-12 border-r border-[#e1e5eb] text-sm font-semibold" onClick={() => setScreen("year")} type="button">Год</button>
-        <button className="min-h-12 border-r border-[#e1e5eb] text-sm font-semibold" onClick={() => setScreen("price")} type="button">Цена</button>
-        <button className="flex min-h-12 items-center justify-center gap-1.5 text-sm font-semibold" onClick={() => setScreen("parameters")} type="button"><SlidersHorizontal size={16} />Параметры{activeParameters ? <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[10px]">{activeParameters}</span> : null}</button>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d7dee8] bg-white px-3 text-sm font-semibold" onClick={() => setScreen("parameters")} type="button"><SlidersHorizontal size={16} />Фильтры{activeParameters ? <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[10px]">{activeParameters}</span> : null}</button>
+        <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d7dee8] bg-white px-3 text-sm font-semibold" onClick={() => setScreen("sort")} type="button">Сортировка<ChevronRight size={16} className="text-[#7a8798]" /></button>
       </div>
-      <button className="flex min-h-10 items-center justify-between rounded-lg border border-[#d7dee8] bg-white px-3 text-xs font-semibold text-[#647084]" onClick={() => setScreen("sort")} type="button"><span>Сортировка</span><span className="text-[#273246]">{sortOptions.find((item) => item.value === selected("sort"))?.label ?? sortOptions[0]?.label}</span></button>
     </div>
     {chips.length ? <div className="scrollbar-none mt-2 flex gap-1.5 overflow-x-auto">{chips.map((chip) => <span className="shrink-0 rounded-full bg-[#101827] px-2.5 py-1 text-[11px] font-semibold text-white" key={chip}>{chip}</span>)}</div> : null}
 

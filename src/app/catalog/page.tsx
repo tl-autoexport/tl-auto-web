@@ -170,14 +170,14 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       <CatalogSearchBar brands={brands} initialValue={value("search")} models={searchableModels} />
 
       <section className="border-b border-[#dce2eb] bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-5 md:py-10">
+        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-5 md:py-10">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end md:gap-5">
             <div>
-              <p className="text-xs font-semibold text-[#956f2c] sm:text-sm">Корея</p>
-              <h1 className="mt-1.5 text-[32px] font-semibold leading-tight tracking-normal sm:mt-2 sm:text-4xl">Каталог автомобилей</h1>
-              <p className="mt-2 max-w-2xl text-[13px] leading-5 text-[#647084] sm:mt-3 sm:text-sm sm:leading-6">Подбор по реальным данным источника с расчётом цены до Владивостока.</p>
+              <p className="hidden text-xs font-semibold text-[#956f2c] sm:text-sm md:block">Корея</p>
+              <h1 className="mt-0 text-[25px] font-semibold leading-tight tracking-normal sm:mt-2 sm:text-4xl">Каталог автомобилей</h1>
+              <p className="mt-1.5 max-w-2xl text-[12px] leading-4 text-[#647084] sm:mt-3 sm:text-sm sm:leading-6">Подбор по реальным данным источника с расчётом цены до Владивостока.</p>
             </div>
-            <div className="inline-flex items-center gap-2 self-start rounded-full bg-[#fbf7ed] px-3 py-2 text-xs text-[#7b5a22] md:gap-3 md:rounded-none md:border-l-2 md:border-[#c7a55a] md:bg-transparent md:pl-4 md:text-sm"><CarFront size={18} className="text-[#c7a55a] md:size-5" /><span><strong className="mr-1 text-base text-[#101827] md:block md:text-xl">{totalCars}</strong><span className="text-[#647084]">автомобилей найдено</span></span></div>
+            <div className="hidden items-center gap-2 self-start rounded-full bg-[#fbf7ed] px-3 py-2 text-xs text-[#7b5a22] md:inline-flex md:gap-3 md:rounded-none md:border-l-2 md:border-[#c7a55a] md:bg-transparent md:pl-4 md:text-sm"><CarFront size={18} className="text-[#c7a55a] md:size-5" /><span><strong className="mr-1 text-base text-[#101827] md:block md:text-xl">{totalCars}</strong><span className="text-[#647084]">автомобилей найдено</span></span></div>
           </div>
 
           {popularBrands.length ? (
@@ -210,17 +210,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         </div>
       </section>
 
-      <section id="filters" className="border-b border-[#dce2eb] bg-white">
+      <section id="filters" className="hidden border-b border-[#dce2eb] bg-white md:block">
         <div className="mx-auto max-w-7xl px-3 pb-5 sm:px-5 md:pb-8">
           <div className="rounded-2xl border border-[#dce2eb] bg-[#f7f8fa] p-3 shadow-[0_12px_32px_rgba(16,24,39,0.05)] sm:p-4 md:p-5">
-            <div className="md:hidden">
-              <MobileCatalogExperience
-                currentQuery={currentQuery}
-                options={{ bodies, colors, fuels, transmissions, trims }}
-                sortOptions={Object.entries(sortLabels).map(([optionValue, label]) => ({ value: optionValue, label }))}
-                totalCars={totalCars}
-              />
-            </div>
             <div className="hidden md:block"><GenerationCascade brand={filters.brand} currentQuery={currentQuery} generation={filters.generation} model={filters.model} totalCars={totalCars} /></div>
             <div className="mt-4 hidden border-t border-[#dce2eb] pt-4 md:block">
               <CatalogFilterForm {...filterFormProps} />
@@ -229,7 +221,15 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         </div>
       </section>
 
-      <section id="catalog-results" className="mx-auto max-w-7xl scroll-mt-4 px-3 pb-12 pt-5 sm:px-5 md:pb-12 md:pt-7">
+      <section id="catalog-results" className="mx-auto max-w-7xl scroll-mt-4 px-3 pb-12 pt-2 sm:px-5 md:pb-12 md:pt-7">
+        <div className="md:hidden">
+          <MobileCatalogExperience
+            currentQuery={currentQuery}
+            options={{ bodies, colors, fuels, transmissions, trims }}
+            sortOptions={Object.entries(sortLabels).map(([optionValue, label]) => ({ value: optionValue, label }))}
+            totalCars={totalCars}
+          />
+        </div>
         <div className="scrollbar-none mb-3 flex gap-2 overflow-x-auto">
           {([
             { key: "under160", label: "До 160 л.с.", patch: { under160: "1", page: null }, count: presetCounts.under160 },
