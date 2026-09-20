@@ -35,8 +35,6 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   const currentFacets = facetsQuery === query ? facets : null;
   const hasCurrentCount = countQuery === query;
   const selected = (name: string) => draft.get(name) || "";
-  const selectedSummary = [selected("brand"), selected("model"), generationLabel(selected("generation"), currentFacets)].filter(Boolean).join(", ");
-  const needsGeneration = Boolean(selected("brand") && selected("model") && !selected("generation"));
   const activeParameters = PARAM_KEYS.filter((key) => draft.has(key)).length;
 
   useEffect(() => {
@@ -118,16 +116,13 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   const chips = [selected("brand"), selected("model"), generationLabel(selected("generation"), currentFacets)].filter(Boolean);
 
   return <div className="md:hidden">
-    <div className="sticky top-0 z-30 -mx-3 bg-[#f5f6f8] px-3 py-2 sm:-mx-5 sm:px-5">
-      <button className="flex min-h-14 items-center justify-between rounded-xl border border-[#d7dee8] bg-white px-4 text-left" onClick={() => setScreen(selected("brand") ? "parameters" : "brand")} type="button">
-        <span className="min-w-0"><span className="block truncate text-[15px] font-semibold text-[#101827]">{selectedSummary || "Марка и модель"}</span>{needsGeneration ? <span className="mt-0.5 block truncate text-xs text-[#7a8798]">Указать поколение</span> : null}</span><ChevronRight className="shrink-0 text-[#647084]" size={20} />
-      </button>
-      <div className="mt-2 grid grid-cols-2 gap-2">
+    <div className="sticky top-[68px] z-30 -mx-3 bg-[#f5f6f8] px-3 py-2 shadow-[0_5px_14px_rgba(16,24,39,0.06)] sm:-mx-5 sm:px-5">
+      <div className="grid grid-cols-2 gap-2">
         <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d7dee8] bg-white px-3 text-sm font-semibold" onClick={() => setScreen("parameters")} type="button"><SlidersHorizontal size={16} />Фильтры{activeParameters ? <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[10px]">{activeParameters}</span> : null}</button>
         <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d7dee8] bg-white px-3 text-sm font-semibold" onClick={() => setScreen("sort")} type="button">Сортировка<ChevronRight size={16} className="text-[#7a8798]" /></button>
       </div>
+      {chips.length ? <div className="scrollbar-none mt-2 flex gap-1.5 overflow-x-auto">{chips.map((chip) => <span className="shrink-0 rounded-full bg-[#101827] px-2.5 py-1 text-[11px] font-semibold text-white" key={chip}>{chip}</span>)}</div> : null}
     </div>
-    {chips.length ? <div className="scrollbar-none mt-2 flex gap-1.5 overflow-x-auto">{chips.map((chip) => <span className="shrink-0 rounded-full bg-[#101827] px-2.5 py-1 text-[11px] font-semibold text-white" key={chip}>{chip}</span>)}</div> : null}
 
     {screen !== "home" ? <div aria-modal="true" className="fixed inset-x-0 top-0 z-[130] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#f4f6f9] pt-[env(safe-area-inset-top)]" role="dialog">
       <header className="grid min-h-16 grid-cols-[44px_minmax(0,1fr)_76px] items-center border-b border-[#dce2eb] bg-white px-4">
