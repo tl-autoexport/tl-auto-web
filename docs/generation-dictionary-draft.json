@@ -4,17 +4,38 @@
   "description": "Draft of the generation dictionary for human review. label_ru is composed from the published Latin model name and a generation code the model's own allowlist recognises, or the ordinal the source states. Nothing is translated by guesswork; needs_review entries list the candidate codes found in the source value.",
   "rules": {
     "parenthesised_code": "any 2-4 character alphanumeric token in parentheses, e.g. (DN8), (JA), (8Y)",
-    "bare_code": "recognised only when the same model already used it in parentheses",
+    "bare_code": "recognised only when the model's approved list contains it",
     "ordinal": "Korean N세대 becomes \"N-е поколение\"",
-    "review": "no code and no ordinal, or a refresh marker that cannot name a generation"
+    "review": "no code and no ordinal, or a refresh marker that cannot name a generation",
+    "provenance": "source_explicit = written in the source value; derived_from_model_allowlist = approved per model"
   },
   "coverage": {
     "sourceValues": 92,
     "cars": 3515,
-    "autoLabeled": 38,
-    "autoLabeledCars": 2056,
-    "needsReview": 54,
-    "needsReviewCars": 1459
+    "autoLabeled": 43,
+    "autoLabeledCars": 2396,
+    "needsReview": 49,
+    "needsReviewCars": 1119,
+    "byProvenance": {
+      "source_explicit": 2056,
+      "derived_from_model_allowlist": 340
+    }
+  },
+  "approvedModelCodes": {
+    "a-class": [
+      "W176",
+      "W177"
+    ],
+    "c-class": [
+      "W205",
+      "W206"
+    ],
+    "glb-class": [
+      "X247"
+    ],
+    "avante": [
+      "AD"
+    ]
   },
   "modelCodeAllowlist": {
     "avante": [
@@ -68,6 +89,7 @@
       "cars": 356,
       "code": "cn7",
       "label_ru": "AVANTE (CN7)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -78,6 +100,7 @@
       "cars": 276,
       "code": "dn8",
       "label_ru": "Sonata (DN8)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -88,6 +111,7 @@
       "cars": 210,
       "code": "k5-gen3",
       "label_ru": "K5, 3-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -98,6 +122,7 @@
       "cars": 176,
       "code": "k3-gen2",
       "label_ru": "K3, 2-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -106,13 +131,10 @@
       "model": "C-Class",
       "model_label": "C-Class",
       "cars": 168,
-      "code": null,
-      "label_ru": null,
-      "status": "needs_review",
-      "reason": "no_code_or_ordinal",
-      "candidate_codes": [
-        "W205"
-      ]
+      "code": "w205",
+      "label_ru": "C-Class (W205)",
+      "provenance": "derived_from_model_allowlist",
+      "status": "auto"
     },
     {
       "source_value": "더 뉴 K5 3세대",
@@ -122,6 +144,7 @@
       "cars": 106,
       "code": "k5-gen3",
       "label_ru": "K5, 3-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -132,6 +155,7 @@
       "cars": 99,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -144,6 +168,7 @@
       "cars": 96,
       "code": "cn7",
       "label_ru": "AVANTE (CN7)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -154,6 +179,7 @@
       "cars": 96,
       "code": "jetta-gen7",
       "label_ru": "Jetta, 7-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -164,6 +190,7 @@
       "cars": 96,
       "code": "tiguan-gen2",
       "label_ru": "Tiguan, 2-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -174,6 +201,7 @@
       "cars": 87,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -184,13 +212,10 @@
       "model": "AVANTE",
       "model_label": "AVANTE",
       "cars": 80,
-      "code": null,
-      "label_ru": null,
-      "status": "needs_review",
-      "reason": "refresh_marker_without_generation",
-      "candidate_codes": [
-        "AD"
-      ]
+      "code": "ad",
+      "label_ru": "AVANTE (AD)",
+      "provenance": "derived_from_model_allowlist",
+      "status": "auto"
     },
     {
       "source_value": "Q3 (F3)",
@@ -200,6 +225,7 @@
       "cars": 79,
       "code": "f3",
       "label_ru": "Q3 (F3)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -208,13 +234,10 @@
       "model": "A-Class",
       "model_label": "A-Class",
       "cars": 77,
-      "code": null,
-      "label_ru": null,
-      "status": "needs_review",
-      "reason": "no_code_or_ordinal",
-      "candidate_codes": [
-        "W177"
-      ]
+      "code": "w177",
+      "label_ru": "A-Class (W177)",
+      "provenance": "derived_from_model_allowlist",
+      "status": "auto"
     },
     {
       "source_value": "디스커버리 스포츠 2세대",
@@ -224,6 +247,7 @@
       "cars": 70,
       "code": "discovery-sport-gen2",
       "label_ru": "Discovery Sport, 2-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -234,6 +258,7 @@
       "cars": 61,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": [
@@ -248,6 +273,7 @@
       "cars": 56,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -260,6 +286,7 @@
       "cars": 55,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -272,6 +299,7 @@
       "cars": 53,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -284,6 +312,7 @@
       "cars": 51,
       "code": "carnival-gen4",
       "label_ru": "Carnival, 4-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -294,6 +323,7 @@
       "cars": 50,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -306,6 +336,7 @@
       "cars": 50,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -318,6 +349,7 @@
       "cars": 49,
       "code": "b9",
       "label_ru": "A4 (B9)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -328,6 +360,7 @@
       "cars": 49,
       "code": "f40",
       "label_ru": "1 Series (F40)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -338,6 +371,7 @@
       "cars": 48,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -350,6 +384,7 @@
       "cars": 48,
       "code": "range-rover-evoque-gen2",
       "label_ru": "Range Rover Evoque, 2-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -360,6 +395,7 @@
       "cars": 47,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -372,6 +408,7 @@
       "cars": 42,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -384,6 +421,7 @@
       "cars": 41,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -396,6 +434,7 @@
       "cars": 39,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -408,6 +447,7 @@
       "cars": 39,
       "code": "f48",
       "label_ru": "X1 (F48)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -418,6 +458,7 @@
       "cars": 37,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -430,6 +471,7 @@
       "cars": 31,
       "code": "golf-gen8",
       "label_ru": "Golf, 8-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -440,6 +482,7 @@
       "cars": 31,
       "code": "u11",
       "label_ru": "X1 (U11)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -450,6 +493,7 @@
       "cars": 29,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -462,6 +506,7 @@
       "cars": 29,
       "code": "f20",
       "label_ru": "1 Series (F20)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -472,6 +517,7 @@
       "cars": 26,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -484,6 +530,7 @@
       "cars": 24,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -496,6 +543,7 @@
       "cars": 24,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -508,6 +556,7 @@
       "cars": 22,
       "code": "8y",
       "label_ru": "A3 (8Y)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -518,6 +567,7 @@
       "cars": 22,
       "code": "nx4",
       "label_ru": "Tucson (NX4)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -528,6 +578,7 @@
       "cars": 21,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -540,6 +591,7 @@
       "cars": 21,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -552,6 +604,7 @@
       "cars": 19,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -564,6 +617,7 @@
       "cars": 19,
       "code": "sorento-gen4",
       "label_ru": "Sorento, 4-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -574,6 +628,7 @@
       "cars": 18,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -586,6 +641,7 @@
       "cars": 16,
       "code": "dn8",
       "label_ru": "Sonata (DN8)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -596,6 +652,7 @@
       "cars": 15,
       "code": "sportage-gen5",
       "label_ru": "Sportage, 5-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -606,6 +663,7 @@
       "cars": 15,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -618,6 +676,7 @@
       "cars": 14,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -630,6 +689,7 @@
       "cars": 13,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -642,6 +702,7 @@
       "cars": 12,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -654,6 +715,7 @@
       "cars": 12,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -666,6 +728,7 @@
       "cars": 11,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -676,13 +739,10 @@
       "model": "C-Class",
       "model_label": "C-Class",
       "cars": 11,
-      "code": null,
-      "label_ru": null,
-      "status": "needs_review",
-      "reason": "no_code_or_ordinal",
-      "candidate_codes": [
-        "W206"
-      ]
+      "code": "w206",
+      "label_ru": "C-Class (W206)",
+      "provenance": "derived_from_model_allowlist",
+      "status": "auto"
     },
     {
       "source_value": "더 뉴 기아 레이",
@@ -692,6 +752,7 @@
       "cars": 11,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -704,6 +765,7 @@
       "cars": 11,
       "code": "ja",
       "label_ru": "Morning (JA)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -714,6 +776,7 @@
       "cars": 10,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -726,6 +789,7 @@
       "cars": 9,
       "code": "u10",
       "label_ru": "X2 (F39) (U10)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -736,6 +800,7 @@
       "cars": 8,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -748,6 +813,7 @@
       "cars": 8,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -760,6 +826,7 @@
       "cars": 8,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -772,6 +839,7 @@
       "cars": 8,
       "code": "sx2",
       "label_ru": "Kona (SX2)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -782,6 +850,7 @@
       "cars": 8,
       "code": "carnival-gen4",
       "label_ru": "Carnival, 4-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -792,6 +861,7 @@
       "cars": 7,
       "code": "cooper-gen4",
       "label_ru": "Cooper, 4-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -802,6 +872,7 @@
       "cars": 6,
       "code": "sorento-gen4",
       "label_ru": "Sorento, 4-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -812,6 +883,7 @@
       "cars": 6,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -824,6 +896,7 @@
       "cars": 5,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -836,6 +909,7 @@
       "cars": 5,
       "code": "sportage-gen5",
       "label_ru": "Sportage, 5-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -846,6 +920,7 @@
       "cars": 5,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -858,6 +933,7 @@
       "cars": 4,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -870,6 +946,7 @@
       "cars": 4,
       "code": "cooper-gen4",
       "label_ru": "Cooper, 4-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -880,6 +957,7 @@
       "cars": 4,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -892,6 +970,7 @@
       "cars": 4,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -904,6 +983,7 @@
       "cars": 4,
       "code": "f44",
       "label_ru": "2 Series (F44)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -912,13 +992,10 @@
       "model": "A-Class",
       "model_label": "A-Class",
       "cars": 4,
-      "code": null,
-      "label_ru": null,
-      "status": "needs_review",
-      "reason": "no_code_or_ordinal",
-      "candidate_codes": [
-        "W176"
-      ]
+      "code": "w176",
+      "label_ru": "A-Class (W176)",
+      "provenance": "derived_from_model_allowlist",
+      "status": "auto"
     },
     {
       "source_value": "쿠퍼 D 클럽맨",
@@ -928,6 +1005,7 @@
       "cars": 4,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -940,6 +1018,7 @@
       "cars": 3,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": [
@@ -954,6 +1033,7 @@
       "cars": 3,
       "code": "ja",
       "label_ru": "Morning (JA)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -964,6 +1044,7 @@
       "cars": 3,
       "code": "ja",
       "label_ru": "Morning (JA)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -974,6 +1055,7 @@
       "cars": 3,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -986,6 +1068,7 @@
       "cars": 3,
       "code": "nx4",
       "label_ru": "Tucson (NX4)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -996,6 +1079,7 @@
       "cars": 3,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1008,6 +1092,7 @@
       "cars": 2,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1020,6 +1105,7 @@
       "cars": 2,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1032,6 +1118,7 @@
       "cars": 2,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1044,6 +1131,7 @@
       "cars": 1,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": [
@@ -1058,6 +1146,7 @@
       "cars": 1,
       "code": "k5-gen2",
       "label_ru": "K5, 2-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -1068,6 +1157,7 @@
       "cars": 1,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1080,6 +1170,7 @@
       "cars": 1,
       "code": "seltos-gen2",
       "label_ru": "Seltos, 2-е поколение",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -1090,6 +1181,7 @@
       "cars": 1,
       "code": "js",
       "label_ru": "Veloster (JS)",
+      "provenance": "source_explicit",
       "status": "auto"
     },
     {
@@ -1100,26 +1192,13 @@
       "cars": 1,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
     }
   ],
   "review": [
-    {
-      "source_value": "C-클래스 W205",
-      "brand": "Mercedes-Benz",
-      "model": "C-Class",
-      "model_label": "C-Class",
-      "cars": 168,
-      "code": null,
-      "label_ru": null,
-      "status": "needs_review",
-      "reason": "no_code_or_ordinal",
-      "candidate_codes": [
-        "W205"
-      ]
-    },
     {
       "source_value": "베뉴",
       "brand": "Hyundai",
@@ -1128,6 +1207,7 @@
       "cars": 99,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1140,37 +1220,10 @@
       "cars": 87,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
-    },
-    {
-      "source_value": "더 뉴 아반떼 AD",
-      "brand": "Hyundai",
-      "model": "AVANTE",
-      "model_label": "AVANTE",
-      "cars": 80,
-      "code": null,
-      "label_ru": null,
-      "status": "needs_review",
-      "reason": "refresh_marker_without_generation",
-      "candidate_codes": [
-        "AD"
-      ]
-    },
-    {
-      "source_value": "A-클래스 W177",
-      "brand": "Mercedes-Benz",
-      "model": "A-Class",
-      "model_label": "A-Class",
-      "cars": 77,
-      "code": null,
-      "label_ru": null,
-      "status": "needs_review",
-      "reason": "no_code_or_ordinal",
-      "candidate_codes": [
-        "W177"
-      ]
     },
     {
       "source_value": "GLB-클래스 X247",
@@ -1180,6 +1233,7 @@
       "cars": 61,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": [
@@ -1194,6 +1248,7 @@
       "cars": 56,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1206,6 +1261,7 @@
       "cars": 55,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1218,6 +1274,7 @@
       "cars": 53,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1230,6 +1287,7 @@
       "cars": 50,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1242,6 +1300,7 @@
       "cars": 50,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1254,6 +1313,7 @@
       "cars": 48,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1266,6 +1326,7 @@
       "cars": 47,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1278,6 +1339,7 @@
       "cars": 42,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1290,6 +1352,7 @@
       "cars": 41,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1302,6 +1365,7 @@
       "cars": 39,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1314,6 +1378,7 @@
       "cars": 37,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1326,6 +1391,7 @@
       "cars": 29,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1338,6 +1404,7 @@
       "cars": 26,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1350,6 +1417,7 @@
       "cars": 24,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1362,6 +1430,7 @@
       "cars": 24,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1374,6 +1443,7 @@
       "cars": 21,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1386,6 +1456,7 @@
       "cars": 21,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1398,6 +1469,7 @@
       "cars": 19,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1410,6 +1482,7 @@
       "cars": 18,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1422,6 +1495,7 @@
       "cars": 15,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1434,6 +1508,7 @@
       "cars": 14,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1446,6 +1521,7 @@
       "cars": 13,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1458,6 +1534,7 @@
       "cars": 12,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1470,6 +1547,7 @@
       "cars": 12,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1482,23 +1560,10 @@
       "cars": 11,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
-    },
-    {
-      "source_value": "C-클래스 W206",
-      "brand": "Mercedes-Benz",
-      "model": "C-Class",
-      "model_label": "C-Class",
-      "cars": 11,
-      "code": null,
-      "label_ru": null,
-      "status": "needs_review",
-      "reason": "no_code_or_ordinal",
-      "candidate_codes": [
-        "W206"
-      ]
     },
     {
       "source_value": "더 뉴 기아 레이",
@@ -1508,6 +1573,7 @@
       "cars": 11,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1520,6 +1586,7 @@
       "cars": 10,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1532,6 +1599,7 @@
       "cars": 8,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1544,6 +1612,7 @@
       "cars": 8,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1556,6 +1625,7 @@
       "cars": 8,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1568,6 +1638,7 @@
       "cars": 6,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1580,6 +1651,7 @@
       "cars": 5,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1592,6 +1664,7 @@
       "cars": 5,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1604,6 +1677,7 @@
       "cars": 4,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1616,6 +1690,7 @@
       "cars": 4,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1628,23 +1703,10 @@
       "cars": 4,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
-    },
-    {
-      "source_value": "A-클래스 W176",
-      "brand": "Mercedes-Benz",
-      "model": "A-Class",
-      "model_label": "A-Class",
-      "cars": 4,
-      "code": null,
-      "label_ru": null,
-      "status": "needs_review",
-      "reason": "no_code_or_ordinal",
-      "candidate_codes": [
-        "W176"
-      ]
     },
     {
       "source_value": "쿠퍼 D 클럽맨",
@@ -1654,6 +1716,7 @@
       "cars": 4,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1666,6 +1729,7 @@
       "cars": 3,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": [
@@ -1680,6 +1744,7 @@
       "cars": 3,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1692,6 +1757,7 @@
       "cars": 3,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1704,6 +1770,7 @@
       "cars": 2,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1716,6 +1783,7 @@
       "cars": 2,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1728,6 +1796,7 @@
       "cars": 2,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
@@ -1740,6 +1809,7 @@
       "cars": 1,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": [
@@ -1754,6 +1824,7 @@
       "cars": 1,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "refresh_marker_without_generation",
       "candidate_codes": []
@@ -1766,9 +1837,28 @@
       "cars": 1,
       "code": null,
       "label_ru": null,
+      "provenance": null,
       "status": "needs_review",
       "reason": "no_code_or_ordinal",
       "candidate_codes": []
+    }
+  ],
+  "rejected": [
+    {
+      "source_value": "쿠퍼 SD 컨트리맨",
+      "model": "Countryman",
+      "model_label": "Countryman",
+      "code": "SD",
+      "reason": "not_a_generation",
+      "cars": 3
+    },
+    {
+      "source_value": "쿠퍼 SD 클럽맨",
+      "model": "Clubman",
+      "model_label": "Clubman",
+      "code": "SD",
+      "reason": "not_a_generation",
+      "cars": 1
     }
   ]
 }

@@ -41,6 +41,26 @@ const NOT_A_CODE = new Set([
 
 const slug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
+/**
+ * Codes approved by the project for a specific model. A bare token is only
+ * recognised when it is listed here for that very model, which is what keeps a
+ * global regex from reading `LPG`, `GT` or `SD` as a generation.
+ */
+const APPROVED_MODEL_CODES: Record<string, string[]> = {
+  "a-class": ["W176", "W177"],
+  "c-class": ["W205", "W206"],
+  "glb-class": ["X247"],
+  avante: ["AD"],
+};
+
+/** Tokens reviewed and refused, recorded so the decision is not lost. */
+const REJECTED_MODEL_CODES: Record<string, string[]> = {
+  countryman: ["SD"],
+  clubman: ["SD"],
+};
+
+type Provenance = "source_explicit" | "derived_from_model_allowlist";
+
 type Entry = {
   source_value: string;
   brand: string | null;
@@ -48,6 +68,7 @@ type Entry = {
   model_label: string;
   code: string | null;
   label_ru: string | null;
+  provenance: Provenance | null;
   status: "auto" | "needs_review";
   reason?: string;
   candidate_codes?: string[];
@@ -85,37 +106,51 @@ async function main() {
     }
 
     const entries: Entry[] = [];
+    const rejected: Array<Record<string, unknown>> = [];
     for (const row of rows) {
+      const modelKey = modelKeyOf(row);
       const modelLabel = modelLabelOf(row);
-      const allowed = codesByModel.get(modelKeyOf(row)) ?? new Set<string>();
-      const parenthesised = row.generation.match(PARENTHESISED_CODE)?.[1]?.toUpperCase() ?? null;
-      const bare = parenthesised
-        ? null
-        : [...row.generation.toUpperCase().matchAll(BARE_TOKEN)].map((match) => match[1]).find((token) => allowed.has(token)) ?? null;
-      const code = parenthesised ?? bare;
-      const ordinal = row.generation.match(ORDINAL)?.[1] ?? null;
-      const candidates = [...row.generation.toUpperCase().matchAll(BARE_TOKEN)]
+      const approved = new Set((APPROVED_MODEL_CODES[modelKey] ?? []).map((code) => code.toUpperCase()));
+      const refused = new Set((REJECTED_MODEL_CODES[modelKey] ?? []).map((code) => code.toUpperCase()));
+      const tokens = [...row.generation.toUpperCase().matchAll(BARE_TOKEN)]
         .map((match) => match[1])
         .filter((token) => !NOT_A_CODE.has(token.toLowerCase()) && token !== modelLabel.toUpperCase());
+
+      const parenthesised = row.generation.match(PARENTHESISED_CODE)?.[1]?.toUpperCase() ?? null;
+      const sourceCode = parenthesised && !refused.has(parenthesised) && !NOT_A_CODE.has(parenthesised.toLowerCase()) ? parenthesised : null;
+      const approvedBare = sourceCode ? null : tokens.find((token) => approved.has(token)) ?? null;
+      const code = sourceCode ?? approvedBare;
+      const provenance: Provenance | null = sourceCode
+        ? "source_explicit"
+        : approvedBare
+          ? "derived_from_model_allowlist"
+          : null;
+      const ordinal = row.generation.match(ORDINAL)?.[1] ?? null;
+
+      for (const token of tokens) {
+        if (refused.has(token)) {
+          rejected.push({ source_value: row.generation, model: row.model, model_label: modelLabel, code: token, reason: "not_a_generation", cars: row.cars });
+        }
+      }
 
       const base = { source_value: row.generation, brand: row.brand, model: row.model, model_label: modelLabel, cars: row.cars };
 
       if (HANGUL.test(modelLabel)) {
-        entries.push({ ...base, code, label_ru: null, status: "needs_review", reason: "model_name_not_mapped", candidate_codes: candidates });
+        entries.push({ ...base, code, label_ru: null, provenance: null, status: "needs_review", reason: "model_name_not_mapped", candidate_codes: tokens });
         continue;
       }
       if (code) {
-        entries.push({ ...base, code: code.toLowerCase(), label_ru: `${modelLabel} (${code})`, status: "auto" });
+        entries.push({ ...base, code: code.toLowerCase(), label_ru: `${modelLabel} (${code})`, provenance, status: "auto" });
         continue;
       }
       if (ordinal) {
-        entries.push({ ...base, code: `${slug(modelLabel)}-gen${ordinal}`, label_ru: `${modelLabel}, ${ordinal}-е поколение`, status: "auto" });
+        entries.push({ ...base, code: `${slug(modelLabel)}-gen${ordinal}`, label_ru: `${modelLabel}, ${ordinal}-е поколение`, provenance: "source_explicit", status: "auto" });
         continue;
       }
       entries.push({
-        ...base, code: null, label_ru: null, status: "needs_review",
+        ...base, code: null, label_ru: null, provenance: null, status: "needs_review",
         reason: REFRESH.test(row.generation) ? "refresh_marker_without_generation" : "no_code_or_ordinal",
-        candidate_codes: candidates,
+        candidate_codes: tokens,
       });
     }
 
@@ -130,9 +165,10 @@ async function main() {
         "Draft of the generation dictionary for human review. label_ru is composed from the published Latin model name and a generation code the model's own allowlist recognises, or the ordinal the source states. Nothing is translated by guesswork; needs_review entries list the candidate codes found in the source value.",
       rules: {
         parenthesised_code: "any 2-4 character alphanumeric token in parentheses, e.g. (DN8), (JA), (8Y)",
-        bare_code: "recognised only when the same model already used it in parentheses",
+        bare_code: "recognised only when the model's approved list contains it",
         ordinal: "Korean N세대 becomes \"N-е поколение\"",
         review: "no code and no ordinal, or a refresh marker that cannot name a generation",
+        provenance: "source_explicit = written in the source value; derived_from_model_allowlist = approved per model",
       },
       coverage: {
         sourceValues: entries.length,
@@ -141,10 +177,17 @@ async function main() {
         autoLabeledCars: sum(auto),
         needsReview: review.length,
         needsReviewCars: sum(review),
+        byProvenance: auto.reduce<Record<string, number>>((map, entry) => {
+          const key = entry.provenance ?? "unknown";
+          map[key] = (map[key] ?? 0) + entry.cars;
+          return map;
+        }, {}),
       },
+      approvedModelCodes: APPROVED_MODEL_CODES,
       modelCodeAllowlist: Object.fromEntries([...codesByModel.entries()].map(([model, codes]) => [model, [...codes].sort()])),
       entries,
       review,
+      rejected,
     }, null, 2)}\n`, "utf8");
 
     console.log(JSON.stringify({
