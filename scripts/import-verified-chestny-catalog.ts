@@ -27,14 +27,21 @@ const model = (v: string | null) => aliases[(v ?? "").toLowerCase()] ?? (v ?? ""
  * Electric cars are electric, not hybrids. The previous revision collapsed
  * 전기 into "hybrid", which sent every EV through the hybrid duty branch and
  * let it be counted as a hybrid in the catalogue.
+ *
+ * Only the fuels the catalogue supports are mapped. Anything else (LPG,
+ * hydrogen) returns null and the row is skipped explicitly instead of being
+ * published under a raw source string: gas is intentionally out of scope for
+ * now, and an unknown fuel must not appear in the catalogue by accident.
  */
-const fuel = (v: string | null) => {
+const SUPPORTED_FUELS = new Set(["gasoline", "diesel", "electric", "hybrid"]);
+
+const fuel = (v: string | null): string | null => {
   const s = (v ?? "").toLowerCase();
   if (s.includes("디젤") || s.includes("diesel")) return "diesel";
   if (s.includes("전기") || s.includes("electric")) return "electric";
   if (s.includes("하이브리드") || s.includes("hybrid")) return "hybrid";
   if (s.includes("가솔린") || s.includes("gas")) return "gasoline";
-  return v;
+  return null;
 };
 
 const bump = (map: Record<string, number>, key: string) => { map[key] = (map[key] ?? 0) + 1; };
@@ -69,9 +76,17 @@ async function main() {
     const rows = q.rows.filter((r) => r.price_krw != null && r.model_year != null && r.current_sources?.power_hp != null);
     const payload: Array<Record<string, unknown>> = [];
     const skipReasons: Record<string, number> = {};
+    const unsupportedFuelValues: Record<string, number> = {};
 
     for (const r of rows) {
       const fuelType = fuel(r.fuel_type);
+      // Unsupported fuel (LPG, hydrogen, unknown): skipped on purpose and
+      // reported by its raw source value, never published with a raw label.
+      if (!fuelType || !SUPPORTED_FUELS.has(fuelType)) {
+        bump(skipReasons, "unsupported_fuel");
+        bump(unsupportedFuelValues, String(r.fuel_type ?? "<null>").trim());
+        continue;
+      }
       const monthInfo = resolveCalculationMonth({ registrationDate: r.first_registration_date });
 
       // A card without a usable registration month is not priced on a silent
@@ -165,6 +180,7 @@ async function main() {
       skipped: (q.rowCount ?? 0) - rows.length,
       prepared: payload.length,
       skippedByReason: skipReasons,
+      unsupportedFuelValues,
       imported: dryRun ? 0 : payload.length,
       note: "Only verified queue rows; no images copied.",
     }, null, 2));
