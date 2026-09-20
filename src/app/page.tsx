@@ -84,6 +84,7 @@ export default async function Home() {
       <CatalogQuickNav
         brands={[...new Set(facetCars.map((car) => car.brand).filter(Boolean))] as string[]}
         models={[...new Map(facetCars.filter((car) => car.brand && car.model).map((car) => [`${car.brand}:${car.model}`, { brand: car.brand!, model: car.model! }])).values()]}
+        totalCars={facetCars.length}
       />
 
       <div className="bg-[#f5f6f8]">
