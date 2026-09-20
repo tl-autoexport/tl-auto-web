@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
 import { normalizeColor, normalizeDrive } from "../src/server/normalization/vehicles";
+import { displayModelName } from "../src/server/catalog/display-model";
 import { evaluatePublication, powerBasisForFuel, resolveCalculationMonth } from "../src/server/cars/calculation-contract";
 
 config({ path: ".env.local", quiet: true });
@@ -16,12 +17,6 @@ const limit = Number(process.env.CHESTNY_PROMOTION_LIMIT ?? 0);
 if (!Number.isInteger(limit) || limit < 0) throw new Error("CHESTNY_PROMOTION_LIMIT must be a non-negative integer");
 
 const KW_PER_PS = 0.73549875;
-
-const aliases: Record<string, string> = {
-  canival: "Carnival", santafe: "Santa Fe", ray: "Ray", morning: "Morning", tiboli: "Tivoli",
-  "x2 (f39)": "X2", "1-series": "1 Series", "2-series": "2 Series",
-};
-const model = (v: string | null) => aliases[(v ?? "").toLowerCase()] ?? (v ?? "");
 
 /**
  * Electric cars are electric, not hybrids. The previous revision collapsed
@@ -132,7 +127,7 @@ async function main() {
         source_updated_at: null,
         last_seen_at: new Date().toISOString(),
         brand: r.manufacturer,
-        model: model(r.model),
+        model: displayModelName(r.model),
         generation: r.generation,
         year: r.model_year,
         registration_year: r.model_year,
@@ -169,7 +164,10 @@ async function main() {
         const cols = Object.keys(part[0]);
         const vals: unknown[] = [];
         const tuples = part.map((row) => `(${cols.map((k) => { vals.push(row[k]); return "$" + vals.length; }).join(",")})`);
-        await c.query(`insert into public.cars(${cols.join(",")}) values ${tuples.join(",")} on conflict(primary_source,source_id) do update set ${cols.filter((k) => !["primary_source", "source_id"].includes(k)).map((k) => `${k}=excluded.${k}`).join(",")},updated_at=now()`, vals);
+        // `generation` is updated with coalesce: an empty source value must not
+        // erase a generation that was already resolved for the card.
+        const updatable = cols.filter((k) => !["primary_source", "source_id", "generation"].includes(k));
+        await c.query(`insert into public.cars(${cols.join(",")}) values ${tuples.join(",")} on conflict(primary_source,source_id) do update set ${updatable.map((k) => `${k}=excluded.${k}`).join(",")},generation=coalesce(excluded.generation,cars.generation),updated_at=now()`, vals);
       }
     }
 

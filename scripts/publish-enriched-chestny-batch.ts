@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
 import { canonicalCandidates, canonicalInput } from "../src/server/power-resolution/canonical";
+import { displayModelName } from "../src/server/catalog/display-model";
 import { evaluatePublication } from "../src/server/cars/calculation-contract";
 import { tierFromStored, type EvidenceTier } from "../src/server/power-resolution/evidence-tiers";
 import { decidePublication } from "../src/server/power-resolution/publication-gate";
@@ -49,12 +50,8 @@ type RefRow = {
   production_year_to: number | null; engine_cc_from: number | null; engine_cc_to: number | null;
 };
 
-/** Model names kept for storage only; matching uses the canonical module. */
-const aliases: Record<string, string> = {
-  canival: "Carnival", morning: "Morning", ray: "Ray", "1-series": "1 Series", "2-series": "2 Series",
-  avante: "AVANTE", tiboli: "Tivoli", "glb-class": "GLB-Class",
-};
-const displayModel = (value: string | null) => aliases[(value ?? "").trim().toLowerCase()] ?? (value ?? "").trim();
+/** Model names are written through the shared mapping so every writer agrees. */
+const displayModel = displayModelName;
 
 /** External gallery only; duplicates and non-http entries are dropped, order kept. */
 const galleryUrls = (value: unknown) => {

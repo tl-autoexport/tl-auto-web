@@ -1,17 +1,25 @@
 import { Client } from "pg";
 import { config } from "dotenv";
+import { canonicalModelKey } from "../src/server/catalog/display-model";
+import { normalizeBrand } from "../src/server/normalization/vehicles";
 
 /**
  * Backfills `cars.generation` from the source staging row.
  *
- * It never trusts the pairing blindly: a row is written only when the staging
- * row exists for the same `source_listing_id` and the brand, model and year
- * agree with the published car. Everything else is reported instead of written.
+ * It never trusts the pairing blindly. A row is written only when:
+ *   - the car belongs to `chestny_prigon` — a numeric `source_id` of an Encar
+ *     car can coincidentally equal a staging listing id, and that pair would be
+ *     meaningless;
+ *   - the staging row exists for the same `source_listing_id`;
+ *   - brand, model and year agree, compared in canonical form through the very
+ *     mapping the writers use, so `1-Series` and `1 Series` are not treated as
+ *     different cars.
  *
- * The report separates three groups, because they need different follow-up:
- *   - filled            matched, verified and written;
- *   - matched_no_source matched, but the source row has no generation;
- *   - unmatched         no staging row at all (needs the dictionary layer).
+ * A generation written earlier onto a car from another source is cleared,
+ * because such a value could only come from a coincidental identifier match.
+ *
+ * The report separates the follow-up groups: written, matched without a source
+ * value, no staging row at all, refused identity mismatches.
  *
  * Read-only by default; set GENERATION_BACKFILL_WRITE=true to apply.
  * No Encar requests.
@@ -24,11 +32,21 @@ if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
 type Row = {
   car_id: string;
   source_id: string;
+  primary_source: string;
+  brand: string | null;
+  model: string | null;
+  year: number | null;
   generation: string | null;
-  source_generation: string | null;
   has_source: boolean;
-  brand_ok: boolean;
-  year_ok: boolean;
+  source_brand: string | null;
+  source_model: string | null;
+  source_year: number | null;
+  source_generation: string | null;
+};
+
+const sameBrand = (left: string | null, right: string | null) => {
+  if (!left || !right) return true;
+  return (normalizeBrand(left) ?? left).toLowerCase() === (normalizeBrand(right) ?? right).toLowerCase();
 };
 
 async function main() {
@@ -36,34 +54,49 @@ async function main() {
   await db.connect();
   try {
     const { rows } = await db.query<Row>(`
-      select c.id as car_id, c.source_id, c.generation,
-             s.generation as source_generation,
+      select c.id as car_id, c.source_id, c.primary_source, c.brand, c.model, c.year, c.generation,
              (s.source_listing_id is not null) as has_source,
-             (s.manufacturer is null or c.brand is null or lower(s.manufacturer) = lower(c.brand)) as brand_ok,
-             (s.model_year is null or c.year is null or s.model_year = c.year) as year_ok
+             s.manufacturer as source_brand, s.model as source_model,
+             s.model_year as source_year, s.generation as source_generation
       from public.cars c
       left join public.chestny_catalog_staging s on s.source_listing_id = c.source_id
       where c.is_available = true`);
 
-    const candidates: Array<{ carId: string; sourceId: string; generation: string }> = [];
+    const candidates: Array<{ carId: string; generation: string }> = [];
+    const foreignSourceCarIds: string[] = [];
     let matchedNoSource = 0;
     let unmatched = 0;
     let identityMismatch = 0;
     let alreadySet = 0;
+    let wrongModel = 0;
 
     for (const row of rows) {
+      const isChestny = row.primary_source === "chestny_prigon";
+
+      // A generation on a car from another source can only be a coincidence.
+      if (!isChestny) {
+        if (row.generation) foreignSourceCarIds.push(row.car_id);
+        unmatched++;
+        continue;
+      }
       if (!row.has_source) { unmatched++; continue; }
       if (!row.source_generation) { matchedNoSource++; continue; }
       if (row.generation === row.source_generation) { alreadySet++; continue; }
-      if (!row.brand_ok || !row.year_ok) { identityMismatch++; continue; }
-      candidates.push({ carId: row.car_id, sourceId: row.source_id, generation: row.source_generation });
+      if (!sameBrand(row.brand, row.source_brand) || canonicalModelKey(row.model) !== canonicalModelKey(row.source_model) ||
+        (row.year != null && row.source_year != null && row.year !== row.source_year)) {
+        identityMismatch++;
+        if (canonicalModelKey(row.model) !== canonicalModelKey(row.source_model)) wrongModel++;
+        continue;
+      }
+      candidates.push({ carId: row.car_id, generation: row.source_generation });
     }
 
     const distinct = new Map<string, number>();
     for (const candidate of candidates) distinct.set(candidate.generation, (distinct.get(candidate.generation) ?? 0) + 1);
 
     let written = 0;
-    if (write && candidates.length) {
+    let cleared = 0;
+    if (write && (candidates.length || foreignSourceCarIds.length)) {
       await db.query("begin");
       try {
         for (let i = 0; i < candidates.length; i += 500) {
@@ -75,6 +108,14 @@ async function main() {
             [part.map((item) => item.carId), part.map((item) => item.generation)],
           );
           written += result.rowCount ?? 0;
+        }
+        for (let i = 0; i < foreignSourceCarIds.length; i += 500) {
+          const result = await db.query(
+            `update public.cars set generation = null, updated_at = now()
+              where id = any($1::uuid[]) and generation is not null`,
+            [foreignSourceCarIds.slice(i, i + 500)],
+          );
+          cleared += result.rowCount ?? 0;
         }
         await db.query("commit");
       } catch (error) {
@@ -90,10 +131,13 @@ async function main() {
       written,
       alreadyHadGeneration: alreadySet,
       matchedWithoutSourceValue: matchedNoSource,
-      unmatchedNoStagingRow: unmatched,
+      unmatchedNoChestnySourceRow: unmatched,
       identityMismatchRefused: identityMismatch,
+      identityMismatchByModel: wrongModel,
+      foreignSourceGenerationToClear: foreignSourceCarIds.length,
+      foreignSourceGenerationCleared: cleared,
       distinctGenerationsToWrite: distinct.size,
-      topValues: [...distinct.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15).map(([generation, cars]) => ({ generation, cars })),
+      sample: candidates.slice(0, 5).map((candidate) => ({ carId: candidate.carId, generation: candidate.generation })),
       encarRequests: 0,
     }, null, 2));
   } finally {
