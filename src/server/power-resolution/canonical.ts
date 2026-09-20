@@ -172,3 +172,74 @@ export function configurationKey(input: CanonicalVehicleInput): string {
     input.driveType ?? "-",
   ].join(" | ");
 }
+
+/**
+ * Engine displacement as one number, whatever the source wrote.
+ *
+ * Sources spell the same engine as `1598`, `1.6`, `1.598L`, `1.6T` or
+ * `1,598 cc`. A bare four-digit number is cubic centimetres; a number below ten
+ * is litres. Anything else is left unknown rather than guessed, so a value that
+ * cannot be read never silently becomes a match.
+ */
+export function canonicalEngineCc(value: unknown): number | null {
+  const text = String(value ?? "").trim().toLowerCase();
+  if (!text) return null;
+
+  // Explicit cubic centimetres anywhere in the text: 1,598 cc, 1598毫升.
+  const explicitCc = text.match(/(\d{1,2}[,.]?\d{3})\s*(?:cc|毫升)/);
+  if (explicitCc) return Math.round(Number(explicitCc[1].replace(",", "")));
+
+  // A leading decimal is litres: 1.6, 1.598l, 1.6t, 2.0 柴油, 1.6升.
+  // Anchored on purpose: an unanchored pattern read the tail of `1.598l` as `8l`.
+  const litres = text.match(/^(\d[.,]\d{1,3})(?![.,]?\d)/);
+  if (litres) {
+    const parsed = Number(litres[1].replace(",", "."));
+    if (parsed >= 0.6 && parsed <= 8) return Math.round(parsed * 1000);
+  }
+
+  // A standalone four-digit number, also at the end of a longer label
+  // (`Prestige 1598`), which is how the sources write the engine group.
+  const trailing = text.match(/(?:^|\s)(\d{3,4})$/);
+  return trailing ? Number(trailing[1]) : null;
+}
+
+/**
+ * Drive layout as one of three explicit values, or generic two-wheel drive.
+ *
+ * `FWD` and `RWD` must stay distinguishable: collapsing them lets a rear-wheel
+ * car take the power of the front-wheel version of the same engine. Korean and
+ * Chinese spellings are recognised because both appear in our sources.
+ *
+ * `TWO_WHEEL_GENERIC` covers `2WD` without an axle stated, and `null` means the
+ * source said nothing. Both are compatible with either explicit value, only a
+ * conflict between two explicit different layouts is a real conflict.
+ */
+export type DriveGroup = "FWD" | "RWD" | "AWD" | "TWO_WHEEL_GENERIC" | null;
+
+export function canonicalDriveGroup(value: unknown): DriveGroup {
+  const text = String(value ?? "").trim().toLowerCase();
+  if (!text) return null;
+
+  const allWheel = /awd|4wd|4x4|四驱|四轮|4륜|사륜|상시사륜|전자식사륜/;
+  if (allWheel.test(text)) return "AWD";
+
+  const front = /fwd|前驱|前置前驱|전륜|앞바퀴|ff\b/;
+  if (front.test(text)) return "FWD";
+
+  const rear = /rwd|后驱|후륜|뒷바퀴|fr\b/;
+  if (rear.test(text)) return "RWD";
+
+  if (/2wd|two.?wheel/i.test(text)) return "TWO_WHEEL_GENERIC";
+
+  return null;
+}
+
+/**
+ * Compatibility rule for the drive layout: an unknown or generic value never
+ * blocks, only two explicit and different layouts do.
+ */
+export function driveGroupsCompatible(source: DriveGroup, target: DriveGroup): boolean {
+  if (source == null || target == null) return true;
+  if (source === "TWO_WHEEL_GENERIC" || target === "TWO_WHEEL_GENERIC") return true;
+  return source === target;
+}

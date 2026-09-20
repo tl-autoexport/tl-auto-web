@@ -1,61 +1,86 @@
 import fs from "node:fs";
+import { matchCardGroup, type AutoHomeSpec } from "../src/server/catalog/autohome-match";
 
+/**
+ * Matches AutoHome specifications against catalogue card groups.
+ *
+ * The matching rules live in `src/server/catalog/autohome-match.ts` so they are
+ * covered by tests, and the normalisation of displacement, fuel and drive layout
+ * is shared with the rest of the system through
+ * `src/server/power-resolution/canonical.ts`. This script only reads the source
+ * dump, calls the ladder and writes the report.
+ *
+ * The report now carries the reason as well: which features matched, which one
+ * blocked, and at which year tier the match was reached. That is what makes it
+ * possible to see whether candidates are lost to the year, the displacement, the
+ * drive layout or an ambiguous power, instead of guessing.
+ */
 const input = process.env.AUTOHOME_INPUT ?? "/tmp/tl-auto-autohome-ice-v2.json";
 const output = process.env.AUTOHOME_MATCH_OUTPUT ?? "/tmp/tl-auto-autohome-ice-matches.json";
 const data = JSON.parse(fs.readFileSync(input, "utf8"));
 
-function ccFrom(text: string) {
-  const liters = text.match(/(\d+(?:\.\d+)?)\s*(?:升|L|T)\b/i);
-  if (liters) return Math.round(Number(liters[1]) * 1000);
-  const cc = text.match(/(\d{3,4})\s*(?:cc|毫升)/i);
-  return cc ? Number(cc[1]) : null;
-}
-function driveCompatible(source: string | null, ah: string | null) {
-  if (!source || !ah) return true;
-  const four = /4WD|四驱|四轮驱动/i.test(source);
-  const ahFour = /四驱|四轮/i.test(ah);
-  return four === ahFour;
-}
-function nameTokens(value: string | null) {
-  return new Set((value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").split(/\s+/).filter((x: string) => x.length >= 2));
-}
-function trimCompatible(trim: string | null, names: string[]) {
-  const tokens = [...nameTokens(trim)].filter((token) => !new Set(["4matic", "xdrive", "sdrive", "line", "premium", "luxury", "sport", "classic", "edition", "favoured", "signature", "noblesse", "core", "se", "re"]).has(token));
-  if (!tokens.length) return true;
-  return names.some((name) => tokens.some((token) => name.toLowerCase().includes(token)));
-}
-function hasBadgeHint(trim: string | null) {
-  return /(?:\b(?:gti|tdi|tfsi|td4|all4|xdrive|sdrive)\b|\b[a-z]{1,3}\s?\d{2,3}[a-z]*\b|\b[dp]\d{3}\b)/i.test(trim ?? "");
-}
+type Group = {
+  model_year: number | null;
+  engine_cc: number | null;
+  fuel_type: string | null;
+  drive_type: string | null;
+  trim: string | null;
+  cards: number;
+  [key: string]: unknown;
+};
 
-// The AutoHome payload is external and untyped; the fields below are always
-// populated for the series that reach this script, exactly as assumed before.
-type AutoHomeSpec = { year: number | string | null; name: string; engineGroup: string; drive: string | null; powerHp: number | string | null; specId: string | null };
-type MatchRow = { status: string; cards: number; [key: string]: unknown };
-
-const rows: MatchRow[] = [];
-for (const series of data.series) {
+const rows: Array<Record<string, unknown>> = [];
+for (const series of data.series as Array<{ seriesId: unknown; key: unknown; groups: Group[]; specs: AutoHomeSpec[] }>) {
   for (const group of series.groups) {
-    const candidates = (series.specs as AutoHomeSpec[]).filter((spec) => {
-      if (group.model_year && spec.year && Math.abs(Number(spec.year) - Number(group.model_year)) > 1) return false;
-      if (group.engine_cc) {
-        const cc = ccFrom(`${spec.engineGroup ?? ""} ${spec.name ?? ""}`);
-        if ((!cc || Math.abs(cc - Number(group.engine_cc)) > 80) && !(hasBadgeHint(group.trim) && trimCompatible(group.trim, [spec.name, spec.engineGroup]))) return false;
-      }
-      if (!driveCompatible(group.drive_type, spec.drive)) return false;
-      const specText = `${spec.name ?? ""} ${spec.engineGroup ?? ""}`;
-      if (group.fuel_type === "디젤" && /汽油|汽油机|燃油类型/.test(specText) && !/柴油|d[ií]esel/i.test(specText)) return false;
-      if (group.fuel_type === "가솔린" && /柴油|d[ií]esel/i.test(specText)) return false;
-      return true;
+    const result = matchCardGroup({
+      model_year: group.model_year,
+      engine_cc: group.engine_cc,
+      fuel_type: group.fuel_type,
+      drive_type: group.drive_type,
+      trim: group.trim,
+    }, series.specs ?? []);
+
+    rows.push({
+      ...group,
+      seriesId: series.seriesId,
+      sourceKey: series.key,
+      candidateCount: result.usable.length,
+      powers: result.powers,
+      status: result.status,
+      yearTier: result.yearTier,
+      matchedFeatures: result.matchedFeatures,
+      failedFeature: result.failedFeature,
+      rejectionCounts: result.rejectionCounts,
+      candidates: result.usable.slice(0, 20).map((spec) => ({
+        name: spec.name, year: spec.year, powerHp: spec.powerHp, drive: spec.drive, engineGroup: spec.engineGroup, specId: spec.specId,
+      })),
     });
-    const trimmed = candidates.filter((spec) => trimCompatible(group.trim, [spec.name, spec.engineGroup]));
-    const usable = trimmed.length ? trimmed : candidates;
-    const powers = [...new Set(usable.map((x) => Number(x.powerHp)).filter((x) => Number.isFinite(x) && x > 0))];
-    const status = powers.length === 1 && usable.length > 0 ? (trimmed.length ? "high_confidence" : "review") : powers.length > 1 ? "ambiguous" : "no_match";
-    rows.push({ ...group, seriesId: series.seriesId, sourceKey: series.key, candidateCount: usable.length, powers, status, candidates: usable.slice(0, 20).map((x) => ({ name: x.name, year: x.year, powerHp: x.powerHp, drive: x.drive, engineGroup: x.engineGroup, specId: x.specId })) });
   }
 }
-const counts = rows.reduce((m, row) => { m[row.status] = (m[row.status] ?? 0) + row.cards; return m; }, {} as Record<string, number>);
-const groups = rows.reduce((m, row) => { m[row.status] = (m[row.status] ?? 0) + 1; return m; }, {} as Record<string, number>);
-fs.writeFileSync(output, JSON.stringify({ input, totalCards: rows.reduce((n, r) => n + r.cards, 0), counts, groups, rows }, null, 2));
-console.log(JSON.stringify({ totalCards: rows.reduce((n, r) => n + r.cards, 0), counts, groups, output }, null, 2));
+
+const counts = rows.reduce<Record<string, number>>((map, row) => {
+  const status = String(row.status);
+  map[status] = (map[status] ?? 0) + Number(row.cards ?? 0);
+  return map;
+}, {} as Record<string, number>);
+const groups = rows.reduce<Record<string, number>>((map, row) => {
+  const status = String(row.status);
+  map[status] = (map[status] ?? 0) + 1;
+  return map;
+}, {} as Record<string, number>);
+const failedFeatures = rows.reduce<Record<string, number>>((map, row) => {
+  if (!row.failedFeature) return map;
+  const feature = String(row.failedFeature);
+  map[feature] = (map[feature] ?? 0) + Number(row.cards ?? 0);
+  return map;
+}, {} as Record<string, number>);
+const yearTiers = rows.reduce<Record<string, number>>((map, row) => {
+  if (!row.yearTier) return map;
+  const tier = String(row.yearTier);
+  map[tier] = (map[tier] ?? 0) + Number(row.cards ?? 0);
+  return map;
+}, {} as Record<string, number>);
+
+const totalCards = rows.reduce((sum, row) => sum + Number(row.cards ?? 0), 0);
+fs.writeFileSync(output, JSON.stringify({ input, totalCards, counts, groups, failedFeatures, yearTiers, rows }, null, 2));
+console.log(JSON.stringify({ totalCards, counts, groups, failedFeatures, yearTiers, output }, null, 2));
