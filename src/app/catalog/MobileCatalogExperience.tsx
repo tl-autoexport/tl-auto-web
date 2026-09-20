@@ -120,7 +120,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   return <div className="md:hidden">
     <div className="grid gap-2">
       <button className="flex min-h-14 items-center justify-between rounded-xl border border-[#d7dee8] bg-white px-4 text-left" onClick={() => setScreen(selected("brand") ? "parameters" : "brand")} type="button">
-        <span className="min-w-0"><span className="block text-[10px] font-semibold uppercase tracking-[.12em] text-[#956f2c]">Фильтр</span><span className="mt-0.5 block truncate text-[15px] font-semibold text-[#101827]">{selectedSummary || "Марка и модель"}</span>{needsGeneration ? <span className="mt-0.5 block truncate text-xs text-[#7a8798]">Указать поколение</span> : null}</span><ChevronRight className="shrink-0 text-[#647084]" size={20} />
+        <span className="min-w-0"><span className="block truncate text-[15px] font-semibold text-[#101827]">{selectedSummary || "Марка и модель"}</span>{needsGeneration ? <span className="mt-0.5 block truncate text-xs text-[#7a8798]">Указать поколение</span> : null}</span><ChevronRight className="shrink-0 text-[#647084]" size={20} />
       </button>
       <div className="grid grid-cols-3 overflow-hidden rounded-xl border border-[#d7dee8] bg-white">
         <button className="min-h-12 border-r border-[#e1e5eb] text-sm font-semibold" onClick={() => setScreen("year")} type="button">Год</button>
