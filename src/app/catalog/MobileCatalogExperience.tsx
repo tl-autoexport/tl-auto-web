@@ -82,8 +82,9 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     });
   }
 
-  function apply() {
-    const suffix = query ? `?${query}` : "";
+  function apply(nextDraft = draft) {
+    const nextQuery = nextDraft.toString();
+    const suffix = nextQuery ? `?${nextQuery}` : "";
     router.replace(`/catalog${suffix}#catalog-results`, { scroll: false });
     setScreen("home");
   }
@@ -121,7 +122,13 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     if (axis === "generation") { patch({ generation: selected("generation") === option.value ? null : option.value }); }
   }
 
-  function changeSort(value: string) { patch({ sort: value }); apply(); }
+  function changeSort(value: string) {
+    const next = new URLSearchParams(draft);
+    next.delete("page");
+    next.set("sort", value);
+    setDraft(next);
+    apply(next);
+  }
   const chips = [selected("brand"), selected("model"), generationLabel(selected("generation"), currentFacets)].filter(Boolean);
   const hasAppliedFilters = chips.length > 0 || activeParameters > 0;
 
@@ -146,7 +153,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
         {screen === "year" || screen === "price" ? <Range title={screen === "year" ? "Год выпуска" : "Цена до Владивостока, ₽"} minKey={screen === "year" ? "yearMin" : "priceMin"} maxKey={screen === "year" ? "yearMax" : "priceMax"} onOpen={setRangePicker} selected={selected} /> : null}
         {screen === "sort" ? <div className="overflow-hidden rounded-2xl bg-white">{sortOptions.map((option) => <button className={`flex min-h-14 w-full items-center justify-between border-b border-[#edf0f4] px-4 text-left text-sm ${selected("sort") === option.value ? "font-semibold text-[#956f2c]" : "text-[#273246]"}`} key={option.value} onClick={() => changeSort(option.value)} type="button">{option.label}<span>{selected("sort") === option.value ? "✓" : ""}</span></button>)}</div> : null}
       </div>
-      {screen !== "sort" ? <div className="shrink-0 border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount} onClick={apply} type="button">{loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button></div> : null}
+      {screen !== "sort" ? <div className="shrink-0 border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount} onClick={() => apply()} type="button">{loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button></div> : null}
     </div> : null}
     {rangePicker ? <RangePicker onClose={() => setRangePicker(null)} patch={patch} selected={selected} state={rangePicker} /> : null}
   </div>;
