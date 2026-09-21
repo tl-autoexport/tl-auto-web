@@ -6,7 +6,7 @@ import {
   MessageCircle,
   Share2,
 } from "lucide-react";
-import { RemoteImage } from "@/components/site/RemoteImage";
+import { CatalogCardPhotoGallery } from "@/components/catalog/CatalogCardPhotoGallery";
 import { useDestination } from "@/components/site/DestinationProvider";
 import { vehicleClientMessage, whatsappContactUrl } from "@/lib/contact";
 import { publicCarPath } from "@/lib/car-url";
@@ -105,12 +105,8 @@ export function PrototypeVehicleCard({ car, priorityImage = false }: { car: Vehi
     >
       <Link aria-label={`Открыть карточку ${title}`} className="absolute inset-0 z-0" href={detailsHref} prefetch={false} />
 
-      <div className="pointer-events-none relative z-10 aspect-[2.25/1] overflow-hidden bg-[#e8edf3]">
-        {showcasePhoto ? (
-          <RemoteImage alt={title} className="object-cover" decoding="async" fill loading={priorityImage ? "eager" : "lazy"} priority={priorityImage} sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)" src={showcasePhoto} />
-        ) : (
-          <div className="flex h-full items-center justify-center text-sm text-[#647084]">Фото временно недоступно</div>
-        )}
+      <div className="relative z-10">
+        <CatalogCardPhotoGallery alt={title} href={detailsHref} mediaCount={car.media_count} primaryImageUrl={showcasePhoto} priority={priorityImage} source={car.primary_source} sourceId={car.source_id} />
       </div>
 
       <div className="pointer-events-none relative z-10 flex-1 p-2.5 sm:p-4">

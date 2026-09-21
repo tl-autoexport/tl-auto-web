@@ -70,6 +70,41 @@ export type CatalogCardSummary = Omit<CatalogCar, "vehicle_specs" | "car_media">
   seats: number | null;
 };
 
+/** Five lightweight photo URLs for an already-opened catalogue card. */
+export async function getCatalogPreviewImages(source: string, sourceId: string): Promise<string[]> {
+  if (buildWithoutCatalog || !["encar", "chestny_prigon"].includes(source)) return [];
+
+  const supabase = createSupabaseServerRead();
+  const { data, error } = await supabase
+    .from("cars")
+    .select("car_media(url, thumbnail_url, media_type, category, is_primary, sort_order)")
+    .eq("primary_source", source)
+    .eq("source_id", sourceId)
+    .eq("is_available", true)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[cars] Preview media query failed", { source, sourceId, error });
+    return [];
+  }
+
+  const media = Array.isArray(data?.car_media) ? data.car_media : [];
+  return [...media]
+    .filter((item) => item.media_type === "image" && Boolean(item.url))
+    .sort((left, right) => previewPhotoScore(right) - previewPhotoScore(left) || Number(right.is_primary) - Number(left.is_primary) || left.sort_order - right.sort_order)
+    .map((item) => item.thumbnail_url || item.url)
+    .filter((url, index, urls) => urls.indexOf(url) === index)
+    .slice(0, 5);
+}
+
+function previewPhotoScore(media: { url: string; category: string | null }) {
+  const category = media.category?.toLowerCase() ?? "";
+  if (["inner", "inside", "inside_image", "interior", "option", "condition", "scratch", "inspection_record", "underbody", "thermal", "thermal_reference", "exterior_360_thumbnail"].some((blocked) => category === blocked || category.startsWith(`${blocked}_`))) return 0;
+  const fileCode = Number(media.url.match(/_(\d{3})(?:\.[a-z]+)(?:\?|$)/i)?.[1] ?? Number.NaN);
+  if (["outside", "outside_image", "exterior", "outer"].includes(category)) return 400 + (fileCode === 1 ? 140 : fileCode === 3 ? 130 : fileCode === 5 ? 90 : fileCode === 2 ? 25 : 0);
+  return 100;
+}
+
 export type CatalogPageResult = {
   cars: CatalogCardSummary[];
   nextCursor: string | null;
