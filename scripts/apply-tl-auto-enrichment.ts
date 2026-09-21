@@ -5,6 +5,7 @@ import { categorizeOption, translateInspectionLabel, translateInspectionStatus, 
 config({ path: ".env", quiet: true });
 const runId = process.env.TL_AUTO_ENRICHMENT_RUN_ID ?? "349fe610-17e0-4df8-8053-bcd7d234983d";
 const write = process.env.TL_AUTO_ENRICHMENT_APPLY === "true";
+const approvedIds = process.env.TL_AUTO_ENRICHMENT_APPROVED_IDS?.split(",").map((value) => value.trim()).filter(Boolean);
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
 if (!url || !key) throw new Error("NEXT_PUBLIC_SUPABASE_URL and Supabase service key are required");
@@ -64,8 +65,8 @@ async function main() {
     pages<Car>("cars", "id,source_id", (q) => q.eq("is_available", true)),
   ]);
   const stageBySource = new Map(staging.map((row) => [row.source_listing_id, row])); const carBySource = new Map(cars.map((row) => [row.source_id, row]));
-  const work = queue.filter((q) => q.status === "succeeded" && stageBySource.get(q.source_listing_id)?.raw_payload && carBySource.has(q.source_listing_id));
-  const report = { runId, write, encarRequests: 0, matchedCars: work.length, reports: 0, options: 0, galleryImages: 0, galleriesSkippedEmpty: 0, errors: [] as string[] };
+  const work = queue.filter((q) => q.status === "succeeded" && (!approvedIds || approvedIds.includes(q.source_listing_id)) && stageBySource.get(q.source_listing_id)?.raw_payload && carBySource.has(q.source_listing_id));
+  const report = { runId, write, allowlistApplied: Boolean(approvedIds), allowlistedIds: approvedIds?.length ?? null, matchedCars: work.length, reports: 0, options: 0, galleryImages: 0, galleriesSkippedEmpty: 0, errors: [] as string[] };
   for (const q of work) {
     const car = carBySource.get(q.source_listing_id)!; const payload = stageBySource.get(q.source_listing_id)!.raw_payload!;
     const reportReady = Boolean(q.task.insurance) && ready(q, "insurance"); const optionReady = Boolean(q.task.options) && ready(q, "options"); const galleryReady = Boolean(q.task.gallery) && ready(q, "gallery");
