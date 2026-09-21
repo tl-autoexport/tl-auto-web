@@ -7,7 +7,6 @@ import {
   BadgeCheck,
   Calculator,
   ChevronDown,
-  Info,
   MessageCircle,
   Phone,
   RefreshCw,
@@ -141,7 +140,6 @@ function RuPriceCalculationCard({
 }: PriceCalculationCardProps) {
   const { city } = useDestination();
   const [isModalOpen, setModalOpen] = useState(false);
-  const [isDutyInfoOpen, setDutyInfoOpen] = useState(false);
   const [currency, setCurrency] = useState<"RUB" | "USD">("RUB");
   const calculationTitleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -326,21 +324,8 @@ function RuPriceCalculationCard({
           ))}
         </div>
 
-        <div className="relative mt-5">
-          <button
-            aria-expanded={isDutyInfoOpen}
-            className="flex min-h-11 w-full items-center justify-between gap-3 rounded border border-[#d8dde6] bg-[#fafbfc] px-3 py-2 text-left text-xs font-medium leading-4 text-[#39475a] sm:text-sm"
-            onClick={() => setDutyInfoOpen((value) => !value)}
-            type="button"
-          >
-            Таможенные платежи рассчитываются по действующим ставкам и курсам на дату оформления. Итог предварительный.
-            <Info size={16} className="text-[#647084]" />
-          </button>
-          {isDutyInfoOpen && (
-            <div className="absolute z-10 mt-2 rounded bg-[#07152d] p-4 text-sm leading-5 text-white shadow-xl" role="status">
-              <>Точная сумма зависит от возраста автомобиля, объёма двигателя, стоимости автомобиля и даты таможенного оформления. Для подтверждения расчёта свяжитесь с менеджером.</>
-            </div>
-          )}
+        <div className="mt-5 rounded border border-[#d8dde6] bg-[#fafbfc] px-3 py-3 text-left text-xs font-semibold leading-4 text-[#39475a] sm:text-sm">
+          Расчёт предварительный. Итоговая стоимость и мощность уточняются по данным конкретной комплектации.
         </div>
 
         <div className="mt-4 grid gap-2.5 text-[13px] sm:mt-5 sm:gap-3 sm:text-sm">
