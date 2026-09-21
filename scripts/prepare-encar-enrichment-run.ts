@@ -34,7 +34,7 @@ async function main() {
     const sourceListingId = String(candidate.sourceListingId ?? candidate.source_listing_id ?? "").trim();
     const sourceUrl = String(candidate.sourceUrl ?? candidate.source_url ?? `https://www.encar.com/dc/dc_cardetailview.do?carid=${sourceListingId}`).trim();
     if (!source || !sourceListingId || !sourceUrl) throw new Error("Every candidate needs source, sourceListingId, and sourceUrl");
-    const defaultTask = { insurance: purpose === "insurance" || purpose === "full", options: purpose === "options" || purpose === "full", gallery: purpose === "gallery" || purpose === "full", diagnosis: purpose === "full", sellingpoint: purpose === "full", contents: purpose === "full", history: purpose === "full", category: purpose === "full" };
+    const defaultTask = { insurance: purpose === "insurance" || purpose === "full", options: purpose === "options" || purpose === "full", gallery: purpose === "gallery" || purpose === "full", diagnosis: purpose === "full", sellingpoint: purpose === "full", contents: purpose === "full", history: purpose === "full", category: purpose === "full" && Boolean(candidate.manufacturerCd ?? candidate.manufacturer_cd) && Boolean(candidate.modelCd ?? candidate.model_cd) };
     const task = candidate.task && typeof candidate.task === "object" ? { ...defaultTask, ...(candidate.task as Record<string, unknown>) } : defaultTask;
     return { source, source_listing_id: sourceListingId, source_url: sourceUrl, task, candidate_snapshot: candidate };
   });
