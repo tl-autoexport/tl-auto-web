@@ -286,7 +286,7 @@ function compactOptionRow(option: EncarOptionRow) {
   };
 }
 
-type ImportOptions = {
+export type ImportOptions = {
   target?: number;
   maxPages?: number;
   electricTarget?: number;
@@ -302,6 +302,8 @@ type ImportOptions = {
   brandMinimums?: Record<string, number>;
   modelMinimums?: Record<string, number>;
   priorityBrandPages?: Record<string, number>;
+  /** Return safe queue payloads during a dry run without inserting cars. */
+  collectNewCandidateDrafts?: boolean;
 };
 
 type EncarFilterBounds = {
@@ -1637,6 +1639,16 @@ export async function importEncar(options: ImportOptions = {}) {
         ).length,
         reportTypes: item.reports.map((report) => report.report_type),
       })),
+      candidateDrafts: options.collectNewCandidateDrafts
+        ? mapped.map((item) => ({
+            source: "encar",
+            sourceListingId: item.car.source_id,
+            sourceUrl: item.car.source_url,
+            brand: item.car.brand,
+            model: item.car.model,
+            year: item.car.year,
+          }))
+        : undefined,
     };
   }
 
