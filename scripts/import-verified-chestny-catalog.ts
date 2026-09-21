@@ -113,6 +113,8 @@ async function main() {
         calculationMonth: monthInfo.month,
         fuelType,
         hybridDvsPowerHp: null,
+        powerConfidence: "high",
+        calculationPowerSpecId: null,
         legacyCalculationStatus: null,
       });
       if (!verdict.ok) { bump(skipReasons, `contract_${verdict.blockers[0]}`); continue; }

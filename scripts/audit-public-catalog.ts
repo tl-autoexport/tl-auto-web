@@ -18,7 +18,9 @@ type PublicAuditCar = {
   vehicle_specs: Record<string, unknown> | null;
   calculation_power_status: string | null;
   calculation_power_kw: number | null;
+  calculation_power_spec_id: string | null;
   power_basis: string | null;
+  power_confidence: string | null;
   power_resolution_source: string | null;
   calculation_month: number | null;
   hybrid_dvs_power_hp: number | null;
@@ -37,7 +39,7 @@ async function main() {
     const { data, error } = await supabase
       .from("cars")
       .select(
-        "id, primary_source, brand, fuel_type, price_rub, power_hp, source_url, source_updated_at, has_360_interior, vehicle_specs, calculation_power_status, calculation_power_kw, power_basis, power_resolution_source, calculation_month, hybrid_dvs_power_hp, legacy_calculation_status",
+        "id, primary_source, brand, fuel_type, price_rub, power_hp, source_url, source_updated_at, has_360_interior, vehicle_specs, calculation_power_status, calculation_power_kw, calculation_power_spec_id, power_basis, power_confidence, power_resolution_source, calculation_month, hybrid_dvs_power_hp, legacy_calculation_status",
       )
       .eq("is_available", true)
       // TL Auto's public catalogue is currently mirrored from the
@@ -73,6 +75,7 @@ async function main() {
   }
 
   const gateFailures = new Map<string, number>();
+  const preliminaryByConfidence: Record<string, number> = {};
   let gateChecked = 0;
   for (const car of cars) {
     // An unpriced card simply shows no landed price; the contract only has to
@@ -89,11 +92,21 @@ async function main() {
       calculationMonth: car.calculation_month,
       fuelType: car.fuel_type,
       hybridDvsPowerHp: car.hybrid_dvs_power_hp,
+      powerConfidence: car.power_confidence,
+      calculationPowerSpecId: car.calculation_power_spec_id,
       legacyCalculationStatus: car.legacy_calculation_status,
     };
     const verdict = evaluatePublication(candidate);
-    if (verdict.ok) continue;
-    for (const blocker of verdict.blockers) gateFailures.set(blocker, (gateFailures.get(blocker) ?? 0) + 1);
+    if (!verdict.ok) {
+      for (const blocker of verdict.blockers) gateFailures.set(blocker, (gateFailures.get(blocker) ?? 0) + 1);
+      continue;
+    }
+    // A published price that is only preliminary is a normal state, but its
+    // number must be visible: it is what the customer sees on the card.
+    if (verdict.finality === "preliminary") {
+      const confidence = car.power_confidence ?? "unknown";
+      preliminaryByConfidence[confidence] = (preliminaryByConfidence[confidence] ?? 0) + 1;
+    }
   }
   const brandCount = (brand: string) =>
     cars.filter((car) => car.brand === brand).length;
@@ -145,6 +158,11 @@ async function main() {
       checked: gateChecked,
       withSnapshot: snapshotCarIds.size,
       failures: Object.fromEntries(gateFailures),
+    },
+    priceFinality: {
+      preliminary: Object.values(preliminaryByConfidence).reduce((sum, count) => sum + count, 0),
+      byConfidence: preliminaryByConfidence,
+      note: "Preliminary prices are published by design and marked on the car page only; the catalogue list and sorting are unchanged.",
     },
   };
 

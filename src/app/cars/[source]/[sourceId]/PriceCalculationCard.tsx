@@ -2,6 +2,8 @@
 
 import { createPortal } from "react-dom";
 
+import { isPreliminaryConfidence } from "@/server/cars/calculation-contract";
+
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   BadgeCheck,
@@ -131,6 +133,7 @@ function RuPriceCalculationCard({
   fuel,
   mileageKm,
   powerHp,
+  powerConfidence,
   priceKrw,
   source,
   sourceId,
@@ -324,9 +327,11 @@ function RuPriceCalculationCard({
           ))}
         </div>
 
-        <div className="mt-5 rounded border border-[#d8dde6] bg-[#fafbfc] px-3 py-3 text-left text-xs font-semibold leading-4 text-[#39475a] sm:text-sm">
-          Расчёт предварительный. Итоговая стоимость и мощность уточняются по данным конкретной комплектации.
-        </div>
+        {isPreliminaryConfidence(powerConfidence) ? (
+          <div className="mt-5 rounded border border-[#d8dde6] bg-[#fafbfc] px-3 py-3 text-left text-xs font-semibold leading-4 text-[#39475a] sm:text-sm">
+            Расчёт предварительный. Итоговая стоимость и мощность уточняются по данным конкретной комплектации.
+          </div>
+        ) : null}
 
         <div className="mt-4 grid gap-2.5 text-[13px] sm:mt-5 sm:gap-3 sm:text-sm">
           <Spec

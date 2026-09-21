@@ -78,6 +78,36 @@ function parseMonth(value: string | null, year: number | null): number | null {
   return Number.isNaN(date.getTime()) ? null : date.getUTCMonth() + 1;
 }
 
+export type PriceFinality = "final" | "preliminary" | "none";
+
+/**
+ * Whether a calculated price may be presented as final, as preliminary, or not
+ * at all.
+ *
+ * `official` and `high` come from an approved reference specification and are
+ * final. `medium` is documented as "inferred but constrained", so it stays final
+ * only when it came from an approved specification rather than a card-level
+ * inference. `approximate` and `automatic` are preliminary by definition, and a
+ * price without an exact power or without a stated source is not shown at all.
+ */
+export function priceFinality(input: {
+  powerConfidence: string | null | undefined;
+  calculationPowerKw: number | null | undefined;
+  powerResolutionSource: string | null | undefined;
+  calculationPowerSpecId?: string | null;
+}): PriceFinality {
+  if (input.calculationPowerKw == null || !input.powerResolutionSource) return "none";
+  const confidence = input.powerConfidence ?? null;
+  if (confidence === "official" || confidence === "high") return "final";
+  if (confidence === "medium") return input.calculationPowerSpecId ? "final" : "preliminary";
+  return "preliminary";
+}
+
+/** Confidence values whose price must be marked as preliminary on the card. */
+export function isPreliminaryConfidence(value: string | null | undefined): boolean {
+  return value === "approximate" || value === "automatic";
+}
+
 export type PublicationCandidate = {
   priceRub: number | null;
   hasSnapshot: boolean;
@@ -88,11 +118,17 @@ export type PublicationCandidate = {
   calculationMonth: number | null;
   fuelType: string | null;
   hybridDvsPowerHp: number | null;
+  /** Power confidence of the resolved power, `cars.power_confidence`. */
+  powerConfidence: string | null;
+  /** Approved specification the power came from, when it came from one. */
+  calculationPowerSpecId?: string | null;
   /** Historic free-form marker; a `pending_*` value means a blocked import. */
   legacyCalculationStatus: string | null;
 };
 
-export type PublicationVerdict = { ok: true } | { ok: false; blockers: string[] };
+export type PublicationVerdict =
+  | { ok: true; finality: PriceFinality }
+  | { ok: false; blockers: string[] };
 
 /**
  * The only place that decides whether a calculated card may be published.
@@ -116,5 +152,15 @@ export function evaluatePublication(candidate: PublicationCandidate): Publicatio
   if (basis != null && basis !== expectedBasis) blockers.push("power_basis_mismatch");
   if (expectedBasis === "electric_30min" && candidate.hybridDvsPowerHp != null) blockers.push("electric_has_ice_power");
 
-  return blockers.length ? { ok: false, blockers } : { ok: true };
+  const finality = priceFinality({
+    powerConfidence: candidate.powerConfidence,
+    calculationPowerKw: candidate.calculationPowerKw,
+    powerResolutionSource: candidate.powerResolutionSource,
+    calculationPowerSpecId: candidate.calculationPowerSpecId,
+  });
+  // An unconfirmed power may be published, but only as a marked preliminary
+  // price; without an exact power or a source the price is not shown at all.
+  if (finality === "none") blockers.push("price_without_confirmed_power");
+
+  return blockers.length ? { ok: false, blockers } : { ok: true, finality };
 }
