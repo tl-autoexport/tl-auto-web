@@ -12,7 +12,7 @@ type FieldOptions = { fuels: string[]; transmissions: string[]; bodies: string[]
 type Screen = "home" | "brand" | "model" | "generation" | "parameters" | "year" | "price" | "mileage" | "sort";
 type RangePickerState = { title: string; minKey: string; maxKey: string; single?: boolean };
 
-const PARAM_KEYS = ["fuel", "transmission", "body", "trim", "color", "yearMin", "yearMax", "priceMin", "priceMax", "mileageMax", "engineMin", "engineMax", "powerMax", "under160", "passable", "clean", "noInsurance"];
+const PARAM_KEYS = ["fuel", "transmission", "body", "trim", "color", "yearMin", "yearMax", "priceMin", "priceMax", "mileageMin", "mileageMax", "engineMin", "engineMax", "powerMax", "under160", "passable", "clean", "noInsurance"];
 
 export function MobileCatalogExperience({ currentQuery, options, sortOptions, totalCars }: {
   currentQuery: string;
@@ -39,7 +39,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   const activeParameters = PARAM_KEYS.filter((key) => draft.has(key)).length;
 
   useEffect(() => {
-    if (screen === "home") return;
+    if (screen === "home" && !rangePicker) return;
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       setLoading(true);
@@ -64,7 +64,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
       }
     }, 180);
     return () => { controller.abort(); window.clearTimeout(timer); };
-  }, [query, screen]);
+  }, [query, screen, rangePicker]);
 
   useEffect(() => {
     if (["brand", "model", "generation"].includes(screen)) {
@@ -132,10 +132,14 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   }
   function openQuickRange(screen: "price" | "year" | "mileage") {
     setRangePicker({
-      title: screen === "price" ? "Цена до Владивостока, ₽" : screen === "year" ? "Год выпуска" : "Пробег, км",
+      title: screen === "price" ? "Цена, ₽" : screen === "year" ? "Год выпуска" : "Пробег, км",
       minKey: screen === "price" ? "priceMin" : screen === "year" ? "yearMin" : "mileageMin",
       maxKey: screen === "price" ? "priceMax" : screen === "year" ? "yearMax" : "mileageMax",
     });
+  }
+  function applyRange() {
+    setRangePicker(null);
+    apply();
   }
   const chips = [selected("brand"), selected("model"), generationLabel(selected("generation"), currentFacets)].filter(Boolean);
   const hasAppliedFilters = chips.length > 0 || activeParameters > 0;
@@ -167,7 +171,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
       </div>
       {screen !== "sort" ? <div className="shrink-0 border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount} onClick={() => apply()} type="button">{loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button></div> : null}
     </div> : null}
-    {rangePicker ? <RangePicker onClose={() => setRangePicker(null)} patch={patch} selected={selected} state={rangePicker} /> : null}
+    {rangePicker ? <RangePicker count={count} hasCurrentCount={hasCurrentCount} loading={loading} onApply={applyRange} onClose={() => setRangePicker(null)} patch={patch} selected={selected} state={rangePicker} /> : null}
   </div>;
 }
 
@@ -187,7 +191,7 @@ function Range({ title, minKey, maxKey, onOpen, selected, single = false }: { ti
   return <fieldset><legend className="mb-1.5 text-sm text-[#647084]">{title}</legend><button aria-label={`Выбрать: ${title}`} className="grid w-full grid-cols-2 overflow-hidden rounded-xl border border-[#d7dee8] bg-white text-left" onClick={() => onOpen({ title, minKey, maxKey, single })} type="button"><span className="min-w-0 border-r border-[#d7dee8] px-3 py-3 text-[15px] text-[#273246]">{displayValue(selected(minKey), single ? "До" : "От")}</span><span className="min-w-0 px-3 py-3 text-[15px] text-[#273246]">{single ? "л.с." : displayValue(selected(maxKey), "До")}</span></button></fieldset>;
 }
 
-function RangePicker({ onClose, patch, selected, state }: { onClose: () => void; patch: (values: Record<string, string | null>) => void; selected: (name: string) => string; state: RangePickerState }) {
+function RangePicker({ count, hasCurrentCount, loading, onApply, onClose, patch, selected, state }: { count: number; hasCurrentCount: boolean; loading: boolean; onApply: () => void; onClose: () => void; patch: (values: Record<string, string | null>) => void; selected: (name: string) => string; state: RangePickerState }) {
   const values = rangeValues(state.minKey);
   const minValue = selected(state.minKey);
   const maxValue = selected(state.maxKey);
@@ -196,8 +200,8 @@ function RangePicker({ onClose, patch, selected, state }: { onClose: () => void;
     if (key === state.maxKey && minValue && Number(value) < Number(minValue)) return;
     patch({ [key]: value || null });
   };
-  const column = (key: string, heading: string, value: string) => <div className="min-w-0"><p className="mb-2 text-sm text-[#7a8798]">{heading}</p><div className="h-56 snap-y overflow-y-auto rounded-2xl bg-[#f2f4f7] p-1">{["", ...values].map((option) => <button className={`block min-h-11 w-full snap-center rounded-xl px-3 text-left text-[15px] ${value === option ? "bg-white font-semibold text-[#101827] shadow-sm" : option === "160" && state.minKey === "powerMax" ? "font-bold text-[#101827]" : "text-[#647084]"}`} key={option || "empty"} onClick={() => selectValue(key, option)} type="button">{option ? formatRangeValue(option, state.minKey) : "Не выбрано"}</button>)}</div></div>;
-  return <div aria-modal="true" className="fixed inset-0 z-[150] flex items-end bg-[#101827]/45" onClick={onClose} role="dialog"><section className="w-full rounded-t-[28px] bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" onClick={(event) => event.stopPropagation()}><div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-[#d5dae2]" /><header className="mb-5 flex items-center justify-between gap-3"><h3 className="text-xl font-semibold">{state.title}</h3><button className="text-sm font-semibold text-[#956f2c]" onClick={() => patch({ [state.minKey]: null, [state.maxKey]: null })} type="button">Сбросить</button><button aria-label="Закрыть" className="grid size-9 place-items-center text-3xl font-light leading-none" onClick={onClose} type="button">×</button></header><div className={state.single ? "grid" : "grid grid-cols-2 gap-3"}>{state.single ? column(state.minKey, "До", minValue) : <>{column(state.minKey, "От", minValue)}{column(state.maxKey, "До", maxValue)}</>}</div><button className="mt-5 min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white" onClick={onClose} type="button">Готово</button></section></div>;
+  const column = (key: string, heading: string, value: string) => <div className="min-w-0"><p className="mb-2 text-sm text-[#7a8798]">{heading}</p><div className="h-44 snap-y overflow-y-auto rounded-2xl bg-[#f2f4f7] p-1">{["", ...values].map((option) => <button className={`block min-h-10 w-full snap-center rounded-xl px-3 text-left text-[15px] ${value === option ? "bg-white font-semibold text-[#101827] shadow-sm" : option === "160" && state.minKey === "powerMax" ? "font-bold text-[#101827]" : "text-[#647084]"}`} key={option || "empty"} onClick={() => selectValue(key, option)} type="button">{option ? formatRangeValue(option, state.minKey) : "Не выбрано"}</button>)}</div></div>;
+  return <div aria-modal="true" className="fixed inset-0 z-[150] flex items-end bg-[#101827]/45" onClick={onClose} role="dialog"><section className="w-full rounded-t-[28px] bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" onClick={(event) => event.stopPropagation()}><div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-[#d5dae2]" /><header className="mb-5 flex items-center justify-between gap-3"><h3 className="text-xl font-semibold">{state.title}</h3><button className="text-sm font-semibold text-[#956f2c]" onClick={() => patch({ [state.minKey]: null, [state.maxKey]: null })} type="button">Сбросить</button><button aria-label="Закрыть" className="grid size-9 place-items-center text-3xl font-light leading-none" onClick={onClose} type="button">×</button></header><div className={state.single ? "grid" : "grid grid-cols-2 gap-3"}>{state.single ? column(state.minKey, "До", minValue) : <>{column(state.minKey, "От", minValue)}{column(state.maxKey, "До", maxValue)}</>}</div><button className="mt-5 min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount} onClick={onApply} type="button">{loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button></section></div>;
 }
 
 function rangeValues(key: string) {
