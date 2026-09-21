@@ -243,7 +243,7 @@ function WheelField({ label, value, options, onChange }: { label: string; value:
 }
 
 function WheelSelect({ value, options, placeholder, onChange }: { value: string; options: string[]; placeholder: string; onChange: (value: string) => void }) {
-  return <select className="h-12 w-full appearance-none rounded-xl border border-[#d7dee8] bg-white px-3 text-[15px] text-[#273246]" onChange={(event) => onChange(event.target.value)} value={value}><option value="">{placeholder}</option>{options.map((option) => <option key={option} value={option}>{option === "160" ? "160 л.с. — рекомендуем" : option}</option>)}</select>;
+  return <select className="h-12 w-full appearance-none rounded-xl border border-[#d7dee8] bg-white px-3 text-[15px] text-[#273246]" onChange={(event) => onChange(event.target.value)} value={value}><option value="">{placeholder}</option>{options.map((option) => <option key={option} value={option}>{option}</option>)}</select>;
 }
 
 function numberOptions(kind: "price" | "year" | "mileage" | "power") {

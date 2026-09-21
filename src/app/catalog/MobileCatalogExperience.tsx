@@ -209,7 +209,7 @@ function rangeValues(key: string) {
   if (key === "priceMin") return Array.from({ length: 80 }, (_, index) => String((index + 1) * 250_000));
   if (key === "mileageMin") return Array.from({ length: 31 }, (_, index) => String(index * 10_000));
   if (key === "engineMin") return Array.from({ length: 66 }, (_, index) => String(500 + index * 100));
-  if (key === "powerMax") return Array.from({ length: 19 }, (_, index) => String(50 + index * 25));
+  if (key === "powerMax") return [...new Set(["160", ...Array.from({ length: 19 }, (_, index) => String(50 + index * 25))])].sort((left, right) => Number(left) - Number(right));
   return [];
 }
 
