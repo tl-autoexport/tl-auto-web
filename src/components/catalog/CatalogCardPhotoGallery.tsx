@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { RemoteImage } from "@/components/site/RemoteImage";
 
 const MAX_PREVIEW_PHOTOS = 5;
@@ -25,8 +25,10 @@ export function CatalogCardPhotoGallery({ alt, href, mediaCount = 0, primaryImag
   const [images, setImages] = useState(() => primaryImageUrl ? [primaryImageUrl] : []);
   const [selected, setSelected] = useState(0);
   const [isLoading, setLoading] = useState(false);
+  const galleryRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef(images);
   const requestRef = useRef<Promise<string[]> | null>(null);
+  const preloadsRef = useRef(new Map<string, Promise<void>>());
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const suppressClickRef = useRef(false);
   const declaredMediaCount = mediaCount ?? 0;
@@ -56,11 +58,40 @@ export function CatalogCardPhotoGallery({ alt, href, mediaCount = 0, primaryImag
     return requestRef.current;
   }, [declaredMediaCount, primaryImageUrl, source, sourceId]);
 
+  const preload = useCallback((url: string | undefined) => {
+    if (!url || typeof window === "undefined") return Promise.resolve();
+    const existing = preloadsRef.current.get(url);
+    if (existing) return existing;
+    const request = new Promise<void>((resolve) => {
+      const image = new window.Image();
+      image.onload = () => resolve();
+      image.onerror = () => resolve();
+      image.src = url;
+    });
+    preloadsRef.current.set(url, request);
+    return request;
+  }, []);
+
+  useEffect(() => {
+    const node = galleryRef.current;
+    if (!node || declaredMediaCount < 2) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      void loadImages().then((available) => preload(available[1]));
+    }, { rootMargin: "240px 0px" });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [declaredMediaCount, loadImages, preload]);
+
   const move = useCallback(async (direction: -1 | 1) => {
     const available = await loadImages();
     if (available.length < 2) return;
-    setSelected((current) => (current + direction + available.length) % available.length);
-  }, [loadImages]);
+    const next = (selected + direction + available.length) % available.length;
+    await preload(available[next]);
+    setSelected(next);
+    void preload(available[(next + direction + available.length) % available.length]);
+  }, [loadImages, preload, selected]);
 
   const current = images[selected] ?? primaryImageUrl;
   const handleTouchEnd = (event: React.TouchEvent<HTMLAnchorElement>) => {
@@ -78,7 +109,7 @@ export function CatalogCardPhotoGallery({ alt, href, mediaCount = 0, primaryImag
   };
 
   return (
-    <div className="group relative aspect-[2.25/1] overflow-hidden bg-[#e8edf3] sm:aspect-[16/10]">
+    <div className="group relative aspect-[2.25/1] overflow-hidden bg-[#e8edf3] sm:aspect-[16/10]" ref={galleryRef}>
       {current ? (
         <Link
           aria-label={`Открыть карточку ${alt}`}

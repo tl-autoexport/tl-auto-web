@@ -163,7 +163,7 @@ export function CatalogInfiniteGrid({ initialCars, initialCursor, query }: Props
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {cars.map((car, index) => (
           <div className="lg:[content-visibility:auto] lg:[contain-intrinsic-size:auto_430px]" key={car.id}>
-            <PrototypeVehicleCard car={car} priorityImage={index < 4} />
+            <PrototypeVehicleCard car={car} enableGallery priorityImage={index < 4} />
           </div>
         ))}
       </div>
