@@ -99,6 +99,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     registrationMonth: numberParam(value("month")),
     trim: value("trim") || undefined,
     bodyType: value("body") || undefined,
+    driveType: value("drive") || undefined,
     color: value("color") || undefined,
     minOwners: numberParam(value("ownersMin")),
     maxOwners: numberParam(value("ownersMax")),

@@ -287,7 +287,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     .select(CATALOG_CAR_SELECT)
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
-    .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
+    .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
     .not("price_rub", "is", null).not("power_hp", "is", null);
 
   if (source) query = query.eq("primary_source", source);
@@ -369,7 +369,7 @@ export async function getCatalogCardPage(
     .select(CATALOG_CARD_SELECT)
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
-    .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
+    .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
     .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (filters.source) query = query.eq("primary_source", filters.source);
@@ -479,7 +479,7 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
     .select("id", { count: "exact", head: true })
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
-    .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
+    .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
     .not("price_rub", "is", null).not("power_hp", "is", null);
 
   if (filters.source) query = query.eq("primary_source", filters.source);
@@ -749,7 +749,7 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
       .select("brand, model, trim, body_type, fuel_type, transmission, drive_type, color, owners_count")
       .eq("is_available", true)
       .in("primary_source", ["encar", "chestny_prigon"])
-      .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
+      .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
       .not("price_rub", "is", null).not("power_hp", "is", null)
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
@@ -855,7 +855,7 @@ export async function getSitemapCars(): Promise<SitemapCar[]> {
       .select("primary_source, source_id, source_updated_at")
       .eq("is_available", true)
       .in("primary_source", ["encar", "chestny_prigon"])
-      .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
+      .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
       .not("price_rub", "is", null).not("power_hp", "is", null)
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
@@ -882,7 +882,7 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
     .select(`${CATALOG_CAR_SELECT}, car_options(category, source_code, name_original, name_ru, value_original, value_ru, description_original, description_ru, is_present, sort_order), car_condition_reports(source, report_type, summary, items)`)
     .eq("primary_source", source)
     .eq("source_id", sourceId)
-    .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric"])
+    .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
     .not("price_rub", "is", null).not("power_hp", "is", null)
     .order("sort_order", { foreignTable: "car_media", ascending: true })
     .order("sort_order", { foreignTable: "car_options", ascending: true })
