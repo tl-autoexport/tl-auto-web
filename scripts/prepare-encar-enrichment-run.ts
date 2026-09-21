@@ -34,7 +34,7 @@ async function main() {
     const sourceListingId = String(candidate.sourceListingId ?? candidate.source_listing_id ?? "").trim();
     const sourceUrl = String(candidate.sourceUrl ?? candidate.source_url ?? `https://www.encar.com/dc/dc_cardetailview.do?carid=${sourceListingId}`).trim();
     if (!source || !sourceListingId || !sourceUrl) throw new Error("Every candidate needs source, sourceListingId, and sourceUrl");
-    return { source, source_listing_id: sourceListingId, source_url: sourceUrl, task: candidate.task ?? { insurance: purpose === "insurance" || purpose === "full", options: purpose === "options" || purpose === "full", gallery: purpose === "gallery" || purpose === "full" }, candidate_snapshot: candidate };
+    return { source, source_listing_id: sourceListingId, source_url: sourceUrl, task: candidate.task ?? { insurance: purpose === "insurance" || purpose === "full", options: purpose === "options" || purpose === "full", gallery: purpose === "gallery" || purpose === "full", diagnosis: purpose === "full", sellingpoint: purpose === "full", contents: purpose === "full", history: purpose === "full" }, candidate_snapshot: candidate };
   });
   const keys = rows.map((row) => `${row.source}:${row.source_listing_id}`);
   if (new Set(keys).size !== keys.length) throw new Error("Input contains duplicate source/sourceListingId pairs");
