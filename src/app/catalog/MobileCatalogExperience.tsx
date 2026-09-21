@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
+import { ArrowDownUp, ChevronLeft, ChevronRight, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 import { translateFuel, translateTransmission } from "@/server/normalization/display";
 
 type Option = { value: string; label: string; cars: number };
 type Facets = { total: number; axes: Record<string, Option[]> };
 type SortOption = { value: string; label: string };
 type FieldOptions = { fuels: string[]; transmissions: string[]; bodies: string[]; trims: string[]; colors: string[] };
-type Screen = "home" | "brand" | "model" | "generation" | "parameters" | "year" | "price" | "sort";
+type Screen = "home" | "brand" | "model" | "generation" | "parameters" | "year" | "price" | "mileage" | "sort";
 type RangePickerState = { title: string; minKey: string; maxKey: string; single?: boolean };
 
 const PARAM_KEYS = ["fuel", "transmission", "body", "trim", "color", "yearMin", "yearMax", "priceMin", "priceMax", "mileageMax", "engineMin", "engineMax", "powerMax", "under160", "passable", "clean", "noInsurance"];
@@ -98,7 +98,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
       if (screen === "model") ["model", "generation"].forEach((key) => next.delete(key));
       if (screen === "generation") next.delete("generation");
       if (screen === "parameters") ["brand", "model", "generation", ...PARAM_KEYS].forEach((key) => next.delete(key));
-      if (["year", "price"].includes(screen)) PARAM_KEYS.forEach((key) => next.delete(key));
+      if (["year", "price", "mileage"].includes(screen)) PARAM_KEYS.forEach((key) => next.delete(key));
       if (screen === "sort") next.delete("sort");
       return next;
     });
@@ -130,28 +130,39 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     setDraft(next);
     apply(next);
   }
+  function openQuickRange(screen: "price" | "year" | "mileage") {
+    setRangePicker({
+      title: screen === "price" ? "Цена до Владивостока, ₽" : screen === "year" ? "Год выпуска" : "Пробег, км",
+      minKey: screen === "price" ? "priceMin" : screen === "year" ? "yearMin" : "mileageMin",
+      maxKey: screen === "price" ? "priceMax" : screen === "year" ? "yearMax" : "mileageMax",
+    });
+  }
   const chips = [selected("brand"), selected("model"), generationLabel(selected("generation"), currentFacets)].filter(Boolean);
   const hasAppliedFilters = chips.length > 0 || activeParameters > 0;
+  const quickRanges = [
+    { label: "Цена", screen: "price" as const, active: selected("priceMin") || selected("priceMax") },
+    { label: "Год", screen: "year" as const, active: selected("yearMin") || selected("yearMax") },
+    { label: "Пробег", screen: "mileage" as const, active: selected("mileageMax") || selected("mileageMin") },
+  ];
 
   return <div className="md:hidden">
-    <div className="bg-[#f5f6f8] px-3 py-2 sm:px-5">
-      <div className="grid grid-cols-2 gap-2">
-        <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d7dee8] bg-white px-3 text-sm font-semibold" onClick={() => setScreen("parameters")} type="button"><SlidersHorizontal size={16} />Фильтры{activeParameters ? <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[10px]">{activeParameters}</span> : null}</button>
-        <button className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#d7dee8] bg-white px-3 text-sm font-semibold" onClick={() => setScreen("sort")} type="button">Сортировка<ChevronRight size={16} className="text-[#7a8798]" /></button>
-      </div>
-      {hasAppliedFilters ? <div className="scrollbar-none mt-2 flex items-center gap-1.5 overflow-x-auto">{chips.map((chip) => <span className="shrink-0 rounded-full bg-[#101827] px-2.5 py-1 text-[11px] font-semibold text-white" key={chip}>{chip}</span>)}<button className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#657287]" onClick={resetAll} type="button"><RotateCcw size={14} />Сбросить всё</button></div> : null}
+    <div className="scrollbar-none flex gap-2 overflow-x-auto bg-[#f5f6f8] px-3 py-2 sm:px-5">
+      <button className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#e7e9ed] px-4 text-sm font-semibold" onClick={() => setScreen("parameters")} type="button"><SlidersHorizontal size={16} />Фильтры{activeParameters ? <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[10px] text-white">{activeParameters}</span> : null}</button>
+    {quickRanges.map((item) => <button className={`inline-flex min-h-10 shrink-0 items-center rounded-full px-5 text-sm font-medium ${item.active ? "bg-[#101827] text-white" : "bg-[#e7e9ed] text-[#101827]"}`} key={item.label} onClick={() => openQuickRange(item.screen)} type="button">{item.label}</button>)}
+      <button aria-label="Сортировка" className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-full bg-[#e7e9ed] px-3 text-[#101827]" onClick={() => setScreen("sort")} type="button"><ArrowDownUp size={18} /></button>
     </div>
+    {hasAppliedFilters ? <div className="scrollbar-none flex items-center gap-1.5 overflow-x-auto bg-[#f5f6f8] px-3 pb-2 sm:px-5">{chips.map((chip) => <span className="shrink-0 rounded-full bg-[#101827] px-2.5 py-1 text-[11px] font-semibold text-white" key={chip}>{chip}</span>)}<button className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#657287]" onClick={resetAll} type="button"><RotateCcw size={14} />Сбросить всё</button></div> : null}
 
     {screen !== "home" ? <div aria-modal="true" className="fixed inset-x-0 top-0 z-[130] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#f4f6f9] pt-[env(safe-area-inset-top)]" role="dialog">
       <header className="grid min-h-16 grid-cols-[44px_minmax(0,1fr)_76px] items-center border-b border-[#dce2eb] bg-white px-4">
-        <button aria-label="Назад" className="grid size-11 place-items-center" onClick={() => setScreen(screen === "parameters" || screen === "year" || screen === "price" || screen === "sort" ? "home" : screen === "brand" ? "home" : screen === "model" ? "brand" : "model")} type="button"><ChevronLeft size={25} /></button>
+        <button aria-label="Назад" className="grid size-11 place-items-center" onClick={() => setScreen(screen === "parameters" || screen === "year" || screen === "price" || screen === "mileage" || screen === "sort" ? "home" : screen === "brand" ? "home" : screen === "model" ? "brand" : "model")} type="button"><ChevronLeft size={25} /></button>
         <h2 className="truncate text-center text-lg font-semibold">{titleFor(screen)}</h2>
         <button aria-label="Сбросить фильтры" className="px-1 text-right text-xs font-semibold text-[#956f2c]" onClick={reset} type="button">Сбросить</button>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-28">
         {(["brand", "model", "generation"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation"} facets={currentFacets} find={find} inputRef={inputRef} loading={loading} onChoose={choose} onFind={setFind} selectedValue={selected(screen)} /> : null}
         {screen === "parameters" ? <Parameters generationLabel={generationLabel(selected("generation"), currentFacets)} onOpenRange={setRangePicker} onSelectLevel={setScreen} options={options} patch={patch} selected={selected} /> : null}
-        {screen === "year" || screen === "price" ? <Range title={screen === "year" ? "Год выпуска" : "Цена до Владивостока, ₽"} minKey={screen === "year" ? "yearMin" : "priceMin"} maxKey={screen === "year" ? "yearMax" : "priceMax"} onOpen={setRangePicker} selected={selected} /> : null}
+        {screen === "year" || screen === "price" || screen === "mileage" ? <Range title={screen === "year" ? "Год выпуска" : screen === "price" ? "Цена до Владивостока, ₽" : "Пробег, км"} minKey={screen === "year" ? "yearMin" : screen === "price" ? "priceMin" : "mileageMin"} maxKey={screen === "year" ? "yearMax" : screen === "price" ? "priceMax" : "mileageMax"} onOpen={setRangePicker} selected={selected} /> : null}
         {screen === "sort" ? <div className="overflow-hidden rounded-2xl bg-white">{sortOptions.map((option) => <button className={`flex min-h-14 w-full items-center justify-between border-b border-[#edf0f4] px-4 text-left text-sm ${selected("sort") === option.value ? "font-semibold text-[#956f2c]" : "text-[#273246]"}`} key={option.value} onClick={() => changeSort(option.value)} type="button">{option.label}<span>{selected("sort") === option.value ? "✓" : ""}</span></button>)}</div> : null}
       </div>
       {screen !== "sort" ? <div className="shrink-0 border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount} onClick={() => apply()} type="button">{loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button></div> : null}
@@ -208,5 +219,5 @@ function formatRangeValue(value: string, key: string) {
 }
 function cleanParams(query: string) { const params = new URLSearchParams(query); ["page", "cursor", "limit"].forEach((key) => params.delete(key)); return params; }
 function generationLabel(code: string, facets: Facets | null) { return facets?.axes.generation?.find((item) => item.value === code)?.label || (code ? code.toUpperCase() : ""); }
-function titleFor(screen: Screen | "brand" | "model" | "generation") { return ({ brand: "Марка", model: "Модель", generation: "Поколение", parameters: "Параметры", year: "Год выпуска", price: "Цена", sort: "Сортировка", home: "Фильтры" } as const)[screen]; }
+function titleFor(screen: Screen | "brand" | "model" | "generation") { return ({ brand: "Марка", model: "Модель", generation: "Поколение", parameters: "Параметры", year: "Год выпуска", price: "Цена", mileage: "Пробег, км", sort: "Сортировка", home: "Фильтры" } as const)[screen]; }
 function pluralCars(count: number) { const tail = count % 100; if (tail > 10 && tail < 15) return "автомобилей"; return count % 10 === 1 ? "автомобиль" : count % 10 >= 2 && count % 10 <= 4 ? "автомобиля" : "автомобилей"; }
