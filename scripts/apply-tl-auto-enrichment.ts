@@ -64,7 +64,7 @@ async function main() {
     pages<Car>("cars", "id,source_id", (q) => q.eq("is_available", true)),
   ]);
   const stageBySource = new Map(staging.map((row) => [row.source_listing_id, row])); const carBySource = new Map(cars.map((row) => [row.source_id, row]));
-  const work = queue.filter((q) => q.status === "succeeded" && stageBySource.get(q.source_listing_id)?.raw_payload && carBySource.has(q.source_listing_id) && Object.entries(q.task ?? {}).every(([block, required]) => !required || ready(q, block)));
+  const work = queue.filter((q) => q.status === "succeeded" && stageBySource.get(q.source_listing_id)?.raw_payload && carBySource.has(q.source_listing_id));
   const report = { runId, write, encarRequests: 0, matchedCars: work.length, reports: 0, options: 0, galleryImages: 0, galleriesSkippedEmpty: 0, errors: [] as string[] };
   for (const q of work) {
     const car = carBySource.get(q.source_listing_id)!; const payload = stageBySource.get(q.source_listing_id)!.raw_payload!;
