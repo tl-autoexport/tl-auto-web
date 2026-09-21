@@ -24,6 +24,8 @@ type Props = {
 export function CatalogCardPhotoGallery({ alt, href, mediaCount = 0, primaryImageUrl, priority = false, source, sourceId }: Props) {
   const [images, setImages] = useState(() => primaryImageUrl ? [primaryImageUrl] : []);
   const [selected, setSelected] = useState(0);
+  const [mountedIndexes, setMountedIndexes] = useState<number[]>([0]);
+  const [pendingIndex, setPendingIndex] = useState<number | null>(null);
   const [isLoading, setLoading] = useState(false);
   const galleryRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef(images);
@@ -85,15 +87,20 @@ export function CatalogCardPhotoGallery({ alt, href, mediaCount = 0, primaryImag
   }, [declaredMediaCount, loadImages, preload]);
 
   const move = useCallback(async (direction: -1 | 1) => {
+    if (pendingIndex !== null) return;
     const available = await loadImages();
     if (available.length < 2) return;
     const next = (selected + direction + available.length) % available.length;
-    await preload(available[next]);
-    setSelected(next);
+    if (mountedIndexes.includes(next)) {
+      setSelected(next);
+      void preload(available[(next + direction + available.length) % available.length]);
+      return;
+    }
+    setPendingIndex(next);
+    setMountedIndexes((current) => [...current, next]);
     void preload(available[(next + direction + available.length) % available.length]);
-  }, [loadImages, preload, selected]);
+  }, [loadImages, mountedIndexes, pendingIndex, preload, selected]);
 
-  const current = images[selected] ?? primaryImageUrl;
   const handleTouchEnd = (event: React.TouchEvent<HTMLAnchorElement>) => {
     const start = touchStartRef.current;
     touchStartRef.current = null;
@@ -110,7 +117,7 @@ export function CatalogCardPhotoGallery({ alt, href, mediaCount = 0, primaryImag
 
   return (
     <div className="group relative aspect-[2.25/1] overflow-hidden bg-[#e8edf3] sm:aspect-[16/10]" ref={galleryRef}>
-      {current ? (
+      {primaryImageUrl ? (
         <Link
           aria-label={`Открыть карточку ${alt}`}
           className="group block h-full w-full touch-pan-y"
@@ -123,7 +130,31 @@ export function CatalogCardPhotoGallery({ alt, href, mediaCount = 0, primaryImag
           onTouchEnd={handleTouchEnd}
           onTouchStart={(event) => { touchStartRef.current = { x: event.touches[0]?.clientX ?? 0, y: event.touches[0]?.clientY ?? 0 }; }}
         >
-          <RemoteImage alt={`${alt}, фото ${selected + 1}`} className="object-cover transition duration-300 group-hover:scale-[1.015]" decoding="async" fill loading={priority && selected === 0 ? "eager" : "lazy"} priority={priority && selected === 0} sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)" src={current} />
+          {mountedIndexes.map((index) => {
+            const url = images[index];
+            if (!url) return null;
+            return <RemoteImage
+              alt={`${alt}, фото ${index + 1}`}
+              className={`object-cover transition-[opacity,transform] duration-200 ${index === selected ? "opacity-100 group-hover:scale-[1.015]" : "opacity-0"}`}
+              decoding="async"
+              fill
+              key={url}
+              loading={priority && index === 0 ? "eager" : "lazy"}
+              onError={() => {
+                if (pendingIndex !== index) return;
+                setMountedIndexes((current) => current.filter((value) => value !== index));
+                setPendingIndex(null);
+              }}
+              onLoad={() => {
+                if (pendingIndex !== index) return;
+                setSelected(index);
+                setPendingIndex(null);
+              }}
+              priority={priority && index === 0}
+              sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)"
+              src={url}
+            />;
+          })}
         </Link>
       ) : (
         <Link aria-label={`Открыть карточку ${alt}`} className="flex h-full items-center justify-center text-sm text-[#647084]" href={href}>Фото временно недоступно</Link>
