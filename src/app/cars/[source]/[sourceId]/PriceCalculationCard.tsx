@@ -79,6 +79,10 @@ function money(value: number | null | undefined) {
   return `${rub.format(value ?? 0)}\u00A0₽`;
 }
 
+function dollars(value: number | null | undefined) {
+  return `${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value ?? 0)}\u00A0$`;
+}
+
 function won(value: number | null | undefined) {
   return `${rub.format(value ?? 0)}\u00A0₩`;
 }
@@ -138,6 +142,7 @@ function RuPriceCalculationCard({
   const { city } = useDestination();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDutyInfoOpen, setDutyInfoOpen] = useState(false);
+  const [currency, setCurrency] = useState<"RUB" | "USD">("RUB");
   const calculationTitleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -164,6 +169,7 @@ function RuPriceCalculationCard({
   const rateDetails = resultObject(activeCalc?.result, "rateDetails");
   const dealerKrwRub = objectNumber(dealerRates, "krwRub");
   const dealerUsdRub = objectNumber(dealerRates, "usdRub");
+  const displayTotal = currency === "USD" && dealerUsdRub > 0 ? total / dealerUsdRub : total;
   const usdtKrw = objectNumber(rateDetails, "usdtKrwAdjusted");
   const excise = resultNumber(activeCalc?.result, "exciseRub");
   const vat = resultNumber(activeCalc?.result, "vatRub");
@@ -249,7 +255,7 @@ function RuPriceCalculationCard({
       <aside className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <p className="whitespace-nowrap text-[30px] font-semibold leading-none tracking-tight text-[#121722] tabular-nums sm:text-3xl">
-            {money(total)}
+            {currency === "USD" ? dollars(displayTotal) : money(displayTotal)}
           </p>
           <InfoHint
             label="О предварительном расчёте"
@@ -278,9 +284,18 @@ function RuPriceCalculationCard({
 
         <div className="mt-3 flex items-center gap-3 text-[13px] text-[#647084] sm:mt-4 sm:text-sm">
           <span>Оплата</span>
-          <span className="inline-flex min-h-10 items-center gap-2 rounded border border-[#d8dde6] px-3 py-2 font-medium text-[#121722]">
-            ₽ в рублях <ChevronDown size={16} />
-          </span>
+          <label className="relative inline-flex min-h-10 items-center rounded border border-[#d8dde6] font-medium text-[#121722]">
+            <select
+              aria-label="Валюта оплаты"
+              className="min-h-10 appearance-none bg-transparent py-2 pl-3 pr-9 outline-none"
+              onChange={(event) => setCurrency(event.target.value as "RUB" | "USD")}
+              value={currency}
+            >
+              <option value="RUB">₽ в рублях</option>
+              <option value="USD">$ в долларах</option>
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-2" size={16} />
+          </label>
         </div>
 
         <div className="mt-5 overflow-hidden rounded-full bg-[#edf0f5] p-0.5">
