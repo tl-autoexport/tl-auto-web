@@ -323,10 +323,12 @@ async function main() {
             insert into public.cars(primary_source,source_kind,source_id,source_url,enrichment_status,is_available,sale_status,published_at,source_updated_at,last_seen_at,
               brand,model,year,registration_year,registration_date,registration_month,mileage_km,price_krw,price_rub,engine_cc,power_hp,power_source,power_confidence,power_resolution_note,
               fuel_type,transmission,drive_type,color,body_type,seller_region,vin_masked,vehicle_specs,generation,
-              calculation_power_status,calculation_power_spec_id,calculation_power_spec_version,calculation_power_kw,power_basis,power_resolution_source,calculation_month,calculation_month_source)
-            values ('chestny_prigon','chestny_prigon',$1,$2,'source_only',true,null,now(),now(),now(),
+              calculation_power_status,calculation_power_spec_id,calculation_power_spec_version,calculation_power_kw,power_basis,power_resolution_source,calculation_month,calculation_month_source,
+              published_at_source,catalog_added_at,encar_enrichment_status)
+            values ('chestny_prigon','chestny_prigon',$1,$2,'source_only',true,null,null,now(),now(),
               $3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,'tl_auto_approved_reference',$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$28,
-              'approved',$23,$24,$25,$26,$27,$7,'registration_date')
+              'approved',$23,$24,$25,$26,$27,$7,'registration_date',
+              'unknown',now(),'absent')
             on conflict(primary_source,source_id) do update set source_url=excluded.source_url,enrichment_status=excluded.enrichment_status,is_available=true,sale_status=null,published_at=coalesce(cars.published_at,now()),
               source_updated_at=excluded.source_updated_at,last_seen_at=excluded.last_seen_at,brand=excluded.brand,model=excluded.model,year=excluded.year,registration_year=excluded.registration_year,
               registration_date=excluded.registration_date,registration_month=excluded.registration_month,mileage_km=excluded.mileage_km,price_krw=excluded.price_krw,price_rub=excluded.price_rub,engine_cc=excluded.engine_cc,power_hp=excluded.power_hp,
@@ -335,7 +337,10 @@ async function main() {
               generation=coalesce(excluded.generation, cars.generation),
               calculation_power_status=excluded.calculation_power_status,calculation_power_spec_id=excluded.calculation_power_spec_id,calculation_power_spec_version=excluded.calculation_power_spec_version,
               calculation_power_kw=excluded.calculation_power_kw,power_basis=excluded.power_basis,power_resolution_source=excluded.power_resolution_source,
-              calculation_month=excluded.calculation_month,calculation_month_source=excluded.calculation_month_source,updated_at=now()
+              calculation_month=excluded.calculation_month,calculation_month_source=excluded.calculation_month_source,
+              published_at_source=coalesce(cars.published_at_source, excluded.published_at_source),
+              catalog_added_at=coalesce(cars.catalog_added_at, excluded.catalog_added_at),
+              encar_enrichment_status=excluded.encar_enrichment_status,updated_at=now()
             returning id
           `, [row.source_listing_id, row.source_url, row.manufacturer, displayModel(row.model), row.model_year,
             row.first_registration_date, month, row.mileage_km, row.price_krw, item.priceRub, row.engine_cc, hp,

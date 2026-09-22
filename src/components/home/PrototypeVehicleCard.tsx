@@ -42,14 +42,13 @@ function bodyShapeForCard(car: VehicleCardData) {
 }
 
 function daysOnSale(car: CatalogCar) {
-  // "Time on sale in Korea" is only supportable by a source date. Without one the
-  // number describes our own catalogue, so it is labelled as such and never
-  // presented as a fact about the Korean market.
+  // "Time on sale in Korea" is supportable only by a confirmed source date. Our
+  // stored Encar payload carries no advertisement date, so nothing is shown
+  // rather than substituting our own timeline for the Korean one.
   const sourceDated = car.published_at_source === "source_payload" || car.published_at_source === "source_snapshot";
-  const listedAt = sourceDated ? car.published_at : (car.catalog_added_at ?? car.created_at);
-  if (!listedAt) return null;
-  const elapsed = Math.floor((Date.now() - new Date(listedAt).getTime()) / day);
-  return { days: Math.max(1, elapsed), sourceDated };
+  if (!sourceDated || !car.published_at) return null;
+  const elapsed = Math.floor((Date.now() - new Date(car.published_at).getTime()) / day);
+  return Math.max(1, elapsed);
 }
 
 export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage = false }: { car: VehicleCardData; enableGallery?: boolean; priorityImage?: boolean }) {
@@ -152,9 +151,11 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
         <button aria-label="Поделиться объявлением" className="grid h-10 w-16 shrink-0 place-items-center rounded-xl border border-[#dce5df] bg-white transition hover:border-[#207a45] hover:bg-[#f4faf6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#207a45] focus-visible:ring-offset-2 sm:h-11 sm:w-20" onClick={(event) => { event.stopPropagation(); void share(); }} title="Поделиться объявлением" type="button"><Share2 size={18} /><span className="sr-only">Поделиться объявлением</span></button>
       </div>
 
-      <div className="pointer-events-none relative z-10 px-2.5 py-1.5 text-[11px] text-[#7a8798] sm:px-4 sm:py-3 sm:text-xs">
-        <span>{saleDays == null ? "Срок продажи уточняется" : saleDays.sourceDated ? `В продаже ${saleDays.days} ${pluralDays(saleDays.days)} в Корее` : `Добавлено в каталог ${saleDays.days} ${pluralDays(saleDays.days)} назад`}</span>
-      </div>
+      {saleDays != null ? (
+        <div className="pointer-events-none relative z-10 px-2.5 py-1.5 text-[11px] text-[#7a8798] sm:px-4 sm:py-3 sm:text-xs">
+          <span>{`В продаже ${saleDays} ${pluralDays(saleDays)} в Корее`}</span>
+        </div>
+      ) : null}
       {shareNotice ? <span aria-live="polite" className="sr-only">{shareNotice}</span> : null}
     </article>
   );

@@ -157,6 +157,9 @@ async function main() {
         calculation_month: monthInfo.month,
         calculation_month_source: monthInfo.source,
         legacy_calculation_status: "calculated_from_staging",
+        published_at_source: "unknown",
+        catalog_added_at: new Date().toISOString(),
+        encar_enrichment_status: "absent",
       });
     }
 
