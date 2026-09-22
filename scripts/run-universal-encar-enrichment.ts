@@ -14,6 +14,7 @@ const runId = process.env.ENCAR_UNIVERSAL_RUN_ID?.trim();
 const delayMs = Math.max(1_000, Number(process.env.ENCAR_UNIVERSAL_DELAY_MS ?? 3_000));
 const leaseMinutes = Math.max(5, Math.min(120, Number(process.env.ENCAR_UNIVERSAL_LEASE_MINUTES ?? 15)));
 const pollMs = Math.max(1_000, Number(process.env.ENCAR_UNIVERSAL_POLL_MS ?? 10_000));
+const sourceBackoffMs = Math.max(15_000, Number(process.env.ENCAR_UNIVERSAL_SOURCE_BACKOFF_MS ?? 300_000));
 const dryRun = process.env.ENCAR_UNIVERSAL_DRY_RUN === "true";
 const radarPriorityPath = `${process.env.ENCAR_COORDINATION_DIR ?? "/tmp/encar-coordination"}/radar-priority.json`;
 const lockPath = process.env.ENCAR_UNIVERSAL_LOCK_PATH?.trim()
@@ -30,6 +31,7 @@ type Row = {
   candidate_snapshot: Record<string, unknown>;
 };
 type Probe = { status: number; body?: unknown; error?: string };
+class TemporarySourceError extends Error {}
 
 /* Standalone worker intentionally uses untyped Supabase RPCs from migrations. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -172,6 +174,15 @@ async function complete(row: Row, status: "succeeded" | "unavailable" | "failed"
   if (error) throw new Error(error.message);
 }
 
+async function releaseForRetry(row: Row) {
+  if (dryRun) return;
+  const { error } = await db.from("encar_enrichment_queue")
+    .update({ status: "queued", lease_until: null, updated_at: new Date().toISOString() })
+    .eq("id", row.id)
+    .eq("status", "leased");
+  if (error) throw new Error(error.message);
+}
+
 async function processRow(row: Row) {
   const id = idOf(row);
   const task = row.task ?? {};
@@ -183,6 +194,17 @@ async function processRow(row: Row) {
   const normalized: Record<string, unknown> = {};
   const probes: Record<string, Probe> = {};
 
+  // Detail is the availability gate and a proxy health signal. A temporary
+  // source/proxy outage must not become a failed vehicle record.
+  const needsDetail = Boolean(task.gallery || task.contents || task.diagnosis || task.sellingpoint || task.history || task.category);
+  if (needsDetail) {
+    probes.detail = await get(`https://api.encar.com/v1/readside/vehicle/${id}`);
+    payload.detail = probes.detail.body ?? null;
+    if (probes.detail.status === 0 || [403, 429, 503].includes(probes.detail.status)) {
+      throw new TemporarySourceError(`detail unavailable: ${classify(probes.detail)}`);
+    }
+  }
+
   if (task.insurance) {
     probes.inspection = await get(`https://api.encar.com/v1/readside/inspection/vehicle/${id}`);
     probes.summary = await get(`https://api.encar.com/v1/readside/inspection/vehicle/${id}/summary`);
@@ -193,10 +215,6 @@ async function processRow(row: Row) {
   if (task.options) {
     probes.options = await get(`https://api.encar.com/v1/readside/vehicles/car/${id}/options/choice`);
     payload.choiceOptions = probes.options.body ?? null;
-  }
-  if (task.gallery) {
-    probes.detail = await get(`https://api.encar.com/v1/readside/vehicle/${id}`);
-    payload.detail = probes.detail.body ?? null;
   }
   if (task.diagnosis) {
     probes.diagnosis = await get(`https://api.encar.com/v1/readside/diagnosis/vehicle/${id}`);
@@ -253,7 +271,7 @@ async function main() {
       if (updateError) throw new Error(updateError.message);
     }
 
-    log("worker_started", { dryRun, leaseMinutes, delayMs, lockPath });
+    log("worker_started", { dryRun, leaseMinutes, delayMs, sourceBackoffMs, lockPath });
     while (!stopping) {
       if (await radarHasPriority()) {
         log("waiting_for_radar", { pollMs });
@@ -283,6 +301,12 @@ async function main() {
         await processRow(row);
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
+        if (error instanceof TemporarySourceError) {
+          await releaseForRetry(row);
+          log("source_backoff", { sourceListingId: row.source_listing_id, error: message, sourceBackoffMs });
+          await sleep(sourceBackoffMs);
+          continue;
+        }
         await complete(row, "failed", { encarId: idOf(row), workerError: message }, null, {}, message);
         log("item_failed", { sourceListingId: row.source_listing_id, error: message });
       }

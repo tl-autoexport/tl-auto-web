@@ -11,6 +11,7 @@ Environment=NODE_ENV=production
 Environment=ENCAR_UNIVERSAL_RUN_ID=%i
 Environment=ENCAR_UNIVERSAL_DELAY_MS=1000
 Environment=ENCAR_UNIVERSAL_LEASE_MINUTES=15
+Environment=ENCAR_UNIVERSAL_SOURCE_BACKOFF_MS=300000
 Environment=ENCAR_UNIVERSAL_DRY_RUN=false
 ExecStart=/usr/bin/npm run run:encar:universal
 Restart=on-failure
