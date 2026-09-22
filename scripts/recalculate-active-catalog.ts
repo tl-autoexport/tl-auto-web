@@ -128,10 +128,11 @@ async function main() {
       ? null
       : automaticReferences.get(referenceKey(car));
     const resolvedPowerHp = reference?.power_hp ?? car.power_hp;
+    const needsEngineCc = car.fuel_type !== "electric";
     if (
       !car.price_krw ||
       !car.year ||
-      !car.engine_cc ||
+      (needsEngineCc && !car.engine_cc) ||
       (!approvedPowerKw && !resolvedPowerHp && !car.hybrid_dvs_power_hp)
     ) {
       return null;
