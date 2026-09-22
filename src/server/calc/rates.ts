@@ -4,9 +4,10 @@ import { createSupabasePublic } from "@/server/supabase/public";
 const CBR_DAILY_RATES_URL = "https://www.cbr.ru/scripts/XML_daily.asp";
 const NAVER_USDT_KRW_URL = "https://m.stock.naver.com/front-api/chart/cryptoChartData";
 const CBR_MARKUP_PERCENT = 4;
-// The commercial KRW rate follows the customer's transparent formula:
-// USD/RUB divided by the live USDT/KRW quote. Do not apply a hidden spread.
-const USDT_KRW_ADJUSTMENT = 0;
+// The commercial KRW rate keeps the agreed hidden dealer spread. The adjusted
+// effective rate is used in the formula, while the -20 correction itself is
+// never shown as a separate customer-facing line.
+const USDT_KRW_ADJUSTMENT = 20;
 const CBR_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const USDT_CACHE_TTL_MS = 15 * 60 * 1000;
 const MAX_STORED_RATE_AGE_MS = 24 * 60 * 60 * 1000;
