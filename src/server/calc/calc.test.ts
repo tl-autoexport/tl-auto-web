@@ -12,7 +12,7 @@ assert.equal(genesisG70.dutyRub, 478_538.78);
 assert.equal(genesisG70.feesRub, 13_541);
 assert.equal(genesisG70.utilRub, 1_838_400);
 assert.equal(genesisG70.koreaExpensesRub, 105_284);
-assert.equal(genesisG70.totalRub, 3_913_866.93);
+assert.equal(genesisG70.totalRub, 3_913_866.78);
 
 const moscowDelivery = calculateRuVladivostok({
   priceKrw: 26_690_000, year: 2021, month: 10, engineCc: 1998, powerHp: 252,
@@ -33,6 +33,11 @@ assert.equal(dualRate.carPriceRub, 700_000, "car price uses the TL Auto commerci
 assert.equal(dualRate.customsValueRub, 600_000, "customs value uses the official Central Bank KRW rate");
 assert.equal(dualRate.feesRub, 4_924, "customs fee uses the official customs value");
 assert.equal(dualRate.customsRates.krwRub, 0.06);
+assert.equal(
+  dualRate.totalRub,
+  dualRate.carPriceRub + dualRate.freightRub + dualRate.koreaExpensesRub + dualRate.brokerRub + dualRate.deliveryRub + dualRate.serviceFeeRub + dualRate.dutyRub + dualRate.exciseRub + dualRate.vatRub + dualRate.feesRub + dualRate.utilRub,
+  "total must equal the customer-visible estimate rows",
+);
 
 const genesisLargeNew = calculateRuVladivostok({
   priceKrw: 29_000_000, year: 2024, month: 7, engineCc: 3342, powerHp: 370,

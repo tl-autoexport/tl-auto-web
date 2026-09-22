@@ -72,12 +72,18 @@ async function main() {
   }
   try {
     const db = createSupabaseAdmin();
-    const { data, error } = await db.from("cars")
+    const sourceIds = (process.env.TL_AUTO_ENCAR_SOURCE_IDS ?? "")
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean);
+    let query = db.from("cars")
       .select("id,source_id,source_url,price_krw,encar_check_attempts")
       // TL Auto publishes the catalog sourced from Chesty; Encar is used only
       // as the live authority for availability and current price.
       .eq("primary_source", "chestny_prigon").eq("is_available", true)
-      .or(`next_encar_check_at.is.null,next_encar_check_at.lte.${new Date().toISOString()}`)
+      .or(`next_encar_check_at.is.null,next_encar_check_at.lte.${new Date().toISOString()}`);
+    if (sourceIds.length) query = query.in("source_id", sourceIds);
+    const { data, error } = await query
       .order("next_encar_check_at", { ascending: true, nullsFirst: true })
       .limit(batchSize);
     if (error) throw error;

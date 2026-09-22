@@ -8,7 +8,7 @@ import {
   tksStpExciseRub,
 } from "./tks-rules";
 
-export const CALC_VERSION = "ru-individual-autoexport-tks-dual-rate-2026.02";
+export const CALC_VERSION = "ru-individual-autoexport-tks-client-total-2026.03";
 
 const DEFAULT_RATES: CalcRates = { krwRub: 0.04718, eurRub: 87.403, usdRub: 70.95, kztRub: 0.14 };
 // TL Auto uses a 30-day planning window for the estimated customs clearance
@@ -119,7 +119,10 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
   const utilRub = Math.round(UTIL_BASE_RUB * utilCoefficient);
   const exciseRub = usesStp ? roundRub(tksStpExciseRub(powerKw!)) : 0;
   const vatRub = usesStp ? roundRub((customsValueRub + customs.dutyRub + exciseRub) * 0.22) : 0;
-  const totalRub = roundRub(customsValueRub + koreaExpensesRub + brokerRub + deliveryRub + serviceFeeRub + customs.dutyRub + exciseRub + vatRub + feesRub + utilRub);
+  // The customer-facing total must be the sum of the very same rows displayed
+  // in the estimate. Customs value remains an internal tax base only; the
+  // actual purchase price is the commercial KRW conversion shown to a client.
+  const totalRub = roundRub(carPriceRub + freightRub + koreaExpensesRub + brokerRub + deliveryRub + serviceFeeRub + customs.dutyRub + exciseRub + vatRub + feesRub + utilRub);
   return {
     countryCode: "RU", destinationCity: input.destinationCity === "Москва" ? "Москва" : input.destinationCity === "Уссурийск" ? "Уссурийск" : "Владивосток", importerType: "individual", calcVersion: CALC_VERSION,
     carPriceRub, customsValueRub: roundRub(customsValueRub), freightRub, brokerRub, deliveryRub, serviceFeeRub, dutyRub: customs.dutyRub, exciseRub, vatRub, feesRub, utilRub, totalRub,

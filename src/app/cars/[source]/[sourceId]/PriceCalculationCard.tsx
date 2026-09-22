@@ -159,22 +159,22 @@ function RuPriceCalculationCard({
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const delivery = city.id === "moscow" ? 220_000 : 0;
   const serviceFee = resultNumber(activeCalc?.result, "serviceFeeRub") || 50_000;
-  const hasServiceFee = resultValue(activeCalc?.result, "serviceFeeRub") != null;
-  const hasDelivery = resultValue(activeCalc?.result, "deliveryRub") != null;
-  const total = number(activeCalc?.total_rub) - number(activeCalc?.freight_rub) + (hasServiceFee ? 0 : serviceFee) + (hasDelivery ? 0 : delivery);
   const car = number(activeCalc?.car_price_rub);
-  const korea = resultNumber(activeCalc?.result, "koreaExpensesRub");
+  const korea = resultNumber(activeCalc?.result, "koreaExpensesRub") + number(activeCalc?.freight_rub);
   const russia = number(activeCalc?.broker_rub) + delivery + serviceFee;
   const duty = number(activeCalc?.duty_rub);
   const dealerRates = resultObject(activeCalc?.result, "rates");
   const rateDetails = resultObject(activeCalc?.result, "rateDetails");
   const dealerKrwRub = objectNumber(dealerRates, "krwRub");
   const dealerUsdRub = objectNumber(dealerRates, "usdRub");
-  const displayTotal = currency === "USD" && dealerUsdRub > 0 ? total / dealerUsdRub : total;
   const usdtKrw = objectNumber(rateDetails, "usdtKrwAdjusted");
   const excise = resultNumber(activeCalc?.result, "exciseRub");
   const vat = resultNumber(activeCalc?.result, "vatRub");
-  const customs = duty + excise + vat;
+  const customs = duty + excise + vat + number(activeCalc?.fees_rub) + number(activeCalc?.util_rub);
+  // Do not display a stored total that was built from a different set of
+  // fields. The card total is always the exact sum of its visible rows.
+  const total = car + korea + russia + customs;
+  const displayTotal = currency === "USD" && dealerUsdRub > 0 ? total / dealerUsdRub : total;
   const calculatedAt = activeCalc?.calculated_at
     ? new Intl.DateTimeFormat("ru-RU", {
         day: "numeric",
@@ -468,7 +468,7 @@ function RuPriceCalculationCard({
                   ["Таможенный сбор", number(activeCalc?.fees_rub)],
                   ["Утилизационный сбор", number(activeCalc?.util_rub)],
                 ]}
-                total={customs + number(activeCalc?.fees_rub) + number(activeCalc?.util_rub)}
+                total={customs}
               />
             </div>
             <footer className="shrink-0 space-y-2 border-t border-[#e1e5eb] bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6">

@@ -2116,13 +2116,19 @@ export async function refreshEncarHistories(
   };
 }
 
-export async function refreshEncarPhotos() {
+export async function refreshEncarPhotos(sourceIds?: readonly string[]) {
   const supabase = createSupabaseAdmin();
-  const { data: cars, error: carsError } = await supabase
+  let query = supabase
     .from("cars")
-    .select("id, source_id")
-    .eq("primary_source", "encar")
+    .select("id, source_id, primary_source")
     .eq("is_available", true);
+  // Published cards use `chestny_prigon` as their catalogue source while
+  // retaining an Encar source ID. An explicit list lets us enrich those cards
+  // from Encar without running a broad media migration.
+  query = sourceIds?.length
+    ? query.in("source_id", [...sourceIds])
+    : query.eq("primary_source", "encar");
+  const { data: cars, error: carsError } = await query;
   if (carsError) throw carsError;
 
   let updated = 0;
@@ -2139,15 +2145,14 @@ export async function refreshEncarPhotos() {
         .from("car_media")
         .delete()
         .eq("car_id", car.id)
-        .eq("source", "encar")
         .eq("media_type", "image")
-        .in("category", ["exterior", "photo"]);
+        .in("category", ["outer", "inner", "option", "thumbnail", "exterior", "photo"]);
       assertSupabaseResult(deleteResult);
 
       const insertResult = await supabase.from("car_media").insert(
         detail.photos.map((photo, index) => ({
           car_id: car.id,
-          source: "encar",
+          source: car.primary_source,
           media_type: "image",
           category: photo.category,
           url: photo.url,
