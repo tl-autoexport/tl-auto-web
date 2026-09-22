@@ -1,0 +1,22 @@
+[Unit]
+Description=TL Auto Encar enrichment run %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/tl-auto
+Environment=NODE_ENV=production
+Environment=ENCAR_UNIVERSAL_RUN_ID=%i
+Environment=ENCAR_UNIVERSAL_DELAY_MS=1000
+Environment=ENCAR_UNIVERSAL_LEASE_MINUTES=15
+Environment=ENCAR_UNIVERSAL_DRY_RUN=false
+ExecStart=/usr/bin/npm run run:encar:universal
+Restart=on-failure
+RestartSec=15
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -48,6 +48,37 @@ function idOf(row: Row) {
   return String(row.candidate_snapshot.encarId ?? row.candidate_snapshot.encar_id ?? row.source_listing_id);
 }
 
+async function acquireLock() {
+  try {
+    const handle = await open(lockPath, "wx");
+    await handle.writeFile(JSON.stringify({ pid: process.pid, startedAt: new Date().toISOString() }));
+    return handle;
+  } catch (error) {
+    const code = error && typeof error === "object" && "code" in error ? error.code : null;
+    if (code !== "EEXIST") throw error;
+    let ownerPid: number | null = null;
+    try {
+      const owner = JSON.parse(await readFile(lockPath, "utf8")) as { pid?: unknown };
+      ownerPid = Number.isInteger(owner.pid) ? Number(owner.pid) : null;
+      if (ownerPid && ownerPid > 0) {
+        try {
+          process.kill(ownerPid, 0);
+          throw new Error(`Another Encar enrichment worker is already running (${lockPath}, pid=${ownerPid})`);
+        } catch (ownerError) {
+          if (ownerError instanceof Error && ownerError.message.includes("already running")) throw ownerError;
+        }
+      }
+    } catch (readError) {
+      if (readError instanceof Error && readError.message.includes("already running")) throw readError;
+    }
+    await rm(lockPath, { force: true });
+    const handle = await open(lockPath, "wx");
+    await handle.writeFile(JSON.stringify({ pid: process.pid, startedAt: new Date().toISOString(), replacedStaleLock: true, previousPid: ownerPid }));
+    log("stale_lock_recovered", { previousPid: ownerPid, lockPath });
+    return handle;
+  }
+}
+
 async function radarHasPriority() {
   try {
     const owner = JSON.parse(await readFile(radarPriorityPath, "utf8")) as { pid?: unknown };
@@ -209,9 +240,7 @@ async function processRow(row: Row) {
 }
 
 async function main() {
-  const lock = await open(lockPath, "wx").catch(() => {
-    throw new Error(`Another Encar enrichment worker is already running (${lockPath})`);
-  });
+  const lock = await acquireLock();
   try {
     if (!dryRun) {
       const { data: run, error } = await db.from("encar_enrichment_runs").select("status").eq("id", runId).maybeSingle();
