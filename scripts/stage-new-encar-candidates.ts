@@ -48,7 +48,7 @@ async function main() {
     .from("encar_enrichment_runs")
     .insert({
       project: "tl-auto",
-      purpose: "new_catalog_candidates_full",
+      purpose: "full",
       priority: 40,
       status: "awaiting_approval",
       requested_limit: candidates.length,
