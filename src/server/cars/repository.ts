@@ -14,6 +14,8 @@ export type CatalogCar = {
   source_id: string;
   source_url: string | null;
   published_at: string | null;
+  published_at_source: string | null;
+  catalog_added_at: string | null;
   created_at: string | null;
   brand: string | null;
   model: string | null;
@@ -111,10 +113,10 @@ export type CatalogPageResult = {
 };
 
 const CATALOG_CAR_SELECT =
-  "id, primary_source, source_kind, source_id, source_url, published_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(source, url, thumbnail_url, media_type, category, is_primary, sort_order)";
+  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_added_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(source, url, thumbnail_url, media_type, category, is_primary, sort_order)";
 
 const CATALOG_CARD_SELECT =
-  "id, primary_source, source_kind, source_id, source_url, published_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, primary_image_url, primary_thumbnail_url, media_count, seats";
+  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_added_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, primary_image_url, primary_thumbnail_url, media_count, seats";
 
 export type CarDetail = CatalogCar & {
   car_options?: Array<{

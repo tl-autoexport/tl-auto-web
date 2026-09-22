@@ -42,13 +42,14 @@ function bodyShapeForCard(car: VehicleCardData) {
 }
 
 function daysOnSale(car: CatalogCar) {
-  // Prefer Encar's first-advertised date. If it is unavailable, count from
-  // the moment the card entered TL Auto, but never show an incorrect zero-day
-  // value for a card that has just been imported.
-  const listedAt = car.published_at ?? car.created_at;
+  // "Time on sale in Korea" is only supportable by a source date. Without one the
+  // number describes our own catalogue, so it is labelled as such and never
+  // presented as a fact about the Korean market.
+  const sourceDated = car.published_at_source === "source_payload" || car.published_at_source === "source_snapshot";
+  const listedAt = sourceDated ? car.published_at : (car.catalog_added_at ?? car.created_at);
   if (!listedAt) return null;
   const elapsed = Math.floor((Date.now() - new Date(listedAt).getTime()) / day);
-  return Math.max(1, elapsed);
+  return { days: Math.max(1, elapsed), sourceDated };
 }
 
 export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage = false }: { car: VehicleCardData; enableGallery?: boolean; priorityImage?: boolean }) {
@@ -152,7 +153,7 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
       </div>
 
       <div className="pointer-events-none relative z-10 px-2.5 py-1.5 text-[11px] text-[#7a8798] sm:px-4 sm:py-3 sm:text-xs">
-        <span>{saleDays != null ? `В продаже ${saleDays} ${pluralDays(saleDays)} в Корее` : "Срок продажи уточняется"}</span>
+        <span>{saleDays == null ? "Срок продажи уточняется" : saleDays.sourceDated ? `В продаже ${saleDays.days} ${pluralDays(saleDays.days)} в Корее` : `Добавлено в каталог ${saleDays.days} ${pluralDays(saleDays.days)} назад`}</span>
       </div>
       {shareNotice ? <span aria-live="polite" className="sr-only">{shareNotice}</span> : null}
     </article>
