@@ -36,7 +36,7 @@ async function main() {
     electricPages: 0,
     hybridTarget: 0,
     hybridPages: 0,
-    collectNewCandidateDrafts: true,
+    collectNewCandidateDrafts: "raw",
   });
   const candidates = (discovery.candidateDrafts ?? []) as CandidateDraft[];
   if (candidates.length !== target) {

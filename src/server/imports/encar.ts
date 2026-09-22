@@ -303,7 +303,7 @@ export type ImportOptions = {
   modelMinimums?: Record<string, number>;
   priorityBrandPages?: Record<string, number>;
   /** Return safe queue payloads during a dry run without inserting cars. */
-  collectNewCandidateDrafts?: boolean;
+  collectNewCandidateDrafts?: boolean | "raw";
 };
 
 type EncarFilterBounds = {
@@ -1640,7 +1640,8 @@ export async function importEncar(options: ImportOptions = {}) {
         reportTypes: item.reports.map((report) => report.report_type),
       })),
       candidateDrafts: options.collectNewCandidateDrafts
-        ? mapped.map((item) => ({
+        ? (options.collectNewCandidateDrafts === true
+          ? mapped.map((item) => ({
             source: "encar",
             sourceListingId: item.car.source_id,
             sourceUrl: item.car.source_url,
@@ -1648,6 +1649,20 @@ export async function importEncar(options: ImportOptions = {}) {
             model: item.car.model,
             year: item.car.year,
           }))
+          : freshCandidates
+            .filter((item) => {
+              const fuel = normalizeFuel(item.FuelType);
+              return fuel === "gasoline" || fuel === "diesel";
+            })
+            .slice(0, target)
+            .map((item) => ({
+              source: "encar",
+              sourceListingId: String(item.Id),
+              sourceUrl: `https://fem.encar.com/cars/detail/${item.Id}`,
+              brand: normalizeBrand(item.Manufacturer),
+              model: normalizeModel(item.Model),
+              year: Number(item.Year) || null,
+            })))
         : undefined,
     };
   }
