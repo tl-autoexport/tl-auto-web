@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 import { fetch, ProxyAgent } from "undici";
-import { open, rm } from "node:fs/promises";
+import { open, readFile, rm } from "node:fs/promises";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
 
 config({ path: ".env.local", quiet: true });
@@ -15,6 +15,7 @@ const delayMs = Math.max(1_000, Number(process.env.ENCAR_UNIVERSAL_DELAY_MS ?? 3
 const leaseMinutes = Math.max(5, Math.min(120, Number(process.env.ENCAR_UNIVERSAL_LEASE_MINUTES ?? 15)));
 const pollMs = Math.max(1_000, Number(process.env.ENCAR_UNIVERSAL_POLL_MS ?? 10_000));
 const dryRun = process.env.ENCAR_UNIVERSAL_DRY_RUN === "true";
+const radarPriorityPath = `${process.env.ENCAR_COORDINATION_DIR ?? "/tmp/encar-coordination"}/radar-priority.json`;
 const lockPath = process.env.ENCAR_UNIVERSAL_LOCK_PATH?.trim()
   || `/tmp/tl-auto-encar-enrichment-${(runId ?? "unknown").replace(/[^a-zA-Z0-9-]/g, "_")}.lock`;
 
@@ -45,6 +46,21 @@ function log(event: string, details: Record<string, unknown> = {}) {
 
 function idOf(row: Row) {
   return String(row.candidate_snapshot.encarId ?? row.candidate_snapshot.encar_id ?? row.source_listing_id);
+}
+
+async function radarHasPriority() {
+  try {
+    const owner = JSON.parse(await readFile(radarPriorityPath, "utf8")) as { pid?: unknown };
+    if (!Number.isInteger(owner.pid) || Number(owner.pid) < 1) return false;
+    try {
+      process.kill(Number(owner.pid), 0);
+      return true;
+    } catch {
+      return false;
+    }
+  } catch {
+    return false;
+  }
 }
 
 async function get(endpoint: string): Promise<Probe> {
@@ -210,6 +226,11 @@ async function main() {
 
     log("worker_started", { dryRun, leaseMinutes, delayMs, lockPath });
     while (!stopping) {
+      if (await radarHasPriority()) {
+        log("waiting_for_radar", { pollMs });
+        await sleep(pollMs);
+        continue;
+      }
       const row = await claim();
       if (!row) {
         const counts = await queueCounts();
