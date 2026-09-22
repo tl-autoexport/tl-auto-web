@@ -76,6 +76,7 @@ async function main() {
 
   const gateFailures = new Map<string, number>();
   const preliminaryByConfidence: Record<string, number> = {};
+  const snapshotSuspects: string[] = [];
   let gateChecked = 0;
   for (const car of cars) {
     // An unpriced card simply shows no landed price; the contract only has to
@@ -98,6 +99,9 @@ async function main() {
     };
     const verdict = evaluatePublication(candidate);
     if (!verdict.ok) {
+      // A card published between the two reads of this audit would look like it
+      // has no snapshot. Those ids are re-checked below before being reported.
+      if (verdict.blockers.includes("snapshot_missing")) snapshotSuspects.push(car.id);
       for (const blocker of verdict.blockers) gateFailures.set(blocker, (gateFailures.get(blocker) ?? 0) + 1);
       continue;
     }
@@ -130,6 +134,27 @@ async function main() {
   const electricWithPrice = electric.filter((car) => car.price_rub != null).length;
   const electricWithoutPrice = electric.length - electricWithPrice;
 
+  // The catalogue is written by a live publisher, so a card can appear between
+  // the two reads. Re-reading only the suspects tells a genuine missing snapshot
+  // apart from a card that was mid-publication when the audit started.
+  let snapshotRaceResolved = 0;
+  if (snapshotSuspects.length) {
+    const confirmed = new Set<string>();
+    for (let index = 0; index < snapshotSuspects.length; index += 100) {
+      const { data } = await supabase
+        .from("calc_snapshots")
+        .select("car_id")
+        .in("car_id", snapshotSuspects.slice(index, index + 100));
+      for (const row of (data ?? []) as Array<{ car_id: string }>) confirmed.add(row.car_id);
+    }
+    snapshotRaceResolved = confirmed.size;
+    if (confirmed.size) {
+      const remaining = Math.max(0, (gateFailures.get("snapshot_missing") ?? 0) - confirmed.size);
+      if (remaining) gateFailures.set("snapshot_missing", remaining);
+      else gateFailures.delete("snapshot_missing");
+    }
+  }
+
   const report = {
     total: cars.length,
     sources: {
@@ -157,6 +182,7 @@ async function main() {
     publicationContract: {
       checked: gateChecked,
       withSnapshot: snapshotCarIds.size,
+      snapshotRaceResolved,
       failures: Object.fromEntries(gateFailures),
     },
     priceFinality: {
