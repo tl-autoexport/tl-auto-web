@@ -3,6 +3,7 @@ import { calculateRuVladivostok } from "@/server/calc/ru";
 import { CALC_VERSION } from "@/server/calc/ru";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import { createSupabaseAdmin } from "@/server/supabase/admin";
+import { resolveAutomaticPowerReference, type AutomaticPowerReferenceRow } from "@/server/catalog/automatic-power-reference";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -33,26 +34,6 @@ type CatalogCar = {
   power_basis: "combustion_engine" | "electric_30min" | "parallel_sum" | null;
 };
 
-type AutomaticPowerReference = {
-  configuration_key: string;
-  brand: string | null;
-  model: string | null;
-  fuel_type: string | null;
-  engine_cc: number | null;
-  drive_type: string | null;
-  badge: string | null;
-  badge_detail: string | null;
-  power_hp: number | null;
-  power_kw: number | null;
-  source: string;
-  status: "automatic" | "confirmed" | "retired";
-};
-
-function referenceKey(car: Pick<CatalogCar, "brand" | "model" | "fuel_type" | "engine_cc" | "drive_type" | "badge" | "badge_detail">) {
-  const normalize = (value: string | null) => (value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
-  return [normalize(car.brand), normalize(car.model), normalize(car.fuel_type), car.engine_cc ?? "unknown", normalize(car.drive_type), normalize(car.badge), normalize(car.badge_detail)].join("|");
-}
-
 async function main() {
   const dryRun = process.env.RECALCULATE_DRY_RUN !== "false";
   const rateSnapshot = await getCbrCalcRates();
@@ -74,12 +55,10 @@ async function main() {
   }
   const { data: referenceRows, error: referenceError } = await supabase
     .from("vehicle_power_automatic_reference")
-    .select("configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,power_hp,power_kw,source,status")
+    .select("configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,year_from,year_to,power_hp,power_kw,source,status")
     .neq("status", "retired");
   if (referenceError) throw referenceError;
-  const automaticReferences = new Map(
-    ((referenceRows ?? []) as AutomaticPowerReference[]).map((row) => [row.configuration_key, row]),
-  );
+  const automaticReferences = (referenceRows ?? []) as AutomaticPowerReferenceRow[];
 
   const existingVersionIds = new Set<string>();
   if (!dryRun) {
@@ -126,7 +105,7 @@ async function main() {
       : null;
     const reference = approvedPowerKw != null || car.fuel_type === "hybrid" || car.fuel_type === "electric"
       ? null
-      : automaticReferences.get(referenceKey(car));
+      : resolveAutomaticPowerReference(car, automaticReferences);
     const resolvedPowerHp = reference?.power_hp ?? car.power_hp;
     const needsEngineCc = car.fuel_type !== "electric";
     if (
