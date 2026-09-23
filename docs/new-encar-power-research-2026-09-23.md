@@ -99,3 +99,9 @@ These are source leads only. A manufacturer spec for a vehicle family does not b
 2. Keep Audi rules split by model year: earlier 45 TFSI non-quattro → 252 PS; 2022 model-year 45 TFSI quattro → 265 PS. Do not merge them under a generic badge-only rule.
 3. Reconcile accepted BMW/Audi candidates against approved TL Auto power evidence before any reference write. This report did not update the database, calculate prices, or publish cars.
 4. For the 31 AutoHome `no_match` cards and 102 unmapped configurations, test additional source coverage/name mappings separately. `no_match` means no supported AutoHome match, not that the power is unknowable.
+
+## Reference-manifest update
+
+After review, three narrowly-scoped BMW rules were added to `data/power-reference/manufacturer-korea-v1.json` for the verified Encar configurations: G01 X3 xDrive20i M Sport/M Sport Pro (2023, 184 PS), G05 X5 xDrive40i xLine (2024, 381 PS), and G30 530i M Sport Package (2022, 252 PS). The rule ranges require the exact generation, badge, fuel, year and engine-size window; AWD is additionally required where the badge/configuration proves it. The manufacturer import dry-run and the repository check passed. No Supabase or car-card changes were made.
+
+Audi was intentionally not added to the executable reference yet. The verified 21/11 Encar listing is labeled model year 2022 while the matcher/database currently carry registration year 2021; the 21/10 non-quattro listing may be either side of the Korean output update. The current match schema cannot represent production month or model year independently, and the same badge exists at both 252 and 265 PS. Adding a broad 2021 rule would therefore risk applying the wrong power to other cars. Add Audi only after the matcher can distinguish model year/production date or exact type approval resolves the variants.

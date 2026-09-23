@@ -2956,6 +2956,70 @@
         { "generation": "더 뉴 티볼리", "trim": "V3", "driveType": "2WD", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1588, "engineCcTo": 1605 },
         { "generation": "더 뉴 티볼리", "trim": "1.6 2WD", "driveType": "2WD", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1588, "engineCcTo": 1605 }
       ]
+    },
+    {
+      "specKey": "bmw-x3-g01-xdrive20i-1998-184ps-2023",
+      "brand": "BMW",
+      "model": "X3",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2023, 2023],
+      "power": { "value": 184, "unit": "PS", "kw": 135.33177 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea G01 X3 xDrive20i technical specification — 1,998 cc, 184 PS",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0354632KO/bmw-%EC%BD%94%EB%A6%AC%EC%95%84-%EB%89%B4-x3-%EB%B0%8F-%EB%89%B4-x4-%EA%B5%AD%EB%82%B4-%EA%B3%B5%EC%8B%9D-%EC%B6%9C%EC%8B%9C",
+        "supportingUri": "https://www.bmw.co.kr/content/dam/bmw/marketKR/bmw_co_kr/Pricelist/BMW_September_pricelist_0913.pdf.asset.1694747480366.pdf",
+        "retrievedAt": "2026-09-23",
+        "note": "BMW Korea's G01 launch technical data specifies the Korean-market xDrive20i at 1,998 cc and 184 PS. The 2023 Korea price list confirms the local M Sport and M Sport Pro trim names. Restricted to 2023 G01 xDrive20i M Sport and M Sport Pro AWD listings; not transferable to Chinese-market X3 engine outputs."
+      },
+      "matches": [
+        { "generation": "G01", "trim": "xdrive 20i m sport", "badge": "xdrive 20i m sport", "driveType": "4WD", "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1990, "engineCcTo": 2005 },
+        { "generation": "G01", "trim": "xdrive 20i m sports pro", "badge": "xdrive 20i m sports pro", "driveType": "4WD", "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "bmw-x5-g05-xdrive40i-2998-381ps-2024",
+      "brand": "BMW",
+      "model": "X5",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 2998,
+      "years": [2024, 2024],
+      "power": { "value": 381, "unit": "PS", "kw": 280.22502375 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea facelift X5 xDrive40i technical specification — 2,998 cc, 381 PS",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0428819KO/bmw-%EC%BD%94%EB%A6%AC%EC%95%84-%ED%95%9C%EC%B8%B5-%EB%86%92%EC%9D%80-%EC%99%84%EC%84%B1%EB%8F%84%EC%9D%98-%EB%89%B4-x5-%EB%B0%8F-%EB%89%B4-x6-%EA%B5%AD%EB%82%B4-%EA%B3%B5%EC%8B%9D-%EC%B6%9C%EC%8B%9C",
+        "supportingUri": "https://www.bmw.co.kr/content/dam/bmw/marketKR/bmw_co_kr/Pricelist/BMW_February_pricelist.pdf.asset.1707881709774.pdf",
+        "retrievedAt": "2026-09-23",
+        "note": "BMW Korea's Korean facelift launch specifies xDrive40i at 381 PS; the February 2024 Korea price list confirms the xDrive40i xLine trim. Restricted to 2024 G05 xDrive40i xLine AWD listings. Earlier Chinese-market 340 PS data is not applicable."
+      },
+      "matches": [
+        { "generation": "G05", "trim": "xdrive 40i xline", "badge": "xdrive 40i xline", "driveType": "4WD", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 2985, "engineCcTo": 3010 }
+      ]
+    },
+    {
+      "specKey": "bmw-5-series-g30-530i-1998-252ps-2022",
+      "brand": "BMW",
+      "model": "5 Series",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2022, 2022],
+      "power": { "value": 252, "unit": "PS", "kw": 185.345685 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "BMW Korea G30 530i technical specification — 1,998 cc, 252 PS",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0268099KO/bmw-%EC%BD%94%EB%A6%AC%EC%95%84-7%EC%84%B8%EB%8C%80-%EB%89%B4-5%EC%8B%9C%EB%A6%AC%EC%A6%88-%EA%B3%B5%EC%8B%9D-%EC%B6%9C%EC%8B%9C",
+        "supportingUri": "https://www.drom.ru/catalog/bmw/5-series/2022/",
+        "retrievedAt": "2026-09-23",
+        "note": "BMW Korea's G30 launch technical data specifies 530i at 1,998 cc and 252 PS. Drom's 2022 G30 data independently lists 252 PS for M Sport RWD and xDrive variants. Restricted to 2022 G30 530i M Sport Package gasoline listings; the Encar card's drivetrain is absent, and it is not used as a match requirement because the documented output is the same for both drives."
+      },
+      "matches": [
+        { "generation": "G30", "trim": "530i m sport package", "badge": "530i m sport package", "yearFrom": 2022, "yearTo": 2022, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
     }
   ]
 }
