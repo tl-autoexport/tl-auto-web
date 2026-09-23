@@ -43,7 +43,7 @@ async function main() {
     const { data: page, error } = await supabase
       .from("cars")
       .select(
-        "id,primary_source,source_id,brand,model,drive_type,badge,badge_detail,year,registration_month,price_krw,price_rub,engine_cc,power_hp,fuel_type,hybrid_dvs_power_hp,hybrid_electric_power_kw,hybrid_dvs_above_electric_30min,hybrid_sequential,calculation_power_kw,calculation_power_status,power_basis",
+        "id,primary_source,source_id,brand,model,drive_type,badge,badge_detail,year,registration_month,price_krw,price_rub,engine_cc,power_hp,power_source,fuel_type,hybrid_dvs_power_hp,hybrid_electric_power_kw,hybrid_dvs_above_electric_30min,hybrid_sequential,calculation_power_kw,calculation_power_status,power_basis",
       )
       .eq("is_available", true)
       .order("primary_source")
@@ -138,6 +138,14 @@ async function main() {
       rateDetails: rateSnapshot.rateDetails,
     });
     const oldPriceRub = car.price_rub;
+    const automaticPowerChanged = reference != null && reference.power_hp !== car.power_hp;
+    // `calculation_power_kw` is the tariff input and can deliberately differ
+    // from the display hp (notably for EV 30-minute power). It must never be
+    // reported as a selected-power change. For a combustion card with an
+    // approved tariff power, keep a separate diagnostic only.
+    const approvedCombustionPowerMismatch = approvedPowerKw != null && car.power_basis === "combustion_engine" && car.power_hp != null
+      ? Math.abs(approvedPowerKw - car.power_hp / 1.3596216173) > 0.01
+      : false;
     const row = {
       source: car.primary_source,
       sourceId: car.source_id,
@@ -153,9 +161,18 @@ async function main() {
       feesRub: calc.feesRub,
       utilRub: calc.utilRub,
       powerSource: approvedPowerKw != null ? "approved_power_spec" : reference ? "automatic_reference" : car.power_source,
-      powerChanged: approvedPowerKw != null
-        ? Math.abs(approvedPowerKw - (car.power_hp ?? 0) / 1.3596216173) > 0.01
-        : reference != null && reference.power_hp !== car.power_hp,
+      selectedPower: {
+        storedHp: car.power_hp,
+        storedCalculationKw: car.calculation_power_kw,
+        storedBasis: car.power_basis,
+        resolvedHp: resolvedPowerHp,
+        resolvedKw: approvedPowerKw ?? reference?.power_kw ?? null,
+        referenceKey: reference?.configuration_key ?? null,
+      },
+      // True only when this run selects a different automatic reference.
+      // Approved data is authoritative and is never replaced by this script.
+      powerChanged: automaticPowerChanged,
+      approvedCombustionPowerMismatch,
     };
 
     if (onlyPowerChanged && !row.powerChanged) return null;
