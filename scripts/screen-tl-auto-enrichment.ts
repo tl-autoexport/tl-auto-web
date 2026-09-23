@@ -40,9 +40,12 @@ async function main() {
   }
 
   const stageById = new Map(staging.map((row) => [row.source_listing_id, row]));
-  const approved: string[] = [];
-  const manualReview: Array<{ sourceListingId: string; missingBlocks: string[] }> = [];
+  const profileComplete: string[] = [];
+  const powerReady: string[] = [];
+  const partialEnrichment: Array<{ sourceListingId: string; missingBlocks: string[] }> = [];
+  const needsPowerReview: Array<{ sourceListingId: string; missingCore: string[] }> = [];
   const unavailable: string[] = [];
+  const missingBlockCounts: Record<string, number> = {};
 
   for (const row of queue) {
     if (row.status === "unavailable") { unavailable.push(row.source_listing_id); continue; }
@@ -53,8 +56,20 @@ async function main() {
       .filter((block) => !ready(row.result, block));
     const stage = stageById.get(row.source_listing_id);
     if (!stage?.raw_payload || !stage.normalized) missingBlocks.push("staging_payload");
-    if (missingBlocks.length) manualReview.push({ sourceListingId: row.source_listing_id, missingBlocks });
-    else approved.push(row.source_listing_id);
+    for (const block of missingBlocks) missingBlockCounts[block] = (missingBlockCounts[block] ?? 0) + 1;
+
+    // A vehicle-detail response and a staged payload are sufficient to carry
+    // a candidate into normalization and power resolution. Insurance, history,
+    // options and diagnosis enrich the card but must not silently exclude it.
+    const missingCore = [
+      ...(ready(row.result, "gallery") ? [] : ["detail"]),
+      ...(!stage?.raw_payload || !stage.normalized ? ["staging_payload"] : []),
+    ];
+    if (missingCore.length) needsPowerReview.push({ sourceListingId: row.source_listing_id, missingCore });
+    else powerReady.push(row.source_listing_id);
+
+    if (missingBlocks.length) partialEnrichment.push({ sourceListingId: row.source_listing_id, missingBlocks });
+    else profileComplete.push(row.source_listing_id);
   }
 
   const report = {
@@ -65,14 +80,32 @@ async function main() {
     databaseWrites: 0,
     queueRows: queue.length,
     stagingRows: staging.length,
-    counts: { approved: approved.length, manualReview: manualReview.length, unavailable: unavailable.length },
-    approved,
-    manualReview,
+    counts: {
+      succeeded: queue.filter((row) => row.status === "succeeded").length,
+      profileComplete: profileComplete.length,
+      powerReady: powerReady.length,
+      partialEnrichment: partialEnrichment.length,
+      needsPowerReview: needsPowerReview.length,
+      unavailable: unavailable.length,
+    },
+    missingBlockCounts,
+    profileComplete,
+    powerReady,
+    partialEnrichment,
+    needsPowerReview,
     unavailable,
   };
   await mkdir("output", { recursive: true });
   await writeFile("output/tl-auto-enrichment-screening.json", `${JSON.stringify(report, null, 2)}\n`);
-  console.log(JSON.stringify({ ...report, approved: undefined, manualReview: undefined, unavailable: undefined, output: "output/tl-auto-enrichment-screening.json" }, null, 2));
+  console.log(JSON.stringify({
+    ...report,
+    profileComplete: undefined,
+    powerReady: undefined,
+    partialEnrichment: undefined,
+    needsPowerReview: undefined,
+    unavailable: undefined,
+    output: "output/tl-auto-enrichment-screening.json",
+  }, null, 2));
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : error); process.exit(1); });
