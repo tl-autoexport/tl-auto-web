@@ -8,7 +8,8 @@
 import { Client } from "pg";
 import { config } from "dotenv";
 import { mkdir, writeFile } from "node:fs/promises";
-import { canonicalCandidates, canonicalEngineCc, canonicalInput, configurationKey } from "../src/server/power-resolution/canonical";
+import { canonicalCandidates, canonicalEngineCc, canonicalGeneration, canonicalInput, configurationKey } from "../src/server/power-resolution/canonical";
+import { normalizeDrive } from "../src/server/normalization/vehicles";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
 
 config({ path: ".env.local", override: true, quiet: true });
@@ -37,6 +38,25 @@ const number = (value: unknown): number | null => {
   const parsed = typeof value === "number" ? value : Number(String(value ?? "").replace(/,/g, ""));
   return Number.isFinite(parsed) ? parsed : null;
 };
+function modelYear(value: unknown): number | null {
+  const raw = String(value ?? "").trim();
+  const match = raw.match(/^(\d{4})(?:\d{2})?$/);
+  if (match) return Number(match[1]);
+  const date = raw.match(/^(\d{4})[-/.]\d{1,2}/);
+  return date ? Number(date[1]) : number(value);
+}
+
+function generationCode(...values: unknown[]): string | null {
+  for (const value of values) {
+    const raw = text(value);
+    if (!raw) continue;
+    const normalized = canonicalGeneration(raw);
+    if (normalized && /^[A-Z]{1,4}\d{1,4}[A-Z]{0,2}$/.test(normalized)) return normalized;
+    const inText = raw.match(/\b([A-Z]{1,4}\d{1,4}[A-Z]{0,2})\b/i);
+    if (inText) return inText[1].toUpperCase();
+  }
+  return null;
+}
 function ready(result: Obj | null, name: string) {
   const probes = obj(obj(result).probes);
   return obj(probes[name]).classification === "ready";
@@ -66,27 +86,67 @@ function inputFor(row: CandidateRow) {
   const spec = obj(detail.spec);
   const category = obj(detail.category);
   const contents = obj(payload.vehicleContents);
-  const year = number(snapshot.year ?? detail.year ?? detail.modelYear ?? contents.year);
+  // Encar listing Year is YYYYMM (e.g. 202411); the power rules use YYYY.
+  const year = modelYear(snapshot.year ?? detail.year ?? detail.modelYear ?? contents.year);
   const engineCc = canonicalEngineCc(spec.displacement ?? detail.displacement ?? snapshot.engineCc);
+  const badge = category.gradeEnglishName ?? snapshot.badge ?? snapshot.badgeDetail;
+  const driveText = [
+    category.gradeEnglishName,
+    category.gradeDetailEnglishName,
+    snapshot.badge,
+    snapshot.badgeDetail,
+    detail.driveType,
+    spec.driveType,
+    contents.driveType,
+  ].filter(Boolean).join(" ");
   return canonicalInput({
     brand: category.manufacturerEnglishName ?? snapshot.brand,
     model: category.modelGroupEnglishName ?? snapshot.model,
-    generation: category.modelName ?? detail.modelName ?? contents.modelName,
-    trim: category.gradeDetailEnglishName ?? category.gradeEnglishName ?? snapshot.badge,
-    badge: category.gradeEnglishName ?? snapshot.badge,
-    modelCode: contents.modelCd ?? contents.modelCode,
+    // Korean display names such as “스타리아” are not generation identifiers.
+    // Only pass an explicit generation code; otherwise leave the field unknown.
+    generation: generationCode(category.generation, category.modelName, detail.generation, detail.modelName, contents.generation, contents.modelName, snapshot.generation),
+    // A full Encar grade often contains engine/drivetrain descriptors rather
+    // than a trim. Keep that text as the badge and only use a detailed grade
+    // as trim, avoiding false exact-trim exclusions.
+    trim: category.gradeDetailEnglishName ?? snapshot.trim,
+    badge,
+    modelCode: contents.modelCode ?? detail.modelCode,
     engineCode: spec.engineCode ?? detail.engineCode,
     fuelType: spec.fuelName ?? detail.fuelName ?? snapshot.fuelType,
-    driveType: spec.driveType ?? detail.driveType ?? contents.driveType,
+    driveType: normalizeDrive(driveText),
     year,
     engineCc,
   });
+}
+
+function potentialMatches(input: ReturnType<typeof inputFor>, candidates: ApprovedPowerCandidate[]) {
+  const missing: Array<keyof ApprovedPowerCandidate["match"]> = [];
+  if (!input.generation) missing.push("generation");
+  if (!input.trim) missing.push("trim");
+  if (!input.badge) missing.push("badgeNormalized");
+  if (!input.modelCode) missing.push("modelCode");
+  if (!input.engineCode) missing.push("engineCode");
+  if (!input.driveType) missing.push("driveType");
+  const relaxed = candidates.map((candidate) => ({
+    ...candidate,
+    match: Object.fromEntries(Object.entries(candidate.match).map(([key, value]) => [
+      key,
+      missing.includes(key as keyof ApprovedPowerCandidate["match"]) ? null : value,
+    ])) as ApprovedPowerCandidate["match"],
+  }));
+  const result = resolveApprovedPower(input, relaxed);
+  return {
+    missingConfigurationFields: missing,
+    specIds: result.status === "matched" ? [result.candidate.specId] : result.candidates.map((candidate) => candidate.specId),
+    ambiguous: result.status !== "matched" && result.candidates.length > 0,
+  };
 }
 
 async function main() {
   const db = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await db.connect();
   try {
+    await db.query("begin read only");
     const [refs, rows] = await Promise.all([
       db.query(`select spec.id spec_id,spec.version spec_version,spec.calculation_power_kw,spec.power_basis,spec.source_priority,
           evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.verification_status,evidence.reliability,evidence.evidence_tier,evidence.source_uri,
@@ -110,11 +170,20 @@ async function main() {
       const coreMissing = [!ready(row.result, "detail") && "detail", !input.brand && "brand", !input.model && "model", !input.year && "year", !input.engineCc && "engine_cc", !input.fuelType && "fuel_type"].filter(Boolean) as string[];
       if (coreMissing.length) return { sourceListingId: row.source_listing_id, status: "needs_source_retry", coreMissing, configuration: input, configurationKey: configurationKey(input) };
       const resolution = resolveApprovedPower(input, approved);
-      if (resolution.status !== "matched") return {
-        sourceListingId: row.source_listing_id, status: resolution.candidates.length ? "ambiguous" : "unmatched",
-        reason: resolution.reason, configuration: input, configurationKey: configurationKey(input),
-        candidateSpecIds: resolution.candidates.map((candidate) => candidate.specId),
-      };
+      if (resolution.status !== "matched") {
+        const potential = potentialMatches(input, approved);
+        const status = resolution.candidates.length
+          ? "ambiguous"
+          : potential.specIds.length
+            ? potential.ambiguous ? "potential_ambiguous_needs_configuration" : "potential_match_needs_configuration"
+            : "unmatched";
+        return {
+          sourceListingId: row.source_listing_id, status,
+          reason: resolution.reason, configuration: input, configurationKey: configurationKey(input),
+          candidateSpecIds: resolution.candidates.map((candidate) => candidate.specId),
+          ...(potential.specIds.length ? { potentialMatch: potential } : {}),
+        };
+      }
       const evidence = evidenceBySpecId.get(resolution.candidate.specId);
       return {
         sourceListingId: row.source_listing_id, status: "approved_match", reason: resolution.reason,
@@ -122,7 +191,9 @@ async function main() {
         power: { specId: resolution.candidate.specId, evidenceId: resolution.candidate.evidenceId, evidenceTier: evidence?.evidenceTier ?? "unknown", sourceUrl: evidence?.sourceUrl ?? null, confidence: resolution.confidence, calculationPowerKw: resolution.candidate.calculationPowerKw, powerBasis: resolution.candidate.powerBasis },
       };
     });
-    const counts = Object.fromEntries(["approved_match", "ambiguous", "unmatched", "needs_source_retry"].map((status) => [status, reportRows.filter((row) => row.status === status).length]));
+    const counts = Object.fromEntries([
+      "approved_match", "ambiguous", "potential_match_needs_configuration", "potential_ambiguous_needs_configuration", "unmatched", "needs_source_retry",
+    ].map((status) => [status, reportRows.filter((row) => row.status === status).length]));
     const report = {
       generatedAt: new Date().toISOString(), runId, readOnly: true, encarRequests: 0, databaseWrites: 0, publicCatalogChanged: false,
       policy: "approved TL Auto power evidence only; automatic reference, AI, price calculation and publication are excluded",
@@ -131,6 +202,9 @@ async function main() {
     await mkdir("output", { recursive: true });
     await writeFile("output/tl-auto-new-encar-power-plan.json", `${JSON.stringify(report, null, 2)}\n`);
     console.log(JSON.stringify({ ...report, candidates: undefined, output: "output/tl-auto-new-encar-power-plan.json" }, null, 2));
-  } finally { await db.end(); }
+    await db.query("rollback");
+  } finally {
+    await db.end();
+  }
 }
 main().catch((error) => { console.error(error instanceof Error ? error.stack ?? error.message : error); process.exit(1); });
