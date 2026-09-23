@@ -105,4 +105,13 @@ assert.equal(fuelConflict.failedFeature, "fuel");
 const fuelAbsent = matchCardGroup(group, [spec({ name: "Prestige", engineGroup: "1598" })]);
 assert.equal(fuelAbsent.status, "high_confidence");
 
+const dieselGroup: CardGroup = { ...group, engine_cc: 1998, fuel_type: "diesel", drive_type: null, trim: "220d" };
+const petrolBadgeOnDieselCard = matchCardGroup(dieselGroup, [spec({ name: "2021款 220i", engineGroup: "1998cc", powerHp: 184 })]);
+assert.equal(petrolBadgeOnDieselCard.status, "no_match");
+assert.equal(petrolBadgeOnDieselCard.failedFeature, "fuel");
+const dieselBadgeOnDieselCard = matchCardGroup(dieselGroup, [spec({ name: "2021款 220d", engineGroup: "1998cc", powerHp: 190 })]);
+assert.equal(dieselBadgeOnDieselCard.status, "high_confidence");
+const tfsiOnPetrolCard = matchCardGroup(group, [spec({ name: "2021款 45 TFSI quattro", engineGroup: "1598cc" })]);
+assert.equal(tfsiOnPetrolCard.status, "high_confidence");
+
 console.log("autohome matching ladder tests passed");

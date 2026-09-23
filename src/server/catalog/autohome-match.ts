@@ -21,6 +21,7 @@ export type AutoHomeSpec = {
   name: string;
   engineGroup: string;
   drive: string | null;
+  fuel?: string | null;
   powerHp: number | string | null;
   specId: string | null;
 };
@@ -64,7 +65,7 @@ const BADGE_FAMILIES: Array<{ name: string; markers: RegExp }> = [
 ];
 
 function specText(spec: AutoHomeSpec) {
-  return `${spec.name ?? ""} ${spec.engineGroup ?? ""}`;
+  return `${spec.name ?? ""} ${spec.engineGroup ?? ""} ${spec.fuel ?? ""}`;
 }
 
 /** `normalizeFuel` returns the raw text when it recognises nothing, so only a
@@ -85,6 +86,10 @@ function specFuel(spec: AutoHomeSpec): string | null {
   if (/柴油/.test(text)) return "diesel";
   if (/电动/.test(text)) return "electric";
   if (/混合/.test(text)) return "hybrid";
+  // AutoHome model grades often encode fuel by engine badge instead of an
+  // explicit fuel label (e.g. BMW 220i/220d, Audi TFSI/TDI).
+  if (/\b(?:t?di|crdi|cdi)\b|d4h[ab]|\b(?:xdrive)?\d{2,3}d\b/i.test(text)) return "diesel";
+  if (/\b(?:t?fsi|tsi|tgdi|t-gdi|mpi|gdi)\b|\b(?:xdrive)?\d{2,3}l?i\b/i.test(text)) return "gasoline";
   return null;
 }
 
