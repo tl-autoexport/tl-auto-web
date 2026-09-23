@@ -1225,11 +1225,13 @@ export function normalizeBrand(value: unknown) {
 export function normalizeModel(value: unknown) {
   const raw = String(value ?? "").trim();
   const lower = raw.toLowerCase();
-  if (lower.includes("glc")) return "GLC";
-  if (lower.includes("gle")) return "GLE";
-  if (lower.includes("gls")) return "GLS";
-  if (lower.includes("glb")) return "GLB";
-  if (lower.includes("gla")) return "GLA";
+  // Match Mercedes SUV model tokens, not arbitrary substrings: `Wrangler`
+  // contains the letters `gle` and was incorrectly normalized to `GLE`.
+  if (/\bglc(?:\s*-?\s*\d{3})?\b/.test(lower)) return "GLC";
+  if (/\bgle(?:\s*-?\s*\d{3})?\b/.test(lower)) return "GLE";
+  if (/\bgls\b/.test(lower)) return "GLS";
+  if (/\bglb\b/.test(lower)) return "GLB";
+  if (/\bgla\b/.test(lower)) return "GLA";
   for (const [from, to] of Object.entries(MODEL_MAP).sort(
     (a, b) => b[0].length - a[0].length,
   )) {

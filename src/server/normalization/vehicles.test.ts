@@ -3,8 +3,15 @@ import {
   driveTypesCompatible,
   normalizeColor,
   normalizeDrive,
+  normalizeModel,
   resolvePower,
 } from "./vehicles";
+
+// Mercedes model aliases must match whole model tokens: a Jeep Wrangler must
+// never collapse to Mercedes GLE just because the text contains `gle`.
+assert.equal(normalizeModel("Wrangler"), "Wrangler");
+assert.equal(normalizeModel("GLE450"), "GLE");
+assert.equal(normalizeModel("GLC 300"), "GLC");
 
 // Colour: Korean source values must become a Russian palette value instead of
 // being dropped, while genuinely unknown Korean text must never leak to a card.

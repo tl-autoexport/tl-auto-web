@@ -46,16 +46,47 @@ function modelYear(value: unknown): number | null {
   return date ? Number(date[1]) : number(value);
 }
 
-function generationCode(...values: unknown[]): string | null {
+function generationCode(model: unknown, ...values: unknown[]): string | null {
+  const modelKey = String(model ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   for (const value of values) {
     const raw = text(value);
     if (!raw) continue;
     const normalized = canonicalGeneration(raw);
-    if (normalized && /^[A-Z]{1,4}\d{1,4}[A-Z]{0,2}$/.test(normalized)) return normalized;
+    if (normalized && /^[A-Z]{1,4}\d{1,4}[A-Z]{0,2}$/.test(normalized)) {
+      if (normalized.replace(/[^A-Z0-9]/g, "") !== modelKey) return normalized;
+      continue;
+    }
     const inText = raw.match(/\b([A-Z]{1,4}\d{1,4}[A-Z]{0,2})\b/i);
-    if (inText) return inText[1].toUpperCase();
+    if (inText && inText[1].toUpperCase() !== modelKey) return inText[1].toUpperCase();
   }
   return null;
+}
+
+function canonicalEncarBrand(value: unknown) {
+  const raw = text(value);
+  if (!raw) return null;
+  const key = raw.toLowerCase().replace(/[\s_()\-]/g, "");
+  if (["renaultkoreasamsung", "renaultkorea"].includes(key)) return "Renault Korea";
+  return raw;
+}
+function sourceIdentity(row: CandidateRow) {
+  const snapshot = obj(row.candidate_snapshot);
+  const payload = obj(row.raw_payload);
+  const detail = obj(payload.detail);
+  const category = obj(detail.category);
+  const contents = obj(payload.vehicleContents);
+  const normalized = obj(row.normalized);
+  return {
+    snapshotBrand: text(snapshot.brand),
+    snapshotModel: text(snapshot.model),
+    snapshotBadge: text(snapshot.badge ?? snapshot.badgeDetail),
+    detailManufacturer: text(category.manufacturerEnglishName ?? category.manufacturerName),
+    detailModelGroup: text(category.modelGroupEnglishName ?? category.modelGroupName),
+    detailModel: text(category.modelName),
+    detailGeneration: text(category.generation ?? detail.generation ?? contents.generation),
+    normalizedBrand: text(normalized.brand),
+    normalizedModel: text(normalized.model),
+  };
 }
 function ready(result: Obj | null, name: string) {
   const probes = obj(obj(result).probes);
@@ -100,11 +131,15 @@ function inputFor(row: CandidateRow) {
     contents.driveType,
   ].filter(Boolean).join(" ");
   return canonicalInput({
-    brand: category.manufacturerEnglishName ?? snapshot.brand,
+    brand: canonicalEncarBrand(category.manufacturerEnglishName ?? snapshot.brand),
     model: category.modelGroupEnglishName ?? snapshot.model,
     // Korean display names such as “스타리아” are not generation identifiers.
     // Only pass an explicit generation code; otherwise leave the field unknown.
-    generation: generationCode(category.generation, category.modelName, detail.generation, detail.modelName, contents.generation, contents.modelName, snapshot.generation),
+    generation: generationCode(
+      category.modelGroupEnglishName ?? snapshot.model,
+      category.generation, category.modelName, detail.generation, detail.modelName,
+      contents.generation, contents.modelName, snapshot.generation,
+    ),
     // A full Encar grade often contains engine/drivetrain descriptors rather
     // than a trim. Keep that text as the badge and only use a detailed grade
     // as trim, avoiding false exact-trim exclusions.
@@ -197,7 +232,7 @@ async function main() {
     const searchGroups = new Map<string, {
       brand: string | null; model: string | null; generation: string | null; year: number | null;
       engineCc: number | null; fuelType: string | null; driveType: string | null;
-      listingIds: string[]; badgeExamples: string[];
+      listingIds: string[]; badgeExamples: string[]; sourceExamples: ReturnType<typeof sourceIdentity>[];
     }>();
     for (const row of reportRows) {
       if (row.status !== "unmatched") continue;
@@ -207,11 +242,15 @@ async function main() {
       const group = searchGroups.get(key) ?? {
         brand: vehicle.brand, model: vehicle.model, generation: vehicle.generation, year: vehicle.year,
         engineCc: vehicle.engineCc, fuelType: vehicle.fuelType, driveType: vehicle.driveType,
-        listingIds: [], badgeExamples: [],
+        listingIds: [], badgeExamples: [], sourceExamples: [],
       };
       group.listingIds.push(row.sourceListingId);
       const badge = vehicle.badge ?? vehicle.trim;
       if (badge && !group.badgeExamples.includes(badge)) group.badgeExamples.push(badge);
+      if (group.sourceExamples.length < 3) {
+        const source = sourceIdentity(rows.rows.find((candidate) => candidate.source_listing_id === row.sourceListingId)!);
+        if (!group.sourceExamples.some((example) => JSON.stringify(example) === JSON.stringify(source))) group.sourceExamples.push(source);
+      }
       searchGroups.set(key, group);
     }
     const externalSearchWorklist = [...searchGroups.values()]
