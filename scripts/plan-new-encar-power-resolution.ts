@@ -194,14 +194,49 @@ async function main() {
     const counts = Object.fromEntries([
       "approved_match", "ambiguous", "potential_match_needs_configuration", "potential_ambiguous_needs_configuration", "unmatched", "needs_source_retry",
     ].map((status) => [status, reportRows.filter((row) => row.status === status).length]));
+    const searchGroups = new Map<string, {
+      brand: string | null; model: string | null; generation: string | null; year: number | null;
+      engineCc: number | null; fuelType: string | null; driveType: string | null;
+      listingIds: string[]; badgeExamples: string[];
+    }>();
+    for (const row of reportRows) {
+      if (row.status !== "unmatched") continue;
+      const vehicle = row.configuration;
+      const key = [vehicle.brand, vehicle.model, vehicle.generation, vehicle.year, vehicle.engineCc, vehicle.fuelType, vehicle.driveType]
+        .map((value) => value ?? "?").join("|");
+      const group = searchGroups.get(key) ?? {
+        brand: vehicle.brand, model: vehicle.model, generation: vehicle.generation, year: vehicle.year,
+        engineCc: vehicle.engineCc, fuelType: vehicle.fuelType, driveType: vehicle.driveType,
+        listingIds: [], badgeExamples: [],
+      };
+      group.listingIds.push(row.sourceListingId);
+      const badge = vehicle.badge ?? vehicle.trim;
+      if (badge && !group.badgeExamples.includes(badge)) group.badgeExamples.push(badge);
+      searchGroups.set(key, group);
+    }
+    const externalSearchWorklist = [...searchGroups.values()]
+      .sort((a, b) => b.listingIds.length - a.listingIds.length || String(a.brand).localeCompare(String(b.brand)) || String(a.model).localeCompare(String(b.model)));
+    const t3Review = reportRows
+      .filter((row) => row.status === "approved_match" && row.power?.evidenceTier === "T3")
+      .map((row) => ({ sourceListingId: row.sourceListingId, configuration: row.configuration, power: row.power ?? null }));
     const report = {
       generatedAt: new Date().toISOString(), runId, readOnly: true, encarRequests: 0, databaseWrites: 0, publicCatalogChanged: false,
       policy: "approved TL Auto power evidence only; automatic reference, AI, price calculation and publication are excluded",
-      input: { succeededEnrichmentRows: rows.rowCount ?? 0, approvedReferenceRules: refs.rowCount ?? 0 }, counts, candidates: reportRows,
+      input: { succeededEnrichmentRows: rows.rowCount ?? 0, approvedReferenceRules: refs.rowCount ?? 0 },
+      counts,
+      externalSearch: { unmatchedListings: counts.unmatched, distinctConfigurations: externalSearchWorklist.length, worklist: externalSearchWorklist },
+      t3Review,
+      candidates: reportRows,
     };
     await mkdir("output", { recursive: true });
     await writeFile("output/tl-auto-new-encar-power-plan.json", `${JSON.stringify(report, null, 2)}\n`);
-    console.log(JSON.stringify({ ...report, candidates: undefined, output: "output/tl-auto-new-encar-power-plan.json" }, null, 2));
+    console.log(JSON.stringify({
+      ...report,
+      candidates: undefined,
+      externalSearch: { ...report.externalSearch, worklist: undefined },
+      t3Review: undefined,
+      output: "output/tl-auto-new-encar-power-plan.json",
+    }, null, 2));
     await db.query("rollback");
   } finally {
     await db.end();
