@@ -48,6 +48,7 @@ const inputPath = process.env.POWER_AI_INPUT ?? "output/tl-auto-new-encar-power-
 const outputPath = process.env.POWER_AI_OUTPUT ?? "output/tl-auto-new-encar-ai-research.json";
 const retryFromPath = process.env.POWER_AI_RETRY_FROM;
 const limit = Math.max(1, Math.min(50, Number(process.env.POWER_AI_LIMIT ?? 20)));
+const offset = Math.max(0, Number(process.env.POWER_AI_OFFSET ?? 0));
 const apiKey = process.env.GEMINI_API_KEY;
 const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
 const dryRun = process.env.POWER_AI_DRY_RUN !== "false";
@@ -126,7 +127,8 @@ async function research(group: WorkGroup): Promise<{ parsed: PowerResearch; raw:
     };
     const prompt = [
       "Research factory engine power for this South Korean-market vehicle using web search.",
-      "Search manufacturer specifications/catalogues first, then homologation or official documents, then multiple independent catalogues.",
+      "Search sources in this order: official manufacturer specifications/catalogues for the Korean market; EncarRus/Encar Russia configuration pages if available; Drom catalogue pages; then other independent catalogues.",
+      "For every source, identify its source_type honestly (official, encarrus, drom, catalogue, other). If EncarRus or Drom have no matching page, do not invent one.",
       "Do not infer power from displacement alone. Do not treat trim-name similarity as proof of configuration identity.",
       "Return a candidate estimate even when not fully confirmed, but mark confidence and configuration match honestly.",
       "Every claimed power must have at least one source URL in sources. If no source supports a value, return null.",
@@ -263,7 +265,7 @@ async function main() {
   };
   const remaining = worklist.filter((group) => !isCoveredByReferences(group));
   let selected = remaining.sort((a, b) => b.listingIds.length - a.listingIds.length ||
-    String(a.brand).localeCompare(String(b.brand)) || String(a.model).localeCompare(String(b.model))).slice(0, limit);
+    String(a.brand).localeCompare(String(b.brand)) || String(a.model).localeCompare(String(b.model))).slice(offset, offset + limit);
   if (retryFromPath) {
     const previous = JSON.parse(await readFile(retryFromPath, "utf8")) as { results?: Array<Record<string, unknown>> };
     const retryKeys = new Set((previous.results ?? [])
@@ -274,7 +276,7 @@ async function main() {
   if (!dryRun && !apiKey) throw new Error("GEMINI_API_KEY is required when POWER_AI_DRY_RUN=false");
   if (!dryRun && !deepSeekApiKey) throw new Error("DEEPSEEK_API_KEY is required when POWER_AI_DRY_RUN=false");
   const report: Record<string, unknown> = {
-    generatedAt: new Date().toISOString(), input: inputPath, limit, providers: ["Gemini Google Search grounding", "DeepSeek evidence review"],
+    generatedAt: new Date().toISOString(), input: inputPath, limit, offset, providers: ["Gemini Google Search grounding", "DeepSeek evidence review"],
     dryRun, readOnly: true, databaseWrites: 0, priceChanges: 0, publications: 0,
     retryFrom: retryFromPath ?? null,
     alreadyCoveredConfigurations: worklist.length - remaining.length,
@@ -368,6 +370,17 @@ async function main() {
     console.log(JSON.stringify({ completed: index + 1, total: selected.length, listings: group.listingIds.length, reusedGemini: Boolean(previousRaw?.gemini), status: (results.at(-1) as { status: string }).status }));
     if (index + 1 < selected.length) await new Promise((resolve) => setTimeout(resolve, 1200));
   }
+  const sourceCoverage = results.reduce<Record<string, number>>((counts, row) => {
+    const sources = (row as { sources?: Array<{ source_type?: string }> }).sources ?? [];
+    for (const source of sources) {
+      const type = String(source.source_type ?? "unknown").toLowerCase();
+      const bucket = /encar.?rus|encar.?russia/.test(type) ? "encarrus" : /drom/.test(type) ? "drom" : /official|manufacturer/.test(type) ? "official" : "other";
+      counts[bucket] = (counts[bucket] ?? 0) + 1;
+    }
+    return counts;
+  }, {});
+  report.sourceCoverage = sourceCoverage;
+  await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify({ ...report, results: undefined, output: outputPath }, null, 2));
 }
 
