@@ -9,7 +9,7 @@ const reportPath = process.env.AI_POWER_REPORT ?? "output/tl-auto-new-encar-ai-r
 const reportPaths = (process.env.AI_POWER_REPORTS ?? "").split(",").map((value) => value.trim()).filter(Boolean);
 // Dataset-specific exceptions needing configuration review: do not turn the AI's
 // tentative number into a fallback while the source/model identity is disputed.
-const manualReviewListingIds = new Set(["42665681", "42636870", "42636891"]);
+const manualReviewListingIds = new Set(["42665681", "42636870", "42636891", "42670982"]);
 const excludedListingIds = new Set([
   ...manualReviewListingIds,
   ...(process.env.AI_POWER_REPORT_EXCLUDE_LISTING_IDS ?? "").split(",").map((value) => value.trim()).filter(Boolean),
