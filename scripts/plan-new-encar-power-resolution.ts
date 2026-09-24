@@ -118,7 +118,12 @@ function inputFor(row: CandidateRow) {
   const category = obj(detail.category);
   const contents = obj(payload.vehicleContents);
   // Encar listing Year is YYYYMM (e.g. 202411); the power rules use YYYY.
-  const year = modelYear(snapshot.year ?? detail.year ?? detail.modelYear ?? contents.year);
+  // Refresh runs may be created from IDs only, so candidate_snapshot has no
+  // discovery-time year. The current Encar detail carries it in category.
+  const year = modelYear(
+    snapshot.year ?? detail.year ?? detail.modelYear ?? contents.year ??
+    category.formYear ?? category.yearMonth,
+  );
   const engineCc = canonicalEngineCc(spec.displacement ?? detail.displacement ?? snapshot.engineCc);
   const badge = category.gradeEnglishName ?? snapshot.badge ?? snapshot.badgeDetail;
   const driveText = [
