@@ -15,6 +15,7 @@ export type EncarDeduplicationCar = {
   price_krw: number | null;
   engine_cc: number | null;
   vehicle_no_masked: string | null;
+  vehicle_no_hash?: string | null;
   vin_masked: string | null;
   source_kind?: string | null;
   enrichment_status?: string | null;
@@ -47,7 +48,7 @@ export type EncarDuplicateGroup = {
 
 const CAR_SELECT = [
   "id", "source_id", "source_updated_at", "updated_at", "brand", "model",
-  "year", "mileage_km", "price_krw", "engine_cc", "vehicle_no_masked",
+  "year", "mileage_km", "price_krw", "engine_cc", "vehicle_no_masked", "vehicle_no_hash",
   "vin_masked", "source_kind", "enrichment_status", "has_360_exterior",
   "has_360_interior", "has_heydealer_eye", "has_obd_scan",
   "has_underbody_photo", "has_thermal_images", "data_confidence",
@@ -120,7 +121,7 @@ function vinKey(car: EncarDeduplicationCar) {
 }
 
 function plateKey(car: EncarDeduplicationCar) {
-  const plate = normalizePlate(car.vehicle_no_masked);
+  const plate = car.vehicle_no_hash ?? normalizePlate(car.vehicle_no_masked);
   const identity = basicIdentity(car);
   if (!plate || !identity || car.engine_cc === null || car.mileage_km === null || car.price_krw === null) return null;
   return [plate, identity, car.engine_cc, car.mileage_km, car.price_krw].join("|");

@@ -214,6 +214,21 @@ async function processRow(row: Row) {
     if (probes.detail.status === 0 || [403, 429, 500, 502, 503, 504].includes(probes.detail.status)) {
       throw new TemporarySourceError(`detail unavailable: ${classify(probes.detail)}`);
     }
+    // These are valid responses, but they must never spend seven additional
+    // Encar requests or reach the publication plan. Preserve the reason in
+    // staging as an unavailable source record so discovery is auditable.
+    const detail = (probes.detail.body && typeof probes.detail.body === "object"
+      ? probes.detail.body : {}) as Record<string, unknown>;
+    const manage = (detail.manage && typeof detail.manage === "object" ? detail.manage : {}) as Record<string, unknown>;
+    const advertisement = (detail.advertisement && typeof detail.advertisement === "object" ? detail.advertisement : {}) as Record<string, unknown>;
+    const exclusion = manage.dummy === true ? "dummy" : advertisement.salesStatus === "CONTRACT" ? "contract" : null;
+    if (exclusion) {
+      await complete(row, "unavailable", { encarId: id, blocks: task, exclusion }, payload,
+        { exclusion, probes: { detail: { status: probes.detail.status, classification: "ready", error: null } } },
+        null);
+      log("item_excluded_before_enrichment", { sourceListingId: row.source_listing_id, exclusion });
+      return;
+    }
   }
 
   if (task.insurance) {

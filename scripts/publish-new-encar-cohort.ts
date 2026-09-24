@@ -2,6 +2,7 @@
 import { config } from "dotenv";
 import { Client } from "pg";
 import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
 import { evaluatePublication, powerBasisForFuel, resolveCalculationMonth, storedPowerFinality } from "../src/server/cars/calculation-contract";
@@ -37,6 +38,9 @@ const num = (v: unknown): number | null => {
 const positive = (v: unknown): number | null => { const n = num(v); return n != null && n > 0 ? n : null; };
 const imageUrl = (path: string) => path.startsWith("http") ? path : `https://ci.encar.com${path}`;
 const KW_PER_HP = 0.73549875;
+const vehicleNoHash = (value: string) => createHash("sha256")
+  .update(value.toUpperCase().replace(/[^0-9A-Z가-힣]/g, ""))
+  .digest("hex");
 
 function automaticInput(c: PlanRow) {
   const x = c.configuration;
@@ -218,15 +222,16 @@ async function main() {
         calculation_month: month.month, calculation_month_source: month.source };
       planned.push({ item, car, calc, photos, options, inspection });
     }
-    const plates = planned.map((p) => str(p.car.vehicle_no_masked)).filter((p): p is string => Boolean(p));
-    if (new Set(plates).size !== plates.length) throw new Error("Duplicate vehicle numbers within publication cohort");
-    const existingPlates = await db.query<{ vehicle_no_masked: string }>(`select distinct vehicle_no_masked from public.cars where vehicle_no_masked=any($1::text[]) and is_available=true`, [plates]);
-    const duplicatePlates = new Set(existingPlates.rows.map((row) => row.vehicle_no_masked));
-    const toPublish = planned.filter((p) => !duplicatePlates.has(String(p.car.vehicle_no_masked ?? "")));
-    if (planned.length !== expectedCandidates || toPublish.length !== expectedNewCars || duplicatePlates.size !== 9)
-      throw new Error(`Existing-catalog overlap changed: candidates=${planned.length}, new=${toPublish.length}, overlapping plates=${duplicatePlates.size}`);
+    const vehicleNumbers = planned.map((p) => str(p.car.vehicle_no_masked)).filter((p): p is string => Boolean(p));
+    const hashes = vehicleNumbers.map(vehicleNoHash);
+    if (new Set(hashes).size !== hashes.length) throw new Error("Duplicate vehicle numbers within publication cohort");
+    const existingHashes = await db.query<{ vehicle_no_hash: string }>(`select distinct vehicle_no_hash from public.cars where vehicle_no_hash=any($1::text[]) and is_available=true`, [hashes]);
+    const duplicateHashes = new Set(existingHashes.rows.map((row) => row.vehicle_no_hash));
+    const toPublish = planned.filter((p) => !duplicateHashes.has(vehicleNoHash(String(p.car.vehicle_no_masked ?? ""))));
+    if (planned.length !== expectedCandidates || toPublish.length !== expectedNewCars || duplicateHashes.size !== 9)
+      throw new Error(`Existing-catalog overlap changed: candidates=${planned.length}, new=${toPublish.length}, overlapping plates=${duplicateHashes.size}`);
     const report = { dryRun: !write, runIds: [originalRunId, refreshRunId], selected: toPublish.length,
-      alreadyInCatalogByPlate: duplicatePlates.size,
+      alreadyInCatalogByPlate: duplicateHashes.size,
       approved: toPublish.filter((p) => p.item.class === "approved").length,
       preliminary: toPublish.filter((p) => p.item.class === "preliminary").length,
       excluded: exclusions, photos: toPublish.reduce((n, p) => n + p.photos.length, 0),
