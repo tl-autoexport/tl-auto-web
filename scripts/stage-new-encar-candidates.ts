@@ -1,12 +1,16 @@
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
+import { createHash } from "node:crypto";
 import { importEncar } from "../src/server/imports/encar";
+import { encarClient } from "../src/server/imports/encar-client";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
 const target = Number(process.env.ENCAR_NEW_STAGING_TARGET ?? 50);
 const maxPages = Number(process.env.ENCAR_NEW_STAGING_MAX_PAGES ?? 6);
+const discoveryPool = Math.max(target, Number(process.env.ENCAR_NEW_DISCOVERY_POOL ?? target * 2));
+const preflightConcurrency = Math.max(1, Math.min(6, Number(process.env.ENCAR_NEW_PREFLIGHT_CONCURRENCY ?? 3)));
 if (!Number.isInteger(target) || target < 1) throw new Error("ENCAR_NEW_STAGING_TARGET must be a positive integer");
 if (!Number.isInteger(maxPages) || maxPages < 1) throw new Error("ENCAR_NEW_STAGING_MAX_PAGES must be a positive integer");
 
@@ -25,10 +29,44 @@ type CandidateDraft = {
   year: number | null;
 };
 
+type Preflight = { candidate: CandidateDraft; status: "ready" | "unknown" | "dummy" | "contract" | "duplicate_vehicle"; vehicleNoHash: string | null; error?: string };
+const obj = (value: unknown): Record<string, unknown> => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+const vehicleNoHash = (value: unknown) => {
+  const key = String(value ?? "").toUpperCase().replace(/[^0-9A-Z가-힣]/g, "");
+  return key ? createHash("sha256").update(key).digest("hex") : null;
+};
+
+async function preflight(candidate: CandidateDraft): Promise<Preflight> {
+  try {
+    const detail = await encarClient.publicRequest<unknown>(`https://api.encar.com/v1/readside/vehicle/${candidate.sourceListingId}`);
+    const body = obj(detail), manage = obj(body.manage), advertisement = obj(body.advertisement);
+    const hash = vehicleNoHash(body.vehicleNo);
+    if (manage.dummy === true) return { candidate, status: "dummy", vehicleNoHash: hash };
+    if (advertisement.salesStatus === "CONTRACT") return { candidate, status: "contract", vehicleNoHash: hash };
+    return { candidate, status: "ready", vehicleNoHash: hash };
+  } catch (error) {
+    // A temporary proxy/source error must not discard a potentially good car.
+    return { candidate, status: "unknown", vehicleNoHash: null, error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+async function inParallel<T, R>(items: T[], concurrency: number, fn: (item: T) => Promise<R>) {
+  const results: R[] = new Array(items.length);
+  let cursor = 0;
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (true) {
+      const index = cursor++;
+      if (index >= items.length) return;
+      results[index] = await fn(items[index]);
+    }
+  }));
+  return results;
+}
+
 async function main() {
   // This calls Encar but stays dry-run: no rows are inserted into cars.
   const discovery = await importEncar({
-    target,
+    target: discoveryPool,
     maxPages,
     onlyNew: true,
     dryRun: true,
@@ -38,12 +76,29 @@ async function main() {
     hybridPages: 0,
     collectNewCandidateDrafts: "raw",
   });
-  const candidates = (discovery.candidateDrafts ?? []) as CandidateDraft[];
-  if (candidates.length !== target) {
-    throw new Error(`Only ${candidates.length} new candidates passed discovery; target is ${target}. No staging run was created.`);
+  const discovered = (discovery.candidateDrafts ?? []) as CandidateDraft[];
+  if (discovered.length < target) {
+    throw new Error(`Only ${discovered.length} new candidates passed discovery; target is ${target}. No staging run was created.`);
   }
 
   const db = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  const preflightRows = await inParallel(discovered, preflightConcurrency, preflight);
+  const hashes = preflightRows.flatMap((row) => row.vehicleNoHash ? [row.vehicleNoHash] : []);
+  const knownHashes = new Set<string>();
+  for (let index = 0; index < hashes.length; index += 200) {
+    const { data, error } = await db.from("cars").select("vehicle_no_hash")
+      .eq("is_available", true).in("vehicle_no_hash", hashes.slice(index, index + 200));
+    if (error) throw new Error(error.message);
+    for (const row of data ?? []) if (row.vehicle_no_hash) knownHashes.add(String(row.vehicle_no_hash));
+  }
+  for (const row of preflightRows) {
+    if (row.status === "ready" && row.vehicleNoHash && knownHashes.has(row.vehicleNoHash)) row.status = "duplicate_vehicle";
+  }
+  const candidates = preflightRows.filter((row) => row.status === "ready" || row.status === "unknown").slice(0, target);
+  if (candidates.length !== target) {
+    const counts = Object.fromEntries(["ready", "unknown", "dummy", "contract", "duplicate_vehicle"].map((status) => [status, preflightRows.filter((row) => row.status === status).length]));
+    throw new Error(`Only ${candidates.length} candidates passed preflight; target is ${target}. Increase ENCAR_NEW_DISCOVERY_POOL. ${JSON.stringify(counts)}`);
+  }
   const { data: run, error: runError } = await db
     .from("encar_enrichment_runs")
     .insert({
@@ -53,7 +108,7 @@ async function main() {
       status: "awaiting_approval",
       requested_limit: candidates.length,
       candidate_count: candidates.length,
-      rules_version: "new-candidate-staging-v1",
+      rules_version: "new-candidate-staging-v2-preflight",
       summary: {
         source: "encar",
         onlyNew: true,
@@ -66,13 +121,14 @@ async function main() {
           freshCandidates: discovery.freshCandidates,
           seen: discovery.seen,
         },
+        preflight: Object.fromEntries(["ready", "unknown", "dummy", "contract", "duplicate_vehicle"].map((status) => [status, preflightRows.filter((row) => row.status === status).length])),
       },
     })
     .select("id,status,candidate_count")
     .single();
   if (runError) throw new Error(runError.message);
 
-  const queueRows = candidates.map((candidate) => ({
+  const queueRows = candidates.map(({ candidate, status, vehicleNoHash, error }) => ({
     run_id: run.id,
     source: candidate.source,
     source_listing_id: candidate.sourceListingId,
@@ -87,7 +143,7 @@ async function main() {
       history: true,
       category: false,
     },
-    candidate_snapshot: candidate,
+    candidate_snapshot: { ...candidate, preflight: { status, vehicleNoHash, ...(error ? { error } : {}) } },
   }));
   const { error: queueError } = await db.from("encar_enrichment_queue").insert(queueRows);
   if (queueError) throw new Error(queueError.message);
@@ -95,8 +151,9 @@ async function main() {
   console.log(JSON.stringify({
     run,
     staged: candidates.length,
-    sourcePolicy: "only Encar IDs absent from cars; combustion only; no cars inserted; no publication",
+    sourcePolicy: "only Encar IDs absent from cars; combustion only; preflight excludes dummy, CONTRACT and active vehicle-number duplicates; transient preflight errors are retained; no cars inserted; no publication",
     discovery: { candidates: discovery.candidates, existingCandidates: discovery.existingCandidates, freshCandidates: discovery.freshCandidates, seen: discovery.seen },
+    preflight: Object.fromEntries(["ready", "unknown", "dummy", "contract", "duplicate_vehicle"].map((status) => [status, preflightRows.filter((row) => row.status === status).length])),
   }, null, 2));
 }
 
