@@ -107,6 +107,23 @@ npm run refresh:encar:history
 npm run refresh:encar:history:write
 ```
 
+Для проверки качества мощности и готовности новой выборки Encar к публикации
+есть read-only команды:
+
+```bash
+npm run audit:automatic-reference
+npm run dry-run:new-encar-preliminary-calculation
+npm run audit:new-encar-readiness
+```
+
+Последние две команды требуют `TL_AUTO_ENRICHMENT_RUN_ID` и предварительно
+подготовленный `output/tl-auto-new-encar-power-plan.json`; запуск расчёта создаёт
+отчёт, который затем читает аудит готовности. Пути можно переопределить через
+`TL_AUTO_POWER_PLAN` и `TL_AUTO_PRELIMINARY_CALCULATION`. Эти проверки не
+публикуют автомобили и не записывают данные в базу. Команда
+`npm run research:power:ai` отдельно обращается к Gemini и DeepSeek API для
+исследования конфигураций и требует соответствующие ключи API.
+
 Курсы для расчёта обновляются автоматически: ЦБ РФ и курс USDT/KRW Bithumb
 проверяются каждые 15 минут, а активный каталог пересчитывается раз в сутки.
 В расчёте сохраняются официальный курс ЦБ, поправка `+4%`, исходный и
