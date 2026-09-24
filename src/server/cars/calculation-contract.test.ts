@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import {
   evaluatePublication,
   isPreliminaryConfidence,
+  isPreliminaryFinality,
   isResolvedPowerStatus,
   powerBasisForFuel,
   priceFinality,
   resolveCalculationMonth,
+  storedPowerFinality,
   type PublicationCandidate,
 } from "./calculation-contract";
 
@@ -47,6 +49,35 @@ assert.equal(isPreliminaryConfidence("approximate"), true);
 assert.equal(isPreliminaryConfidence("automatic"), true);
 assert.equal(isPreliminaryConfidence("medium"), false);
 assert.equal(isPreliminaryConfidence("high"), false);
+
+// --- stored finality ---------------------------------------------------------
+// The stored column must mirror the display rule, so a recalculation can never
+// read a rehearsal as approved.
+assert.equal(storedPowerFinality({ powerConfidence: "high", calculationPowerKw: 139.7, powerResolutionSource: "src" }), "final");
+assert.equal(storedPowerFinality({ powerConfidence: "official", calculationPowerKw: 139.7, powerResolutionSource: "src" }), "final");
+assert.equal(storedPowerFinality({ powerConfidence: "medium", calculationPowerKw: 139.7, powerResolutionSource: "src" }), "provisional");
+assert.equal(
+  storedPowerFinality({ powerConfidence: "medium", calculationPowerKw: 139.7, powerResolutionSource: "src", calculationPowerSpecId: "spec" }),
+  "final",
+);
+assert.equal(storedPowerFinality({ powerConfidence: "approximate", calculationPowerKw: 139.7, powerResolutionSource: "src" }), "provisional");
+assert.equal(storedPowerFinality({ powerConfidence: "automatic", calculationPowerKw: 139.7, powerResolutionSource: "src" }), "provisional");
+// No power or no source: nothing is stored, because no price is implied.
+assert.equal(storedPowerFinality({ powerConfidence: "high", calculationPowerKw: null, powerResolutionSource: "src" }), null);
+assert.equal(storedPowerFinality({ powerConfidence: "high", calculationPowerKw: 139.7, powerResolutionSource: null }), null);
+// A claimed confidence cannot override weak evidence: this is how three T3 cards
+// were published as confirmed before the rule existed.
+assert.equal(
+  storedPowerFinality({ powerConfidence: "high", calculationPowerKw: 139.7, powerResolutionSource: "src", evidenceTier: "T3" }),
+  "provisional",
+);
+assert.equal(
+  storedPowerFinality({ powerConfidence: "high", calculationPowerKw: 139.7, powerResolutionSource: "src", evidenceTier: "T2" }),
+  "final",
+);
+assert.equal(isPreliminaryFinality("provisional"), true);
+assert.equal(isPreliminaryFinality("final"), false);
+assert.equal(isPreliminaryFinality(null), false);
 
 // --- publication gate --------------------------------------------------------
 const base: PublicationCandidate = {

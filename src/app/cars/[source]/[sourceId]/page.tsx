@@ -242,6 +242,7 @@ export default async function CarDetailPage({
             mileageKm={car.mileage_km}
             powerHp={car.power_hp}
             powerConfidence={car.power_confidence}
+            powerFinality={car.power_finality}
             priceKrw={car.price_krw}
             source={source}
             sourceId={sourceId}

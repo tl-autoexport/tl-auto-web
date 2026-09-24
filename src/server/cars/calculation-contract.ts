@@ -17,6 +17,20 @@ export type PowerStatus = (typeof POWER_STATUSES)[number];
 /** Statuses that mean the power is settled and a price may be shown. */
 export const RESOLVED_POWER_STATUSES: readonly PowerStatus[] = ["matched", "approved"];
 
+/**
+ * Persisted price finality, stored in `cars.power_finality`.
+ *
+ * `calculation_power_status` cannot carry this distinction: both approved and
+ * preliminary writers have used `matched`, so a recalculation reading the status
+ * alone could treat a rehearsal as an approved value. The column stores the
+ * result of `priceFinality()` below, so the rule stays in one place.
+ */
+export const POWER_FINALITIES = ["final", "provisional"] as const;
+export type PowerFinalityValue = (typeof POWER_FINALITIES)[number];
+
+/** Evidence tiers that may support a final value. */
+export const FINAL_EVIDENCE_TIERS: readonly string[] = ["T1", "T2"];
+
 export const POWER_BASES = ["combustion_engine", "electric_30min", "parallel_sum"] as const;
 export type PowerBasis = (typeof POWER_BASES)[number];
 
@@ -106,6 +120,35 @@ export function priceFinality(input: {
 /** Confidence values whose price must be marked as preliminary on the card. */
 export function isPreliminaryConfidence(value: string | null | undefined): boolean {
   return value === "approximate" || value === "automatic";
+}
+
+/**
+ * The stored counterpart of `priceFinality()`: what a writer must put into
+ * `cars.power_finality`.
+ *
+ * `evidenceTier` is used whenever the caller knows the specification behind the
+ * value. Anything weaker than T1/T2 can never be final, whatever confidence the
+ * writer claimed — that is exactly how three T3 cards were published as
+ * confirmed before this rule existed.
+ */
+export function storedPowerFinality(input: {
+  powerConfidence: string | null | undefined;
+  calculationPowerKw: number | null | undefined;
+  powerResolutionSource: string | null | undefined;
+  calculationPowerSpecId?: string | null;
+  evidenceTier?: string | null;
+}): PowerFinalityValue | null {
+  const finality = priceFinality(input);
+  if (finality === "none") return null;
+  if (finality === "preliminary") return "provisional";
+  const tier = input.evidenceTier ?? null;
+  if (tier && !FINAL_EVIDENCE_TIERS.includes(tier)) return "provisional";
+  return "final";
+}
+
+/** Whether a stored finality means the price must be presented as preliminary. */
+export function isPreliminaryFinality(value: string | null | undefined): boolean {
+  return value === "provisional";
 }
 
 export type PublicationCandidate = {

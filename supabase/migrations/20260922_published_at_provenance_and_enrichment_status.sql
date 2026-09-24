@@ -1,9 +1,10 @@
 -- Provenance for the publication timestamp and an explicit enrichment status.
 --
 -- `published_at` is shown to customers as "В продаже N дней в Корее", so it must
--- never be invented. The Encar payload we store contains no listing date at all:
--- it carries the registration year, mileage, price and photo timestamps, but no
--- advertisement date. Therefore a value can only be one of:
+-- never be invented. The Encar payload we store does carry an advertisement
+-- timestamp in `detail.manage.firstAdvertisedDateTime`; the earlier assumption
+-- that it carries no listing date at all was wrong and is corrected here. It is
+-- used only when it is actually present, so a value can only be one of:
 --   source_payload      the date came from the source payload itself;
 --   source_snapshot     the date came from a stored source snapshot;
 --   internal_created_at we first saw this listing at our own created_at;

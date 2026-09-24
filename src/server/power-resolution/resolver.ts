@@ -37,6 +37,8 @@ export type ApprovedPowerCandidate = {
   evidenceKind: "sbkts" | "otts" | "epts" | "manufacturer_document" | "vin_decoder" | "manual";
   evidenceVerificationStatus: "approved" | "draft" | "review_required" | "rejected";
   evidenceReliability: "unreviewed" | "low" | "medium" | "high" | "verified";
+  /** Stored evidence tier when the loader knows it; a weak tier can never be final. */
+  evidenceTier?: string | null;
   match: {
     id: string;
     priority: number;

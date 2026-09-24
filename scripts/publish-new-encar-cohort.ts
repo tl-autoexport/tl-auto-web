@@ -4,7 +4,7 @@ import { Client } from "pg";
 import { readFile } from "node:fs/promises";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
-import { evaluatePublication, resolveCalculationMonth } from "../src/server/cars/calculation-contract";
+import { evaluatePublication, powerBasisForFuel, resolveCalculationMonth, storedPowerFinality } from "../src/server/cars/calculation-contract";
 import { resolveAutomaticPowerReference, type AutomaticPowerReferenceRow } from "../src/server/catalog/automatic-power-reference";
 import { normalizeColor, normalizePlate } from "../src/server/normalization/vehicles";
 import { categorizeOption, translateOption, translateInspectionLabel, translateInspectionStatus } from "../src/server/normalization/display";
@@ -139,7 +139,7 @@ async function main() {
       if (obj(detail.advertisement).salesStatus === "CONTRACT") { exclusions.contract++; continue; }
       const newer = refreshedById.get(id);
       const plan = newer ?? originalById.get(id)!;
-      let powerClass = newer ? newer.status === "approved_match" ? "approved" : "preliminary" : oldClass;
+      const powerClass = newer ? newer.status === "approved_match" ? "approved" : "preliminary" : oldClass;
       const reference = powerClass === "preliminary" ? resolveAutomaticPowerReference(automaticInput(plan), refs) : null;
       if (powerClass === "preliminary" && reference?.power_hp == null) {
         if (!newer) throw new Error(`Original preliminary power no longer resolves: ${id}`);
@@ -176,9 +176,16 @@ async function main() {
         throw new Error(`Approved specification changed: ${id}`);
       const powerKw = item.class === "approved" ? positive(plannedPower.calculationPowerKw) : positive(reference?.power_kw) ?? (positive(reference?.power_hp) ?? 0) * KW_PER_HP;
       const powerHp = item.class === "approved" ? Math.round((powerKw ?? 0) / KW_PER_HP) : Math.round(Number(reference?.power_hp));
-      const basis = item.class === "approved" ? str(plannedPower.powerBasis) : "combustion_engine";
-      const source = item.class === "approved" ? `tl_auto_approved_reference:${str(plannedPower.evidenceTier) ?? "unknown"}` : str(reference?.source);
+      const basis = item.class === "approved" ? str(plannedPower.powerBasis) : powerBasisForFuel(fuel);
+      const evidenceTier = str(plannedPower.evidenceTier);
+      const source = item.class === "approved" ? `tl_auto_approved_reference:${evidenceTier ?? "unknown"}` : str(reference?.source);
       if (!powerKw || !powerHp || !basis || !source) throw new Error(`Power not resolved: ${id}`);
+      const powerConfidence = item.class === "approved" ? "high" : "automatic";
+      // A claimed confidence cannot promote weak evidence: anything below T1/T2
+      // stays provisional, which is how three T3 cards were published as final.
+      const powerFinality = storedPowerFinality({ powerConfidence, calculationPowerKw: powerKw,
+        powerResolutionSource: source, calculationPowerSpecId: approvedSpec?.id ?? null, evidenceTier });
+      if (powerFinality == null) throw new Error(`Power finality not resolvable: ${id}`);
       const priceKrw = Math.round(priceUnits * 10_000);
       const calc = calculateRuVladivostok({ priceKrw, year, month: month.month, engineCc, fuelType: fuel,
         ...(item.class === "approved" ? { powerKw } : { powerHp }), destinationCity: "Владивосток",
@@ -186,9 +193,9 @@ async function main() {
       const priceRub = Math.round(calc.totalRub);
       const verdict = evaluatePublication({ priceRub, hasSnapshot: true, calculationPowerStatus: item.class === "approved" ? "approved" : "matched",
         calculationPowerKw: powerKw, powerBasis: basis, powerResolutionSource: source, calculationMonth: month.month,
-        fuelType: fuel, hybridDvsPowerHp: null, powerConfidence: item.class === "approved" ? "high" : "automatic",
+        fuelType: fuel, hybridDvsPowerHp: null, powerConfidence,
         calculationPowerSpecId: approvedSpec?.id ?? null, legacyCalculationStatus: null });
-      if (!verdict.ok || verdict.finality !== (item.class === "approved" ? "final" : "preliminary")) throw new Error(`Publication contract failed: ${id}: ${JSON.stringify(verdict)}`);
+      if (!verdict.ok || verdict.finality !== (powerFinality === "final" ? "final" : "preliminary")) throw new Error(`Publication contract failed: ${id}: ${JSON.stringify(verdict)}`);
       const sourceDate = str(manage.firstAdvertisedDateTime);
       const vehicleNo = normalizePlate(detail.vehicleNo) || null;
       const car: Obj = { primary_source: "encar", source_kind: "encar", source_id: id, source_url: row.source_url,
@@ -196,12 +203,12 @@ async function main() {
         published_at: sourceDate, published_at_source: sourceDate ? "source_payload" : "unknown", catalog_added_at: new Date().toISOString(),
         source_updated_at: str(manage.modifyDateTime), last_seen_at: new Date().toISOString(),
         brand, model, year, registration_year: year, mileage_km: num(spec.mileage), price_krw: priceKrw, price_rub: priceRub,
-        engine_cc: engineCc, power_hp: powerHp, power_source: source, power_confidence: item.class === "approved" ? "high" : "automatic",
+        engine_cc: engineCc, power_hp: powerHp, power_source: source, power_confidence: powerConfidence, power_finality: powerFinality,
         power_resolution_note: item.class === "approved" ? `Approved TL Auto spec ${approvedSpec?.id}` : "Preliminary automatic reference; exact trim power to be confirmed",
         fuel_type: fuel, drive_type: str(c.driveType), color: normalizeColor(spec.colorName), body_type: str(spec.bodyName),
         grade: str(category.gradeEnglishName), trim: str(category.gradeDetailEnglishName), badge: str(c.badge), badge_detail: str(c.trim),
         vehicle_no_masked: vehicleNo, vin_masked: str(detail.vin), media_count: photos.length,
-        vehicle_specs: { source: "encar", seats: num(spec.seatCount), power_confidence: item.class === "approved" ? "high" : "automatic",
+        vehicle_specs: { source: "encar", seats: num(spec.seatCount), power_confidence: powerConfidence,
           encar_options_count: Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).length : 0,
           encar_standard_option_codes: obj(detail.options).standard ?? [], encar_full_gallery_count: photos.length,
           enrichment_run_id: refreshedById.has(id) ? refreshRunId : originalRunId },

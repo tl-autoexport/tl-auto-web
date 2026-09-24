@@ -4,7 +4,7 @@ import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
 import { canonicalCandidates, canonicalInput } from "../src/server/power-resolution/canonical";
 import { displayModelName } from "../src/server/catalog/display-model";
-import { evaluatePublication } from "../src/server/cars/calculation-contract";
+import { evaluatePublication, storedPowerFinality } from "../src/server/cars/calculation-contract";
 import { tierFromStored, type EvidenceTier } from "../src/server/power-resolution/evidence-tiers";
 import { decidePublication } from "../src/server/power-resolution/publication-gate";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
@@ -307,6 +307,12 @@ async function main() {
         const carIds: Array<{ id: string; item: PreparedItem }> = [];
         for (const item of eligible) {
           const { row, hp, drive, month, tier, confidence, specId, evidenceId, specKey, specificationTitle } = item;
+          // Evidence below T1/T2 stays provisional even when the gate reported a
+          // confirmed confidence; the value may be shown, never as final.
+          const powerFinality = storedPowerFinality({ powerConfidence: confidence,
+            calculationPowerKw: item.calculationPowerKw, powerResolutionSource: `tl_auto_approved_reference:${tier}`,
+            calculationPowerSpecId: specId, evidenceTier: tier });
+          if (powerFinality == null) throw new Error(`Power finality not resolvable: ${row.source_listing_id}`);
           const metadata = {
             source: "chestny_prigon",
             power_resolution: "approved_evidence_confirmation",
@@ -323,11 +329,11 @@ async function main() {
             insert into public.cars(primary_source,source_kind,source_id,source_url,enrichment_status,is_available,sale_status,published_at,source_updated_at,last_seen_at,
               brand,model,year,registration_year,registration_date,registration_month,mileage_km,price_krw,price_rub,engine_cc,power_hp,power_source,power_confidence,power_resolution_note,
               fuel_type,transmission,drive_type,color,body_type,seller_region,vin_masked,vehicle_specs,generation,
-              calculation_power_status,calculation_power_spec_id,calculation_power_spec_version,calculation_power_kw,power_basis,power_resolution_source,calculation_month,calculation_month_source,
+              calculation_power_status,calculation_power_spec_id,calculation_power_spec_version,calculation_power_kw,power_basis,power_resolution_source,calculation_month,calculation_month_source,power_finality,
               published_at_source,catalog_added_at,encar_enrichment_status)
             values ('chestny_prigon','chestny_prigon',$1,$2,'source_only',true,null,null,now(),now(),
               $3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,'tl_auto_approved_reference',$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$28,
-              'approved',$23,$24,$25,$26,$27,$7,'registration_date',
+              'approved',$23,$24,$25,$26,$27,$7,'registration_date',$29,
               'unknown',now(),'absent')
             on conflict(primary_source,source_id) do update set source_url=excluded.source_url,enrichment_status=excluded.enrichment_status,is_available=true,sale_status=null,published_at=coalesce(cars.published_at,now()),
               source_updated_at=excluded.source_updated_at,last_seen_at=excluded.last_seen_at,brand=excluded.brand,model=excluded.model,year=excluded.year,registration_year=excluded.registration_year,
@@ -337,7 +343,7 @@ async function main() {
               generation=coalesce(excluded.generation, cars.generation),
               calculation_power_status=excluded.calculation_power_status,calculation_power_spec_id=excluded.calculation_power_spec_id,calculation_power_spec_version=excluded.calculation_power_spec_version,
               calculation_power_kw=excluded.calculation_power_kw,power_basis=excluded.power_basis,power_resolution_source=excluded.power_resolution_source,
-              calculation_month=excluded.calculation_month,calculation_month_source=excluded.calculation_month_source,
+              calculation_month=excluded.calculation_month,calculation_month_source=excluded.calculation_month_source,power_finality=excluded.power_finality,
               published_at_source=coalesce(cars.published_at_source, excluded.published_at_source),
               catalog_added_at=coalesce(cars.catalog_added_at, excluded.catalog_added_at),
               encar_enrichment_status=excluded.encar_enrichment_status,updated_at=now()
@@ -348,7 +354,7 @@ async function main() {
             item.fuel, row.transmission, drive, row.exterior_color, row.body_type, row.location, row.vin_masked,
             JSON.stringify(metadata),
             specId, item.specVersion, item.calculationPowerKw, item.specPowerBasis,
-            `tl_auto_approved_reference:${tier}`, row.generation]);
+            `tl_auto_approved_reference:${tier}`, row.generation, powerFinality]);
           carIds.push({ id: result.rows[0].id, item });
         }
 

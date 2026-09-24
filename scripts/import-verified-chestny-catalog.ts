@@ -4,7 +4,7 @@ import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
 import { normalizeColor, normalizeDrive } from "../src/server/normalization/vehicles";
 import { displayModelName } from "../src/server/catalog/display-model";
-import { evaluatePublication, powerBasisForFuel, resolveCalculationMonth } from "../src/server/cars/calculation-contract";
+import { evaluatePublication, powerBasisForFuel, resolveCalculationMonth, storedPowerFinality } from "../src/server/cars/calculation-contract";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -152,6 +152,8 @@ async function main() {
         vehicle_specs: { source: "chestny_prigon" },
         calculation_power_status: "matched",
         calculation_power_kw: calculationPowerKw,
+        power_finality: storedPowerFinality({ powerConfidence: "high", calculationPowerKw,
+          powerResolutionSource: "tl_auto_review_queue:unique_match" }),
         power_basis: powerBasis,
         power_resolution_source: "tl_auto_review_queue:unique_match",
         calculation_month: monthInfo.month,

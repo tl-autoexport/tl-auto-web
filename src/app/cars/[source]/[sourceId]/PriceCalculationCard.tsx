@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 
-import { isPreliminaryConfidence } from "@/server/cars/calculation-contract";
+import { isPreliminaryConfidence, isPreliminaryFinality } from "@/server/cars/calculation-contract";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
@@ -54,6 +54,8 @@ type PriceCalculationCardProps = {
   mileageKm: number | null;
   powerHp: number | null;
   powerConfidence?: "official" | "high" | "medium" | "approximate" | "automatic" | null;
+  /** Stored finality; when present it decides the preliminary notice. */
+  powerFinality?: "final" | "provisional" | null;
   priceKrw: number | null;
   source: string;
   sourceId: string;
@@ -134,6 +136,7 @@ function RuPriceCalculationCard({
   mileageKm,
   powerHp,
   powerConfidence,
+  powerFinality,
   priceKrw,
   source,
   sourceId,
@@ -327,7 +330,7 @@ function RuPriceCalculationCard({
           ))}
         </div>
 
-        {isPreliminaryConfidence(powerConfidence) ? (
+        {isPreliminaryFinality(powerFinality) || isPreliminaryConfidence(powerConfidence) ? (
           <div className="mt-5 rounded border border-[#d8dde6] bg-[#fafbfc] px-3 py-3 text-left text-xs font-semibold leading-4 text-[#39475a] sm:text-sm">
             Расчёт предварительный. Итоговая стоимость и мощность уточняются по данным конкретной комплектации.
           </div>

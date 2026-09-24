@@ -32,6 +32,7 @@ type CatalogCar = {
   calculation_power_kw: number | null;
   calculation_power_status: "unreviewed" | "matched" | "approved" | "review_required" | "not_applicable";
   power_basis: "combustion_engine" | "electric_30min" | "parallel_sum" | null;
+  power_finality: "final" | "provisional" | null;
 };
 
 async function main() {
@@ -43,7 +44,7 @@ async function main() {
     const { data: page, error } = await supabase
       .from("cars")
       .select(
-        "id,primary_source,source_id,brand,model,drive_type,badge,badge_detail,year,registration_month,price_krw,price_rub,engine_cc,power_hp,power_source,fuel_type,hybrid_dvs_power_hp,hybrid_electric_power_kw,hybrid_dvs_above_electric_30min,hybrid_sequential,calculation_power_kw,calculation_power_status,power_basis",
+        "id,primary_source,source_id,brand,model,drive_type,badge,badge_detail,year,registration_month,price_krw,price_rub,engine_cc,power_hp,power_source,fuel_type,hybrid_dvs_power_hp,hybrid_electric_power_kw,hybrid_dvs_above_electric_30min,hybrid_sequential,calculation_power_kw,calculation_power_status,power_basis,power_finality",
       )
       .eq("is_available", true)
       .order("primary_source")
@@ -85,9 +86,7 @@ async function main() {
       .filter(Boolean),
   );
   const idFilter = new Set((process.env.RECALCULATE_IDS ?? "").split(",").map((value) => value.trim()).filter(Boolean));
-  const eligible = onlyApprovedPower
-    ? data.filter((car) => car.calculation_power_status === "matched" || car.calculation_power_status === "approved")
-    : data;
+  const eligible = onlyApprovedPower ? data.filter((car) => car.power_finality === "final") : data;
   const filteredById = idFilter.size ? eligible.filter((car) => idFilter.has(car.id)) : eligible;
   const filtered = modelFilter.size
     ? filteredById.filter((car) => modelFilter.has(String(car.model ?? "").trim().toLowerCase()))
@@ -100,9 +99,10 @@ async function main() {
     // A reference may omit trim details and then act as a preliminary fallback;
     // explicit conflicting trims do not match. Hybrid and EV keep dedicated
     // legal inputs until their approved power basis is available.
-    const approvedPowerKw = car.calculation_power_status === "matched" || car.calculation_power_status === "approved"
-      ? car.calculation_power_kw
-      : null;
+    // Only a final value may be used as the exact tariff input. `matched` alone
+    // cannot separate an approved value from a rehearsal, which is what let a
+    // preliminary power be re-priced and re-labelled as approved.
+    const approvedPowerKw = car.power_finality === "final" ? car.calculation_power_kw : null;
     const reference = approvedPowerKw != null || car.fuel_type === "hybrid" || car.fuel_type === "electric"
       ? null
       : resolveAutomaticPowerReference(car, automaticReferences);
@@ -196,7 +196,11 @@ async function main() {
           price_rub: Math.round(calc.totalRub),
           ...(reference
             ? {
-                power_confidence: reference.status === "confirmed" ? "high" : "automatic",
+                // An automatic reference is a rehearsal by construction: its own
+                // table describes the match as preliminary. Claiming `high` here
+                // made the next recalculation treat it as approved power.
+                power_confidence: "automatic",
+                power_finality: "provisional",
                 power_resolution_source: `automatic-reference:${reference.source}`,
                 power_resolution_note: "Предварительное автоматическое сопоставление типовой конфигурации; требуется подтверждение комплектации.",
                 power_resolved_at: new Date().toISOString(),

@@ -5,6 +5,7 @@ import {
   type ApprovedPowerCandidate,
   type PowerReferenceInput,
 } from "../src/server/power-resolution/resolver";
+import { storedPowerFinality } from "../src/server/cars/calculation-contract";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -35,6 +36,7 @@ type CandidateRow = {
   evidence_kind: ApprovedPowerCandidate["evidenceKind"];
   evidence_verification_status: ApprovedPowerCandidate["evidenceVerificationStatus"];
   evidence_reliability: ApprovedPowerCandidate["evidenceReliability"];
+  evidence_tier: string | null;
   match_id: string;
   match_priority: number;
   brand: string;
@@ -63,6 +65,7 @@ function candidateFromRow(row: CandidateRow): ApprovedPowerCandidate {
     evidenceKind: row.evidence_kind,
     evidenceVerificationStatus: row.evidence_verification_status,
     evidenceReliability: row.evidence_reliability,
+    evidenceTier: row.evidence_tier,
     match: {
       id: row.match_id,
       priority: row.match_priority,
@@ -97,6 +100,7 @@ const candidateQuery = `select spec.id as spec_id, spec.version as spec_version,
                                evidence.source_kind as evidence_kind,
                                evidence.verification_status as evidence_verification_status,
                                evidence.reliability as evidence_reliability,
+                               evidence.evidence_tier as evidence_tier,
                                matcher.id as match_id, matcher.priority as match_priority, matcher.brand,
                                matcher.model, matcher.generation, matcher.trim, matcher.badge_normalized,
                                matcher.model_code, matcher.engine_code, matcher.fuel_type, matcher.drive_type,
@@ -159,6 +163,17 @@ async function main() {
     for (const { car, resolution } of pending) {
       const { candidate } = resolution;
       const status = resolution.confidence === "official" ? "approved" : "matched";
+      const source = `evidence:${candidate.evidenceKind}:${candidate.evidenceId}`;
+      // The resolver only guarantees an approved specification; the stored finality
+      // additionally requires T1/T2 evidence, so a weak tier stays provisional
+      // instead of being re-labelled as a confirmed value by this writer.
+      const finality = storedPowerFinality({
+        powerConfidence: resolution.confidence,
+        calculationPowerKw: candidate.calculationPowerKw,
+        powerResolutionSource: source,
+        calculationPowerSpecId: candidate.specId,
+        evidenceTier: candidate.evidenceTier,
+      });
       await client.query(
         `update public.cars
             set calculation_power_spec_id = $2,
@@ -169,6 +184,7 @@ async function main() {
                 power_basis = $7,
                 power_resolution_source = $8,
                 power_resolution_note = $9,
+                power_finality = $10,
                 power_resolved_at = now()
           where id = $1`,
         [
@@ -179,8 +195,9 @@ async function main() {
           status,
           resolution.confidence,
           candidate.powerBasis,
-          `evidence:${candidate.evidenceKind}:${candidate.evidenceId}`,
+          source,
           resolution.reason,
+          finality,
         ],
       );
       await client.query(
