@@ -12,6 +12,9 @@ const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROL
 const proxy = process.env.ENCAR_PROXY_URL?.trim();
 const runId = process.env.ENCAR_UNIVERSAL_RUN_ID?.trim();
 const delayMs = Math.max(1_000, Number(process.env.ENCAR_UNIVERSAL_DELAY_MS ?? 3_000));
+const batchSize = Math.max(1, Math.min(30, Number(process.env.ENCAR_UNIVERSAL_BATCH_SIZE ?? 12)));
+const concurrency = Math.max(1, Math.min(6, Number(process.env.ENCAR_UNIVERSAL_CONCURRENCY ?? 3)));
+const maxAttempts = Math.max(1, Math.min(10, Number(process.env.ENCAR_UNIVERSAL_MAX_ATTEMPTS ?? 4)));
 const leaseMinutes = Math.max(5, Math.min(120, Number(process.env.ENCAR_UNIVERSAL_LEASE_MINUTES ?? 15)));
 const pollMs = Math.max(1_000, Number(process.env.ENCAR_UNIVERSAL_POLL_MS ?? 10_000));
 const sourceBackoffMs = Math.max(15_000, Number(process.env.ENCAR_UNIVERSAL_SOURCE_BACKOFF_MS ?? 300_000));
@@ -29,6 +32,7 @@ type Row = {
   source_listing_id: string;
   task: Record<string, boolean>;
   candidate_snapshot: Record<string, unknown>;
+  lease_token: string;
 };
 type Probe = { status: number; body?: unknown; error?: string };
 class TemporarySourceError extends Error {}
@@ -47,7 +51,7 @@ function log(event: string, details: Record<string, unknown> = {}) {
 }
 
 function idOf(row: Row) {
-  return String(row.candidate_snapshot.encarId ?? row.candidate_snapshot.encar_id ?? row.source_listing_id);
+  return String(row.candidate_snapshot?.encarId ?? row.candidate_snapshot?.encar_id ?? row.source_listing_id);
 }
 
 async function acquireLock() {
@@ -144,13 +148,18 @@ function findValue(value: unknown, keys: string[]): string {
   return "";
 }
 
+const workerId = `${process.env.HOSTNAME ?? "worker"}:${process.pid}:${crypto.randomUUID()}`;
+
 async function claim() {
-  const { data, error } = await db.rpc("claim_encar_enrichment_queue_for_run", {
+  const { data, error } = await db.rpc("claim_encar_enrichment_queue_batch_for_run", {
     p_run_id: runId,
+    p_lease_owner: workerId,
+    p_limit: batchSize,
     p_lease_minutes: leaseMinutes,
+    p_max_attempts: maxAttempts,
   });
   if (error) throw new Error(error.message);
-  return data as Row | null;
+  return (data ?? []) as Row[];
 }
 
 async function queueCounts() {
@@ -163,8 +172,9 @@ async function queueCounts() {
 
 async function complete(row: Row, status: "succeeded" | "unavailable" | "failed", result: Record<string, unknown>, payload: unknown, normalized: Record<string, unknown>, errorMessage: string | null) {
   if (dryRun) return;
-  const { error } = await db.rpc("complete_encar_enrichment_queue_item", {
+  const { data, error } = await db.rpc("complete_encar_enrichment_queue_item_owned", {
     p_queue_id: row.id,
+    p_lease_token: row.lease_token,
     p_status: status,
     p_result: result,
     p_raw_payload: payload,
@@ -172,15 +182,16 @@ async function complete(row: Row, status: "succeeded" | "unavailable" | "failed"
     p_error: errorMessage,
   });
   if (error) throw new Error(error.message);
+  if (!data) log("lease_lost_before_completion", { sourceListingId: row.source_listing_id });
 }
 
 async function releaseForRetry(row: Row) {
   if (dryRun) return;
-  const { error } = await db.from("encar_enrichment_queue")
-    .update({ status: "queued", lease_until: null, updated_at: new Date().toISOString() })
-    .eq("id", row.id)
-    .eq("status", "leased");
+  const { data, error } = await db.rpc("release_encar_enrichment_queue_item_owned", {
+    p_queue_id: row.id, p_lease_token: row.lease_token, p_error: "temporary source or proxy error",
+  });
   if (error) throw new Error(error.message);
+  if (!data) log("lease_lost_before_retry", { sourceListingId: row.source_listing_id });
 }
 
 async function processRow(row: Row) {
@@ -200,7 +211,7 @@ async function processRow(row: Row) {
   if (needsDetail) {
     probes.detail = await get(`https://api.encar.com/v1/readside/vehicle/${id}`);
     payload.detail = probes.detail.body ?? null;
-    if (probes.detail.status === 0 || [403, 429, 503].includes(probes.detail.status)) {
+    if (probes.detail.status === 0 || [403, 429, 500, 502, 503, 504].includes(probes.detail.status)) {
       throw new TemporarySourceError(`detail unavailable: ${classify(probes.detail)}`);
     }
   }
@@ -251,7 +262,7 @@ async function processRow(row: Row) {
   const list = Object.values(probes);
   const hasReady = list.some((probe) => probe.status >= 200 && probe.status < 300);
   const terminal = list.some((probe) => [404, 410].includes(probe.status));
-  const technical = list.some((probe) => probe.status === 0 || [403, 429, 503].includes(probe.status));
+  const technical = list.some((probe) => probe.status === 0 || [403, 429, 500, 502, 503, 504].includes(probe.status));
   const status = terminal && !hasReady ? "unavailable" : technical && !hasReady ? "failed" : "succeeded";
   await complete(row, status, { encarId: id, blocks: task, probes: classes }, payload, { ...normalized, probes: classes }, status === "failed" ? JSON.stringify(classes) : null);
   log("item_completed", { sourceListingId: row.source_listing_id, status, probes: classes });
@@ -271,15 +282,19 @@ async function main() {
       if (updateError) throw new Error(updateError.message);
     }
 
-    log("worker_started", { dryRun, leaseMinutes, delayMs, sourceBackoffMs, lockPath });
+    if (dryRun) {
+      log("dry_run_validated", { workerId, batchSize, concurrency, maxAttempts, databaseWrites: 0 });
+      return;
+    }
+    log("worker_started", { workerId, leaseMinutes, delayMs, batchSize, concurrency, maxAttempts, sourceBackoffMs, lockPath });
     while (!stopping) {
       if (await radarHasPriority()) {
         log("waiting_for_radar", { pollMs });
         await sleep(pollMs);
         continue;
       }
-      const row = await claim();
-      if (!row) {
+      const rows = await claim();
+      if (rows.length === 0) {
         const counts = await queueCounts();
         const outstanding = (counts.queued ?? 0) + (counts.leased ?? 0);
         if (outstanding === 0) {
@@ -297,19 +312,28 @@ async function main() {
         await sleep(pollMs);
         continue;
       }
-      try {
-        await processRow(row);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        if (error instanceof TemporarySourceError) {
-          await releaseForRetry(row);
-          log("source_backoff", { sourceListingId: row.source_listing_id, error: message, sourceBackoffMs });
-          await sleep(sourceBackoffMs);
-          continue;
+      let cursor = 0;
+      const work = async () => {
+        while (!stopping) {
+          const row = rows[cursor++];
+          if (!row) return;
+          try {
+            await processRow(row);
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            if (error instanceof TemporarySourceError) {
+              await releaseForRetry(row);
+              log("source_backoff", { sourceListingId: row.source_listing_id, error: message });
+            } else {
+              await complete(row, "failed", { encarId: idOf(row), workerError: message }, null, {}, message);
+              log("item_failed", { sourceListingId: row.source_listing_id, error: message });
+            }
+          }
+          await sleep(delayMs);
         }
-        await complete(row, "failed", { encarId: idOf(row), workerError: message }, null, {}, message);
-        log("item_failed", { sourceListingId: row.source_listing_id, error: message });
-      }
+      };
+      await Promise.all(Array.from({ length: Math.min(concurrency, rows.length) }, work));
+      if (stopping) break;
       await sleep(delayMs);
     }
     log("worker_stopped", { reason: "signal" });
