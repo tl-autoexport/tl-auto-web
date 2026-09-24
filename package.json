@@ -107,6 +107,7 @@
     "apply:ai-preliminary-power": "tsx scripts/apply-ai-preliminary-power-reference.ts",
     "test:automatic-power-reference": "tsx src/server/catalog/automatic-power-reference.test.ts",
     "research:power:ai": "tsx scripts/research-encar-power-with-gemini.ts",
+    "query:power:external-catalogs": "tsx scripts/query-new-encar-external-catalogs.ts",
     "audit:auto-candidate-power": "tsx scripts/audit-auto-candidate-power.ts",
     "resolve:auto-candidate-power": "tsx scripts/resolve-auto-candidate-power.ts",
     "import:chestny:verified": "tsx scripts/import-verified-chestny-catalog.ts",
