@@ -46,6 +46,7 @@ type DeepSeekResponse = {
 
 const inputPath = process.env.POWER_AI_INPUT ?? "output/tl-auto-new-encar-power-plan.json";
 const outputPath = process.env.POWER_AI_OUTPUT ?? "output/tl-auto-new-encar-ai-research.json";
+const retryFromPath = process.env.POWER_AI_RETRY_FROM;
 const limit = Math.max(1, Math.min(50, Number(process.env.POWER_AI_LIMIT ?? 20)));
 const apiKey = process.env.GEMINI_API_KEY;
 const deepSeekApiKey = process.env.DEEPSEEK_API_KEY;
@@ -90,7 +91,7 @@ function parseResearch(text: string): PowerResearch {
 
 function isRetryableProviderError(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
-  return /(?:fetch failed|aborted|HTTP (?:429|5\d\d)|ECONN|ETIMEDOUT|EAI_AGAIN|socket)/i.test(message);
+  return /(?:fetch failed|aborted|HTTP (?:429|5\d\d)|ECONN|ETIMEDOUT|EAI_AGAIN|socket|Gemini response did not contain a JSON object|Gemini returned an invalid estimated_power_ps)/i.test(message);
 }
 
 async function wait(ms: number) {
@@ -238,28 +239,44 @@ async function main() {
   if (!dbUrl) throw new Error("SUPABASE_DB_URL is required for read-only duplicate/configuration filtering");
   const db = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await db.connect();
-  let known: Array<{ brand: string | null; model: string | null; fuel_type: string | null; engine_cc: number | null; drive_type: string | null; year_from: number | null; year_to: number | null }>;
+  let known: Array<{ brand: string | null; model: string | null; fuel_type: string | null; engine_cc: number | null; drive_type: string | null; badge: string | null; badge_detail: string | null; year_from: number | null; year_to: number | null }>;
   try {
     await db.query("begin read only");
-    const result = await db.query(`select brand,model,fuel_type,engine_cc,drive_type,year_from,year_to
+    const result = await db.query(`select brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,year_from,year_to
       from public.vehicle_power_automatic_reference where status='automatic'`);
     known = result.rows;
     await db.query("commit");
   } finally { await db.end(); }
 
-  const remaining = worklist.filter((group) => !known.some((ref) =>
-    normalize(ref.brand) === normalize(group.brand) && normalize(ref.model) === normalize(group.model) &&
-    normalize(ref.fuel_type) === normalize(group.fuelType) && Number(ref.engine_cc) === Number(group.engineCc) &&
-    (ref.drive_type == null ? group.driveType == null : group.driveType != null && normalize(ref.drive_type) === normalize(group.driveType)) &&
-    (ref.year_from == null || group.year == null || (group.year >= ref.year_from && group.year <= (ref.year_to ?? ref.year_from))),
-  ));
-  const selected = remaining.sort((a, b) => b.listingIds.length - a.listingIds.length ||
+  const isCoveredByReferences = (group: WorkGroup) => {
+    const compatible = known.filter((ref) =>
+      normalize(ref.brand) === normalize(group.brand) && normalize(ref.model) === normalize(group.model) &&
+      normalize(ref.fuel_type) === normalize(group.fuelType) && Number(ref.engine_cc) === Number(group.engineCc) &&
+      (ref.drive_type == null ? group.driveType == null : group.driveType != null && normalize(ref.drive_type) === normalize(group.driveType)) &&
+      ref.badge_detail == null &&
+      (ref.year_from == null || group.year == null || (group.year >= ref.year_from && group.year <= (ref.year_to ?? ref.year_from))),
+    );
+    if (!group.badgeExamples.length) return compatible.some((ref) => ref.badge == null);
+    // Different listings in one configuration group may carry different trim labels.
+    // Treat the group as covered only when every observed label has its own exact or wildcard row.
+    return group.badgeExamples.every((badge) => compatible.some((ref) => ref.badge == null || normalize(ref.badge) === normalize(badge)));
+  };
+  const remaining = worklist.filter((group) => !isCoveredByReferences(group));
+  let selected = remaining.sort((a, b) => b.listingIds.length - a.listingIds.length ||
     String(a.brand).localeCompare(String(b.brand)) || String(a.model).localeCompare(String(b.model))).slice(0, limit);
+  if (retryFromPath) {
+    const previous = JSON.parse(await readFile(retryFromPath, "utf8")) as { results?: Array<Record<string, unknown>> };
+    const retryKeys = new Set((previous.results ?? [])
+      .filter((row) => row.status === "provider_error" || row.status === "deepseek_error")
+      .map((row) => Array.isArray(row.listingIds) ? row.listingIds.map(String).join(",") : ""));
+    selected = selected.filter((group) => retryKeys.has(group.listingIds.map(String).join(",")));
+  }
   if (!dryRun && !apiKey) throw new Error("GEMINI_API_KEY is required when POWER_AI_DRY_RUN=false");
   if (!dryRun && !deepSeekApiKey) throw new Error("DEEPSEEK_API_KEY is required when POWER_AI_DRY_RUN=false");
   const report: Record<string, unknown> = {
     generatedAt: new Date().toISOString(), input: inputPath, limit, providers: ["Gemini Google Search grounding", "DeepSeek evidence review"],
     dryRun, readOnly: true, databaseWrites: 0, priceChanges: 0, publications: 0,
+    retryFrom: retryFromPath ?? null,
     alreadyCoveredConfigurations: worklist.length - remaining.length,
     candidateConfigurations: selected.length, candidateListings: selected.reduce((sum, group) => sum + group.listingIds.length, 0),
     results: [],

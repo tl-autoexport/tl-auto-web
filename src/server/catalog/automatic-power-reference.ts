@@ -31,9 +31,13 @@ function sameConfiguration(input: AutomaticPowerReferenceInput, row: AutomaticPo
     normalize(input.fuel_type) === normalize(row.fuel_type) &&
     input.engine_cc === row.engine_cc &&
     normalize(input.drive_type) === normalize(row.drive_type) &&
-    normalize(input.badge) === normalize(row.badge) &&
-    normalize(input.badge_detail) === normalize(row.badge_detail)
+    (!row.badge || normalize(input.badge) === normalize(row.badge)) &&
+    (!row.badge_detail || normalize(input.badge_detail) === normalize(row.badge_detail))
   );
+}
+
+function matchSpecificity(row: AutomaticPowerReferenceRow) {
+  return Number(Boolean(row.badge)) + Number(Boolean(row.badge_detail));
 }
 
 function coversYear(year: number | null, row: AutomaticPowerReferenceRow) {
@@ -57,8 +61,10 @@ export function resolveAutomaticPowerReference(
   );
   if (!matches.length) return null;
 
-  const narrowestWidth = Math.min(...matches.map(yearRangeWidth));
-  const best = matches.filter((row) => yearRangeWidth(row) === narrowestWidth);
+  const mostSpecific = Math.max(...matches.map(matchSpecificity));
+  const configurationMatches = matches.filter((row) => matchSpecificity(row) === mostSpecific);
+  const narrowestWidth = Math.min(...configurationMatches.map(yearRangeWidth));
+  const best = configurationMatches.filter((row) => yearRangeWidth(row) === narrowestWidth);
   const powers = new Set(best.map((row) => `${row.power_hp}:${row.power_kw ?? ""}`));
   return powers.size === 1 ? best[0] : null;
 }

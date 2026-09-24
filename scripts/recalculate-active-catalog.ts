@@ -97,9 +97,9 @@ async function main() {
   let skipped = 0;
   const concurrency = Math.max(1, Number(process.env.RECALCULATE_CONCURRENCY ?? 10));
   async function processCar(car: CatalogCar) {
-    // The provisional reference is used only for an exact configuration key.
-    // Hybrid and EV legal branches retain their dedicated inputs until their
-    // approved power basis is available.
+    // A reference may omit trim details and then act as a preliminary fallback;
+    // explicit conflicting trims do not match. Hybrid and EV keep dedicated
+    // legal inputs until their approved power basis is available.
     const approvedPowerKw = car.calculation_power_status === "matched" || car.calculation_power_status === "approved"
       ? car.calculation_power_kw
       : null;

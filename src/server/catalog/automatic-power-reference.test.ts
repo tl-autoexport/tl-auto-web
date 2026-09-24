@@ -19,5 +19,17 @@ assert.equal(resolveAutomaticPowerReference({ ...input, year: null }, [older, ba
 assert.equal(resolveAutomaticPowerReference({ ...input, year: 2025, drive_type: "2WD" }, [base]), null);
 assert.equal(resolveAutomaticPowerReference({ ...input, year: 2025 }, [base, { ...base, configuration_key: "conflict", power_hp: 77 }]), null);
 assert.equal(resolveAutomaticPowerReference({ ...input, year: 2025 }, [older, base, { ...base, status: "retired" }])?.power_hp, 76);
+assert.equal(resolveAutomaticPowerReference({ ...input, badge: "GTI", year: 2025 }, [base])?.power_hp, 76);
+assert.equal(resolveAutomaticPowerReference({ ...input, badge: "GTI", year: 2025 }, [
+  base,
+  { ...base, configuration_key: "kia|morning|gasoline|998||gti||year=2025-2025", badge: "GTI", power_hp: 80 },
+])?.power_hp, 80);
+assert.equal(resolveAutomaticPowerReference({ ...input, badge: "R-Line", year: 2025 }, [
+  base,
+  { ...base, configuration_key: "kia|morning|gasoline|998||gti||year=2025-2025", badge: "GTI", power_hp: 80 },
+])?.power_hp, 76);
+assert.equal(resolveAutomaticPowerReference({ ...input, badge: "GTI", year: 2025 }, [
+  { ...base, configuration_key: "kia|morning|gasoline|998||gti||year=2025-2025", badge: "GTI", power_hp: 80 },
+])?.power_hp, 80);
 
 console.log("Automatic power reference tests passed.");
