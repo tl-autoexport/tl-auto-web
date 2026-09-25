@@ -35,6 +35,31 @@ type CatalogCar = {
   power_finality: "final" | "provisional" | null;
 };
 
+type RecalcRow = {
+  source: string | null;
+  carId: string;
+  sourceId: string;
+  car: string;
+  oldPriceRub: number | null;
+  newPriceRub: number;
+  changeRub: number | null;
+  changePct: number | null;
+  dutyRub: number;
+  feesRub: number;
+  utilRub: number;
+  powerSource: string | null;
+  selectedPower: {
+    storedHp: number | null;
+    storedCalculationKw: number | null;
+    storedBasis: string | null;
+    resolvedHp: number | null;
+    resolvedKw: number | null;
+    referenceKey: string | null;
+  };
+  powerChanged: boolean;
+  approvedCombustionPowerMismatch: boolean;
+};
+
 async function main() {
   const dryRun = process.env.RECALCULATE_DRY_RUN !== "false";
   const rateSnapshot = await getCbrCalcRates();
@@ -92,10 +117,10 @@ async function main() {
     ? filteredById.filter((car) => modelFilter.has(String(car.model ?? "").trim().toLowerCase()))
     : filteredById;
   const pending = force ? filtered : filtered.filter((car) => !existingVersionIds.has(car.id));
-  const rows: Array<Record<string, unknown>> = [];
+  const rows: RecalcRow[] = [];
   let skipped = 0;
   const concurrency = Math.max(1, Number(process.env.RECALCULATE_CONCURRENCY ?? 10));
-  async function processCar(car: CatalogCar) {
+  async function processCar(car: CatalogCar, persist: boolean) {
     // A reference may omit trim details and then act as a preliminary fallback;
     // explicit conflicting trims do not match. Hybrid and EV keep dedicated
     // legal inputs until their approved power basis is available.
@@ -103,6 +128,13 @@ async function main() {
     // cannot separate an approved value from a rehearsal, which is what let a
     // preliminary power be re-priced and re-labelled as approved.
     const approvedPowerKw = car.power_finality === "final" ? car.calculation_power_kw : null;
+    // The automatic reference is deliberately still allowed to price a provisional card.
+    // A measured dry-run showed that removing it moves 35 cards by up to 97%: a Kia K5 2.0
+    // priced from a 150 hp reference becomes ~twice as expensive when its stored 240 hp is
+    // used instead, so for some configurations the reference is the plausible value and the
+    // stored power is wrong. Which of the two is right is not decidable automatically.
+    // This reference affects the calculated price and its provenance; the write below
+    // does not replace cars.power_hp or cars.calculation_power_kw.
     const reference = approvedPowerKw != null || car.fuel_type === "hybrid" || car.fuel_type === "electric"
       ? null
       : resolveAutomaticPowerReference(car, automaticReferences);
@@ -148,6 +180,7 @@ async function main() {
       : false;
     const row = {
       source: car.primary_source,
+      carId: car.id,
       sourceId: car.source_id,
       car: [car.brand, car.model].filter(Boolean).join(" "),
       oldPriceRub,
@@ -177,7 +210,7 @@ async function main() {
 
     if (onlyPowerChanged && !row.powerChanged) return null;
 
-    if (!dryRun) {
+    if (persist && !dryRun) {
       const { error: leadError } = await supabase
         .from("leads")
         .update({ calc_snapshot_id: null })
@@ -239,21 +272,58 @@ async function main() {
     return row;
   }
 
+  // Pass one always computes and never writes, so the whole run can be judged before any
+  // price is persisted. Prices stay fresh (every card is recalculated), but a card whose
+  // change looks anomalous is held back and reported instead of being written: an automatic
+  // reference or a wrong stored power must not silently move a price by tens of percent.
   for (let offset = 0; offset < pending.length; offset += concurrency) {
     const batch = pending.slice(offset, offset + concurrency);
-    const batchRows = await Promise.all(batch.map(processCar));
+    const batchRows = await Promise.all(batch.map((car) => processCar(car, false)));
     for (const row of batchRows) if (row) rows.push(row);
     skipped += batchRows.filter((row) => !row).length;
     console.error(`Recalculated ${Math.min(offset + batch.length, pending.length)}/${pending.length}`);
+  }
+
+  const comparable = rows.map((row) => row.changePct).filter((value): value is number => value != null);
+  const sorted = [...comparable].sort((a, b) => a - b);
+  const medianChangePct = sorted.length ? sorted[Math.floor(sorted.length / 2)] : 0;
+  const maxAbsChangePct = Number(process.env.RECALCULATE_MAX_CHANGE_PCT ?? 20);
+  const maxDeviationPct = Number(process.env.RECALCULATE_MAX_DEVIATION_PCT ?? 5);
+  const flagged = rows.filter((row) => row.changePct != null
+    && (Math.abs(row.changePct) > maxAbsChangePct || Math.abs(row.changePct - medianChangePct) > maxDeviationPct));
+
+  const carById = new Map(data.map((car) => [car.id, car]));
+  // The key is the internal car id: `source_id` repeats across sources, so matching on it
+  // could hold back a different card. Only cards computed in the first pass and allowed by
+  // the gate are written, and the count comes from what actually persisted.
+  const flaggedIds = new Set(flagged.map((row) => row.carId));
+  const toWrite = rows
+    .filter((row) => !flaggedIds.has(row.carId))
+    .map((row) => carById.get(row.carId))
+    .filter((car): car is CatalogCar => Boolean(car));
+  let written = 0;
+  if (!dryRun) {
+    for (let offset = 0; offset < toWrite.length; offset += concurrency) {
+      const batch = toWrite.slice(offset, offset + concurrency);
+      const results = await Promise.all(batch.map((car) => processCar(car, true)));
+      written += results.filter((row) => row != null).length;
+      console.error(`Written ${Math.min(offset + batch.length, toWrite.length)}/${toWrite.length}`);
+    }
   }
 
   const summary = {
     dryRun,
     rateSnapshot,
     recalculated: rows.length,
+    written: dryRun ? undefined : written,
+    allowed: { count: toWrite.length, sample: toWrite.slice(0, 5).map((car) => ({ carId: car.id, sourceId: car.source_id })) },
     alreadyProcessed: existingVersionIds.size,
     onlyApprovedPower,
     onlyPowerChanged,
+    medianChangePct,
+    thresholds: { maxAbsChangePct, maxDeviationPct },
+    flagged: flagged.map((row) => ({ carId: row.carId, sourceId: row.sourceId, car: row.car, changePct: row.changePct, powerSource: row.powerSource,
+      storedKw: row.selectedPower.storedCalculationKw, resolvedKw: row.selectedPower.resolvedKw, referenceKey: row.selectedPower.referenceKey })),
     modelFilter: modelFilter.size ? [...modelFilter] : "all",
     skipped,
   };

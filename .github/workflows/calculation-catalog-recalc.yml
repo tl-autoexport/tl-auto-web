@@ -30,3 +30,10 @@ jobs:
           RECALCULATE_DRY_RUN: "false"
           RECALCULATE_FORCE: "true"
           RECALCULATE_CONCURRENCY: "10"
+          # Prices stay fresh: every active card is recalculated, provisional power included.
+          # A card whose price moves far from the run's median, or beyond an absolute cap, is
+          # held back and reported instead of written, so a wrong power or an unsuitable
+          # automatic reference cannot move a price silently. The script runs two passes: the
+          # first computes everything, the second writes only what passed this check.
+          RECALCULATE_MAX_CHANGE_PCT: "20"
+          RECALCULATE_MAX_DEVIATION_PCT: "5"
