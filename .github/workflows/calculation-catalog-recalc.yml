@@ -30,3 +30,10 @@ jobs:
           RECALCULATE_DRY_RUN: "false"
           RECALCULATE_FORCE: "true"
           RECALCULATE_CONCURRENCY: "10"
+          # Provisional power must not be rewritten by the daily pass: the automatic
+          # reference still contains displacement-derived values (one blanket 150 hp
+          # answer shared across different models), and adopting them would replace a
+          # stored power with a wrong one. Prices still follow the rates; only final
+          # (approved) power is recalculated. Remove this once those reference rows are
+          # retired and a dry-run shows powerChanged = 0.
+          RECALCULATE_ONLY_APPROVED_POWER: "true"
