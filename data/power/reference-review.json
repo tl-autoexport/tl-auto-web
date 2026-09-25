@@ -895,5 +895,6 @@
       "minPct": 0.29,
       "maxPct": 0.29
     }
-  ]
+  ],
+  "note": "Verdicts are review hypotheses, not actions: the 37-row retirement was reverted and those references are 'automatic' again. Use this only to pick configurations for manual review."
 }
