@@ -155,7 +155,7 @@ type EncarOptionDefinition = {
   subOptions?: EncarOptionDefinition[] | null;
 };
 
-type EncarOptionCatalog = {
+export type EncarOptionCatalog = {
   metas?: Array<{ key?: string | null; value?: string | null }>;
   options?: EncarOptionDefinition[];
 };
@@ -252,7 +252,7 @@ type EncarHistoryResult =
   | { status: "available"; payload: EncarHistoryPayload }
   | { status: "unavailable"; reason: string };
 
-type EncarOptionRow = {
+export type EncarOptionRow = {
   category: string;
   source_code: string | null;
   name_original: string | null;
@@ -637,7 +637,7 @@ async function readListFixture() {
   return listFixturePromise;
 }
 
-async function fetchStandardOptionCatalog() {
+export async function fetchStandardOptionCatalog() {
   return fetchJson<EncarOptionCatalog>(
     "https://api.encar.com/v1/readside/vehicles/car/options/standard",
   );
@@ -670,7 +670,7 @@ function selectedOptionNames(
   };
 }
 
-function mapStandardOptions(
+export function mapStandardOptions(
   catalog: EncarOptionCatalog,
   installedCodes: string[],
 ): EncarOptionRow[] {
