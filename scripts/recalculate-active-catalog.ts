@@ -303,7 +303,7 @@ async function main() {
     dryRun,
     rateSnapshot,
     recalculated: rows.length,
-    written: dryRun || flagged.length ? undefined : rows.length,
+    written: dryRun ? undefined : rows.length - flagged.length,
     alreadyProcessed: existingVersionIds.size,
     onlyApprovedPower,
     onlyPowerChanged,
