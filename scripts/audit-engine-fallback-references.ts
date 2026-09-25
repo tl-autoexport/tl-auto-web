@@ -1,15 +1,12 @@
 /**
- * Read-only review of the displacement-derived automatic references.
+ * Read-only review of the automatic power references and the remaining discrepancies.
  *
- * The daily recalculation would adopt `engine_fallback` values, which are derived from
- * engine displacement only: 37 rows share one blanket 150 hp answer across different
- * models and would replace a stored power with a wrong one.
- *
- * This produces the review list the retirement decision needs, and nothing else:
- *   * every affected reference row (key, model, fuel, cc, drive, badge, hp);
- *   * the cards that would take that value, with their stored power next to it;
- *   * a per-reference verdict hint based on independent approved power for the same
- *     model, because 150 hp is legitimate for some cars and wrong for others.
+ * Two questions, one artifact:
+ *   1. which references carry the blanket displacement-derived answer, and exactly which
+ *      cards each one would have driven (a correct reference -> card linkage this time,
+ *      matching on the key with the recalculation's `|year=` suffix handled);
+ *   2. how the still-diverging cards group by model and configuration, in both directions,
+ *      so they can be classified instead of mass-edited.
  *
  * No writes to any database.
  */
@@ -26,74 +23,99 @@ type RecalcRow = {
   selectedPower?: { storedCalculationKw?: number | null; resolvedKw?: number | null; referenceKey?: string | null };
 };
 
+const keyOf = (value: string | null | undefined) => String(value ?? "").split("|year=")[0];
+
 async function main() {
   const recalcPath = process.env.RECALC_PLAN_PATH ?? "/tmp/recalc-dry.json";
   const text = readFileSync(recalcPath, "utf8");
-  const start = text.indexOf("{");
-  const parsed = JSON.parse(text.slice(start)) as { rows?: RecalcRow[] };
-  const rows = parsed.rows ?? [];
-  const changed = rows.filter((row) => row.powerChanged && String(row.powerSource).startsWith("automatic-reference"));
+  const rows = (JSON.parse(text.slice(text.indexOf("{"))) as { rows?: RecalcRow[] }).rows ?? [];
 
   const db = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await db.connect();
   try {
-    const refs = (await db.query(`
+    // 1. Reference rows that share one blanket answer across unrelated models.
+    const blanket = (await db.query(`
       select id, configuration_key, brand, model, fuel_type, engine_cc, drive_type, badge,
              power_hp::float8 as power_hp, source, status
       from public.vehicle_power_automatic_reference
-      where source = 'engine_fallback' and status <> 'retired'
-        and round(power_kw::numeric, 4) = round(110.3249::numeric, 4)
-      order by brand, model`)).rows;
+      where round(power_kw::numeric, 4) = round(110.3249::numeric, 4)
+      order by status, source, brand, model`)).rows;
 
-    // Independent approved power for the same model, used only as a plausibility hint.
+    // Every recalculation row that used an automatic reference, regardless of the switch.
+    const referenced = rows.filter((row) => String(row.powerSource) === "automatic_reference");
+    const cardsByKey = new Map<string, RecalcRow[]>();
+    for (const row of referenced) {
+      const key = keyOf(row.selectedPower?.referenceKey);
+      cardsByKey.set(key, [...(cardsByKey.get(key) ?? []), row]);
+    }
+
     const approved = (await db.query(`
-      select lower(m.brand) as brand, lower(m.model) as model, round(avg(sp.calculation_power_kw)::numeric, 1) as avg_kw,
-             count(*)::int as specs
+      select lower(m.brand) as brand, lower(m.model) as model, round(avg(sp.calculation_power_kw)::numeric, 1) as avg_kw
       from public.vehicle_power_spec_matches m
       join public.vehicle_power_specs sp on sp.id = m.spec_id
       join public.vehicle_power_evidence e on e.id = sp.evidence_id
       where sp.status = 'approved' and e.verification_status = 'approved' and e.evidence_tier in ('T1','T2')
       group by 1,2`)).rows;
-    const approvedByModel = new Map(approved.map((row) => [`${row.brand}|${row.model}`, row]));
+    const approvedByModel = new Map(approved.map((row) => [`${row.brand}|${row.model}`, Number(row.avg_kw)]));
 
-    const affectedCards = changed.map((row) => ({
-      sourceId: row.sourceId, car: row.car, referenceKey: row.selectedPower?.referenceKey ?? null,
-      storedKw: row.selectedPower?.storedCalculationKw ?? null, resolvedKw: row.selectedPower?.resolvedKw ?? null,
-      changePct: Number(row.changePct.toFixed(2)),
-    }));
-    // The recalculation appends a `|year=...` suffix to the key, so match on the prefix.
-    const keyOf = (value: string | null | undefined) => String(value ?? "").split("|year=")[0];
-
-    const review = refs.map((ref) => {
+    const blanketReview = blanket.map((ref) => {
       const key = String(ref.configuration_key);
-      const cards = affectedCards.filter((card) => keyOf(card.referenceKey) === key);
-      const approvedRow = approvedByModel.get(`${String(ref.brand).toLowerCase()}|${String(ref.model).toLowerCase()}`);
-      const refKw = Number(ref.power_hp) / 1.35962;
-      const approvedKw = approvedRow ? Number(approvedRow.avg_kw) : null;
-      const plausible = approvedKw != null ? Math.abs(approvedKw - refKw) <= 12 : null;
+      const cards = cardsByKey.get(key) ?? [];
+      const refKw = Number(ref.power_hp) / 1.3596216173;
+      const approvedKw = approvedByModel.get(`${String(ref.brand).toLowerCase()}|${String(ref.model).toLowerCase()}`) ?? null;
+      const conflicts = approvedKw != null ? Math.abs(approvedKw - refKw) > 12 : null;
       return {
         configurationKey: key, model: `${ref.brand} ${ref.model}`.trim(), fuel: ref.fuel_type,
-        engineCc: ref.engine_cc, drive: ref.drive_type, badge: ref.badge, powerHp: Number(ref.power_hp),
-        source: ref.source, cardsAffected: cards.length,
-        cardsStoredKw: [...new Set(cards.map((card) => card.storedKw))],
-        approvedKwForModel: approvedKw, referencePlausibleForModel: plausible,
-        verdictHint: plausible === true ? "reference may be right; review the card instead of retiring" : plausible === false ? "reference conflicts with approved power for this model; retire" : "no approved power to compare; needs manual review",
+        engineCc: ref.engine_cc, drive: ref.drive_type, badge: ref.badge, referenceHp: Number(ref.power_hp),
+        source: ref.source, status: ref.status, cardsDriven: cards.length,
+        storedKw: [...new Set(cards.map((card) => card.selectedPower?.storedCalculationKw ?? null))].filter((value) => value != null),
+        resolvedKw: [...new Set(cards.map((card) => card.selectedPower?.resolvedKw ?? null))].filter((value) => value != null),
+        approvedKwForModel: approvedKw,
+        verdict: conflicts === true ? "reference conflicts with approved power for this model"
+          : conflicts === false ? "reference is close to approved power; review the card instead"
+          : "no approved power to compare; manual review",
       };
     });
 
-    const artifact = { readOnly: true, generatedAt: new Date().toISOString(), recalcPlan: recalcPath, referencesReviewed: review.length, affectedCards: affectedCards.length, review, affectedCardsDetail: affectedCards };
+    // 2. Remaining divergence, grouped by model and configuration, with direction.
+    const diverging = rows.filter((row) => row.powerChanged);
+    const groups = new Map<string, { model: string; referenceKey: string; cards: number; up: number; down: number; minPct: number; maxPct: number }>();
+    for (const row of diverging) {
+      const key = String(row.selectedPower?.referenceKey ?? "<none>");
+      const stored = Number(row.selectedPower?.storedCalculationKw ?? 0);
+      const resolved = Number(row.selectedPower?.resolvedKw ?? 0);
+      const entry = groups.get(key) ?? { model: row.car, referenceKey: key, cards: 0, up: 0, down: 0, minPct: 999, maxPct: -999 };
+      entry.cards++;
+      if (resolved > stored) entry.up++; else entry.down++;
+      entry.minPct = Math.min(entry.minPct, Number(row.changePct));
+      entry.maxPct = Math.max(entry.maxPct, Number(row.changePct));
+      groups.set(key, entry);
+    }
+    const remaining = [...groups.values()].sort((a, b) => b.cards - a.cards);
+
+    const artifact = {
+      readOnly: true, generatedAt: new Date().toISOString(), recalcPlan: recalcPath,
+      blankekRows: blanketReview.length,
+      blanketReview,
+      divergentCards: diverging.length,
+      divergentGroups: remaining,
+    };
+    const outPath = process.env.REVIEW_OUT_PATH ?? "data/power/reference-review.json";
     mkdirSync("data/power", { recursive: true });
-    writeFileSync("data/power/engine-fallback-review.json", JSON.stringify(artifact, null, 2));
+    writeFileSync(outPath, JSON.stringify(artifact, null, 2));
 
     const byVerdict: Record<string, number> = {};
-    for (const item of review) byVerdict[item.verdictHint] = (byVerdict[item.verdictHint] ?? 0) + 1;
+    for (const item of blanketReview) byVerdict[item.verdict] = (byVerdict[item.verdict] ?? 0) + 1;
+    const inactive = blanketReview.filter((item) => item.status === "retired");
+    const active = blanketReview.filter((item) => item.status !== "retired");
     console.log(JSON.stringify({
-      referencesReviewed: review.length,
-      affectedCards: affectedCards.length,
+      blanketReferences: { total: blanketReview.length, retired: inactive.length, stillActive: active.length },
+      retiredWithCardsDriven: inactive.filter((item) => item.cardsDriven > 0).map((item) => ({ key: item.configurationKey, cards: item.cardsDriven, model: item.model })),
+      activeReferencesNeedingReview: active.map((item) => ({ key: item.configurationKey, model: item.model, source: item.source, cards: item.cardsDriven, verdict: item.verdict })),
       byVerdict,
-      sample: review.slice(0, 8).map((item) => ({ model: item.model, hp: item.powerHp, approvedKw: item.approvedKwForModel, storedKw: item.cardsStoredKw, cards: item.cardsAffected, verdict: item.verdictHint })),
-      artifact: "data/power/engine-fallback-review.json",
-    }, null, 2));
+      divergent: { cards: diverging.length, groups: remaining.length, top: remaining.slice(0, 6) },
+      artifact: outPath,
+    }, null, 2).slice(0, 4200));
   } finally {
     await db.end();
   }
