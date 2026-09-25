@@ -82,7 +82,32 @@ async function main() {
   }
 
   const db = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false, autoRefreshToken: false } });
-  const preflightRows = await inParallel(discovered, preflightConcurrency, preflight);
+  // Keep this run isolated: don't enrich Encar IDs already present in any
+  // historical enrichment queue, even if they were not inserted into cars.
+  const discoveredIds = [...new Set(discovered.map((candidate) => candidate.sourceListingId))];
+  const previouslyQueuedIds = new Set<string>();
+  for (let index = 0; index < discoveredIds.length; index += 200) {
+    const chunk = discoveredIds.slice(index, index + 200);
+    for (let offset = 0; ; offset += 1000) {
+      const { data, error } = await db.from("encar_enrichment_queue")
+        .select("source_listing_id")
+        .in("source_listing_id", chunk)
+        .range(offset, offset + 999);
+      if (error) throw new Error(`Failed to exclude previously queued Encar IDs: ${error.message}`);
+      for (const row of data ?? []) previouslyQueuedIds.add(String(row.source_listing_id));
+      if (!data || data.length < 1000) break;
+    }
+  }
+  const discoveredUnique = new Map<string, CandidateDraft>();
+  for (const candidate of discovered) {
+    if (!previouslyQueuedIds.has(candidate.sourceListingId)) discoveredUnique.set(candidate.sourceListingId, candidate);
+  }
+  const neverQueued = [...discoveredUnique.values()];
+  if (neverQueued.length < target) {
+    throw new Error(`Only ${neverQueued.length} never-queued candidates remain after excluding ${previouslyQueuedIds.size} prior queue IDs; target is ${target}. No staging run was created.`);
+  }
+
+  const preflightRows = await inParallel(neverQueued, preflightConcurrency, preflight);
   const hashes = preflightRows.flatMap((row) => row.vehicleNoHash ? [row.vehicleNoHash] : []);
   const knownHashes = new Set<string>();
   for (let index = 0; index < hashes.length; index += 200) {
@@ -91,8 +116,14 @@ async function main() {
     if (error) throw new Error(error.message);
     for (const row of data ?? []) if (row.vehicle_no_hash) knownHashes.add(String(row.vehicle_no_hash));
   }
+  const seenVehicleHashes = new Set<string>();
   for (const row of preflightRows) {
-    if (row.status === "ready" && row.vehicleNoHash && knownHashes.has(row.vehicleNoHash)) row.status = "duplicate_vehicle";
+    if (row.status !== "ready" || !row.vehicleNoHash) continue;
+    if (knownHashes.has(row.vehicleNoHash) || seenVehicleHashes.has(row.vehicleNoHash)) {
+      row.status = "duplicate_vehicle";
+      continue;
+    }
+    seenVehicleHashes.add(row.vehicleNoHash);
   }
   const candidates = preflightRows.filter((row) => row.status === "ready" || row.status === "unknown").slice(0, target);
   if (candidates.length !== target) {
@@ -108,7 +139,7 @@ async function main() {
       status: "awaiting_approval",
       requested_limit: candidates.length,
       candidate_count: candidates.length,
-      rules_version: "new-candidate-staging-v2-preflight",
+      rules_version: "new-candidate-staging-v3-run-isolation",
       summary: {
         source: "encar",
         onlyNew: true,
@@ -121,6 +152,7 @@ async function main() {
           freshCandidates: discovery.freshCandidates,
           seen: discovery.seen,
         },
+        excludedPreviouslyQueued: previouslyQueuedIds.size,
         preflight: Object.fromEntries(["ready", "unknown", "dummy", "contract", "duplicate_vehicle"].map((status) => [status, preflightRows.filter((row) => row.status === status).length])),
       },
     })
@@ -151,8 +183,9 @@ async function main() {
   console.log(JSON.stringify({
     run,
     staged: candidates.length,
-    sourcePolicy: "only Encar IDs absent from cars; combustion only; preflight excludes dummy, CONTRACT and active vehicle-number duplicates; transient preflight errors are retained; no cars inserted; no publication",
+    sourcePolicy: "only Encar IDs absent from cars and all prior Encar enrichment queues; combustion only; preflight excludes dummy, CONTRACT and active/in-batch vehicle-number duplicates; transient preflight errors are retained; no cars inserted; no publication",
     discovery: { candidates: discovery.candidates, existingCandidates: discovery.existingCandidates, freshCandidates: discovery.freshCandidates, seen: discovery.seen },
+    excludedPreviouslyQueued: previouslyQueuedIds.size,
     preflight: Object.fromEntries(["ready", "unknown", "dummy", "contract", "duplicate_vehicle"].map((status) => [status, preflightRows.filter((row) => row.status === status).length])),
   }, null, 2));
 }
