@@ -602,6 +602,15 @@ function ConditionOverview({
             </div>
           ))}
         </div>
+        {isConfirmedCleanHistory(carHistory) && (
+          <div className="mt-3 flex items-start gap-3 rounded bg-[#eef7f0] p-3 text-sm text-[#1f5130] ring-1 ring-[#bfe0c8]">
+            <ShieldCheck className="mt-0.5 shrink-0" size={18} />
+            <p>
+              История проверена по базе Chestny: страховых случаев и выплат не
+              найдено.
+            </p>
+          </div>
+        )}
         {nonInsurancePeriods !== null && nonInsurancePeriods > 0 && (
           <div className="flex items-start gap-3 rounded bg-[#fff8e6] p-3 text-sm text-[#7a5411] ring-1 ring-[#f0d28a]">
             <ShieldAlert className="mt-0.5 shrink-0" size={18} />
@@ -904,9 +913,14 @@ type InspectionGroup = {
 function buildInspectionGroups(
   reports: Array<{ report_type: string; items: unknown }>,
 ): InspectionGroup[] {
-  const report = reports.find(
-    (item) => item.report_type === "encar_inspection",
-  );
+  // A report that exists but carries no items must not hide a structured report from
+  // the other source: an empty `encar_inspection` used to make this return [] and the
+  // Chestny inspection was never reached. Encar still wins when it has content.
+  const hasItems = (report?: { items: unknown }) => Array.isArray(report?.items) && report.items.length > 0;
+  const report = reports.find((item) => item.report_type === "encar_inspection" && hasItems(item))
+    ?? reports.find((item) => item.report_type === "chestny_inspection" && hasItems(item))
+    ?? reports.find((item) => item.report_type === "encar_inspection")
+    ?? reports.find((item) => item.report_type === "chestny_inspection");
   if (!Array.isArray(report?.items)) return [];
 
   return report.items
@@ -1196,9 +1210,49 @@ function getCarHistory(
   const encarHistory = reports.find(
     (report) => report.report_type === "encar_carhistory",
   );
-  return (
+  const encarResolved = (
     getObject(encarHistory?.raw_payload) ?? getObject(encarHistory?.summary)
   );
+  if (encarResolved) return encarResolved;
+  // A Chestny history is a separate source: it is used only when no other report
+  // exists, and it never overwrites Encar data.
+  const chestnyHistory = reports.find(
+    (report) => report.report_type === "chestny_carhistory",
+  );
+  return (
+    getObject(chestnyHistory?.summary) ?? getObject(chestnyHistory?.raw_payload)
+  );
+}
+
+/**
+ * A Chestny report may say "history checked, nothing found". That is a positive
+ * statement, not missing data, so the card states it explicitly instead of leaving
+ * the customer to guess from zeros.
+ */
+function isConfirmedCleanHistory(
+  carHistory: Record<string, unknown> | null,
+): boolean {
+  if (
+    !carHistory ||
+    carHistory.source !== "chestny" ||
+    carHistory.available !== true
+  )
+    return false;
+  const events = Array.isArray(carHistory.accidentHistoryResponse)
+    ? carHistory.accidentHistoryResponse
+    : [];
+  if (events.length) return false;
+  const counters = [
+    carHistory.my_car_accident_count,
+    carHistory.other_accident_count,
+    carHistory.owner_changed_count,
+    carHistory.loan_count,
+    carHistory.theft_count,
+    carHistory.total_loss_count,
+    carHistory.flood_part_loss_count,
+    carHistory.flood_total_loss_count,
+  ];
+  return counters.every((value) => Number(value ?? 0) === 0);
 }
 
 function buildInsuranceEvents(carHistory: Record<string, unknown> | null) {

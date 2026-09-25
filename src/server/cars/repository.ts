@@ -907,7 +907,7 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
       .from("car_condition_reports")
       .select("report_type, raw_payload")
       .eq("car_id", data.id)
-      .in("report_type", ["carhistory", "encar_carhistory", "encar_inspection"]),
+      .in("report_type", ["carhistory", "encar_carhistory", "encar_inspection", "chestny_carhistory", "chestny_inspection"]),
     supabase
       .from("calc_snapshots")
       .select(
