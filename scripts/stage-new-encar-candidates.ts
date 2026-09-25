@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
 import { importEncar } from "../src/server/imports/encar";
 import { encarClient } from "../src/server/imports/encar-client";
+import { deduplicateNewEncarPreflightRows, type NewEncarPreflightRow } from "../src/server/catalog/new-encar-preflight-deduplication";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -29,7 +30,7 @@ type CandidateDraft = {
   year: number | null;
 };
 
-type Preflight = { candidate: CandidateDraft; status: "ready" | "unknown" | "dummy" | "contract" | "duplicate_vehicle"; vehicleNoHash: string | null; error?: string };
+type Preflight = NewEncarPreflightRow<CandidateDraft>;
 const obj = (value: unknown): Record<string, unknown> => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
 const vehicleNoHash = (value: unknown) => {
   const key = String(value ?? "").toUpperCase().replace(/[^0-9A-Z가-힣]/g, "");
@@ -107,8 +108,8 @@ async function main() {
     throw new Error(`Only ${neverQueued.length} never-queued candidates remain after excluding ${previouslyQueuedIds.size} prior queue IDs; target is ${target}. No staging run was created.`);
   }
 
-  const preflightRows = await inParallel(neverQueued, preflightConcurrency, preflight);
-  const hashes = preflightRows.flatMap((row) => row.vehicleNoHash ? [row.vehicleNoHash] : []);
+  const fetchedPreflightRows = await inParallel(neverQueued, preflightConcurrency, preflight);
+  const hashes = fetchedPreflightRows.flatMap((row) => row.vehicleNoHash ? [row.vehicleNoHash] : []);
   const knownHashes = new Set<string>();
   for (let index = 0; index < hashes.length; index += 200) {
     const { data, error } = await db.from("cars").select("vehicle_no_hash")
@@ -116,15 +117,9 @@ async function main() {
     if (error) throw new Error(error.message);
     for (const row of data ?? []) if (row.vehicle_no_hash) knownHashes.add(String(row.vehicle_no_hash));
   }
-  const seenVehicleHashes = new Set<string>();
-  for (const row of preflightRows) {
-    if (row.status !== "ready" || !row.vehicleNoHash) continue;
-    if (knownHashes.has(row.vehicleNoHash) || seenVehicleHashes.has(row.vehicleNoHash)) {
-      row.status = "duplicate_vehicle";
-      continue;
-    }
-    seenVehicleHashes.add(row.vehicleNoHash);
-  }
+  // Also deduplicate against earlier ready rows from this same discovery pool;
+  // previously only duplicates already present in cars were excluded.
+  const preflightRows = deduplicateNewEncarPreflightRows(fetchedPreflightRows, knownHashes);
   const candidates = preflightRows.filter((row) => row.status === "ready" || row.status === "unknown").slice(0, target);
   if (candidates.length !== target) {
     const counts = Object.fromEntries(["ready", "unknown", "dummy", "contract", "duplicate_vehicle"].map((status) => [status, preflightRows.filter((row) => row.status === status).length]));
