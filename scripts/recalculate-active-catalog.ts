@@ -132,8 +132,9 @@ async function main() {
     // A measured dry-run showed that removing it moves 35 cards by up to 97%: a Kia K5 2.0
     // priced from a 150 hp reference becomes ~twice as expensive when its stored 240 hp is
     // used instead, so for some configurations the reference is the plausible value and the
-    // stored power is wrong. Which of the two is right is not decidable automatically, and
-    // the protection against adopting provisional power is ONLY_APPROVED_POWER, not this path.
+    // stored power is wrong. Which of the two is right is not decidable automatically.
+    // This reference affects the calculated price and its provenance; the write below
+    // does not replace cars.power_hp or cars.calculation_power_kw.
     const reference = approvedPowerKw != null || car.fuel_type === "hybrid" || car.fuel_type === "electric"
       ? null
       : resolveAutomaticPowerReference(car, automaticReferences);
