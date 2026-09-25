@@ -103,14 +103,13 @@ async function main() {
     // cannot separate an approved value from a rehearsal, which is what let a
     // preliminary power be re-priced and re-labelled as approved.
     const approvedPowerKw = car.power_finality === "final" ? car.calculation_power_kw : null;
-    // An automatic reference may fill a missing power, never override a present one.
-    // Pricing a provisional card from a value it does not display made the price and the
-    // card disagree, and the run rewrote the card's provenance to point at that value.
-    // A provisional card with a stored power therefore gets a rate-only refresh, and this
-    // holds regardless of the ONLY_APPROVED_POWER switch: a manual run cannot re-price a
-    // rehearsal from the automatic reference either.
-    const reference = approvedPowerKw != null || car.power_hp != null
-      || car.fuel_type === "hybrid" || car.fuel_type === "electric"
+    // The automatic reference is deliberately still allowed to price a provisional card.
+    // A measured dry-run showed that removing it moves 35 cards by up to 97%: a Kia K5 2.0
+    // priced from a 150 hp reference becomes ~twice as expensive when its stored 240 hp is
+    // used instead, so for some configurations the reference is the plausible value and the
+    // stored power is wrong. Which of the two is right is not decidable automatically, and
+    // the protection against adopting provisional power is ONLY_APPROVED_POWER, not this path.
+    const reference = approvedPowerKw != null || car.fuel_type === "hybrid" || car.fuel_type === "electric"
       ? null
       : resolveAutomaticPowerReference(car, automaticReferences);
     const resolvedPowerHp = reference?.power_hp ?? car.power_hp;
