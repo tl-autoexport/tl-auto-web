@@ -37,6 +37,7 @@ type CatalogCar = {
 
 type RecalcRow = {
   source: string | null;
+  carId: string;
   sourceId: string;
   car: string;
   oldPriceRub: number | null;
@@ -178,6 +179,7 @@ async function main() {
       : false;
     const row = {
       source: car.primary_source,
+      carId: car.id,
       sourceId: car.source_id,
       car: [car.brand, car.model].filter(Boolean).join(" "),
       oldPriceRub,
@@ -289,12 +291,21 @@ async function main() {
   const flagged = rows.filter((row) => row.changePct != null
     && (Math.abs(row.changePct) > maxAbsChangePct || Math.abs(row.changePct - medianChangePct) > maxDeviationPct));
 
-  const flaggedIds = new Set(flagged.map((row) => row.sourceId));
-  const toWrite = pending.filter((car) => !flaggedIds.has(car.source_id));
+  const carById = new Map(data.map((car) => [car.id, car]));
+  // The key is the internal car id: `source_id` repeats across sources, so matching on it
+  // could hold back a different card. Only cards computed in the first pass and allowed by
+  // the gate are written, and the count comes from what actually persisted.
+  const flaggedIds = new Set(flagged.map((row) => row.carId));
+  const toWrite = rows
+    .filter((row) => !flaggedIds.has(row.carId))
+    .map((row) => carById.get(row.carId))
+    .filter((car): car is CatalogCar => Boolean(car));
+  let written = 0;
   if (!dryRun) {
     for (let offset = 0; offset < toWrite.length; offset += concurrency) {
       const batch = toWrite.slice(offset, offset + concurrency);
-      await Promise.all(batch.map((car) => processCar(car, true)));
+      const results = await Promise.all(batch.map((car) => processCar(car, true)));
+      written += results.filter((row) => row != null).length;
       console.error(`Written ${Math.min(offset + batch.length, toWrite.length)}/${toWrite.length}`);
     }
   }
@@ -303,13 +314,14 @@ async function main() {
     dryRun,
     rateSnapshot,
     recalculated: rows.length,
-    written: dryRun ? undefined : rows.length - flagged.length,
+    written: dryRun ? undefined : written,
+    allowed: { count: toWrite.length, sample: toWrite.slice(0, 5).map((car) => ({ carId: car.id, sourceId: car.source_id })) },
     alreadyProcessed: existingVersionIds.size,
     onlyApprovedPower,
     onlyPowerChanged,
     medianChangePct,
     thresholds: { maxAbsChangePct, maxDeviationPct },
-    flagged: flagged.map((row) => ({ sourceId: row.sourceId, car: row.car, changePct: row.changePct, powerSource: row.powerSource,
+    flagged: flagged.map((row) => ({ carId: row.carId, sourceId: row.sourceId, car: row.car, changePct: row.changePct, powerSource: row.powerSource,
       storedKw: row.selectedPower.storedCalculationKw, resolvedKw: row.selectedPower.resolvedKw, referenceKey: row.selectedPower.referenceKey })),
     modelFilter: modelFilter.size ? [...modelFilter] : "all",
     skipped,
