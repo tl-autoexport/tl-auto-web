@@ -28,7 +28,6 @@ export function whatsappPowersportsContactUrl(message = GENERAL_CLIENT_MESSAGE) 
 }
 
 export function vehicleClientMessage({
-  source,
   sourceId,
   title,
 }: {
@@ -36,6 +35,5 @@ export function vehicleClientMessage({
   sourceId: string;
   title: string;
 }) {
-  const sourceLabel = source === "encar" ? "Encar" : source;
-  return `Здравствуйте! Меня заинтересовал автомобиль «${title}» (${sourceLabel}, ID ${sourceId}) на сайте TL Auto. Хочу получить подробную консультацию.`;
+  return `Здравствуйте! Меня заинтересовал автомобиль «${title}» (ID ${sourceId}) на сайте TL Auto. Хочу получить подробную консультацию.`;
 }

@@ -29,6 +29,8 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   const [count, setCount] = useState(totalCars);
   const [countQuery, setCountQuery] = useState(() => cleanParams(currentQuery).toString());
   const [loading, setLoading] = useState(false);
+  const [failedQuery, setFailedQuery] = useState<string | null>(null);
+  const [retry, setRetry] = useState(0);
   const [find, setFind] = useState("");
   const [rangePicker, setRangePicker] = useState<RangePickerState | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -36,36 +38,44 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   const query = useMemo(() => draft.toString(), [draft]);
   const currentFacets = facetsQuery === query ? facets : null;
   const hasCurrentCount = countQuery === query;
+  const requestFailed = failedQuery === query;
   const selected = (name: string) => draft.get(name) || "";
   const activeParameters = PARAM_KEYS.filter((key) => draft.has(key)).length;
 
   useEffect(() => {
     if (screen === "home" && !rangePicker) return;
     const controller = new AbortController();
+    let active = true;
+    let timeout: number | undefined;
     const timer = window.setTimeout(async () => {
       setLoading(true);
+      setFailedQuery(null);
+      timeout = window.setTimeout(() => controller.abort(), 12_000);
       try {
         const suffix = query ? `?${query}` : "";
-        const facetRequest = fetch(`/api/catalog/facets${suffix}`, { signal: controller.signal }).then(async (response) => {
-          if (response.ok && !controller.signal.aborted) {
-            setFacets(await response.json());
-            setFacetsQuery(query);
-          }
-        }).catch(() => {});
-        const countResponse = await fetch(`/api/catalog/count${suffix}`, { signal: controller.signal });
-        if (countResponse.ok) {
-          setCount((await countResponse.json()).count ?? 0);
-          setCountQuery(query);
-        }
-        void facetRequest;
+        const [facetResponse, countResponse] = await Promise.all([
+          fetch(`/api/catalog/facets${suffix}`, { signal: controller.signal }),
+          fetch(`/api/catalog/count${suffix}`, { signal: controller.signal }),
+        ]);
+        if (!facetResponse.ok || !countResponse.ok) throw new Error("Не удалось обновить фильтры");
+        const [nextFacets, nextCount] = await Promise.all([
+          facetResponse.json() as Promise<Facets>,
+          countResponse.json() as Promise<{ count: number }>,
+        ]);
+        if (!active || !Number.isFinite(nextCount.count)) return;
+        setFacets(nextFacets);
+        setFacetsQuery(query);
+        setCount(nextCount.count);
+        setCountQuery(query);
       } catch {
-        // A cancelled request is expected while the customer changes a filter.
+        if (active) setFailedQuery(query);
       } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        window.clearTimeout(timeout);
+        if (active) setLoading(false);
       }
     }, 180);
-    return () => { controller.abort(); window.clearTimeout(timer); };
-  }, [query, screen, rangePicker]);
+    return () => { active = false; controller.abort(); window.clearTimeout(timer); window.clearTimeout(timeout); };
+  }, [query, screen, rangePicker, retry]);
 
   useEffect(() => {
     if (["brand", "model", "generation"].includes(screen)) {
@@ -92,7 +102,6 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   }
 
   function reset() {
-    const retainedBrand = selected("brand");
     setDraft((previous) => {
       const next = new URLSearchParams(previous);
       if (screen === "brand") ["brand", "model", "generation"].forEach((key) => next.delete(key));
@@ -103,10 +112,11 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
       if (screen === "sort") next.delete("sort");
       return next;
     });
-    setFacets(null);
-    setFacetsQuery("");
-    setCount(screen === "model" && retainedBrand ? currentFacets?.axes.brand?.find((item) => item.value === retainedBrand)?.cars ?? totalCars : totalCars);
-    setCountQuery("");
+    setFind("");
+    // The query may already be empty (or this level may not be selected).
+    // Keep the last resolved count: invalidating it without changing the query
+    // leaves the button stuck on "Пересчитываем…" with no new request.
+    if (requestFailed) setRetry((value) => value + 1);
   }
 
   function resetAll() {
@@ -165,20 +175,20 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
         <button aria-label="Сбросить фильтры" className="px-1 text-right text-xs font-semibold text-[#956f2c]" onClick={reset} type="button">Сбросить</button>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-28">
-        {(["brand", "model", "generation"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation"} fallback={screen === "brand" ? options.brands : screen === "model" ? options.modelsByBrand[selected("brand")] ?? [] : []} facets={currentFacets} find={find} inputRef={inputRef} loading={loading} onChoose={choose} onFind={setFind} selectedValue={selected(screen)} /> : null}
+        {(["brand", "model", "generation"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation"} facets={currentFacets} find={find} inputRef={inputRef} loading={loading || !currentFacets} onChoose={choose} onFind={setFind} onRetry={() => setRetry((value) => value + 1)} requestFailed={requestFailed} selectedValue={selected(screen)} /> : null}
         {screen === "parameters" ? <Parameters generationLabel={generationLabel(selected("generation"), currentFacets)} onOpenRange={setRangePicker} onSelectLevel={setScreen} options={options} patch={patch} selected={selected} /> : null}
         {screen === "year" || screen === "price" || screen === "mileage" ? <Range title={screen === "year" ? "Год выпуска" : screen === "price" ? "Цена до Владивостока, ₽" : "Пробег, км"} minKey={screen === "year" ? "yearMin" : screen === "price" ? "priceMin" : "mileageMin"} maxKey={screen === "year" ? "yearMax" : screen === "price" ? "priceMax" : "mileageMax"} onOpen={setRangePicker} selected={selected} /> : null}
         {screen === "sort" ? <div className="overflow-hidden rounded-2xl bg-white">{sortOptions.map((option) => <button className={`flex min-h-14 w-full items-center justify-between border-b border-[#edf0f4] px-4 text-left text-sm ${selected("sort") === option.value ? "font-semibold text-[#956f2c]" : "text-[#273246]"}`} key={option.value} onClick={() => changeSort(option.value)} type="button">{option.label}<span>{selected("sort") === option.value ? "✓" : ""}</span></button>)}</div> : null}
       </div>
-      {screen !== "sort" ? <div className="shrink-0 border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount} onClick={() => apply()} type="button">{loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button></div> : null}
+      {screen !== "sort" ? <div className="shrink-0 border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount || requestFailed} onClick={() => apply()} type="button">{requestFailed ? "Не удалось пересчитать" : loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button>{requestFailed ? <button className="mt-2 w-full text-sm text-[#956f2c]" onClick={() => setRetry((value) => value + 1)} type="button">Повторить запрос</button> : null}</div> : null}
     </div>, document.body) : null}
     {rangePicker && typeof document !== "undefined" ? createPortal(<RangePicker count={count} hasCurrentCount={hasCurrentCount} loading={loading} onApply={applyRange} onClose={() => setRangePicker(null)} patch={patch} selected={selected} state={rangePicker} />, document.body) : null}
   </div>;
 }
 
-function Picker({ axis, fallback, facets, find, inputRef, loading, onChoose, onFind, selectedValue }: { axis: "brand" | "model" | "generation"; fallback: string[]; facets: Facets | null; find: string; inputRef: React.RefObject<HTMLInputElement | null>; loading: boolean; onChoose: (axis: "brand" | "model" | "generation", item: Option) => void; onFind: (text: string) => void; selectedValue: string }) {
-  const items: Option[] = (facets?.axes[axis] ?? fallback.map((value) => ({ value, label: value }))).filter((item) => item.label.toLowerCase().includes(find.toLowerCase()));
-  return <><label className="relative mb-4 block"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7a8798]" size={20} /><input className="h-13 w-full rounded-xl bg-white pl-11 pr-4 text-base outline-none ring-1 ring-[#e0e5ec] focus:ring-[#a98239]" onChange={(event) => onFind(event.target.value)} placeholder={`Поиск: ${titleFor(axis).toLowerCase()}`} ref={inputRef} value={find} /></label><div className="overflow-hidden rounded-2xl bg-white">{loading && !items.length ? <p className="p-5 text-sm text-[#647084]">Загружаем варианты…</p> : items.length ? items.map((item) => { const isSelected = selectedValue === item.value; return <button className={`flex min-h-14 w-full items-center gap-3 border-b border-[#edf0f4] px-4 text-left ${isSelected ? "bg-[#fbf7ed]" : ""}`} key={item.value} onClick={() => { onFind(""); onChoose(axis, item); }} type="button"><span className="min-w-0 flex-1 truncate text-[15px] font-medium">{item.label}</span>{item.cars !== undefined ? <span className="text-xs text-[#7a8798]">{item.cars}</span> : null}{axis === "brand" ? <ChevronRight aria-hidden="true" className="text-[#a4adba]" size={18} /> : <span aria-hidden="true" className={`grid size-6 place-items-center rounded-md border ${isSelected ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span>}</button>; }) : <p className="p-5 text-sm text-[#647084]">Нет вариантов для текущего отбора.</p>}</div></>;
+function Picker({ axis, facets, find, inputRef, loading, onChoose, onFind, onRetry, requestFailed, selectedValue }: { axis: "brand" | "model" | "generation"; facets: Facets | null; find: string; inputRef: React.RefObject<HTMLInputElement | null>; loading: boolean; onChoose: (axis: "brand" | "model" | "generation", item: Option) => void; onFind: (text: string) => void; onRetry: () => void; requestFailed: boolean; selectedValue: string }) {
+  const items = (facets?.axes[axis] ?? []).filter((item) => item.label.toLowerCase().includes(find.toLowerCase()));
+  return <><label className="relative mb-4 block"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7a8798]" size={20} /><input className="h-13 w-full rounded-xl bg-white pl-11 pr-4 text-base outline-none ring-1 ring-[#e0e5ec] focus:ring-[#a98239]" onChange={(event) => onFind(event.target.value)} placeholder={`Поиск: ${titleFor(axis).toLowerCase()}`} ref={inputRef} value={find} /></label><div className="overflow-hidden rounded-2xl bg-white">{requestFailed ? <div className="p-5 text-sm text-[#647084]">Не удалось загрузить варианты. <button className="font-semibold text-[#956f2c]" onClick={onRetry} type="button">Повторить</button></div> : loading ? <p className="p-5 text-sm text-[#647084]">Загружаем варианты…</p> : items.length ? items.map((item) => { const isSelected = selectedValue === item.value; return <button className={`flex min-h-14 w-full items-center gap-3 border-b border-[#edf0f4] px-4 text-left ${isSelected ? "bg-[#fbf7ed]" : ""}`} key={item.value} onClick={() => { onFind(""); onChoose(axis, item); }} type="button"><span className="min-w-0 flex-1 truncate text-[15px] font-medium">{item.label}</span>{item.cars !== undefined ? <span className="text-xs text-[#7a8798]">{item.cars}</span> : null}{axis === "brand" ? <ChevronRight aria-hidden="true" className="text-[#a4adba]" size={18} /> : <span aria-hidden="true" className={`grid size-6 place-items-center rounded-md border ${isSelected ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span>}</button>; }) : <p className="p-5 text-sm text-[#647084]">Нет вариантов для текущего отбора.</p>}</div></>;
 }
 
 function Parameters({ generationLabel, onOpenRange, onSelectLevel, options, patch, selected }: { generationLabel: string; onOpenRange: (state: RangePickerState) => void; onSelectLevel: (screen: Screen) => void; options: FieldOptions; patch: (values: Record<string, string | null>) => void; selected: (name: string) => string }) {

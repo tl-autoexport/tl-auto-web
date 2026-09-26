@@ -602,15 +602,6 @@ function ConditionOverview({
             </div>
           ))}
         </div>
-        {isConfirmedCleanHistory(carHistory) && (
-          <div className="mt-3 flex items-start gap-3 rounded bg-[#eef7f0] p-3 text-sm text-[#1f5130] ring-1 ring-[#bfe0c8]">
-            <ShieldCheck className="mt-0.5 shrink-0" size={18} />
-            <p>
-              История проверена по базе Chestny: страховых случаев и выплат не
-              найдено.
-            </p>
-          </div>
-        )}
         {nonInsurancePeriods !== null && nonInsurancePeriods > 0 && (
           <div className="flex items-start gap-3 rounded bg-[#fff8e6] p-3 text-sm text-[#7a5411] ring-1 ring-[#f0d28a]">
             <ShieldAlert className="mt-0.5 shrink-0" size={18} />
@@ -1224,36 +1215,6 @@ function getCarHistory(
   );
 }
 
-/**
- * A Chestny report may say "history checked, nothing found". That is a positive
- * statement, not missing data, so the card states it explicitly instead of leaving
- * the customer to guess from zeros.
- */
-function isConfirmedCleanHistory(
-  carHistory: Record<string, unknown> | null,
-): boolean {
-  if (
-    !carHistory ||
-    carHistory.source !== "chestny" ||
-    carHistory.available !== true
-  )
-    return false;
-  const events = Array.isArray(carHistory.accidentHistoryResponse)
-    ? carHistory.accidentHistoryResponse
-    : [];
-  if (events.length) return false;
-  const counters = [
-    carHistory.my_car_accident_count,
-    carHistory.other_accident_count,
-    carHistory.owner_changed_count,
-    carHistory.loan_count,
-    carHistory.theft_count,
-    carHistory.total_loss_count,
-    carHistory.flood_part_loss_count,
-    carHistory.flood_total_loss_count,
-  ];
-  return counters.every((value) => Number(value ?? 0) === 0);
-}
 
 function buildInsuranceEvents(carHistory: Record<string, unknown> | null) {
   const ownEvents = Array.isArray(carHistory?.my_car_accident_list)

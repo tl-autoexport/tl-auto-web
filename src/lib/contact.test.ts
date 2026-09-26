@@ -12,7 +12,11 @@ const message = vehicleClientMessage({
 });
 
 assert.match(message, /Mercedes-Benz E-Class/);
-assert.match(message, /Encar, ID abc123/);
+assert.match(message, /ID abc123/);
+assert.doesNotMatch(message, /Encar|Chestny|chestny_prigon/);
+const importedMessage = vehicleClientMessage({ source: "chestny_prigon", sourceId: "41730430", title: "Hyundai AVANTE" });
+assert.match(importedMessage, /Hyundai AVANTE.*ID 41730430/);
+assert.doesNotMatch(importedMessage, /Chestny|chestny_prigon|Честный пригон/i);
 assert.equal(
   decodeURIComponent(telegramContactUrl(message)),
   `https://t.me/TL_Auto_export?text=${message}`,
