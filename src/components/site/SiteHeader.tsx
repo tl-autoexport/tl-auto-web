@@ -197,7 +197,7 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <header className="sticky top-0 z-50 border-b border-[#d9e5ef] bg-white text-[#111827] shadow-[0_4px_16px_rgba(15,53,84,0.08)]">
+      <header className="sticky top-0 z-[70] border-b border-[#d9e5ef] bg-white text-[#111827] shadow-[0_4px_16px_rgba(15,53,84,0.08)]">
         <div className="mx-auto flex min-h-[68px] max-w-[1440px] items-center justify-between gap-3 bg-white px-4 sm:min-h-[74px] sm:px-6 lg:min-h-[76px] xl:px-8">
           <Brand />
 
