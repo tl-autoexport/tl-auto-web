@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import { createSupabaseAdmin } from "@/server/supabase/admin";
 import { createSupabasePublic } from "@/server/supabase/public";
 import { normalizeColor, normalizeDrive } from "@/server/normalization/vehicles";
+import { bodyTypeValues, transmissionValues } from "@/lib/catalog-filter-values";
 
 const buildWithoutCatalog =
   process.env.TL_AUTO_BUILD_WITHOUT_CATALOG === "true";
@@ -292,7 +293,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-    .not("price_rub", "is", null).not("power_hp", "is", null);
+    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (source) query = query.eq("primary_source", source);
   if (maxPowerHp) query = query.lte("power_hp", maxPowerHp);
@@ -484,7 +485,7 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-    .not("price_rub", "is", null).not("power_hp", "is", null);
+    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (filters.source) query = query.eq("primary_source", filters.source);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
@@ -754,7 +755,7 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
       .eq("is_available", true)
       .in("primary_source", ["encar", "chestny_prigon"])
       .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-      .not("price_rub", "is", null).not("power_hp", "is", null)
+      .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
 
@@ -1042,30 +1043,6 @@ function showcasePhotoScore(media: NonNullable<CatalogCar["car_media"]>[number])
   }
 
   return 0;
-}
-
-function transmissionValues(value: string) {
-  const groups: Record<string, string[]> = {
-    automatic: ["automatic", "auto", "Автомат", "오토", "오토(A/T)"],
-    manual: ["manual", "Механика", "수동", "수동(M/T)"],
-    cvt: ["cvt"],
-    dct: ["dct"],
-  };
-
-  return groups[value] ?? [value];
-}
-
-function bodyTypeValues(value: string) {
-  const groups: Record<string, string[]> = {
-    "Седан": ["Большой автомобиль", "Среднеразмерный автомобиль", "sedan", "Sedan"],
-    "Хэтчбек": ["Компактный автомобиль", "Микроавтомобиль", "hatchback"],
-    "Кроссовер": ["SUV"],
-    "Универсал": ["wagon"],
-    "Минивэн": ["Минивэн", "minivan"],
-    "Спорткар": ["Спорткар"],
-  };
-
-  return groups[value] ?? [value];
 }
 
 function passableFilterExpression(now = new Date()) {

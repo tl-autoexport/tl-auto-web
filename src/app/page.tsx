@@ -14,6 +14,7 @@ import {
   type CatalogCardSummary,
 } from "@/server/cars/repository";
 import { CatalogQuickNav } from "@/components/home/CatalogQuickNav";
+import { bodyTypeFilterValue, transmissionFilterValue } from "@/lib/catalog-filter-values";
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 import { StoryCarousel } from "@/components/home/StoryCarousel";
 import { ContactLocations } from "@/components/home/ContactLocations";
@@ -84,6 +85,8 @@ export default async function Home() {
       <CatalogQuickNav
         brands={[...new Set(facetCars.map((car) => car.brand).filter(Boolean))] as string[]}
         models={[...new Map(facetCars.filter((car) => car.brand && car.model).map((car) => [`${car.brand}:${car.model}`, { brand: car.brand!, model: car.model! }])).values()]}
+        bodies={[...new Set(facetCars.map((car) => bodyTypeFilterValue(car.body_type)).filter((value): value is string => Boolean(value)))]}
+        transmissions={[...new Set(facetCars.map((car) => transmissionFilterValue(car.transmission)).filter((value): value is string => Boolean(value)))]}
       />
 
       <div className="bg-[#f5f6f8]">
