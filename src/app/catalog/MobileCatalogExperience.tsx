@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import { ArrowDownUp, ChevronLeft, ChevronRight, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 import { translateFuel, translateTransmission } from "@/server/normalization/display";
 
-type Option = { value: string; label: string; cars: number };
+type Option = { value: string; label: string; cars?: number };
 type Facets = { total: number; axes: Record<string, Option[]> };
 type SortOption = { value: string; label: string };
-type FieldOptions = { fuels: string[]; transmissions: string[]; bodies: string[]; trims: string[]; colors: string[] };
+type FieldOptions = { fuels: string[]; transmissions: string[]; bodies: string[]; trims: string[]; colors: string[]; brands: string[]; modelsByBrand: Record<string, string[]> };
 type Screen = "home" | "brand" | "model" | "generation" | "parameters" | "year" | "price" | "mileage" | "sort";
 type RangePickerState = { title: string; minKey: string; maxKey: string; single?: boolean };
 
@@ -45,18 +46,18 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
       setLoading(true);
       try {
         const suffix = query ? `?${query}` : "";
-        const [facetResponse, countResponse] = await Promise.all([
-          fetch(`/api/catalog/facets${suffix}`, { signal: controller.signal }),
-          fetch(`/api/catalog/count${suffix}`, { signal: controller.signal }),
-        ]);
-        if (facetResponse.ok) {
-          setFacets(await facetResponse.json());
-          setFacetsQuery(query);
-        }
+        const facetRequest = fetch(`/api/catalog/facets${suffix}`, { signal: controller.signal }).then(async (response) => {
+          if (response.ok && !controller.signal.aborted) {
+            setFacets(await response.json());
+            setFacetsQuery(query);
+          }
+        }).catch(() => {});
+        const countResponse = await fetch(`/api/catalog/count${suffix}`, { signal: controller.signal });
         if (countResponse.ok) {
           setCount((await countResponse.json()).count ?? 0);
           setCountQuery(query);
         }
+        void facetRequest;
       } catch {
         // A cancelled request is expected while the customer changes a filter.
       } finally {
@@ -157,27 +158,27 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     </div>
     {hasAppliedFilters ? <div className="scrollbar-none flex items-center gap-1.5 overflow-x-auto bg-[#f5f6f8] px-3 pb-2 sm:px-5">{chips.map((chip) => <span className="shrink-0 rounded-full bg-[#101827] px-2.5 py-1 text-[11px] font-semibold text-white" key={chip}>{chip}</span>)}<button className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#657287]" onClick={resetAll} type="button"><RotateCcw size={14} />Сбросить всё</button></div> : null}
 
-    {screen !== "home" ? <div aria-modal="true" className="fixed inset-x-0 top-0 z-[130] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#f4f6f9] pt-[env(safe-area-inset-top)]" role="dialog">
+    {screen !== "home" && typeof document !== "undefined" ? createPortal(<div aria-modal="true" className="fixed inset-x-0 top-0 z-[130] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#f4f6f9] pt-[env(safe-area-inset-top)]" role="dialog">
       <header className="grid min-h-16 grid-cols-[44px_minmax(0,1fr)_76px] items-center border-b border-[#dce2eb] bg-white px-4">
         <button aria-label="Назад" className="grid size-11 place-items-center" onClick={() => setScreen(screen === "parameters" || screen === "year" || screen === "price" || screen === "mileage" || screen === "sort" ? "home" : screen === "brand" ? "home" : screen === "model" ? "brand" : "model")} type="button"><ChevronLeft size={25} /></button>
         <h2 className="truncate text-center text-lg font-semibold">{titleFor(screen)}</h2>
         <button aria-label="Сбросить фильтры" className="px-1 text-right text-xs font-semibold text-[#956f2c]" onClick={reset} type="button">Сбросить</button>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-28">
-        {(["brand", "model", "generation"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation"} facets={currentFacets} find={find} inputRef={inputRef} loading={loading} onChoose={choose} onFind={setFind} selectedValue={selected(screen)} /> : null}
+        {(["brand", "model", "generation"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation"} fallback={screen === "brand" ? options.brands : screen === "model" ? options.modelsByBrand[selected("brand")] ?? [] : []} facets={currentFacets} find={find} inputRef={inputRef} loading={loading} onChoose={choose} onFind={setFind} selectedValue={selected(screen)} /> : null}
         {screen === "parameters" ? <Parameters generationLabel={generationLabel(selected("generation"), currentFacets)} onOpenRange={setRangePicker} onSelectLevel={setScreen} options={options} patch={patch} selected={selected} /> : null}
         {screen === "year" || screen === "price" || screen === "mileage" ? <Range title={screen === "year" ? "Год выпуска" : screen === "price" ? "Цена до Владивостока, ₽" : "Пробег, км"} minKey={screen === "year" ? "yearMin" : screen === "price" ? "priceMin" : "mileageMin"} maxKey={screen === "year" ? "yearMax" : screen === "price" ? "priceMax" : "mileageMax"} onOpen={setRangePicker} selected={selected} /> : null}
         {screen === "sort" ? <div className="overflow-hidden rounded-2xl bg-white">{sortOptions.map((option) => <button className={`flex min-h-14 w-full items-center justify-between border-b border-[#edf0f4] px-4 text-left text-sm ${selected("sort") === option.value ? "font-semibold text-[#956f2c]" : "text-[#273246]"}`} key={option.value} onClick={() => changeSort(option.value)} type="button">{option.label}<span>{selected("sort") === option.value ? "✓" : ""}</span></button>)}</div> : null}
       </div>
       {screen !== "sort" ? <div className="shrink-0 border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount} onClick={() => apply()} type="button">{loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button></div> : null}
-    </div> : null}
-    {rangePicker ? <RangePicker count={count} hasCurrentCount={hasCurrentCount} loading={loading} onApply={applyRange} onClose={() => setRangePicker(null)} patch={patch} selected={selected} state={rangePicker} /> : null}
+    </div>, document.body) : null}
+    {rangePicker && typeof document !== "undefined" ? createPortal(<RangePicker count={count} hasCurrentCount={hasCurrentCount} loading={loading} onApply={applyRange} onClose={() => setRangePicker(null)} patch={patch} selected={selected} state={rangePicker} />, document.body) : null}
   </div>;
 }
 
-function Picker({ axis, facets, find, inputRef, loading, onChoose, onFind, selectedValue }: { axis: "brand" | "model" | "generation"; facets: Facets | null; find: string; inputRef: React.RefObject<HTMLInputElement | null>; loading: boolean; onChoose: (axis: "brand" | "model" | "generation", item: Option) => void; onFind: (text: string) => void; selectedValue: string }) {
-  const items = (facets?.axes[axis] ?? []).filter((item) => item.label.toLowerCase().includes(find.toLowerCase()));
-  return <><label className="relative mb-4 block"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7a8798]" size={20} /><input className="h-13 w-full rounded-xl bg-white pl-11 pr-4 text-base outline-none ring-1 ring-[#e0e5ec] focus:ring-[#a98239]" onChange={(event) => onFind(event.target.value)} placeholder={`Поиск: ${titleFor(axis).toLowerCase()}`} ref={inputRef} value={find} /></label><div className="overflow-hidden rounded-2xl bg-white">{loading && !facets ? <p className="p-5 text-sm text-[#647084]">Загружаем варианты…</p> : items.length ? items.map((item) => { const isSelected = selectedValue === item.value; return <button className={`flex min-h-14 w-full items-center gap-3 border-b border-[#edf0f4] px-4 text-left ${isSelected ? "bg-[#fbf7ed]" : ""}`} key={item.value} onClick={() => { onFind(""); onChoose(axis, item); }} type="button"><span className="min-w-0 flex-1 truncate text-[15px] font-medium">{item.label}</span><span className="text-xs text-[#7a8798]">{item.cars}</span>{axis === "brand" ? <ChevronRight aria-hidden="true" className="text-[#a4adba]" size={18} /> : <span aria-hidden="true" className={`grid size-6 place-items-center rounded-md border ${isSelected ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span>}</button>; }) : <p className="p-5 text-sm text-[#647084]">Нет вариантов для текущего отбора.</p>}</div></>;
+function Picker({ axis, fallback, facets, find, inputRef, loading, onChoose, onFind, selectedValue }: { axis: "brand" | "model" | "generation"; fallback: string[]; facets: Facets | null; find: string; inputRef: React.RefObject<HTMLInputElement | null>; loading: boolean; onChoose: (axis: "brand" | "model" | "generation", item: Option) => void; onFind: (text: string) => void; selectedValue: string }) {
+  const items: Option[] = (facets?.axes[axis] ?? fallback.map((value) => ({ value, label: value }))).filter((item) => item.label.toLowerCase().includes(find.toLowerCase()));
+  return <><label className="relative mb-4 block"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7a8798]" size={20} /><input className="h-13 w-full rounded-xl bg-white pl-11 pr-4 text-base outline-none ring-1 ring-[#e0e5ec] focus:ring-[#a98239]" onChange={(event) => onFind(event.target.value)} placeholder={`Поиск: ${titleFor(axis).toLowerCase()}`} ref={inputRef} value={find} /></label><div className="overflow-hidden rounded-2xl bg-white">{loading && !items.length ? <p className="p-5 text-sm text-[#647084]">Загружаем варианты…</p> : items.length ? items.map((item) => { const isSelected = selectedValue === item.value; return <button className={`flex min-h-14 w-full items-center gap-3 border-b border-[#edf0f4] px-4 text-left ${isSelected ? "bg-[#fbf7ed]" : ""}`} key={item.value} onClick={() => { onFind(""); onChoose(axis, item); }} type="button"><span className="min-w-0 flex-1 truncate text-[15px] font-medium">{item.label}</span>{item.cars !== undefined ? <span className="text-xs text-[#7a8798]">{item.cars}</span> : null}{axis === "brand" ? <ChevronRight aria-hidden="true" className="text-[#a4adba]" size={18} /> : <span aria-hidden="true" className={`grid size-6 place-items-center rounded-md border ${isSelected ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span>}</button>; }) : <p className="p-5 text-sm text-[#647084]">Нет вариантов для текущего отбора.</p>}</div></>;
 }
 
 function Parameters({ generationLabel, onOpenRange, onSelectLevel, options, patch, selected }: { generationLabel: string; onOpenRange: (state: RangePickerState) => void; onSelectLevel: (screen: Screen) => void; options: FieldOptions; patch: (values: Record<string, string | null>) => void; selected: (name: string) => string }) {

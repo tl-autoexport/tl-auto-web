@@ -23,6 +23,7 @@ import {
   type StagingCatalogType,
 } from "@/server/cars/repository";
 import { translateFuel, translateTransmission } from "@/server/normalization/display";
+import { bodyTypeFilterValue, transmissionFilterValue } from "@/lib/catalog-filter-values";
 import { LiveCatalogCount } from "./LiveCatalogCount";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import { PassoCatalogCard } from "@/components/catalog/PassoCatalogCard";
@@ -134,7 +135,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const fuels = unique(optionCars.map((car) => car.fuel_type));
   const transmissions = unique(optionCars.map((car) => transmissionFilterValue(car.transmission)));
   const trims = unique(optionCars.map((car) => car.trim));
-  const bodies = unique(optionCars.map((car) => car.body_type).map((body) => body ? translateBody(body) : null));
+  const bodies = unique(optionCars.map((car) => bodyTypeFilterValue(car.body_type)));
   const colors = unique(optionCars.map((car) => car.color));
   const popularBrands = brands.slice(0, 12);
   const searchableModels = Object.entries(modelsByBrand).flatMap(([brand, modelNames]) => modelNames.map((model) => ({ brand, model })));
@@ -232,7 +233,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           <MobileCatalogExperience
             currentQuery={currentQuery}
             key={currentQuery}
-            options={{ bodies, colors, fuels, transmissions, trims }}
+            options={{ bodies, colors, fuels, transmissions, trims, brands, modelsByBrand }}
             sortOptions={Object.entries(sortLabels).map(([optionValue, label]) => ({ value: optionValue, label }))}
             totalCars={totalCars}
           />
@@ -584,39 +585,10 @@ function positiveInteger(value: string) { const number = Number(value); return N
 function unique(values: Array<string | null>) { return [...new Set(values.filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b, "ru")); }
 
 function translateBody(value: string) {
-  const labels: Record<string, string> = {
-    SUV: "Кроссовер",
-    sedan: "Седан",
-    Sedan: "Седан",
-    hatchback: "Хэтчбек",
-    wagon: "Универсал",
-    minivan: "Минивэн",
-    Спорткар: "Спорткар",
-    "Большой автомобиль": "Седан",
-    "Среднеразмерный автомобиль": "Седан",
-    "Компактный автомобиль": "Хэтчбек",
-    Микроавтомобиль: "Хэтчбек",
-    경차: "Малолитражка",
-    소형차: "Компактный автомобиль",
-    승합차: "Минивэн",
-    준중형차: "Среднеразмерный автомобиль",
-    중형차: "Среднеразмерный автомобиль",
-    RV: "Минивэн",
-  };
-  return labels[value] ?? value;
+  return bodyTypeFilterValue(value) ?? value;
 }
 
 function translateMonth(value: string) {
   const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
   return months[Number(value) - 1] ?? value;
-}
-
-function transmissionFilterValue(value: string | null) {
-  const raw = String(value ?? "").trim().toLowerCase();
-  if (!raw) return null;
-  if (raw.includes("오토") || raw.includes("auto") || raw.includes("a/t") || raw.includes("автомат")) return "automatic";
-  if (raw.includes("수동") || raw.includes("manual") || raw.includes("m/t") || raw.includes("механ")) return "manual";
-  if (raw.includes("cvt")) return "cvt";
-  if (raw.includes("dct")) return "dct";
-  return value;
 }
