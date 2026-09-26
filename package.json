@@ -12,6 +12,7 @@
     "check": "npm run lint && npm run typecheck && npm test",
     "check:deploy-env": "tsx scripts/check-deploy-env.ts",
     "audit:catalog": "tsx scripts/audit-public-catalog.ts",
+    "audit:catalog:publication": "tsx scripts/audit-catalog-publication-contract.ts",
     "audit:attributes": "tsx scripts/audit-catalog-attributes.ts",
     "audit:passo": "tsx scripts/audit-passo.ts",
     "audit:passo:details": "tsx scripts/audit-passo-details.ts",

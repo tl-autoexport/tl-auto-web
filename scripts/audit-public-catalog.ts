@@ -1,6 +1,5 @@
 import { config } from "dotenv";
 import { createSupabasePublic } from "../src/server/supabase/public";
-import { evaluatePublication, type PublicationCandidate } from "../src/server/cars/calculation-contract";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -15,17 +14,20 @@ type PublicAuditCar = {
   source_url: string | null;
   source_updated_at: string | null;
   has_360_interior: boolean;
-  vehicle_specs: Record<string, unknown> | null;
-  calculation_power_status: string | null;
-  calculation_power_kw: number | null;
-  calculation_power_spec_id: string | null;
-  power_basis: string | null;
   power_confidence: string | null;
-  power_resolution_source: string | null;
-  calculation_month: number | null;
-  hybrid_dvs_power_hp: number | null;
-  legacy_calculation_status: string | null;
+  power_finality: string | null;
 };
+
+type SupabaseError = { code?: string; message?: string; details?: string | null; hint?: string | null };
+
+function throwQueryError(operation: string, error: SupabaseError): never {
+  throw new Error(`${operation}: ${JSON.stringify({
+    code: error.code ?? null,
+    message: error.message ?? "Unknown Supabase error",
+    details: error.details ?? null,
+    hint: error.hint ?? null,
+  })}`);
+}
 
 async function main() {
   const minimumCatalogSize = Number(process.env.CATALOG_MIN_TOTAL ?? 420);
@@ -39,7 +41,7 @@ async function main() {
     const { data, error } = await supabase
       .from("cars")
       .select(
-        "id, primary_source, brand, fuel_type, price_rub, power_hp, source_url, source_updated_at, has_360_interior, vehicle_specs, calculation_power_status, calculation_power_kw, calculation_power_spec_id, power_basis, power_confidence, power_resolution_source, calculation_month, hybrid_dvs_power_hp, legacy_calculation_status",
+        "id, primary_source, brand, fuel_type, price_rub, power_hp, source_url, source_updated_at, has_360_interior, power_confidence, power_finality",
       )
       .eq("is_available", true)
       // TL Auto's public catalogue is currently mirrored from the
@@ -50,7 +52,7 @@ async function main() {
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
 
-    if (error) throw error;
+    if (error) throwQueryError(`Reading public cars at offset ${offset}`, error);
     const batch = (data ?? []) as PublicAuditCar[];
     cars.push(...batch);
     if (batch.length < pageSize) break;
@@ -59,55 +61,12 @@ async function main() {
   const sourceCount = (source: string) =>
     cars.filter((car) => car.primary_source === source).length;
 
-  // The publication contract needs to know which cards actually have a stored
-  // calculation snapshot. The public policy exposes snapshots for available cars.
-  const snapshotCarIds = new Set<string>();
-  for (let offset = 0; ; offset += pageSize) {
-    const { data, error } = await supabase
-      .from("calc_snapshots")
-      .select("car_id")
-      .order("car_id", { ascending: true })
-      .range(offset, offset + pageSize - 1);
-    if (error) throw error;
-    const batch = (data ?? []) as Array<{ car_id: string }>;
-    for (const row of batch) snapshotCarIds.add(row.car_id);
-    if (batch.length < pageSize) break;
-  }
-
-  const gateFailures = new Map<string, number>();
   const preliminaryByConfidence: Record<string, number> = {};
-  const snapshotSuspects: string[] = [];
-  let gateChecked = 0;
+  let missingPriceFinality = 0;
   for (const car of cars) {
-    // An unpriced card simply shows no landed price; the contract only has to
-    // hold once a price is exposed.
     if (car.price_rub == null) continue;
-    gateChecked++;
-    const candidate: PublicationCandidate = {
-      priceRub: car.price_rub,
-      hasSnapshot: snapshotCarIds.has(car.id),
-      calculationPowerStatus: car.calculation_power_status,
-      calculationPowerKw: car.calculation_power_kw,
-      powerBasis: car.power_basis,
-      powerResolutionSource: car.power_resolution_source,
-      calculationMonth: car.calculation_month,
-      fuelType: car.fuel_type,
-      hybridDvsPowerHp: car.hybrid_dvs_power_hp,
-      powerConfidence: car.power_confidence,
-      calculationPowerSpecId: car.calculation_power_spec_id,
-      legacyCalculationStatus: car.legacy_calculation_status,
-    };
-    const verdict = evaluatePublication(candidate);
-    if (!verdict.ok) {
-      // A card published between the two reads of this audit would look like it
-      // has no snapshot. Those ids are re-checked below before being reported.
-      if (verdict.blockers.includes("snapshot_missing")) snapshotSuspects.push(car.id);
-      for (const blocker of verdict.blockers) gateFailures.set(blocker, (gateFailures.get(blocker) ?? 0) + 1);
-      continue;
-    }
-    // A published price that is only preliminary is a normal state, but its
-    // number must be visible: it is what the customer sees on the card.
-    if (verdict.finality === "preliminary") {
+    if (car.power_finality == null) missingPriceFinality++;
+    if (car.power_finality === "provisional") {
       const confidence = car.power_confidence ?? "unknown";
       preliminaryByConfidence[confidence] = (preliminaryByConfidence[confidence] ?? 0) + 1;
     }
@@ -134,27 +93,6 @@ async function main() {
   const electricWithPrice = electric.filter((car) => car.price_rub != null).length;
   const electricWithoutPrice = electric.length - electricWithPrice;
 
-  // The catalogue is written by a live publisher, so a card can appear between
-  // the two reads. Re-reading only the suspects tells a genuine missing snapshot
-  // apart from a card that was mid-publication when the audit started.
-  let snapshotRaceResolved = 0;
-  if (snapshotSuspects.length) {
-    const confirmed = new Set<string>();
-    for (let index = 0; index < snapshotSuspects.length; index += 100) {
-      const { data } = await supabase
-        .from("calc_snapshots")
-        .select("car_id")
-        .in("car_id", snapshotSuspects.slice(index, index + 100));
-      for (const row of (data ?? []) as Array<{ car_id: string }>) confirmed.add(row.car_id);
-    }
-    snapshotRaceResolved = confirmed.size;
-    if (confirmed.size) {
-      const remaining = Math.max(0, (gateFailures.get("snapshot_missing") ?? 0) - confirmed.size);
-      if (remaining) gateFailures.set("snapshot_missing", remaining);
-      else gateFailures.delete("snapshot_missing");
-    }
-  }
-
   const report = {
     total: cars.length,
     sources: {
@@ -179,15 +117,10 @@ async function main() {
     },
     staleBeyondDays: { days: freshnessDays, count: stale },
     missingSourceLink,
-    publicationContract: {
-      checked: gateChecked,
-      withSnapshot: snapshotCarIds.size,
-      snapshotRaceResolved,
-      failures: Object.fromEntries(gateFailures),
-    },
     priceFinality: {
       preliminary: Object.values(preliminaryByConfidence).reduce((sum, count) => sum + count, 0),
       byConfidence: preliminaryByConfidence,
+      missing: missingPriceFinality,
       note: "Preliminary prices are published by design and marked on the car page only; the catalogue list and sorting are unchanged.",
     },
   };
@@ -219,9 +152,8 @@ async function main() {
   if (electricWithoutPrice) {
     console.warn(`Warning: ${electricWithoutPrice} electric cars show no landed price yet`);
   }
-  if (gateFailures.size) {
-    const detail = [...gateFailures.entries()].map(([reason, count]) => `${reason}=${count}`).join(", ");
-    blockers.push(`publication contract is violated (${detail})`);
+  if (missingPriceFinality) {
+    blockers.push(`${missingPriceFinality} priced cars have no public finality marker`);
   }
 
   if (blockers.length) {
@@ -237,4 +169,7 @@ async function main() {
   console.log("Public catalog audit passed");
 }
 
-void main();
+void main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.stack ?? error.message : JSON.stringify(error));
+  process.exitCode = 1;
+});
