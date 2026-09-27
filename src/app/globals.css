@@ -21,6 +21,11 @@ body {
   font-family: var(--font-manrope), Arial, Helvetica, sans-serif;
 }
 
+/* The catalog footer appears only after the last page of cars has loaded. */
+body:has(#catalog-results [data-catalog-has-more]) > footer {
+  display: none;
+}
+
 html {
   scroll-padding-top: 76px;
 }

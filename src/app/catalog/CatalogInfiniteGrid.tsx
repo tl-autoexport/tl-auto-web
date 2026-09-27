@@ -43,11 +43,15 @@ export function CatalogInfiniteGrid({ initialCars, initialCursor, query }: Props
   const pendingScrollRef = useRef<{ scrollY: number; cars: number } | null>(null);
   const stateKey = useMemo(() => `${STATE_PREFIX}${query}`, [query]);
 
-  const loadMore = useCallback(async () => {
-    if (!cursor || loading || requestRef.current) return;
+  const loadMore = useCallback(async (retryOnError = false) => {
+    if (!cursor || loading || requestRef.current || (error && !retryOnError)) return;
     const controller = new AbortController();
     requestRef.current = controller;
-    const timeout = window.setTimeout(() => controller.abort(), 12_000);
+    let timedOut = false;
+    const timeout = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 12_000);
     setLoading(true);
     setError(false);
     try {
@@ -66,13 +70,13 @@ export function CatalogInfiniteGrid({ initialCars, initialCursor, query }: Props
       });
       setCursor(next.nextCursor);
     } catch (cause) {
-      if ((cause as Error).name !== "AbortError") setError(true);
+      if (timedOut || (cause as Error).name !== "AbortError") setError(true);
     } finally {
       window.clearTimeout(timeout);
       requestRef.current = null;
       setLoading(false);
     }
-  }, [cursor, loading, query]);
+  }, [cursor, error, loading, query]);
 
   useIsomorphicLayoutEffect(() => {
     if (restoredRef.current) return;
@@ -124,7 +128,7 @@ export function CatalogInfiniteGrid({ initialCars, initialCursor, query }: Props
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) void loadMore();
       },
-      { rootMargin: "800px 0px" },
+      { rootMargin: "1600px 0px" },
     );
     observer.observe(node);
     return () => observer.disconnect();
@@ -159,19 +163,29 @@ export function CatalogInfiniteGrid({ initialCars, initialCursor, query }: Props
   }, [cars, cursor, stateKey]);
 
   return (
-    <>
+    <div data-catalog-has-more={cursor ? "" : undefined}>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {cars.map((car, index) => (
           <div className="lg:[content-visibility:auto] lg:[contain-intrinsic-size:auto_430px]" key={car.id}>
             <PrototypeVehicleCard car={car} enableGallery priorityImage={index < 4} />
           </div>
         ))}
+        {loading && cursor ? Array.from({ length: 4 }, (_, index) => (
+          <div aria-hidden="true" className="overflow-hidden rounded-[20px] bg-white ring-1 ring-[#dce2eb] motion-safe:animate-pulse sm:rounded-[24px]" key={`loading-${index}`}>
+            <div className="aspect-[2.25/1] bg-[#e8edf3] sm:aspect-[16/10]" />
+            <div className="space-y-3 p-4">
+              <div className="h-6 w-2/3 rounded bg-[#e8edf3]" />
+              <div className="h-4 w-4/5 rounded bg-[#eef1f5]" />
+              <div className="h-4 w-1/2 rounded bg-[#eef1f5]" />
+            </div>
+          </div>
+        )) : null}
       </div>
-      <div className={`mt-7 flex items-center justify-center ${loading ? "min-h-16" : "min-h-12"}`} ref={sentinelRef}>
+      <div aria-live="polite" className={`mt-7 flex items-center justify-center ${loading ? "min-h-16" : "min-h-12"}`} ref={sentinelRef}>
         {loading ? <span className="inline-flex items-center gap-2 text-sm text-[#647084]"><LoaderCircle className="animate-spin" size={18} /> Загружаем ещё автомобили</span> : null}
-        {error ? <button className="rounded-md border border-[#c7a55a] bg-white px-4 py-2 text-sm font-semibold text-[#7b5a22]" onClick={() => void loadMore()} type="button">Повторить загрузку</button> : null}
+        {error ? <div className="flex flex-col items-center gap-2 text-sm text-[#647084]"><span>Не удалось загрузить автомобили</span><button className="rounded-md border border-[#c7a55a] bg-white px-4 py-2 font-semibold text-[#7b5a22]" onClick={() => void loadMore(true)} type="button">Повторить загрузку</button></div> : null}
         {!cursor && cars.length > 0 ? <span className="text-sm text-[#647084]">Все подходящие автомобили показаны</span> : null}
       </div>
-    </>
+    </div>
   );
 }
