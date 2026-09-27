@@ -17,6 +17,7 @@ config({ path: ".env", quiet: true });
 
 const runId = process.env.TL_AUTO_ENRICHMENT_RUN_ID;
 const dbUrl = process.env.SUPABASE_DB_URL;
+const outputPath = process.env.TL_AUTO_POWER_PLAN_OUTPUT ?? "output/tl-auto-new-encar-power-plan.json";
 if (!runId) throw new Error("TL_AUTO_ENRICHMENT_RUN_ID is required");
 if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
 
@@ -273,13 +274,13 @@ async function main() {
       candidates: reportRows,
     };
     await mkdir("output", { recursive: true });
-    await writeFile("output/tl-auto-new-encar-power-plan.json", `${JSON.stringify(report, null, 2)}\n`);
+    await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`);
     console.log(JSON.stringify({
       ...report,
       candidates: undefined,
       externalSearch: { ...report.externalSearch, worklist: undefined },
       t3Review: undefined,
-      output: "output/tl-auto-new-encar-power-plan.json",
+      output: outputPath,
     }, null, 2));
     await db.query("rollback");
   } finally {
