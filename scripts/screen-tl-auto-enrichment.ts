@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 import { mkdir, writeFile } from "node:fs/promises";
+import { isEncarElectricFuel } from "../src/server/imports/encar-ev-battery";
 
 config({ path: ".env", quiet: true });
 
@@ -9,7 +10,7 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
 if (!url || !key) throw new Error("NEXT_PUBLIC_SUPABASE_URL and Supabase service key are required");
 
-type QueueRow = { source_listing_id: string; status: string; task: Record<string, boolean>; result: Record<string, unknown> | null };
+type QueueRow = { source_listing_id: string; status: string; task: Record<string, boolean>; result: Record<string, unknown> | null; candidate_snapshot: Record<string, unknown> | null };
 type StageRow = { source_listing_id: string; raw_payload: Record<string, unknown> | null; normalized: Record<string, unknown> | null };
 const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 
@@ -22,7 +23,7 @@ async function main() {
   const queue: QueueRow[] = [];
   for (let from = 0; ; from += 1000) {
     const { data, error } = await db.from("encar_enrichment_queue")
-      .select("source_listing_id,status,task,result")
+      .select("source_listing_id,status,task,result,candidate_snapshot")
       .eq("run_id", runId).range(from, from + 999);
     if (error) throw new Error(error.message);
     queue.push(...((data ?? []) as QueueRow[]));
@@ -46,8 +47,14 @@ async function main() {
   const needsPowerReview: Array<{ sourceListingId: string; missingCore: string[] }> = [];
   const unavailable: string[] = [];
   const missingBlockCounts: Record<string, number> = {};
+  const evBatteryCounts: Record<string, number> = {};
 
   for (const row of queue) {
+    if (isEncarElectricFuel(row.candidate_snapshot?.fuelType ?? row.candidate_snapshot?.fuel_type)) {
+      const stage = stageById.get(row.source_listing_id);
+      const batteryStatus = String(stage?.normalized?.evBatteryStatus ?? "not_requested");
+      evBatteryCounts[batteryStatus] = (evBatteryCounts[batteryStatus] ?? 0) + 1;
+    }
     if (row.status === "unavailable") { unavailable.push(row.source_listing_id); continue; }
     if (row.status !== "succeeded") continue;
     const missingBlocks = Object.entries(row.task ?? {})
@@ -89,6 +96,7 @@ async function main() {
       unavailable: unavailable.length,
     },
     missingBlockCounts,
+    evBatteryCounts,
     profileComplete,
     powerReady,
     partialEnrichment,

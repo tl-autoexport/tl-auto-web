@@ -3,6 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 import { fetch, ProxyAgent } from "undici";
 import { open, readFile, rm } from "node:fs/promises";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
+import {
+  classifyEncarEvBatteryResponse,
+  isEncarElectricFuel,
+} from "../src/server/imports/encar-ev-battery";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -201,6 +205,7 @@ async function processRow(row: Row) {
   let vehicleNo = String(snapshot.vehicleNo ?? snapshot.vehicle_no ?? "").trim();
   let manufacturerCd = String(snapshot.manufacturerCd ?? snapshot.manufacturer_cd ?? "").trim();
   let modelCd = String(snapshot.modelCd ?? snapshot.model_cd ?? "").trim();
+  let advertisesEvBatteryInfo: boolean | null = null;
   const payload: Record<string, unknown> = { encarId: id, fetchedAt: new Date().toISOString() };
   const normalized: Record<string, unknown> = {};
   const probes: Record<string, Probe> = {};
@@ -221,6 +226,8 @@ async function processRow(row: Row) {
       ? probes.detail.body : {}) as Record<string, unknown>;
     const manage = (detail.manage && typeof detail.manage === "object" ? detail.manage : {}) as Record<string, unknown>;
     const advertisement = (detail.advertisement && typeof detail.advertisement === "object" ? detail.advertisement : {}) as Record<string, unknown>;
+    const view = (detail.view && typeof detail.view === "object" ? detail.view : {}) as Record<string, unknown>;
+    advertisesEvBatteryInfo = typeof view.hasEvBatteryInfo === "boolean" ? view.hasEvBatteryInfo : null;
     const exclusion = manage.dummy === true ? "dummy" : advertisement.salesStatus === "CONTRACT" ? "contract" : null;
     if (exclusion) {
       await complete(row, "unavailable", { encarId: id, blocks: task, exclusion }, payload,
@@ -259,6 +266,20 @@ async function processRow(row: Row) {
     normalized.vehicleNo = vehicleNo || null;
     normalized.manufacturerCd = manufacturerCd || null;
     normalized.modelCd = modelCd || null;
+  }
+  if (isEncarElectricFuel(snapshot.fuelType ?? snapshot.fuel_type)) {
+    // Battery health is an optional EV profile block. Missing source data must
+    // remain visible in staging without downgrading an otherwise successful car.
+    if (advertisesEvBatteryInfo === false) {
+      normalized.evBatteryStatus = "not_advertised";
+    } else {
+      probes.evBattery = await get(`https://api.encar.com/v1/readside/vehicle/ev-battery/${id}`);
+      payload.evBatteryInfo = probes.evBattery.body ?? null;
+      normalized.evBatteryStatus = classifyEncarEvBatteryResponse(
+        probes.evBattery.status,
+        probes.evBattery.body,
+      );
+    }
   }
   if (task.category && manufacturerCd && modelCd) {
     probes.category = await get(`https://api.encar.com/v1/readside/vehicle/category?manufacturerCd=${encodeURIComponent(manufacturerCd)}&modelCd=${encodeURIComponent(modelCd)}`);
