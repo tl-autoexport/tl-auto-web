@@ -15,9 +15,10 @@ config({ path: ".env", quiet: true });
 const RUN_ID = "21a687ee-6717-4610-a9cc-97c64608bbb9";
 const POWER_PATH = "data/power/electrified-21a687ee-power-reference.json";
 const PLAN_PATH = "output/tl-auto-electrified-21a687ee-power-plan.json";
-const READINESS_PATH = "output/tl-auto-electrified-21a687ee-publication-readiness.json";
+const READINESS_PATH = "output/tl-auto-electrified-21a687ee-incremental-readiness-v4.json";
+const BASELINE_MANIFEST_PATH = "output/tl-auto-electrified-21a687ee-publication-manifest-v3.json";
 const MANIFEST_PATH = process.env.TL_AUTO_ELECTRIFIED_PUBLICATION_MANIFEST ??
-  "output/tl-auto-electrified-21a687ee-publication-manifest-v2.json";
+  "output/tl-auto-electrified-21a687ee-incremental-manifest-v4.json";
 const REPORT_PATH = process.env.TL_AUTO_ELECTRIFIED_PUBLICATION_REPORT ??
   "output/tl-auto-electrified-21a687ee-publication-report.json";
 const WRITE = process.env.TL_AUTO_ELECTRIFIED_PUBLICATION_WRITE === "true";
@@ -30,7 +31,9 @@ type Obj = Record<string, unknown>;
 type PowerEntry = {
   sourceListingId: string; brand: string; model: string; year: number; fuelType: "hybrid" | "electric";
   sourceKind: string; sourceUrl: string; sourceNote: string; powerBasis: "parallel_sum" | "electric_30min";
-  customsPowerPs: number; calculationPowerKw: number; enginePowerPs: number | null; electric30MinPs: number;
+  customsPowerPs: number; calculationPowerKw: number; enginePowerPs: number | null;
+  electricMotorPowerPs: number | null; electricMotorPowerKw: number | null;
+  electric30MinPs: number | null; electric30MinKw: number | null;
   peakOrSystemPowerPs: number | null; grade: string | null; gradeDetail: string | null;
 };
 type Stage = {
@@ -89,31 +92,43 @@ function optionsFrom(payload: Obj) {
 async function main() {
   if (!DB_URL) throw new Error("SUPABASE_DB_URL is required");
   if (!Number.isInteger(BATCH_SIZE) || BATCH_SIZE < 1 || BATCH_SIZE > 50) throw new Error("Batch size must be 1..50");
-  const [powerText, planText, readinessText, publicationText] = await Promise.all([
-    readFile(POWER_PATH, "utf8"), readFile(PLAN_PATH, "utf8"), readFile(READINESS_PATH, "utf8"), readFile(MANIFEST_PATH, "utf8"),
+  const [powerText, planText, readinessText, publicationText, baselineText] = await Promise.all([
+    readFile(POWER_PATH, "utf8"), readFile(PLAN_PATH, "utf8"), readFile(READINESS_PATH, "utf8"),
+    readFile(MANIFEST_PATH, "utf8"), readFile(BASELINE_MANIFEST_PATH, "utf8"),
   ]);
   const power = JSON.parse(powerText) as { runId: string; entries: PowerEntry[]; unresolved: unknown[] };
   const plan = JSON.parse(planText) as { runId: string; candidates: Array<{ sourceListingId: string; configuration: Obj }> };
   const readiness = JSON.parse(readinessText) as {
-    runId: string; rates: { asOf: string }; summary: { readyForPublicationPreparation: number; blockedWithPower: number };
-    results: Array<{ sourceListingId: string; ready: boolean; priceRub: number | null }>;
+    runId: string; rates: { asOf: string }; summary: { alreadyPublished: number; incrementalCandidates: number;
+      readyForPublicationPreparation: number; blockedWithPower: number };
+    results: Array<{ sourceListingId: string; ready: boolean; priceRub: number | null; blockers: string[] }>;
   };
   const frozen = JSON.parse(publicationText) as {
-    runId: string; expected: number; ratesAsOf: string; powerReportSha256: string; readinessReportSha256: string;
+    runId: string; baselineExpected: number; expectedIncremental: number; totalAfterPublication: number;
+    baselineManifestSha256: string; ratesAsOf: string; powerReportSha256: string; readinessReportSha256: string;
     entries: Array<{ sourceListingId: string; sourceKind: string; calculationPowerKw: number; fetchedAt: string; rawPayloadSha256: string }>;
   };
-  const ids = power.entries.map((entry) => entry.sourceListingId);
+  const baseline = JSON.parse(baselineText) as { runId: string; expected: number; entries: Array<{ sourceListingId: string }> };
+  const baselineIds = new Set(baseline.entries.map((entry) => entry.sourceListingId));
+  const ids = readiness.results.map((row) => row.sourceListingId);
+  const powerById = new Map(power.entries.map((entry) => [entry.sourceListingId, entry]));
   if (power.runId !== RUN_ID || plan.runId !== RUN_ID || readiness.runId !== RUN_ID || frozen.runId !== RUN_ID ||
-      ids.length !== 184 || frozen.expected !== 184 || frozen.entries.length !== 184 || power.unresolved.length !== 60 ||
-      readiness.summary.readyForPublicationPreparation !== 184 || readiness.summary.blockedWithPower !== 0 ||
-      readiness.results.length !== 184 || readiness.results.some((row) => !row.ready || row.priceRub == null) ||
-      sha256(powerText) !== frozen.powerReportSha256 || sha256(readinessText) !== frozen.readinessReportSha256)
-    throw new Error("Run membership, readiness, or frozen manifest hash does not match the reviewed 184-car cohort");
-  if (new Set(ids).size !== 184 || new Set(frozen.entries.map((entry) => entry.sourceListingId)).size !== 184)
-    throw new Error("Duplicate ID in the frozen cohort");
+      baseline.runId !== RUN_ID || baseline.expected !== 184 || baselineIds.size !== 184 ||
+      power.entries.length !== 236 || power.unresolved.length !== 8 || frozen.baselineExpected !== 184 ||
+      frozen.expectedIncremental !== 52 || frozen.totalAfterPublication !== 236 || frozen.entries.length !== 52 ||
+      ids.length !== 52 || readiness.summary.alreadyPublished !== 184 || readiness.summary.incrementalCandidates !== 52 ||
+      readiness.summary.readyForPublicationPreparation !== 52 || readiness.summary.blockedWithPower !== 0 ||
+      readiness.results.some((row) => !row.ready || row.priceRub == null || row.blockers.length) ||
+      sha256(baselineText) !== frozen.baselineManifestSha256 || sha256(powerText) !== frozen.powerReportSha256 ||
+      sha256(readinessText) !== frozen.readinessReportSha256)
+    throw new Error("Run membership, 184-entry frozen baseline, 52-entry readiness, or manifest hash changed");
+  if (new Set(ids).size !== 52 || ids.some((id) => baselineIds.has(id)) ||
+      ids.some((id) => !powerById.has(id)) || new Set(frozen.entries.map((entry) => entry.sourceListingId)).size !== 52)
+    throw new Error("Duplicate, already-published, or missing ID in incremental frozen cohort");
   const frozenById = new Map(frozen.entries.map((entry) => [entry.sourceListingId, entry]));
   const candidateById = new Map(plan.candidates.map((candidate) => [candidate.sourceListingId, candidate]));
   const auditById = new Map(readiness.results.map((row) => [row.sourceListingId, row]));
+  const publicationPowerEntries = ids.map((id) => powerById.get(id)!);
 
   const db = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
   await db.connect();
@@ -125,14 +140,14 @@ async function main() {
         on s.run_id=q.run_id and s.source_listing_id=q.source_listing_id
       where q.run_id=$1 and q.source_listing_id=any($2::text[])`, [RUN_ID, ids])).rows;
     await db.query("rollback");
-    if (stages.length !== 184) throw new Error(`Staging rows changed: ${stages.length}/184`);
+    if (stages.length !== 52) throw new Error(`Staging rows changed: ${stages.length}/52`);
     const stageById = new Map(stages.map((stage) => [stage.source_listing_id, stage]));
     const rates = await getCbrCalcRates();
     if (rates.asOf !== frozen.ratesAsOf || readiness.rates.asOf !== frozen.ratesAsOf)
       throw new Error(`Rate date changed (${rates.asOf} vs frozen ${frozen.ratesAsOf}); rerun readiness and prepare a new manifest`);
 
     const prepared: Prepared[] = [];
-    for (const powerEntry of power.entries) {
+    for (const powerEntry of publicationPowerEntries) {
       const id = powerEntry.sourceListingId, stage = stageById.get(id), candidate = candidateById.get(id);
       const frozenEntry = frozenById.get(id), audit = auditById.get(id);
       if (!stage || !candidate || !frozenEntry || !audit) throw new Error(`Missing run-scoped inputs for ${id}`);
@@ -157,18 +172,21 @@ async function main() {
         throw new Error(`Core fields/photo are missing for ${id}`);
       if (powerEntry.fuelType !== configRow.fuelType ||
           (powerEntry.fuelType === "hybrid" && (powerEntry.powerBasis !== "parallel_sum" ||
-            powerEntry.enginePowerPs == null || powerEntry.customsPowerPs !== powerEntry.enginePowerPs + powerEntry.electric30MinPs ||
-            Math.abs(powerEntry.calculationPowerKw - Number(((powerEntry.enginePowerPs + powerEntry.electric30MinPs) * KW_PER_PS).toFixed(4))) > 0.0002)) ||
+            powerEntry.enginePowerPs == null || powerEntry.electricMotorPowerPs == null || powerEntry.electricMotorPowerKw == null ||
+            powerEntry.electric30MinPs != null ||
+            Math.abs(powerEntry.customsPowerPs - (powerEntry.enginePowerPs + powerEntry.electricMotorPowerPs)) > 0.0002 ||
+            Math.abs(powerEntry.calculationPowerKw - Number((powerEntry.enginePowerPs * KW_PER_PS + powerEntry.electricMotorPowerKw).toFixed(4))) > 0.0002)) ||
           (powerEntry.fuelType === "electric" && (powerEntry.powerBasis !== "electric_30min" || powerEntry.enginePowerPs != null ||
+            powerEntry.electric30MinPs == null || powerEntry.electricMotorPowerKw != null ||
             Math.abs(powerEntry.calculationPowerKw - Number((powerEntry.electric30MinPs * KW_PER_PS).toFixed(4))) > 0.0002)))
         throw new Error(`Power basis/components failed validation for ${id}`);
 
       const hybridDvsPowerHp = powerEntry.fuelType === "hybrid" ? powerEntry.enginePowerPs : null;
       const hybridElectricPowerKw = powerEntry.fuelType === "hybrid"
-        ? Number((powerEntry.electric30MinPs * KW_PER_PS).toFixed(4)) : null;
+        ? powerEntry.electricMotorPowerKw! : null;
       const hybridSequential = powerEntry.fuelType === "hybrid" ? false : null;
       const hybridDvsAbove = powerEntry.fuelType === "hybrid"
-        ? Number(powerEntry.enginePowerPs) > powerEntry.electric30MinPs : null;
+        ? Number(powerEntry.enginePowerPs) > Number(powerEntry.electricMotorPowerPs) : null;
       const calculation = calculateRuVladivostok({
         priceKrw, year, month: month.month, engineCc, fuelType: powerEntry.fuelType,
         powerKw: powerEntry.calculationPowerKw,
@@ -208,7 +226,8 @@ async function main() {
         badge: str(configRow.badge), badge_detail: str(configRow.trim), year, registration_year: year,
         registration_month: month.month, registration_date: null,
         mileage_km: positive(spec.mileage), price_krw: priceKrw, price_rub: priceRub,
-        engine_cc: engineCc, power_hp: displayPower, power_source: powerEntry.sourceKind,
+        // cars.power_hp is an integer column; preserve precise calculation power in kW/evidence.
+        engine_cc: engineCc, power_hp: Math.round(displayPower), power_source: powerEntry.sourceKind,
         power_confidence: "automatic", power_finality: storedPowerFinality({ powerConfidence: "automatic",
           calculationPowerKw: powerEntry.calculationPowerKw, powerResolutionSource: `${powerEntry.sourceKind}:${powerEntry.sourceUrl}` }),
         power_resolution_note: `Preliminary run-scoped ${powerEntry.powerBasis} evidence from ${powerEntry.sourceKind}; ${powerEntry.sourceUrl}`,
@@ -256,7 +275,7 @@ async function main() {
     }
     const pending = prepared.filter((item) => !already.has(item.id));
     const summary = {
-      dryRun: !WRITE, probe: PROBE, runId: RUN_ID, expectedAllowlist: 184,
+      dryRun: !WRITE, probe: PROBE, runId: RUN_ID, expectedAllowlist: 52, priorPublishedBaseline: 184,
       selected: prepared.length, alreadyPublished: already.size, toInsert: pending.length,
       hybrid: prepared.filter((item) => item.car.fuel_type === "hybrid").length,
       electric: prepared.filter((item) => item.car.fuel_type === "electric").length,

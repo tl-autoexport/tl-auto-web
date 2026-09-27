@@ -1,0 +1,169 @@
+{
+  "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+  "status": "draft_preliminary",
+  "policy": "Parallel hybrids use ICE power plus peak electric motor power; EVs use 30-minute power. These are run-scoped source decisions only.",
+  "entries": [
+    {
+      "listingIds": ["42759303", "42776407", "42780126", "42781272", "42785170", "42761800"],
+      "brand": "Hyundai", "model": "Santafe", "generation": "MX5", "engineCc": 1598, "fuelType": "hybrid", "yearFrom": 2025, "yearTo": 2026,
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/santafe-hybrid-catalog-eng.pdf",
+      "sourceTitle": "Hyundai Santa Fe Hybrid official specifications",
+      "enginePowerPs": 180, "electricMotorPowerKw": 47.7, "systemPowerPs": null,
+      "grade": "1.6 Turbo Hybrid",
+      "rationale": "Official Hyundai model catalog lists the 1.6 Turbo Hybrid engine and maximum electric motor output separately. Listing group matches MX5, 1,598 cc HEV and the catalog year range."
+    },
+    {
+      "listingIds": ["42743428", "42787466"],
+      "brand": "Hyundai", "model": "Grandeur", "generation": "GN7", "engineCc": 1598, "fuelType": "hybrid", "yearFrom": 2024, "yearTo": 2025,
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/the-all-new-grandeur-hybrid-catalog-eng.pdf",
+      "sourceTitle": "Hyundai The all-new Grandeur Hybrid official catalog",
+      "enginePowerPs": 180, "electricMotorPowerKw": 44.2, "systemPowerPs": 230,
+      "grade": "1.6 Turbo Hybrid",
+      "rationale": "Official Hyundai catalog gives 180 PS ICE, 44.2 kW maximum motor output and 230 PS system output. The listing is GN7 1,598 cc hybrid in the catalog years."
+    },
+    {
+      "listingIds": ["42781007", "42781540"],
+      "brand": "Hyundai", "model": "Grandeur", "generation": "IG facelift", "engineCc": 2359, "fuelType": "hybrid", "yearFrom": 2020, "yearTo": 2021,
+      "sourceUrl": "https://www.hyundai.com/kr/en/eco/grandeur-hybrid/20fl/specifications",
+      "sourceTitle": "Hyundai Grandeur Hybrid 20FL official specifications",
+      "enginePowerPs": 159, "electricMotorPowerKw": 28, "systemPowerPs": null,
+      "grade": "2.4 Hybrid",
+      "rationale": "Official 20FL hybrid specifications match the 2.4-litre, 2,359 cc configuration and state ICE and electric-motor output separately."
+    },
+    {
+      "listingIds": ["42784438"],
+      "brand": "Hyundai", "model": "Palisade", "generation": "LX3", "engineCc": 2497, "fuelType": "hybrid", "yearFrom": 2025, "yearTo": 2026,
+      "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/the-all-new-palisade-hybrid-catalog.pdf",
+      "sourceTitle": "Hyundai The all-new Palisade Hybrid official catalog",
+      "enginePowerPs": 262, "electricMotorPowerKw": 54, "systemPowerPs": null,
+      "grade": "2.5 Turbo Hybrid",
+      "rationale": "Official LX3 catalog identifies the 2.5-litre hybrid engine and maximum motor output; listing engine size and generation match."
+    },
+    {
+      "listingIds": ["42778090", "42780681"],
+      "brand": "Kia", "model": "Carnival", "generation": "KA4", "engineCc": 1598, "fuelType": "hybrid", "yearFrom": 2025, "yearTo": 2026,
+      "sourceUrl": "https://www.kia.com/kr/vehicles/carnival-hi-limousine/specification",
+      "sourceTitle": "Kia Carnival Hybrid official specifications",
+      "enginePowerPs": 180, "electricMotorPowerKw": 54, "systemPowerPs": null,
+      "grade": "1.6 Turbo Hybrid",
+      "rationale": "Kia specification lists 1.6 turbo hybrid ICE output and maximum electric motor output separately; used only for matching KA4 1,598 cc HEV listings."
+    },
+    {
+      "listingIds": ["42739361", "42747092"],
+      "brand": "Kia", "model": "Sorento", "generation": "MQ4 facelift", "engineCc": 1598, "fuelType": "hybrid", "yearFrom": 2025, "yearTo": 2026,
+      "sourceUrl": "https://www.kia.com/kr/vehicles/sorento/price",
+      "sourceTitle": "Kia Sorento Hybrid official price/specification",
+      "enginePowerPs": 180, "electricMotorPowerKw": 47.7, "systemPowerPs": null,
+      "grade": "1.6 Turbo Hybrid",
+      "rationale": "Official Kia specification for the 1.6 turbo hybrid powertrain; listing displacement and facelift generation align."
+    },
+    {
+      "listingIds": ["42747642", "42765977", "42776622", "42763102"],
+      "brand": "BMW", "model": "X5", "generation": "G05 LCI", "engineCc": 2998, "fuelType": "hybrid", "yearFrom": 2025, "yearTo": 2026,
+      "sourceUrl": "https://www.press.bmwgroup.com/deutschland/article/detail/T0408159DE/der-neue-bmw-x5-und-der-neue-bmw-x6",
+      "sourceTitle": "BMW Group: new BMW X5/X6 technical data",
+      "enginePowerPs": 313, "electricMotorPowerKw": 145, "systemPowerPs": null,
+      "grade": "xDrive50e",
+      "rationale": "BMW Group technical data for X5 xDrive50e; exact 2,998 cc plug-in hybrid badge and G05 generation match."
+    },
+    {
+      "listingIds": ["42769895", "42779266"],
+      "brand": "BMW", "model": "5 Series", "generation": "G30", "engineCc": 1998, "fuelType": "hybrid", "yearFrom": 2021, "yearTo": 2022,
+      "sourceUrl": "https://www.press.bmwgroup.com/global/article/detail/T0308529EN/the-new-bmw-5-series",
+      "sourceTitle": "BMW Group: new BMW 5 Series technical data",
+      "enginePowerPs": 184, "electricMotorPowerKw": 80, "systemPowerPs": null,
+      "grade": "530e",
+      "rationale": "BMW Group technical data for G30 530e; 1,998 cc engine and model-year generation match."
+    },
+    {
+      "listingIds": ["42738051"],
+      "brand": "BMW", "model": "5 Series", "generation": "G60", "engineCc": 1998, "fuelType": "hybrid", "yearFrom": 2026, "yearTo": 2026,
+      "sourceUrl": "https://www.press.bmwgroup.com/global/article/attachment/T0443474EN/629035",
+      "sourceTitle": "BMW Group 5 Series technical data attachment",
+      "enginePowerPs": 190, "electricMotorPowerKw": 135, "systemPowerPs": null,
+      "grade": "530e",
+      "rationale": "BMW Group technical attachment for G60 530e; listing model year 2026 and 1,998 cc match."
+    },
+    {
+      "listingIds": ["42761562", "42766549"],
+      "brand": "BMW", "model": "X3", "generation": "G01 LCI", "engineCc": 1998, "fuelType": "hybrid", "yearFrom": 2021, "yearTo": 2022,
+      "sourceUrl": "https://www.press.bmwgroup.com/global/article/attachment/T0302155EN/452969",
+      "sourceTitle": "BMW Group X3 xDrive30e technical data",
+      "enginePowerPs": 184, "electricMotorPowerKw": 80, "systemPowerPs": null,
+      "grade": "xDrive30e",
+      "rationale": "BMW Group technical data for the G01 X3 xDrive30e; 1,998 cc plug-in hybrid configuration matches."
+    },
+    {
+      "listingIds": ["42746450"],
+      "brand": "BMW", "model": "3 Series", "generation": "G20", "engineCc": 1998, "fuelType": "hybrid", "yearFrom": 2021, "yearTo": 2021,
+      "sourceUrl": "https://www.press.bmwgroup.com/belux/article/detail/T0286885FR/plus-sportive-et-plus-efficiente-que-jamais-grace-a-la-technologie-bmw-edrive-%3A-la-nouvelle-bmw-330e-berline",
+      "sourceTitle": "BMW Group: new BMW 330e technical data",
+      "enginePowerPs": 184, "electricMotorPowerKw": 83, "systemPowerPs": null,
+      "grade": "330e",
+      "rationale": "BMW Group technical data for G20 330e; listing engine size, model year and 330e badge match."
+    },
+    {
+      "listingIds": ["42756245"],
+      "brand": "BMW", "model": "7 Series", "generation": "G70", "engineCc": 2998, "fuelType": "hybrid", "yearFrom": 2024, "yearTo": 2024,
+      "sourceUrl": "https://www.press.bmwgroup.com/korea/article/detail/T0420298KO/bmw-%EC%BD%94%EB%A6%AC%EC%95%84-%ED%94%8C%EB%9E%98%EA%B7%B8%EC%8B%AD-%ED%94%8C%EB%9F%AC%EA%B7%B8-%EC%9D%B8-%ED%95%98%EC%9D%B4%EB%B8%8C%EB%A6%AC%EB%93%9C-%EC%84%B8%EB%8B%A8-%EB%89%B4-750e-xdrive%E2%80%99-%EA%B3%B5%EC%8B%9D-%EC%B6%9C%EC%8B%9C?language=ko",
+      "sourceTitle": "BMW Korea: 750e xDrive launch and technical data",
+      "enginePowerPs": 313, "electricMotorPowerKw": 145, "systemPowerPs": null,
+      "grade": "750e xDrive",
+      "rationale": "BMW Korea official 750e xDrive technical release; G70, 2,998 cc and 2024 model year match."
+    },
+    {
+      "listingIds": ["42754058", "42770308"],
+      "brand": "Mercedes-Benz", "model": "E-Class", "generation": "W213", "engineCc": 1991, "fuelType": "hybrid", "yearFrom": 2021, "yearTo": 2021,
+      "sourceUrl": "https://media.mercedes-benz.at/news-die-aktualisierte-mercedes-benz-e-klasse?id=110011&l=deutsch&menueid=10702",
+      "sourceTitle": "Mercedes-Benz updated E-Class technical data",
+      "enginePowerPs": 211, "electricMotorPowerKw": 90, "systemPowerPs": null,
+      "grade": "E 300 e",
+      "rationale": "Mercedes-Benz technical data for W213 E 300 e; 1,991 cc and listing badge match."
+    },
+    {
+      "listingIds": ["42745183"],
+      "brand": "Mercedes-Benz", "model": "E-Class", "generation": "W214", "engineCc": 2999, "fuelType": "hybrid", "yearFrom": 2026, "yearTo": 2026,
+      "sourceUrl": "https://www.mercedes-amg.com/en/e-class-sedan",
+      "sourceTitle": "Mercedes-AMG E-Class Sedan E 53 HYBRID 4MATIC+ technical data",
+      "enginePowerPs": 449, "electricMotorPowerKw": 120, "systemPowerPs": null,
+      "grade": "AMG E 53 HYBRID 4MATIC+",
+      "rationale": "Mercedes-AMG official E 53 HYBRID technical data; W214 year, engine size and exact AMG badge align."
+    },
+    {
+      "listingIds": ["42746803", "42751958"],
+      "brand": "Hyundai", "model": "Elantra", "generation": "CN7", "engineCc": 1580, "fuelType": "hybrid", "yearFrom": 2021, "yearTo": 2022,
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/avante-hybrid-catalog-eng.pdf",
+      "sourceTitle": "Hyundai Avante CN7 Hybrid official catalog",
+      "enginePowerPs": 105, "electricMotorPowerKw": 32, "systemPowerPs": null,
+      "grade": "1.6 Hybrid",
+      "rationale": "Official Hyundai Avante/Elantra CN7 hybrid catalog gives ICE and motor output separately; 1,580 cc listing configuration and model years match."
+    },
+    {
+      "listingIds": ["42742398"],
+      "brand": "Hyundai", "model": "Ioniq 5", "generation": "NE", "fuelType": "electric", "yearFrom": 2023, "yearTo": 2023,
+      "sourceUrl": "https://dmassets.hyundai.com/is/content/hyundaiautoever/technicka-data-ioniq-5-MR2023pdf",
+      "sourceTitle": "Hyundai IONIQ 5 MY2023 official technical data",
+      "electric30MinKw": 81, "peakOrSystemPowerPs": null,
+      "grade": "Long Range AWD",
+      "rationale": "Official MY2023 technical sheet, matched to Encar Long Range AWD / 4WD listing. Uses 30-minute EV power, not peak output."
+    },
+    {
+      "listingIds": ["42770006"],
+      "brand": "BMW", "model": "i4", "generation": "G26", "fuelType": "electric", "yearFrom": 2023, "yearTo": 2023,
+      "sourceUrl": "https://www.bmw.de/de/neufahrzeuge/bmw-i/i4/bmw-i4-gran-coupe-technical-data.html",
+      "sourceTitle": "BMW i4 M50 official technical data",
+      "electric30MinKw": 125, "peakOrSystemPowerPs": 544,
+      "grade": "M50",
+      "rationale": "Official BMW technical data for i4 M50; exact M50 trim and 2023 model year match. Uses listed continuous/30-minute output rather than peak power."
+    },
+    {
+      "listingIds": ["42771863"],
+      "brand": "Kia", "model": "EV6", "generation": "CV", "fuelType": "electric", "yearFrom": 2022, "yearTo": 2022,
+      "sourceUrl": "https://press.kia.com/content/dam/kiapress/IT/Downloadable-files/Listini/2023/07-luglio/Listino_Kia_EV6_GT_Pubblico_01_07_2023.pdf",
+      "sourceTitle": "Kia EV6 GT official technical/pricelist data",
+      "electric30MinKw": 143, "peakOrSystemPowerPs": 585,
+      "grade": "GT 4WD",
+      "rationale": "Official Kia EV6 GT technical listing, exact GT 4WD grade and original-generation EV6 match. Uses 30-minute EV power, not peak output."
+    }
+  ]
+}

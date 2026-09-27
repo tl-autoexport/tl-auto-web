@@ -1,6 +1,6 @@
 {
   "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
-  "generatedAt": "2026-09-27T07:39:57.789Z",
+  "generatedAt": "2026-09-27T08:24:36.003Z",
   "readOnly": true,
   "databaseWrites": 0,
   "publications": 0,
@@ -8,19 +8,24 @@
     "planPath": "output/tl-auto-electrified-21a687ee-power-plan.json",
     "encarrusPath": "output/tl-auto-electrified-encarrus.json",
     "dromPath": "data/power/drom-hybrid-preliminary-v1.json",
-    "harPath": "data/power/encarrus-hybrid-har-21a687ee.json"
+    "harPath": "data/power/encarrus-hybrid-har-21a687ee.json",
+    "danawaMotorPath": "data/power/electrified-21a687ee-hybrid-motor-candidates.json",
+    "officialDecisionsPath": "data/power/electrified-21a687ee-official-decisions.json"
   },
   "counts": {
     "target": 244,
-    "drom": 99,
+    "drom": 97,
     "encarrusHar": 14,
     "electricCatalog": 77,
-    "unresolved": 54,
+    "unresolved": 8,
     "unresolvedByReason": {
-      "encarrus_card_missing": 4,
-      "no_card_matching_encar_grade": 3,
-      "calculation_power_not_found": 47
-    }
+      "encarrus_card_missing": 2,
+      "no_card_matching_encar_grade": 2,
+      "calculation_power_not_found": 2,
+      "hybrid_motor_peak_power_not_found": 2
+    },
+    "danawa": 14,
+    "officialManufacturer": 34
   },
   "entries": [
     {
@@ -41,6 +46,28 @@
       "sourceSpecKey": null,
       "grade": "Van",
       "gradeDetail": "2-Seater AIr"
+    },
+    {
+      "sourceListingId": "42738051",
+      "brand": "BMW",
+      "model": "5 Series",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/global/article/attachment/T0443474EN/629035",
+      "sourceNote": "BMW Group 5 Series technical data attachment. BMW Group technical attachment for G60 530e; listing model year 2026 and 1,998 cc match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 190 PS + peak motor 135 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 373.5489,
+      "calculationPowerKw": 274.7448,
+      "enginePowerPs": 190,
+      "electricMotorPowerPs": 183.5489,
+      "electricMotorPowerKw": 135,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "530e",
+      "gradeDetail": null
     },
     {
       "sourceListingId": "42738088",
@@ -78,6 +105,28 @@
       "peakOrSystemPowerPs": 601,
       "sourceSpecKey": null,
       "grade": "M60 xDrive",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42739361",
+      "brand": "Kia",
+      "model": "Sorento",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.kia.com/kr/vehicles/sorento/price",
+      "sourceNote": "Kia Sorento Hybrid official price/specification. Official Kia specification for the 1.6 turbo hybrid powertrain; listing displacement and facelift generation align. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 47.7 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 244.854,
+      "calculationPowerKw": 180.0898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 64.854,
+      "electricMotorPowerKw": 47.7,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
       "gradeDetail": null
     },
     {
@@ -157,6 +206,50 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42740267",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4699&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 262 PS + electric motor peak 73 PS = 335 PS; EncarRus displayed power matches 262 PS; Drom engine 262. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 335,
+      "calculationPowerKw": 246.3921,
+      "enginePowerPs": 262,
+      "electricMotorPowerPs": 73,
+      "electricMotorPowerKw": 53.6914,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42740267",
+      "grade": "hev 2.5t 2wd 9 seater / hev 2.5t 2wd 7 seater",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42740856",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4699&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 262 PS + electric motor peak 73 PS = 335 PS; EncarRus displayed power matches 262 PS; Drom engine 262. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 335,
+      "calculationPowerKw": 246.3921,
+      "enginePowerPs": 262,
+      "electricMotorPowerPs": 73,
+      "electricMotorPowerKw": 53.6914,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42740856",
+      "grade": "hev 2.5t 2wd 9 seater / hev 2.5t 2wd 7 seater",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42740929",
       "brand": "Volkswagen",
       "model": "ID.4",
@@ -214,6 +307,28 @@
       "gradeDetail": "GT Line"
     },
     {
+      "sourceListingId": "42741141",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2024,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4188&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 180 PS + electric motor peak 60.1 PS = 240.1 PS; EncarRus displayed power matches 180 PS; Drom engine not available. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 240.1,
+      "calculationPowerKw": 176.5933,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 60.1,
+      "electricMotorPowerKw": 44.2035,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42741141",
+      "grade": "calligraphy",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42742111",
       "brand": "Hyundai",
       "model": "Sonata",
@@ -249,6 +364,28 @@
       "peakOrSystemPowerPs": 230,
       "sourceSpecKey": null,
       "grade": "Calligraphy",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42742398",
+      "brand": "Hyundai",
+      "model": "Ioniq 5",
+      "year": 2023,
+      "fuelType": "electric",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://dmassets.hyundai.com/is/content/hyundaiautoever/technicka-data-ioniq-5-MR2023pdf",
+      "sourceNote": "Hyundai IONIQ 5 MY2023 official technical data. Official MY2023 technical sheet, matched to Encar Long Range AWD / 4WD listing. Uses 30-minute EV power, not peak output. Official 30-minute EV power; preliminary/run-scoped.",
+      "powerBasis": "electric_30min",
+      "customsPowerPs": 110.1294,
+      "calculationPowerKw": 81,
+      "enginePowerPs": null,
+      "electricMotorPowerPs": null,
+      "electricMotorPowerKw": null,
+      "electric30MinPs": 110.1294,
+      "electric30MinKw": 81,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "Long Range AWD",
       "gradeDetail": null
     },
     {
@@ -309,6 +446,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42743428",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/the-all-new-grandeur-hybrid-catalog-eng.pdf",
+      "sourceNote": "Hyundai The all-new Grandeur Hybrid official catalog. Official Hyundai catalog gives 180 PS ICE, 44.2 kW maximum motor output and 230 PS system output. The listing is GN7 1,598 cc hybrid in the catalog years. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 44.2 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 240.0953,
+      "calculationPowerKw": 176.5898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 60.0953,
+      "electricMotorPowerKw": 44.2,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": 230,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42744029",
       "brand": "Kia",
       "model": "K5",
@@ -364,6 +523,28 @@
       "sourceSpecKey": null,
       "grade": "Long Range",
       "gradeDetail": "Exclusive"
+    },
+    {
+      "sourceListingId": "42745183",
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.mercedes-amg.com/en/e-class-sedan",
+      "sourceNote": "Mercedes-AMG E-Class Sedan E 53 HYBRID 4MATIC+ technical data. Mercedes-AMG official E 53 HYBRID technical data; W214 year, engine size and exact AMG badge align. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 449 PS + peak motor 120 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 612.1546,
+      "calculationPowerKw": 450.2389,
+      "enginePowerPs": 449,
+      "electricMotorPowerPs": 163.1546,
+      "electricMotorPowerKw": 120,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "AMG E 53 HYBRID 4MATIC+",
+      "gradeDetail": null
     },
     {
       "sourceListingId": "42745330",
@@ -442,6 +623,50 @@
       "gradeDetail": "Calligraphy"
     },
     {
+      "sourceListingId": "42746450",
+      "brand": "BMW",
+      "model": "3 Series",
+      "year": 2021,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/belux/article/detail/T0286885FR/plus-sportive-et-plus-efficiente-que-jamais-grace-a-la-technologie-bmw-edrive-%3A-la-nouvelle-bmw-330e-berline",
+      "sourceNote": "BMW Group: new BMW 330e technical data. BMW Group technical data for G20 330e; listing engine size, model year and 330e badge match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 184 PS + peak motor 83 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 296.8486,
+      "calculationPowerKw": 218.3318,
+      "enginePowerPs": 184,
+      "electricMotorPowerPs": 112.8486,
+      "electricMotorPowerKw": 83,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "330e",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42746803",
+      "brand": "Hyundai",
+      "model": "Elantra",
+      "year": 2021,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/avante-hybrid-catalog-eng.pdf",
+      "sourceNote": "Hyundai Avante CN7 Hybrid official catalog. Official Hyundai Avante/Elantra CN7 hybrid catalog gives ICE and motor output separately; 1,580 cc listing configuration and model years match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 105 PS + peak motor 32 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 148.5079,
+      "calculationPowerKw": 109.2274,
+      "enginePowerPs": 105,
+      "electricMotorPowerPs": 43.5079,
+      "electricMotorPowerKw": 32,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Hybrid",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42746941",
       "brand": "Hyundai",
       "model": "Grandeur",
@@ -478,6 +703,28 @@
       "sourceSpecKey": "drom-hybrid-hyundai-santafe-2023-1598-4wd-1af39e1cb3",
       "grade": "HEV 1.6 4WD",
       "gradeDetail": "Calligraphy"
+    },
+    {
+      "sourceListingId": "42747092",
+      "brand": "Kia",
+      "model": "Sorento",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.kia.com/kr/vehicles/sorento/price",
+      "sourceNote": "Kia Sorento Hybrid official price/specification. Official Kia specification for the 1.6 turbo hybrid powertrain; listing displacement and facelift generation align. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 47.7 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 244.854,
+      "calculationPowerKw": 180.0898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 64.854,
+      "electricMotorPowerKw": 47.7,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
     },
     {
       "sourceListingId": "42747134",
@@ -553,6 +800,28 @@
       "peakOrSystemPowerPs": null,
       "sourceSpecKey": "drom-hybrid-kia-k5-2023-1999-any-drive-f150b0d6a1",
       "grade": "Signature",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42747642",
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/deutschland/article/detail/T0408159DE/der-neue-bmw-x5-und-der-neue-bmw-x6",
+      "sourceNote": "BMW Group: new BMW X5/X6 technical data. BMW Group technical data for X5 xDrive50e; exact 2,998 cc plug-in hybrid badge and G05 generation match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 313 PS + peak motor 145 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 510.1451,
+      "calculationPowerKw": 375.2111,
+      "enginePowerPs": 313,
+      "electricMotorPowerPs": 197.1451,
+      "electricMotorPowerKw": 145,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "xDrive50e",
       "gradeDetail": null
     },
     {
@@ -706,6 +975,28 @@
       "sourceSpecKey": "drom-hybrid-kia-niro-2021-1580-any-drive-5c681a5106",
       "grade": "1.6 HEV",
       "gradeDetail": "Signature"
+    },
+    {
+      "sourceListingId": "42751958",
+      "brand": "Hyundai",
+      "model": "Elantra",
+      "year": 2022,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/avante-hybrid-catalog-eng.pdf",
+      "sourceNote": "Hyundai Avante CN7 Hybrid official catalog. Official Hyundai Avante/Elantra CN7 hybrid catalog gives ICE and motor output separately; 1,580 cc listing configuration and model years match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 105 PS + peak motor 32 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 148.5079,
+      "calculationPowerKw": 109.2274,
+      "enginePowerPs": 105,
+      "electricMotorPowerPs": 43.5079,
+      "electricMotorPowerKw": 32,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Hybrid",
+      "gradeDetail": null
     },
     {
       "sourceListingId": "42752145",
@@ -917,6 +1208,28 @@
       "gradeDetail": "Prestige N Line"
     },
     {
+      "sourceListingId": "42754058",
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "year": 2021,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://media.mercedes-benz.at/news-die-aktualisierte-mercedes-benz-e-klasse?id=110011&l=deutsch&menueid=10702",
+      "sourceNote": "Mercedes-Benz updated E-Class technical data. Mercedes-Benz technical data for W213 E 300 e; 1,991 cc and listing badge match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 211 PS + peak motor 90 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 333.3659,
+      "calculationPowerKw": 245.1902,
+      "enginePowerPs": 211,
+      "electricMotorPowerPs": 122.3659,
+      "electricMotorPowerKw": 90,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "E 300 e",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42754874",
       "brand": "Hyundai",
       "model": "Ioniq 5",
@@ -1009,6 +1322,28 @@
       "peakOrSystemPowerPs": 204,
       "sourceSpecKey": null,
       "grade": "Pro",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42756245",
+      "brand": "BMW",
+      "model": "7 Series",
+      "year": 2024,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/korea/article/detail/T0420298KO/bmw-%EC%BD%94%EB%A6%AC%EC%95%84-%ED%94%8C%EB%9E%98%EA%B7%B8%EC%8B%AD-%ED%94%8C%EB%9F%AC%EA%B7%B8-%EC%9D%B8-%ED%95%98%EC%9D%B4%EB%B8%8C%EB%A6%AC%EB%93%9C-%EC%84%B8%EB%8B%A8-%EB%89%B4-750e-xdrive%E2%80%99-%EA%B3%B5%EC%8B%9D-%EC%B6%9C%EC%8B%9C?language=ko",
+      "sourceNote": "BMW Korea: 750e xDrive launch and technical data. BMW Korea official 750e xDrive technical release; G70, 2,998 cc and 2024 model year match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 313 PS + peak motor 145 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 510.1451,
+      "calculationPowerKw": 375.2111,
+      "enginePowerPs": 313,
+      "electricMotorPowerPs": 197.1451,
+      "electricMotorPowerKw": 145,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "750e xDrive",
       "gradeDetail": null
     },
     {
@@ -1221,6 +1556,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42759303",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/santafe-hybrid-catalog-eng.pdf",
+      "sourceNote": "Hyundai Santa Fe Hybrid official specifications. Official Hyundai model catalog lists the 1.6 Turbo Hybrid engine and maximum electric motor output separately. Listing group matches MX5, 1,598 cc HEV and the catalog year range. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 47.7 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 244.854,
+      "calculationPowerKw": 180.0898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 64.854,
+      "electricMotorPowerKw": 47.7,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42759595",
       "brand": "Kia",
       "model": "RAY",
@@ -1276,6 +1633,28 @@
       "sourceSpecKey": "drom-hybrid-hyundai-santafe-2021-1598-2wd-c445eaaa96",
       "grade": "HEV 1.6 2WD",
       "gradeDetail": "Calligraphy"
+    },
+    {
+      "sourceListingId": "42760048",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4699&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 262 PS + electric motor peak 73 PS = 335 PS; EncarRus displayed power matches 262 PS; Drom engine 262. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 335,
+      "calculationPowerKw": 246.3921,
+      "enginePowerPs": 262,
+      "electricMotorPowerPs": 73,
+      "electricMotorPowerKw": 53.6914,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42760048",
+      "grade": "hev 2.5t 2wd 9 seater / hev 2.5t 2wd 7 seater",
+      "gradeDetail": null
     },
     {
       "sourceListingId": "42760237",
@@ -1392,6 +1771,28 @@
       "gradeDetail": "Calligraphy"
     },
     {
+      "sourceListingId": "42761562",
+      "brand": "BMW",
+      "model": "X3",
+      "year": 2022,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/global/article/attachment/T0302155EN/452969",
+      "sourceNote": "BMW Group X3 xDrive30e technical data. BMW Group technical data for the G01 X3 xDrive30e; 1,998 cc plug-in hybrid configuration matches. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 184 PS + peak motor 80 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 292.7697,
+      "calculationPowerKw": 215.3318,
+      "enginePowerPs": 184,
+      "electricMotorPowerPs": 108.7697,
+      "electricMotorPowerKw": 80,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "xDrive30e",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42761670",
       "brand": "Hyundai",
       "model": "Grandeur",
@@ -1408,6 +1809,28 @@
       "peakOrSystemPowerPs": 230,
       "sourceSpecKey": null,
       "grade": "Premium",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42761681",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4699&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 262 PS + electric motor peak 73 PS = 335 PS; EncarRus displayed power matches 262 PS; Drom engine 262. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 335,
+      "calculationPowerKw": 246.3921,
+      "enginePowerPs": 262,
+      "electricMotorPowerPs": 73,
+      "electricMotorPowerKw": 53.6914,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42761681",
+      "grade": "hev 2.5t 4wd 9 seater",
       "gradeDetail": null
     },
     {
@@ -1428,6 +1851,28 @@
       "sourceSpecKey": null,
       "grade": "Long Range",
       "gradeDetail": "Prestige"
+    },
+    {
+      "sourceListingId": "42761800",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/santafe-hybrid-catalog-eng.pdf",
+      "sourceNote": "Hyundai Santa Fe Hybrid official specifications. Official Hyundai model catalog lists the 1.6 Turbo Hybrid engine and maximum electric motor output separately. Listing group matches MX5, 1,598 cc HEV and the catalog year range. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 47.7 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 244.854,
+      "calculationPowerKw": 180.0898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 64.854,
+      "electricMotorPowerKw": 47.7,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
     },
     {
       "sourceListingId": "42761900",
@@ -1525,6 +1970,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42763102",
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/deutschland/article/detail/T0408159DE/der-neue-bmw-x5-und-der-neue-bmw-x6",
+      "sourceNote": "BMW Group: new BMW X5/X6 technical data. BMW Group technical data for X5 xDrive50e; exact 2,998 cc plug-in hybrid badge and G05 generation match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 313 PS + peak motor 145 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 510.1451,
+      "calculationPowerKw": 375.2111,
+      "enginePowerPs": 313,
+      "electricMotorPowerPs": 197.1451,
+      "electricMotorPowerKw": 145,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "xDrive50e",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42763645",
       "brand": "Hyundai",
       "model": "Grandeur",
@@ -1601,6 +2068,28 @@
       "gradeDetail": "Prestige"
     },
     {
+      "sourceListingId": "42764768",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2024,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4188&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 180 PS + electric motor peak 60.1 PS = 240.1 PS; EncarRus displayed power matches 180 PS; Drom engine not available. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 240.1,
+      "calculationPowerKw": 176.5933,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 60.1,
+      "electricMotorPowerKw": 44.2035,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42764768",
+      "grade": "calligraphy",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42764830",
       "brand": "Kia",
       "model": "K8",
@@ -1620,6 +2109,50 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42764891",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4699&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 262 PS + electric motor peak 73 PS = 335 PS; EncarRus displayed power matches 262 PS; Drom engine 262. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 335,
+      "calculationPowerKw": 246.3921,
+      "enginePowerPs": 262,
+      "electricMotorPowerPs": 73,
+      "electricMotorPowerKw": 53.6914,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42764891",
+      "grade": "hev 2.5t 4wd 9 seater",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42765977",
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/deutschland/article/detail/T0408159DE/der-neue-bmw-x5-und-der-neue-bmw-x6",
+      "sourceNote": "BMW Group: new BMW X5/X6 technical data. BMW Group technical data for X5 xDrive50e; exact 2,998 cc plug-in hybrid badge and G05 generation match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 313 PS + peak motor 145 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 510.1451,
+      "calculationPowerKw": 375.2111,
+      "enginePowerPs": 313,
+      "electricMotorPowerPs": 197.1451,
+      "electricMotorPowerKw": 145,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "xDrive50e",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42766498",
       "brand": "Kia",
       "model": "Niro",
@@ -1636,6 +2169,28 @@
       "peakOrSystemPowerPs": 204,
       "sourceSpecKey": null,
       "grade": "Noblesse",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42766549",
+      "brand": "BMW",
+      "model": "X3",
+      "year": 2021,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/global/article/attachment/T0302155EN/452969",
+      "sourceNote": "BMW Group X3 xDrive30e technical data. BMW Group technical data for the G01 X3 xDrive30e; 1,998 cc plug-in hybrid configuration matches. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 184 PS + peak motor 80 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 292.7697,
+      "calculationPowerKw": 215.3318,
+      "enginePowerPs": 184,
+      "electricMotorPowerPs": 108.7697,
+      "electricMotorPowerKw": 80,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "xDrive30e",
       "gradeDetail": null
     },
     {
@@ -1731,6 +2286,28 @@
       "peakOrSystemPowerPs": null,
       "sourceSpecKey": "drom-hybrid-kia-sportage-2022-1598-2wd-ac9b77772c",
       "grade": "Nobleless 2WD",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42768139",
+      "brand": "Hyundai",
+      "model": "Staria",
+      "year": 2024,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4014&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 180 PS + electric motor peak 73.4 PS = 253.4 PS; EncarRus displayed power matches 180 PS; Drom engine 180. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 253.4,
+      "calculationPowerKw": 186.3754,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 73.4,
+      "electricMotorPowerKw": 53.9856,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42768139",
+      "grade": "hev 1.6 cargo 5 seater",
       "gradeDetail": null
     },
     {
@@ -1981,6 +2558,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42769895",
+      "brand": "BMW",
+      "model": "5 Series",
+      "year": 2022,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/global/article/detail/T0308529EN/the-new-bmw-5-series",
+      "sourceNote": "BMW Group: new BMW 5 Series technical data. BMW Group technical data for G30 530e; 1,998 cc engine and model-year generation match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 184 PS + peak motor 80 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 292.7697,
+      "calculationPowerKw": 215.3318,
+      "enginePowerPs": 184,
+      "electricMotorPowerPs": 108.7697,
+      "electricMotorPowerKw": 80,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "530e",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42769913",
       "brand": "Kia",
       "model": "K5",
@@ -1997,6 +2596,50 @@
       "peakOrSystemPowerPs": null,
       "sourceSpecKey": "drom-hybrid-kia-k5-2023-1999-any-drive-f150b0d6a1",
       "grade": "Noblesse",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42770006",
+      "brand": "BMW",
+      "model": "i4",
+      "year": 2023,
+      "fuelType": "electric",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.bmw.de/de/neufahrzeuge/bmw-i/i4/bmw-i4-gran-coupe-technical-data.html",
+      "sourceNote": "BMW i4 M50 official technical data. Official BMW technical data for i4 M50; exact M50 trim and 2023 model year match. Uses listed continuous/30-minute output rather than peak power. Official 30-minute EV power; preliminary/run-scoped.",
+      "powerBasis": "electric_30min",
+      "customsPowerPs": 169.9527,
+      "calculationPowerKw": 125,
+      "enginePowerPs": null,
+      "electricMotorPowerPs": null,
+      "electricMotorPowerKw": null,
+      "electric30MinPs": 169.9527,
+      "electric30MinKw": 125,
+      "peakOrSystemPowerPs": 544,
+      "sourceSpecKey": null,
+      "grade": "M50",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42770308",
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "year": 2021,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://media.mercedes-benz.at/news-die-aktualisierte-mercedes-benz-e-klasse?id=110011&l=deutsch&menueid=10702",
+      "sourceNote": "Mercedes-Benz updated E-Class technical data. Mercedes-Benz technical data for W213 E 300 e; 1,991 cc and listing badge match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 211 PS + peak motor 90 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 333.3659,
+      "calculationPowerKw": 245.1902,
+      "enginePowerPs": 211,
+      "electricMotorPowerPs": 122.3659,
+      "electricMotorPowerKw": 90,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "E 300 e",
       "gradeDetail": null
     },
     {
@@ -2054,6 +2697,28 @@
       "peakOrSystemPowerPs": 204,
       "sourceSpecKey": null,
       "grade": "Air",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42771863",
+      "brand": "Kia",
+      "model": "EV6",
+      "year": 2022,
+      "fuelType": "electric",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://press.kia.com/content/dam/kiapress/IT/Downloadable-files/Listini/2023/07-luglio/Listino_Kia_EV6_GT_Pubblico_01_07_2023.pdf",
+      "sourceNote": "Kia EV6 GT official technical/pricelist data. Official Kia EV6 GT technical listing, exact GT 4WD grade and original-generation EV6 match. Uses 30-minute EV power, not peak output. Official 30-minute EV power; preliminary/run-scoped.",
+      "powerBasis": "electric_30min",
+      "customsPowerPs": 194.4259,
+      "calculationPowerKw": 143,
+      "enginePowerPs": null,
+      "electricMotorPowerPs": null,
+      "electricMotorPowerKw": null,
+      "electric30MinPs": 194.4259,
+      "electric30MinKw": 143,
+      "peakOrSystemPowerPs": 585,
+      "sourceSpecKey": null,
+      "grade": "GT 4WD",
       "gradeDetail": null
     },
     {
@@ -2304,6 +2969,28 @@
       "gradeDetail": "Prestige"
     },
     {
+      "sourceListingId": "42773917",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2024,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4188&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 180 PS + electric motor peak 60.1 PS = 240.1 PS; EncarRus displayed power matches 180 PS; Drom engine not available. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 240.1,
+      "calculationPowerKw": 176.5933,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 60.1,
+      "electricMotorPowerKw": 44.2035,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42773917",
+      "grade": "calligraphy",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42774209",
       "brand": "Kia",
       "model": "Sportage",
@@ -2399,44 +3086,6 @@
       "gradeDetail": "Signature"
     },
     {
-      "sourceListingId": "42775951",
-      "brand": "Kia",
-      "model": "Seltos",
-      "year": 2026,
-      "fuelType": "hybrid",
-      "sourceKind": "drom",
-      "sourceUrl": "https://www.drom.ru/catalog/kia/seltos/549130/",
-      "sourceNote": "Drom reports ICE 105 PS plus electric 30-minute power 14 PS (119 PS calculation total); same 1.6 HEV 2WD powertrain as the listing, despite a Prestige trim label. Preliminary, run-scoped match.; selected Drom trim: HEV 1.6 GDI DCT 2WD Trendy",
-      "powerBasis": "parallel_sum",
-      "customsPowerPs": 119,
-      "calculationPowerKw": 87.5244,
-      "enginePowerPs": 105,
-      "electric30MinPs": 14,
-      "peakOrSystemPowerPs": null,
-      "sourceSpecKey": "drom-reviewed-21a687ee-42775951",
-      "grade": "HEV 1.6 2WD",
-      "gradeDetail": "Prestige"
-    },
-    {
-      "sourceListingId": "42775980",
-      "brand": "Kia",
-      "model": "Seltos",
-      "year": 2026,
-      "fuelType": "hybrid",
-      "sourceKind": "drom",
-      "sourceUrl": "https://www.drom.ru/catalog/kia/seltos/549130/",
-      "sourceNote": "Drom reports ICE 105 PS plus electric 30-minute power 14 PS (119 PS calculation total); selected Trendy trim matches this listing. Preliminary, run-scoped match.; selected Drom trim: HEV 1.6 GDI DCT 2WD Trendy",
-      "powerBasis": "parallel_sum",
-      "customsPowerPs": 119,
-      "calculationPowerKw": 87.5244,
-      "enginePowerPs": 105,
-      "electric30MinPs": 14,
-      "peakOrSystemPowerPs": null,
-      "sourceSpecKey": "drom-reviewed-21a687ee-42775980",
-      "grade": "HEV 1.6 2WD",
-      "gradeDetail": "Trendy"
-    },
-    {
       "sourceListingId": "42776006",
       "brand": "Kia",
       "model": "Sorento",
@@ -2475,6 +3124,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42776407",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/santafe-hybrid-catalog-eng.pdf",
+      "sourceNote": "Hyundai Santa Fe Hybrid official specifications. Official Hyundai model catalog lists the 1.6 Turbo Hybrid engine and maximum electric motor output separately. Listing group matches MX5, 1,598 cc HEV and the catalog year range. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 47.7 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 244.854,
+      "calculationPowerKw": 180.0898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 64.854,
+      "electricMotorPowerKw": 47.7,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42776502",
       "brand": "Hyundai",
       "model": "Ioniq 5",
@@ -2492,6 +3163,28 @@
       "sourceSpecKey": null,
       "grade": "Long Range AWD",
       "gradeDetail": "N Line"
+    },
+    {
+      "sourceListingId": "42776622",
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/deutschland/article/detail/T0408159DE/der-neue-bmw-x5-und-der-neue-bmw-x6",
+      "sourceNote": "BMW Group: new BMW X5/X6 technical data. BMW Group technical data for X5 xDrive50e; exact 2,998 cc plug-in hybrid badge and G05 generation match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 313 PS + peak motor 145 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 510.1451,
+      "calculationPowerKw": 375.2111,
+      "enginePowerPs": 313,
+      "electricMotorPowerPs": 197.1451,
+      "electricMotorPowerKw": 145,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "xDrive50e",
+      "gradeDetail": null
     },
     {
       "sourceListingId": "42776841",
@@ -2530,6 +3223,28 @@
       "sourceSpecKey": "drom-hybrid-kia-niro-2021-1580-any-drive-5c681a5106",
       "grade": "1.6 HEV",
       "gradeDetail": "Signature"
+    },
+    {
+      "sourceListingId": "42778090",
+      "brand": "Kia",
+      "model": "Carnival",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.kia.com/kr/vehicles/carnival-hi-limousine/specification",
+      "sourceNote": "Kia Carnival Hybrid official specifications. Kia specification lists 1.6 turbo hybrid ICE output and maximum electric motor output separately; used only for matching KA4 1,598 cc HEV listings. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 54 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 253.4196,
+      "calculationPowerKw": 186.3898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 73.4196,
+      "electricMotorPowerKw": 54,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
     },
     {
       "sourceListingId": "42778209",
@@ -2646,6 +3361,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42778760",
+      "brand": "Hyundai",
+      "model": "Staria",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4765&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 180 PS + electric motor peak 73.4 PS = 253.4 PS; EncarRus displayed power matches 180 PS; Drom engine 180. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 253.4,
+      "calculationPowerKw": 186.3754,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 73.4,
+      "electricMotorPowerKw": 53.9856,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42778760",
+      "grade": "hev 1.6 cargo 3 seater / hev 1.6 tourer 9 seater",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42778971",
       "brand": "BMW",
       "model": "i4",
@@ -2681,6 +3418,28 @@
       "peakOrSystemPowerPs": null,
       "sourceSpecKey": "drom-hybrid-kia-k8-2023-1598-any-drive-21b37d17cc",
       "grade": "Noblesse",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42779266",
+      "brand": "BMW",
+      "model": "5 Series",
+      "year": 2022,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.press.bmwgroup.com/global/article/detail/T0308529EN/the-new-bmw-5-series",
+      "sourceNote": "BMW Group: new BMW 5 Series technical data. BMW Group technical data for G30 530e; 1,998 cc engine and model-year generation match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 184 PS + peak motor 80 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 292.7697,
+      "calculationPowerKw": 215.3318,
+      "enginePowerPs": 184,
+      "electricMotorPowerPs": 108.7697,
+      "electricMotorPowerKw": 80,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "530e",
       "gradeDetail": null
     },
     {
@@ -2741,6 +3500,28 @@
       "gradeDetail": "Prestige"
     },
     {
+      "sourceListingId": "42780126",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/santafe-hybrid-catalog-eng.pdf",
+      "sourceNote": "Hyundai Santa Fe Hybrid official specifications. Official Hyundai model catalog lists the 1.6 Turbo Hybrid engine and maximum electric motor output separately. Listing group matches MX5, 1,598 cc HEV and the catalog year range. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 47.7 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 244.854,
+      "calculationPowerKw": 180.0898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 64.854,
+      "electricMotorPowerKw": 47.7,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42780377",
       "brand": "BMW",
       "model": "i5",
@@ -2779,6 +3560,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42780681",
+      "brand": "Kia",
+      "model": "Carnival",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.kia.com/kr/vehicles/carnival-hi-limousine/specification",
+      "sourceNote": "Kia Carnival Hybrid official specifications. Kia specification lists 1.6 turbo hybrid ICE output and maximum electric motor output separately; used only for matching KA4 1,598 cc HEV listings. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 54 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 253.4196,
+      "calculationPowerKw": 186.3898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 73.4196,
+      "electricMotorPowerKw": 54,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42780847",
       "brand": "Kia",
       "model": "K5",
@@ -2798,6 +3601,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42781007",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2021,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/kr/en/eco/grandeur-hybrid/20fl/specifications",
+      "sourceNote": "Hyundai Grandeur Hybrid 20FL official specifications. Official 20FL hybrid specifications match the 2.4-litre, 2,359 cc configuration and state ICE and electric-motor output separately. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 159 PS + peak motor 28 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 197.0694,
+      "calculationPowerKw": 144.9443,
+      "enginePowerPs": 159,
+      "electricMotorPowerPs": 38.0694,
+      "electricMotorPowerKw": 28,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "2.4 Hybrid",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42781241",
       "brand": "Kia",
       "model": "Carnival",
@@ -2814,6 +3639,50 @@
       "peakOrSystemPowerPs": null,
       "sourceSpecKey": "drom-hybrid-kia-carnival-2024-1598-any-drive-88970c70e1",
       "grade": "HEV 9seater Gravity",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42781272",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/santafe-hybrid-catalog-eng.pdf",
+      "sourceNote": "Hyundai Santa Fe Hybrid official specifications. Official Hyundai model catalog lists the 1.6 Turbo Hybrid engine and maximum electric motor output separately. Listing group matches MX5, 1,598 cc HEV and the catalog year range. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 47.7 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 244.854,
+      "calculationPowerKw": 180.0898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 64.854,
+      "electricMotorPowerKw": 47.7,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42781540",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2021,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/kr/en/eco/grandeur-hybrid/20fl/specifications",
+      "sourceNote": "Hyundai Grandeur Hybrid 20FL official specifications. Official 20FL hybrid specifications match the 2.4-litre, 2,359 cc configuration and state ICE and electric-motor output separately. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 159 PS + peak motor 28 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 197.0694,
+      "calculationPowerKw": 144.9443,
+      "enginePowerPs": 159,
+      "electricMotorPowerPs": 38.0694,
+      "electricMotorPowerKw": 28,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "2.4 Hybrid",
       "gradeDetail": null
     },
     {
@@ -3045,6 +3914,50 @@
       "gradeDetail": "Prestige"
     },
     {
+      "sourceListingId": "42784438",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/the-all-new-palisade-hybrid-catalog.pdf",
+      "sourceNote": "Hyundai The all-new Palisade Hybrid official catalog. Official LX3 catalog identifies the 2.5-litre hybrid engine and maximum motor output; listing engine size and generation match. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 262 PS + peak motor 54 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 335.4196,
+      "calculationPowerKw": 246.7007,
+      "enginePowerPs": 262,
+      "electricMotorPowerPs": 73.4196,
+      "electricMotorPowerKw": 54,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "2.5 Turbo Hybrid",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42785170",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/santafe-hybrid-catalog-eng.pdf",
+      "sourceNote": "Hyundai Santa Fe Hybrid official specifications. Official Hyundai model catalog lists the 1.6 Turbo Hybrid engine and maximum electric motor output separately. Listing group matches MX5, 1,598 cc HEV and the catalog year range. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 47.7 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 244.854,
+      "calculationPowerKw": 180.0898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 64.854,
+      "electricMotorPowerKw": 47.7,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42785553",
       "brand": "BMW",
       "model": "i7",
@@ -3159,6 +4072,28 @@
       "gradeDetail": "Exclusive"
     },
     {
+      "sourceListingId": "42787113",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2024,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4188&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 180 PS + electric motor peak 60.1 PS = 240.1 PS; EncarRus displayed power matches 180 PS; Drom engine not available. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 240.1,
+      "calculationPowerKw": 176.5933,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 60.1,
+      "electricMotorPowerKw": 44.2035,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42787113",
+      "grade": "calligraphy",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42787149",
       "brand": "Volkswagen",
       "model": "ID.4",
@@ -3235,6 +4170,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42787466",
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "official_manufacturer",
+      "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/the-all-new-grandeur-hybrid-catalog-eng.pdf",
+      "sourceNote": "Hyundai The all-new Grandeur Hybrid official catalog. Official Hyundai catalog gives 180 PS ICE, 44.2 kW maximum motor output and 230 PS system output. The listing is GN7 1,598 cc hybrid in the catalog years. Manufacturer-level powertrain match to the saved Encar configuration; preliminary/run-scoped. TKS components: ICE 180 PS + peak motor 44.2 kW. No 30-minute hybrid value used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 240.0953,
+      "calculationPowerKw": 176.5898,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 60.0953,
+      "electricMotorPowerKw": 44.2,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": 230,
+      "sourceSpecKey": null,
+      "grade": "1.6 Turbo Hybrid",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42787587",
       "brand": "Kia",
       "model": "K8",
@@ -3251,6 +4208,28 @@
       "peakOrSystemPowerPs": null,
       "sourceSpecKey": "drom-hybrid-kia-k8-2023-1598-any-drive-21b37d17cc",
       "grade": "Signature",
+      "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42787737",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4699&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 262 PS + electric motor peak 73 PS = 335 PS; EncarRus displayed power matches 262 PS; Drom engine 262. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 335,
+      "calculationPowerKw": 246.3921,
+      "enginePowerPs": 262,
+      "electricMotorPowerPs": 73,
+      "electricMotorPowerKw": 53.6914,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42787737",
+      "grade": "hev 2.5t 2wd 9 seater / hev 2.5t 2wd 7 seater",
       "gradeDetail": null
     },
     {
@@ -3463,6 +4442,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42791349",
+      "brand": "Hyundai",
+      "model": "Staria",
+      "year": 2025,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4765&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 180 PS + electric motor peak 73.4 PS = 253.4 PS; EncarRus displayed power matches 180 PS; Drom engine 180. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 253.4,
+      "calculationPowerKw": 186.3754,
+      "enginePowerPs": 180,
+      "electricMotorPowerPs": 73.4,
+      "electricMotorPowerKw": 53.9856,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42791349",
+      "grade": "hev 1.6 cargo 3 seater / hev 1.6 tourer 9 seater",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42791352",
       "brand": "Hyundai",
       "model": "Sonata",
@@ -3558,6 +4559,28 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42792964",
+      "brand": "Hyundai",
+      "model": "Palisade",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "danawa",
+      "sourceUrl": "https://auto.danawa.com/auto/?Model=4699&Work=model",
+      "sourceNote": "Danawa exact listing-group powertrain: ICE 262 PS + electric motor peak 73 PS = 335 PS; EncarRus displayed power matches 262 PS; Drom engine 262. Run-scoped preliminary match; not a 30-minute rating. Run-scoped preliminary evidence; peak motor power is used; no hybrid 30-minute value is used.",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 335,
+      "calculationPowerKw": 246.3921,
+      "enginePowerPs": 262,
+      "electricMotorPowerPs": 73,
+      "electricMotorPowerKw": 53.6914,
+      "electric30MinPs": null,
+      "electric30MinKw": null,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "danawa-hybrid-motor-21a687ee-42792964",
+      "grade": "hev 2.5t 2wd 9 seater",
+      "gradeDetail": null
+    },
+    {
       "sourceListingId": "42792989",
       "brand": "Hyundai",
       "model": "Ioniq 5",
@@ -3636,139 +4659,9 @@
   ],
   "unresolved": [
     {
-      "sourceListingId": "42738051",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42739361",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42740267",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42740856",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42741141",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42742398",
-      "fuelType": "electric",
-      "reason": "encarrus_card_missing"
-    },
-    {
-      "sourceListingId": "42743428",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42745183",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42746450",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42746803",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42747092",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42747642",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42751958",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
       "sourceListingId": "42753770",
       "fuelType": "electric",
       "reason": "encarrus_card_missing"
-    },
-    {
-      "sourceListingId": "42754058",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42756245",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42759303",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42760048",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42761562",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42761681",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42761800",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42763102",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42764768",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42764891",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42765977",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42766549",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42768139",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
     },
     {
       "sourceListingId": "42768728",
@@ -3777,73 +4670,24 @@
       "candidates30MinPs": []
     },
     {
-      "sourceListingId": "42769895",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42770006",
-      "fuelType": "electric",
-      "reason": "no_card_matching_encar_grade",
-      "candidates30MinPs": []
-    },
-    {
-      "sourceListingId": "42770308",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42771863",
-      "fuelType": "electric",
-      "reason": "encarrus_card_missing"
-    },
-    {
       "sourceListingId": "42773175",
       "fuelType": "hybrid",
       "reason": "calculation_power_not_found"
     },
     {
-      "sourceListingId": "42773917",
+      "sourceListingId": "42775951",
       "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
+      "reason": "hybrid_motor_peak_power_not_found",
+      "note": "Saved Drom value is electric-motor 30-minute power; parallel-hybrid TKS matching requires the motor's rated peak output."
     },
     {
-      "sourceListingId": "42776407",
+      "sourceListingId": "42775980",
       "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42776622",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
+      "reason": "hybrid_motor_peak_power_not_found",
+      "note": "Saved Drom value is electric-motor 30-minute power; parallel-hybrid TKS matching requires the motor's rated peak output."
     },
     {
       "sourceListingId": "42776683",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42778090",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42778760",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42779266",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42780126",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42780681",
       "fuelType": "hybrid",
       "reason": "calculation_power_not_found"
     },
@@ -3854,59 +4698,9 @@
       "candidates30MinPs": []
     },
     {
-      "sourceListingId": "42781007",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42781272",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42781540",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
       "sourceListingId": "42782540",
       "fuelType": "electric",
       "reason": "encarrus_card_missing"
-    },
-    {
-      "sourceListingId": "42784438",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42785170",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42787113",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42787466",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42787737",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42791349",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42792964",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
     }
   ]
 }
