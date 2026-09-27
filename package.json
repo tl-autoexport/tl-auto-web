@@ -93,6 +93,7 @@
     "prepare:encar:enrichment": "tsx scripts/prepare-encar-enrichment-run.ts",
     "stage:new-encar-candidates": "tsx scripts/stage-new-encar-candidates.ts",
     "discover:classic:encar": "tsx scripts/discover-classic-encar-candidates.ts",
+    "stage:classic:encar": "tsx scripts/stage-classic-encar-candidates.ts",
     "export:tl-auto:enrichment-candidates": "tsx scripts/export-tl-auto-enrichment-candidates.ts",
     "run:encar:universal": "tsx scripts/run-universal-encar-enrichment.ts",
     "screen:tl-auto:enrichment": "tsx scripts/screen-tl-auto-enrichment.ts",
