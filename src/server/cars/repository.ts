@@ -491,7 +491,7 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
   if (filters.source) query = query.eq("primary_source", filters.source);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
   if (filters.search) query = query.or(catalogSearchExpression(filters.search));
-  if (filters.brand) query = query.eq("brand", filters.brand);
+  if (filters.brand) query = query.in("brand", catalogBrandValues(filters.brand));
   if (filters.generation) query = query.eq("generation_code", filters.generation);
   if (filters.model) {
     query = !filters.brand && /\s/.test(filters.model)
