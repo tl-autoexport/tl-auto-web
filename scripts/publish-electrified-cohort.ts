@@ -342,7 +342,7 @@ async function main() {
       }
     }
     const finalReport = { ...summary, dryRun: false, probe: PROBE, completed: !PROBE,
-      newlyPublished, output: REPORT_PATH };
+      newlyPublished, databaseWrites: newlyPublished, output: REPORT_PATH };
     await writeFile(REPORT_PATH, `${JSON.stringify(finalReport, null, 2)}\n`);
     console.log(JSON.stringify(finalReport, null, 2));
   } finally {
