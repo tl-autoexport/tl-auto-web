@@ -10,7 +10,8 @@ config({ path: ".env", quiet: true });
 const runId = "21a687ee-6717-4610-a9cc-97c64608bbb9";
 const powerPath = "data/power/electrified-21a687ee-power-reference.json";
 const readinessPath = "output/tl-auto-electrified-21a687ee-publication-readiness.json";
-const outputPath = "output/tl-auto-electrified-21a687ee-publication-manifest-v2.json";
+const outputPath = process.env.TL_AUTO_ELECTRIFIED_PUBLICATION_MANIFEST ??
+  "output/tl-auto-electrified-21a687ee-publication-manifest-v2.json";
 const digest = (value: string) => createHash("sha256").update(value).digest("hex");
 
 async function main() {
