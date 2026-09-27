@@ -25,6 +25,7 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
   const [level, setLevel] = useState<Level>("brand");
   const [selection, setSelection] = useState<Selection>({ brand: brand ?? undefined, model: model ?? undefined, generation: generation ?? undefined });
   const [loaded, setLoaded] = useState<{ query: string; data: FacetsResponse } | null>(null);
+  const [loadedGenerations, setLoadedGenerations] = useState<{ query: string; data: FacetsResponse } | null>(null);
 
   const query = useMemo(() => {
     const params = new URLSearchParams(currentQuery);
@@ -36,8 +37,22 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
     return text ? `?${text}` : "";
   }, [currentQuery, selection]);
 
+  const generationsQuery = useMemo(() => {
+    const params = new URLSearchParams();
+    const current = new URLSearchParams(currentQuery);
+    const source = current.get("source");
+    if (source) params.set("source", source);
+    if (selection.brand) params.set("brand", selection.brand);
+    if (selection.model) params.set("model", selection.model);
+    const text = params.toString();
+    return text ? `?${text}` : "";
+  }, [currentQuery, selection.brand, selection.model]);
+
   const loading = open && loaded?.query !== query;
   const data = loaded?.query === query ? loaded.data : null;
+  const generationsLoading = open && loadedGenerations?.query !== generationsQuery;
+  const generationsData = loadedGenerations?.query === generationsQuery ? loadedGenerations.data : null;
+  const generationOptions = generationsData?.axes.generation ?? data?.axes.generation ?? [];
 
   useEffect(() => {
     if (!open) return;
@@ -52,8 +67,21 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
     return () => controller.abort();
   }, [open, query]);
 
-  const options = level === "brand" ? data?.axes.brand ?? [] : level === "model" ? data?.axes.model ?? [] : data?.axes.generation ?? [];
-  const generationLabel = data?.axes.generation?.find((item) => item.value === selection.generation)?.label ?? selection.generation?.toUpperCase();
+  useEffect(() => {
+    if (!open) return;
+    const controller = new AbortController();
+    fetch(`/api/catalog/facets${generationsQuery}`, { signal: controller.signal })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error(String(response.status))))
+      .then((json: FacetsResponse) => setLoadedGenerations({ query: generationsQuery, data: json }))
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        if (!controller.signal.aborted) setLoadedGenerations({ query: generationsQuery, data: { total: 0, axes: {} } });
+      });
+    return () => controller.abort();
+  }, [open, generationsQuery]);
+
+  const options = level === "brand" ? data?.axes.brand ?? [] : level === "model" ? data?.axes.model ?? [] : generationOptions;
+  const generationLabel = generationOptions.find((item) => item.value === selection.generation)?.label ?? selection.generation?.toUpperCase();
   const summary = [selection.brand, selection.model, generationLabel].filter(Boolean).join(", ");
   const needsGeneration = Boolean(selection.brand && selection.model && !selection.generation);
 
@@ -133,12 +161,12 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
             </div>
 
             <div className="max-h-[42vh] overflow-y-auto rounded-xl border border-[#e8ecf2] md:grid md:max-h-72 md:grid-cols-2 lg:grid-cols-3">
-              {loading ? (
+              {(level === "generation" ? generationsLoading : loading) ? (
                 <p className="flex items-center gap-2 p-4 text-sm text-[#647084]"><LoaderCircle className="animate-spin" size={17} /> Загружаем варианты</p>
               ) : options.length ? options.map((option) => {
                 const selected = selection[level] === option.value;
                 return <button className={`flex min-h-12 w-full items-center justify-between gap-3 border-b border-[#eef1f5] px-4 text-left text-sm transition md:border-r ${selected ? "bg-[#fbf7ed]" : "hover:bg-[#f7f9fc]"}`} key={`${level}-${option.value}`} onClick={() => pick(option)} type="button"><span className="min-w-0 truncate font-medium text-[#273246]">{option.label}</span>{level === "model" ? <span aria-hidden="true" className={`grid size-5 shrink-0 place-items-center rounded border text-xs ${selected ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span> : <span className="shrink-0 text-xs text-[#7a8798]">{option.cars}</span>}</button>;
-              }) : <p className="p-4 text-sm text-[#647084]">{level === "generation" ? "Для этой модели подтверждённых поколений нет." : "Нет вариантов для текущего отбора."}</p>}
+              }) : <p className="p-4 text-sm text-[#647084]">{level === "generation" ? "Для этой марки и модели пока нет подтверждённых данных о поколениях." : "Нет вариантов для текущего отбора."}</p>}
             </div>
 
             <div className="mt-4 flex items-center gap-3">
