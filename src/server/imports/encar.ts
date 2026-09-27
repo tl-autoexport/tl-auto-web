@@ -290,6 +290,9 @@ function compactOptionRow(option: EncarOptionRow) {
 export type ImportOptions = {
   target?: number;
   maxPages?: number;
+  /** Optional manufacture-year bounds, in Encar YYYYMM format. */
+  minYear?: number;
+  maxYear?: number;
   electricTarget?: number;
   electricPages?: number;
   hybridTarget?: number;
@@ -376,8 +379,9 @@ function buildListUrl(
   offset: number,
   manufacturer?: string,
   fuelType?: "electric" | "hybrid",
+  bounds: EncarFilterBounds = getEncarFilterBounds(),
 ) {
-  const query = encodeURIComponent(buildFilter(manufacturer, fuelType));
+  const query = encodeURIComponent(buildFilter(manufacturer, fuelType, bounds));
   const sort = encodeURIComponent(`|ModifiedDate|${offset}|${ENCAR_PAGE_SIZE}`);
   return `${ENCAR_BASE_URL}?count=true&q=${query}&sr=${sort}`;
 }
@@ -963,6 +967,7 @@ async function fetchListPage(
   offset: number,
   manufacturer?: string,
   fuelType?: "electric" | "hybrid",
+  bounds: EncarFilterBounds = getEncarFilterBounds(),
 ) {
   const fixture = await readListFixture();
   if (fixture) {
@@ -975,7 +980,7 @@ async function fetchListPage(
       .slice(offset, offset + ENCAR_PAGE_SIZE);
   }
   const data = await fetchJson<{ SearchResults?: EncarListCar[] }>(
-    buildListUrl(offset, manufacturer, fuelType),
+    buildListUrl(offset, manufacturer, fuelType, bounds),
     6,
   );
   return data.SearchResults ?? [];
@@ -1460,6 +1465,15 @@ export async function importEncar(options: ImportOptions = {}) {
   const maxListingAgeDays =
     options.maxListingAgeDays ??
     positiveInt(process.env.CATALOG_MAX_LISTING_AGE_DAYS, 30);
+  const filterBounds = {
+    ...getEncarFilterBounds(),
+    ...(options.minYear === undefined ? {} : { minYear: options.minYear }),
+    ...(options.maxYear === undefined ? {} : { maxYear: options.maxYear }),
+  };
+  if (!Number.isInteger(filterBounds.minYear) || !Number.isInteger(filterBounds.maxYear) ||
+      filterBounds.minYear < 190001 || filterBounds.maxYear > 210012 ||
+      filterBounds.minYear > filterBounds.maxYear)
+    throw new Error("Encar manufacture-year bounds must be valid YYYYMM values with minYear <= maxYear");
   const listRequestDelayMs = Number(process.env.ENCAR_LIST_REQUEST_DELAY_MS ?? 0);
   if (!Number.isInteger(listRequestDelayMs) || listRequestDelayMs < 0 || listRequestDelayMs > 60_000)
     throw new Error("ENCAR_LIST_REQUEST_DELAY_MS must be an integer from 0 to 60000");
@@ -1555,7 +1569,7 @@ export async function importEncar(options: ImportOptions = {}) {
   for (let page = 0; page < maxPages; page += 1) {
     let list: EncarListCar[];
     try {
-      list = await fetchListPage(page * ENCAR_PAGE_SIZE);
+      list = await fetchListPage(page * ENCAR_PAGE_SIZE, undefined, undefined, filterBounds);
       if (listRequestDelayMs) await sleep(listRequestDelayMs);
     } catch (error) {
       listPageErrors.push({

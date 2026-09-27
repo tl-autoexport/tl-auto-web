@@ -11,6 +11,10 @@ const pool = Number(process.env.TL_AUTO_CLASSIC_DISCOVERY_POOL ?? 1200);
 const pages = Number(process.env.TL_AUTO_CLASSIC_DISCOVERY_MAX_PAGES ?? 220);
 const output = process.env.TL_AUTO_CLASSIC_DISCOVERY_OUTPUT ??
   "output/tl-auto-classic-30plus-discovery.json";
+const minYear = Number(process.env.TL_AUTO_CLASSIC_MIN_YEAR ?? 196001);
+const maxYear = Number(process.env.TL_AUTO_CLASSIC_MAX_YEAR ?? 199608);
+const maxListingAgeDays = Number(process.env.TL_AUTO_CLASSIC_MAX_LISTING_AGE_DAYS ?? 365);
+const requestDelayMs = Number(process.env.TL_AUTO_CLASSIC_REQUEST_DELAY_MS ?? 900);
 const brands = (process.env.TL_AUTO_CLASSIC_BRANDS ??
   "Mercedes-Benz,BMW,Volkswagen,Audi,Porsche,Lexus,Volvo,Maserati,Land Rover,재규어,벤틀리,롤스로이스,페라리,람보르기니,애스턴마틴")
   .split(",").map((value) => value.trim()).filter(Boolean);
@@ -18,13 +22,23 @@ const brands = (process.env.TL_AUTO_CLASSIC_BRANDS ??
 async function main() {
   if (!Number.isInteger(pool) || pool < 1 || pool > 5000) throw new Error("Discovery pool must be 1..5000");
   if (!Number.isInteger(pages) || pages < 1 || pages > 500) throw new Error("Discovery max pages must be 1..500");
+  if (!Number.isInteger(minYear) || !Number.isInteger(maxYear) || minYear < 190001 || maxYear > 210012 || minYear > maxYear)
+    throw new Error("Classic discovery year bounds must be valid YYYYMM values with min <= max");
+  if (!Number.isInteger(maxListingAgeDays) || maxListingAgeDays < 1 || maxListingAgeDays > 3650)
+    throw new Error("Classic discovery max listing age must be 1..3650 days");
+  if (!Number.isInteger(requestDelayMs) || requestDelayMs < 0 || requestDelayMs > 60_000)
+    throw new Error("Classic discovery request delay must be 0..60000 ms");
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
   if (!url || !key) throw new Error("Supabase URL and service key are required for read-only duplicate exclusion");
+  process.env.ENCAR_LIST_REQUEST_DELAY_MS = String(requestDelayMs);
 
   const result = await importEncar({
     target: pool,
     maxPages: pages,
+    minYear,
+    maxYear,
+    maxListingAgeDays,
     onlyNew: true,
     dryRun: true,
     fastMode: true,
@@ -64,9 +78,10 @@ async function main() {
   }
   const report = {
     generatedAt: new Date().toISOString(),
-    policy: { manufactureYearMin: Number(process.env.ENCAR_MIN_YEAR ?? 196001),
-      manufactureYearMonthMax: Number(process.env.ENCAR_MAX_YEAR ?? 199608),
-      brands, listingUpdatedWithinDays: Number(process.env.CATALOG_MAX_LISTING_AGE_DAYS ?? 365),
+    policy: { manufactureYearMin: minYear,
+      manufactureYearMonthMax: maxYear,
+      brands, listingUpdatedWithinDays: maxListingAgeDays,
+      requestDelayMs,
       excludeExistingCatalogAndAnyPriorQueue: true },
     readOnly: true, databaseWrites: 0, EncarDetailRequests: 0,
     discovery: { listCandidates: result.candidates, uniqueCandidates: result.uniqueCandidates,
