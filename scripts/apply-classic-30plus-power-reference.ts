@@ -37,6 +37,8 @@ type RefRow = {
 const normalize = (value: string | null | undefined) => (value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
 const referenceKey = (r: Manifest["records"][number]) =>
   [normalize(r.brand), normalize(r.model), normalize(r.fuelType), r.engineCc, "", "", "", `year=${r.year}-${r.year}`].join("|");
+const legacyModel = (model: string) => model === "E-Class" ? "E-Class W124"
+  : model === "G-Class" ? "G-Class W460" : null;
 
 async function main() {
   if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
@@ -70,30 +72,61 @@ async function main() {
     );
     if (staging.rows.length !== listingIds.length || staging.rows.some((r) => r.status !== "succeeded"))
       throw new Error(`Run staging mismatch: expected ${listingIds.length} succeeded rows, got ${staging.rows.length}`);
+    const legacyKeys = manifest.records.flatMap((record) => {
+      const oldModel = legacyModel(record.model);
+      return oldModel ? [[normalize(record.brand), normalize(oldModel), normalize(record.fuelType), record.engineCc, "", "", "", `year=${record.year}-${record.year}`].join("|")] : [];
+    });
     const existing = await db.query<{
-      configuration_key: string; status: string; power_hp: string | null; source: string;
-    }>(`select configuration_key,status,power_hp::text,source from public.vehicle_power_automatic_reference
-        where configuration_key=any($1::text[])`, [rows.map((r) => r.configuration_key)]);
+      configuration_key: string; brand: string; model: string; fuel_type: string; engine_cc: number;
+      year_from: number; year_to: number; status: string; power_hp: string | null; source: string; note: string;
+    }>(`select configuration_key,brand,model,fuel_type,engine_cc,year_from,year_to,status,power_hp::text,source,note
+        from public.vehicle_power_automatic_reference
+        where configuration_key=any($1::text[])`, [[...rows.map((r) => r.configuration_key), ...legacyKeys]]);
     await db.query("rollback");
 
     const existingByKey = new Map(existing.rows.map((r) => [r.configuration_key, r]));
+    const legacyRenames = rows.flatMap((row, index) => {
+      const oldModel = legacyModel(manifest.records[index].model);
+      if (!oldModel) return [];
+      const oldKey = [normalize(row.brand), normalize(oldModel), normalize(row.fuel_type), row.engine_cc, "", "", "", `year=${row.year_from}-${row.year_to}`].join("|");
+      const old = existingByKey.get(oldKey);
+      if (!old) return [];
+      const record = manifest.records[index];
+      const allowed = old.status === "automatic" && old.source === "classic_30plus_manual_web" &&
+        Number(old.power_hp) === row.power_hp && old.note.includes(`Run ${runId}; listing IDs ${record.listingIds.join(", ")}.`);
+      if (!allowed) throw new Error(`Legacy reference is not safe to rename: ${oldKey}`);
+      return [{ oldKey, row }];
+    });
     const protectedRows = rows.filter((r) => {
       const old = existingByKey.get(r.configuration_key);
       return old && (old.status !== "automatic" || Number(old.power_hp) !== r.power_hp);
     });
     if (protectedRows.length) throw new Error(`Existing non-automatic or conflicting references; no writes: ${JSON.stringify(protectedRows.map((r) => ({ key: r.configuration_key, proposed: r.power_hp, existing: existingByKey.get(r.configuration_key) })))}`);
-    const insertRows = rows.filter((r) => !existingByKey.has(r.configuration_key));
+    const renamedKeys = new Set(legacyRenames.map(({ row }) => row.configuration_key));
+    const insertRows = rows.filter((r) => !existingByKey.has(r.configuration_key) && !renamedKeys.has(r.configuration_key));
     console.log(JSON.stringify({
       write, runId, preliminaryConfigurations: rows.length, listingCount: listingIds.length,
       skippedListingIds: manifest.excludedListingIds,
       newReferences: insertRows.length,
-      alreadyPresentSameAutomaticReferences: existing.rows.length - protectedRows.length,
+      renamedLegacyReferences: legacyRenames.length,
+      alreadyPresentSameAutomaticReferences: existing.rows.filter((r) => rows.some((candidate) => candidate.configuration_key === r.configuration_key)).length,
       effects: { carsChanged: 0, tksSpecsApproved: 0, calculationsChanged: 0, pricesChanged: 0, publicationChanged: 0 },
       proposed: rows.map(({ configuration_key, brand, model, year_from, engine_cc, power_hp, note }) => ({ configuration_key, brand, model, year: year_from, engineCc: engine_cc, powerPs: power_hp, note })),
     }, null, 2));
-    if (!write || !insertRows.length) return;
+    if (!write || (!insertRows.length && !legacyRenames.length)) return;
 
     await db.query("begin");
+    for (const { oldKey, row } of legacyRenames) {
+      const manifestRecord = manifest.records.find((record) => referenceKey(record) === row.configuration_key)!;
+      const old = existingByKey.get(oldKey)!;
+      const updated = await db.query(`update public.vehicle_power_automatic_reference
+        set configuration_key=$1,model=$2,note=$3,updated_at=now()
+        where configuration_key=$4 and source='classic_30plus_manual_web' and status='automatic'
+          and power_hp=$5 and note=$6`, [row.configuration_key, row.model,
+        `Preliminary only; not approved TKS evidence. Run ${runId}; listing IDs ${manifestRecord.listingIds.join(", ")}. ${manifestRecord.note} Source: ${manifestRecord.sourceUrl}`,
+        oldKey, row.power_hp, old.note]);
+      if (updated.rowCount !== 1) throw new Error(`Could not safely rename legacy key ${oldKey}`);
+    }
     await db.query(
       `insert into public.vehicle_power_automatic_reference
        (configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,
@@ -110,10 +143,16 @@ async function main() {
        where configuration_key=any($1::text[]) and source='classic_30plus_manual_web' and status='automatic'`,
       [insertRows.map((r) => r.configuration_key)],
     );
-    if (Number(verify.rows[0]?.count) !== insertRows.length)
-      throw new Error(`Post-write verification failed: expected ${insertRows.length}, got ${verify.rows[0]?.count}`);
+    const expectedNew = insertRows.length + legacyRenames.length;
+    const totalVerify = await db.query<{ count: string }>(
+      `select count(*)::text as count from public.vehicle_power_automatic_reference
+       where configuration_key=any($1::text[]) and source='classic_30plus_manual_web' and status='automatic'`,
+      [rows.map((r) => r.configuration_key)],
+    );
+    if (Number(totalVerify.rows[0]?.count) !== rows.length || Number(verify.rows[0]?.count) !== insertRows.length)
+      throw new Error(`Post-write verification failed: refs=${totalVerify.rows[0]?.count}/${rows.length}, inserted=${verify.rows[0]?.count}/${insertRows.length}`);
     await db.query("commit");
-    console.log(JSON.stringify({ appliedReferences: insertRows.length, listingCount: 34, referenceOnly: true,
+    console.log(JSON.stringify({ appliedReferences: insertRows.length, renamedReferences: legacyRenames.length, listingCount: 34, referenceOnly: true,
       carsChanged: 0, calculationsChanged: 0, pricesChanged: 0, published: 0 }, null, 2));
   } catch (error) {
     await db.query("rollback").catch(() => undefined);
