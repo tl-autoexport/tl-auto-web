@@ -26,13 +26,13 @@ export default async function Home() {
     getHomeCatalogData(),
     getCatalogFacetCars(),
   ]);
-  const { cars, under160Cars, electricCars } =
+  const { cars, under160Cars, fourWheelDriveCrossovers } =
     homeDataResult.status === "fulfilled"
       ? homeDataResult.value
-      : { cars: [], under160Cars: [], electricCars: [] };
+      : { cars: [], under160Cars: [], fourWheelDriveCrossovers: [] };
   const usedCarIds = new Set<string>();
   const under160 = selectShelfCars(under160Cars, usedCarIds);
-  const electric = selectShelfCars(electricCars, usedCarIds);
+  const crossovers4wd = selectShelfCars(fourWheelDriveCrossovers, usedCarIds);
   const newArrivals = selectShelfCars(cars, usedCarIds);
   const facetCars = facetResult.status === "fulfilled" ? facetResult.value : [];
 
@@ -100,12 +100,12 @@ export default async function Home() {
       />
 
       <VehicleShelf
-        id="electric"
-        title="Электромобили из Кореи"
-        description="Свежие объявления из Кореи. Итоговую стоимость рассчитываем индивидуально после подтверждения тарифа ввоза."
-        href="/catalog?fuel=electric"
-        cars={electric}
-        empty="Свежие электромобили появятся после ближайшего обновления каталога."
+        id="crossovers-4wd"
+        title="Полноприводные кроссоверы"
+        description="Кроссоверы из Кореи с полным приводом 4WD."
+        href="/catalog?body=%D0%9A%D1%80%D0%BE%D1%81%D1%81%D0%BE%D0%B2%D0%B5%D1%80&drive=4WD"
+        cars={crossovers4wd}
+        empty="Подходящие полноприводные кроссоверы появятся после обновления каталога."
       />
 
       <VehicleShelf

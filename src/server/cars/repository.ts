@@ -203,7 +203,7 @@ export type HomeCatalogData = {
   cars: CatalogCardSummary[];
   under160Cars: CatalogCardSummary[];
   passableCars: CatalogCardSummary[];
-  electricCars: CatalogCardSummary[];
+  fourWheelDriveCrossovers: CatalogCardSummary[];
 };
 
 export type LatestCalculation = {
@@ -710,7 +710,7 @@ export async function getCatalogMetrics(): Promise<CatalogMetrics> {
 }
 
 async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
-  const [cars, under160Cars, passableCars, electricCars] = await Promise.all([
+  const [cars, under160Cars, passableCars, fourWheelDriveCrossovers] = await Promise.all([
     // The homepage "Новые автомобили" shelf is a mileage-defined category:
     // only listings with a known odometer reading up to 1,000 km belong here.
     // The repository filter also excludes null mileage values at the database
@@ -718,14 +718,14 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
     getCatalogCardPage({ maxMileageKm: 1000 }, null, 16),
     getCatalogCardPage({ maxPowerHp: 160 }, null, 16),
     getCatalogCardPage({ passable: true }, null, 12),
-    getCatalogCardPage({ fuelType: "electric" }, null, 16),
+    getCatalogCardPage({ bodyType: "Кроссовер", driveType: "4WD" }, null, 16),
   ]);
 
   return {
     cars: cars.cars,
     under160Cars: under160Cars.cars,
     passableCars: passableCars.cars,
-    electricCars: electricCars.cars,
+    fourWheelDriveCrossovers: fourWheelDriveCrossovers.cars,
   };
 }
 
@@ -737,7 +737,7 @@ const getCachedHomeCatalogData = unstable_cache(
 
 export async function getHomeCatalogData(): Promise<HomeCatalogData> {
   if (buildWithoutCatalog) {
-    return { cars: [], under160Cars: [], passableCars: [], electricCars: [] };
+    return { cars: [], under160Cars: [], passableCars: [], fourWheelDriveCrossovers: [] };
   }
 
   return getCachedHomeCatalogData();
