@@ -891,6 +891,7 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
     .select(`${CATALOG_CAR_SELECT}, car_options(category, source_code, name_original, name_ru, value_original, value_ru, description_original, description_ru, is_present, sort_order), car_condition_reports(source, report_type, summary, items)`)
     .eq("primary_source", source)
     .eq("source_id", sourceId)
+    .eq("is_available", true)
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
     .not("price_rub", "is", null).not("power_hp", "is", null)
     .order("sort_order", { foreignTable: "car_media", ascending: true })

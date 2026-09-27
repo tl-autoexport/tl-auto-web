@@ -262,9 +262,9 @@ export default async function CarDetailPage({
 
 function Spec({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex min-h-7 items-start justify-between gap-3 border-b border-dashed border-[#cbd3df] pb-2">
-      <span className="text-[#647084]">{label}</span>
-      <span className="shrink-0 whitespace-nowrap text-right font-semibold tabular-nums">{value}</span>
+    <div className="grid min-h-7 grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-start gap-3 border-b border-dashed border-[#cbd3df] pb-2">
+      <span className="min-w-0 text-[#647084]">{label}</span>
+      <span className="min-w-0 break-words text-right font-semibold tabular-nums">{value}</span>
     </div>
   );
 }

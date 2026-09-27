@@ -83,8 +83,8 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
     seats,
   ].filter((value): value is string => Boolean(value));
   const saleDays = daysOnSale(car);
-  const isVladivostokPrice = country.countryCode === "RU" && city.id === "vladivostok";
-  const hasExactVladivostokPrice = isVladivostokPrice && car.price_rub != null;
+  const isSupportedRuPrice = country.countryCode === "RU" && ["vladivostok", "ussuriysk"].includes(city.id);
+  const hasExactRuPrice = isSupportedRuPrice && car.price_rub != null;
   const isElectricPending = car.fuel_type === "electric" && car.price_rub == null;
   const pendingPriceLabel = country.countryCode === "KZ" && city.id === "almaty"
     ? "Расчёт до Алматы уточняется"
@@ -120,10 +120,10 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
 
       <div className="pointer-events-none relative z-10 flex-1 p-2.5 sm:p-4">
         <div>
-          {hasExactVladivostokPrice ? (
+          {hasExactRuPrice ? (
             <>
               <p className="text-xl font-bold tabular-nums text-[#101827] sm:text-2xl">{rub.format(car.price_rub!)} ₽</p>
-              <p className="mt-0.5 text-xs text-[#647084] sm:mt-1 sm:text-sm">Цена под ключ до Владивостока</p>
+              <p className="mt-0.5 text-xs text-[#647084] sm:mt-1 sm:text-sm">Цена под ключ до {city.label}</p>
             </>
           ) : (
             <>
@@ -156,7 +156,7 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
 
       {saleDays != null ? (
         <div className="pointer-events-none relative z-10 px-2.5 py-1.5 text-[11px] text-[#7a8798] sm:px-4 sm:py-3 sm:text-xs">
-          <span>{`В продаже ${saleDays} ${pluralDays(saleDays)} в Корее`}</span>
+          <span>{`Размещено в Корее ${saleDays} ${pluralDays(saleDays)} назад`}</span>
         </div>
       ) : null}
       {shareNotice ? <span aria-live="polite" className="sr-only">{shareNotice}</span> : null}
