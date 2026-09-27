@@ -67,8 +67,8 @@ async function main() {
     throw new Error("TL_AUTO_CLASSIC_EXPECTED_COUNT must be an integer from 1 to 500");
   if (!Number.isInteger(requestDelayMs) || requestDelayMs < 900 || requestDelayMs > 60_000)
     throw new Error("TL_AUTO_CLASSIC_PREFLIGHT_DELAY_MS must be an integer from 900 to 60000");
-  if (process.env.ENCAR_PROXY_REQUIRED === "true" && !process.env.ENCAR_PROXY_URL?.trim())
-    throw new Error("ENCAR_PROXY_REQUIRED=true but ENCAR_PROXY_URL is missing");
+  if (!process.env.ENCAR_PROXY_URL?.trim())
+    throw new Error("ENCAR_PROXY_URL is required; classic candidate preflight must use the configured proxy");
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const serviceKey = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
   if (!url || !serviceKey) throw new Error("Supabase URL and service-role key are required");
