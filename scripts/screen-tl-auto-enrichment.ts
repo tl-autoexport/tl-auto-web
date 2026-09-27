@@ -6,6 +6,7 @@ import { isEncarElectricFuel } from "../src/server/imports/encar-ev-battery";
 config({ path: ".env", quiet: true });
 
 const runId = process.env.TL_AUTO_ENRICHMENT_RUN_ID ?? "349fe610-17e0-4df8-8053-bcd7d234983d";
+const outputPath = process.env.TL_AUTO_ENRICHMENT_SCREENING_OUTPUT ?? "output/tl-auto-enrichment-screening.json";
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
 if (!url || !key) throw new Error("NEXT_PUBLIC_SUPABASE_URL and Supabase service key are required");
@@ -104,7 +105,7 @@ async function main() {
     unavailable,
   };
   await mkdir("output", { recursive: true });
-  await writeFile("output/tl-auto-enrichment-screening.json", `${JSON.stringify(report, null, 2)}\n`);
+  await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify({
     ...report,
     profileComplete: undefined,
@@ -112,7 +113,7 @@ async function main() {
     partialEnrichment: undefined,
     needsPowerReview: undefined,
     unavailable: undefined,
-    output: "output/tl-auto-enrichment-screening.json",
+    output: outputPath,
   }, null, 2));
 }
 
