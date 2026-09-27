@@ -113,6 +113,7 @@
     "test:automatic-power-reference": "tsx src/server/catalog/automatic-power-reference.test.ts",
     "research:power:ai": "tsx scripts/research-encar-power-with-gemini.ts",
     "query:power:external-catalogs": "tsx scripts/query-new-encar-external-catalogs.ts",
+    "import:drom:hybrid-preliminary": "tsx scripts/import-drom-hybrid-preliminary.ts",
     "test:encarrus-power": "tsx src/server/catalog/encarrus-power.test.ts",
     "audit:auto-candidate-power": "tsx scripts/audit-auto-candidate-power.ts",
     "resolve:auto-candidate-power": "tsx scripts/resolve-auto-candidate-power.ts",

@@ -14,6 +14,7 @@ import {
   resolveHybridPower,
   resolveEngineCc,
   resolvePower,
+  type HybridPowerResolution,
 } from "@/server/normalization/vehicles";
 import {
   translateInspectionLabel,
@@ -984,6 +985,7 @@ async function mapCar(
   rateSnapshot: CalcRateSnapshot,
   onReject?: (reason: string) => void,
   fastMode = false,
+  hybridPowerOverride?: HybridPowerResolution,
 ) {
   const sourceId = String(listCar.Id);
   const detail = fastMode ? null : await fetchDetail(sourceId).catch(() => null);
@@ -1051,7 +1053,9 @@ async function mapCar(
     engineCc,
     year,
   };
-  const hybridPower = isHybrid ? resolveHybridPower(powerInput) : null;
+  const hybridPower = isHybrid
+    ? hybridPowerOverride ?? resolveHybridPower(powerInput)
+    : null;
   const power = hybridPower ?? resolvePower(powerInput);
   if (isHybrid && !hybridPower) {
     onReject?.(
@@ -1269,6 +1273,162 @@ async function mapCar(
       parser_version: "encar-electric-safe-2026-08-24",
       status: "ok",
     },
+  };
+}
+
+/**
+ * Capture one explicitly requested Encar listing for comparison without
+ * involving the catalog sync, freshness window, replacement, or row updates.
+ * This is intentionally restricted to the comparison vehicle used for the
+ * EncarRus investigation; it is not a general-purpose importer.
+ */
+export async function captureEncarComparisonListing(options: { write?: boolean } = {}) {
+  const sourceId = "42370783";
+  const query =
+    "(And.Hidden.N._.Manufacturer.현대._.Model.아반떼 하이브리드 (CN7)._.FuelType.가솔린+전기._.Year.range(202100..202700)._.Mileage.range(..200000)._.Price.range(700..15000).)";
+  const matches: EncarListCar[] = [];
+
+  // Tight, bounded source query (3 pages maximum), rather than a catalog run.
+  for (let offset = 0; offset < 150; offset += ENCAR_PAGE_SIZE) {
+    const url = `${ENCAR_BASE_URL}?count=true&q=${encodeURIComponent(query)}&sr=${encodeURIComponent(`|ModifiedDate|${offset}|${ENCAR_PAGE_SIZE}`)}`;
+    const page = await fetchJson<{ SearchResults?: EncarListCar[] }>(url, 2);
+    const found = (page.SearchResults ?? []).find(
+      (item) => String(item.Id) === sourceId,
+    );
+    if (found) {
+      matches.push(found);
+      break;
+    }
+    if ((page.SearchResults ?? []).length < ENCAR_PAGE_SIZE) break;
+  }
+
+  const listCar = matches[0];
+  if (!listCar) {
+    throw new Error(`Encar listing ${sourceId} was not found in the bounded Hyundai Avante Hybrid query`);
+  }
+
+  const [rateSnapshot, optionCatalog] = await Promise.all([
+    getCbrCalcRates(),
+    fetchStandardOptionCatalog(),
+  ]);
+  let rejectReason: string | undefined;
+  // This one-off override is constrained to the requested source ID, model,
+  // year, and fuel. It does not change recurring catalog resolution.
+  const comparisonHybridSpec: HybridPowerResolution | undefined =
+    String(listCar.Id) === sourceId &&
+    listCar.Manufacturer === "현대" &&
+    listCar.Model === "아반떼 하이브리드 (CN7)" &&
+    normalizeFuel(listCar.FuelType) === "hybrid" &&
+    String(listCar.Year) === "202112"
+      ? {
+          powerHp: 105,
+          electricPowerKw: 32,
+          dvsAboveElectric30Min: true,
+          sequential: false,
+          source: "official_hyundai_avante_cn7_hybrid_specs",
+        }
+      : undefined;
+  const item = await mapCar(
+    listCar,
+    optionCatalog,
+    rateSnapshot,
+    (reason) => { rejectReason = reason; },
+    false,
+    comparisonHybridSpec,
+  );
+  if (!item) {
+    throw new Error(`Encar listing ${sourceId} failed TL Auto mapping validation: ${rejectReason ?? "unknown reason"}`);
+  }
+
+  const safeSummary = {
+    sourceId,
+    brand: item.car.brand,
+    model: item.car.model,
+    grade: item.car.grade,
+    year: item.car.year,
+    mileageKm: item.car.mileage_km,
+    priceKrw: item.car.price_krw,
+    engineCc: item.car.engine_cc,
+    powerHp: item.car.power_hp,
+    fuelType: item.car.fuel_type,
+    transmission: item.car.transmission,
+    photoCount: item.photos.length,
+    optionCount: item.options.length,
+    reports: item.reports.map((report) => report.report_type),
+    calculatedTotalRub: item.calc ? Math.round(item.calc.totalRub) : null,
+    write: options.write === true,
+  };
+  if (!options.write) return { mode: "dry-run", summary: safeSummary };
+
+  const supabase = createSupabaseAdmin();
+  const comparisonSource = "encar_comparison";
+  const { data: existing, error: lookupError } = await supabase
+    .from("source_snapshots")
+    .select("id, fetched_at")
+    .eq("source", comparisonSource)
+    .eq("source_id", sourceId)
+    .maybeSingle();
+  if (lookupError) throw lookupError;
+  if (existing) {
+    return {
+      mode: "already-saved",
+      snapshotId: existing.id,
+      fetchedAt: existing.fetched_at,
+      summary: safeSummary,
+    };
+  }
+
+  // Store a comparison capture in the existing snapshot schema, isolated from
+  // `source: encar` so catalog and importer lookups cannot consume it.
+  const comparisonPayload = {
+    purpose: "manual_source_comparison",
+    source: "encar",
+    sourceId,
+    capturedAt: new Date().toISOString(),
+    summary: safeSummary,
+    listing: {
+      year: item.car.year,
+      registrationMonth: item.car.registration_month,
+      mileageKm: item.car.mileage_km,
+      priceKrw: item.car.price_krw,
+      engineCc: item.car.engine_cc,
+      powerHp: item.car.power_hp,
+      fuelType: item.car.fuel_type,
+      transmission: item.car.transmission,
+      bodyType: item.car.body_type,
+      brand: item.car.brand,
+      model: item.car.model,
+      grade: item.car.grade,
+      sourceUpdatedAt: item.car.source_updated_at,
+    },
+    photos: item.photos.map((photo, sortOrder) => ({ ...photo, sortOrder })),
+    options: item.options,
+    reports: item.reports.map((report) => ({
+      reportType: report.report_type,
+      summary: report.summary,
+      items: report.items,
+    })),
+    calculation: item.calc,
+  };
+  const { data: snapshot, error: snapshotError } = await supabase
+    .from("source_snapshots")
+    .insert({
+      source: comparisonSource,
+      source_id: sourceId,
+      source_url: `https://fem.encar.com/cars/detail/${sourceId}`,
+      payload: comparisonPayload,
+      payload_hash: hashPayload(comparisonPayload),
+      parser_version: "encar-comparison-only-v1",
+      status: "comparison_only",
+    })
+    .select("id, fetched_at")
+    .single();
+  if (snapshotError) throw snapshotError;
+  return {
+    mode: "comparison-snapshot-saved",
+    snapshotId: snapshot.id,
+    fetchedAt: snapshot.fetched_at,
+    summary: safeSummary,
   };
 }
 
