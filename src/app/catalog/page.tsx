@@ -133,7 +133,8 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     return groups;
   }, {});
   for (const models of Object.values(modelsByBrand)) models.sort();
-  const fuels = unique(optionCars.map((car) => car.fuel_type));
+  // Keep Hybrid selectable even if the current facet sample has no hybrid rows.
+  const fuels = unique([...optionCars.map((car) => car.fuel_type), "hybrid"]);
   const transmissions = unique(optionCars.map((car) => transmissionFilterValue(car.transmission)));
   const trims = unique(optionCars.map((car) => car.trim));
   const bodies = unique(optionCars.map((car) => bodyTypeFilterValue(car.body_type)));
