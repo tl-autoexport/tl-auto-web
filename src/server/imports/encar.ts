@@ -310,6 +310,8 @@ export type ImportOptions = {
   allowedBrands?: string[];
   /** List-only discovery: do not load detail pages, rates, or option catalogs. */
   discoveryOnly?: boolean;
+  /** Search each Encar manufacturer independently during read-only discovery. */
+  discoveryManufacturers?: string[];
   brandMinimums?: Record<string, number>;
   modelMinimums?: Record<string, number>;
   priorityBrandPages?: Record<string, number>;
@@ -1539,6 +1541,7 @@ export async function importEncar(options: ImportOptions = {}) {
   const identities = new Set<string>();
 
   const candidates: EncarListCar[] = [];
+  const manufacturerDiscoveryCounts: Record<string, number> = {};
   const listPageErrors: Array<{
     page: number;
     brand?: string;
@@ -1576,21 +1579,44 @@ export async function importEncar(options: ImportOptions = {}) {
       }
     }
   }
-  for (let page = 0; page < maxPages; page += 1) {
-    let list: EncarListCar[];
-    try {
-      list = await fetchListPage(page * ENCAR_PAGE_SIZE, undefined, undefined, filterBounds);
-      if (listRequestDelayMs) await sleep(listRequestDelayMs);
-    } catch (error) {
-      listPageErrors.push({
-        page: page + 1,
-        message: error instanceof Error ? error.message : String(error),
-      });
-      if (candidates.length === 0) throw error;
-      break;
+  if (options.discoveryOnly && options.discoveryManufacturers?.length) {
+    const manufacturers = [...new Set(options.discoveryManufacturers.map((value) => value.trim()).filter(Boolean))];
+    for (const manufacturer of manufacturers) {
+      manufacturerDiscoveryCounts[manufacturer] = 0;
+      for (let page = 0; page < maxPages; page += 1) {
+        try {
+          const list = await fetchListPage(page * ENCAR_PAGE_SIZE, manufacturer, undefined, filterBounds);
+          if (listRequestDelayMs) await sleep(listRequestDelayMs);
+          manufacturerDiscoveryCounts[manufacturer] += list.length;
+          candidates.push(...list);
+          console.log(JSON.stringify({ event: "classic_discovery_progress", manufacturer, page: page + 1,
+            fetchedForManufacturer: manufacturerDiscoveryCounts[manufacturer], totalFetched: candidates.length }));
+          if (list.length < ENCAR_PAGE_SIZE) break;
+        } catch (error) {
+          listPageErrors.push({ page: page + 1, brand: manufacturer,
+            message: error instanceof Error ? error.message : String(error) });
+          break;
+        }
+      }
     }
-    if (!list.length) break;
-    candidates.push(...list);
+  } else {
+    for (let page = 0; page < maxPages; page += 1) {
+      let list: EncarListCar[];
+      try {
+        list = await fetchListPage(page * ENCAR_PAGE_SIZE, undefined, undefined, filterBounds);
+        if (listRequestDelayMs) await sleep(listRequestDelayMs);
+      } catch (error) {
+        listPageErrors.push({
+          page: page + 1,
+          message: error instanceof Error ? error.message : String(error),
+        });
+        if (candidates.length === 0) throw error;
+        break;
+      }
+      if (!list.length) break;
+      candidates.push(...list);
+      if (list.length < ENCAR_PAGE_SIZE) break;
+    }
   }
   for (let page = 0; page < electricPages; page += 1) {
     try {
@@ -1676,7 +1702,32 @@ export async function importEncar(options: ImportOptions = {}) {
     .sort((left, right) => Number(right.Id) - Number(left.Id));
 
   if (options.discoveryOnly) {
-    const candidateDrafts = freshCandidates.slice(0, target).map((item) => {
+    let selectedCandidates = freshCandidates.slice(0, target);
+    if (options.discoveryManufacturers?.length && freshCandidates.length > target) {
+      // Prevent high-volume makes from consuming the entire review pool before
+      // rare luxury makes are represented. Preserve newest-first order per make.
+      const buckets = new Map<string, EncarListCar[]>();
+      for (const item of freshCandidates) {
+        const brand = normalizeBrand(item.Manufacturer) ?? "unknown";
+        const bucket = buckets.get(brand) ?? [];
+        bucket.push(item);
+        buckets.set(brand, bucket);
+      }
+      selectedCandidates = [];
+      const orderedBrands = [...buckets.keys()].sort();
+      for (let index = 0; selectedCandidates.length < target; index += 1) {
+        let added = false;
+        for (const brand of orderedBrands) {
+          const candidate = buckets.get(brand)?.[index];
+          if (!candidate) continue;
+          selectedCandidates.push(candidate);
+          added = true;
+          if (selectedCandidates.length >= target) break;
+        }
+        if (!added) break;
+      }
+    }
+    const candidateDrafts = selectedCandidates.map((item) => {
       const { year, month } = normalizeYear(item.Year);
       return {
         source: "encar" as const,
@@ -1705,6 +1756,7 @@ export async function importEncar(options: ImportOptions = {}) {
       existingCandidates: existingSourceIds.size,
       listPageErrors,
       freshCandidates: freshCandidates.length,
+      manufacturerDiscoveryCounts,
       candidateDrafts,
     };
   }

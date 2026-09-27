@@ -8,7 +8,7 @@ config({ path: ".env.local", override: true, quiet: true });
 config({ path: ".env", quiet: true });
 
 const pool = Number(process.env.TL_AUTO_CLASSIC_DISCOVERY_POOL ?? 1200);
-const pages = Number(process.env.TL_AUTO_CLASSIC_DISCOVERY_MAX_PAGES ?? 220);
+const pagesPerBrand = Number(process.env.TL_AUTO_CLASSIC_DISCOVERY_PAGES_PER_BRAND ?? 20);
 const output = process.env.TL_AUTO_CLASSIC_DISCOVERY_OUTPUT ??
   "output/tl-auto-classic-30plus-discovery.json";
 const minYear = Number(process.env.TL_AUTO_CLASSIC_MIN_YEAR ?? 196001);
@@ -24,10 +24,21 @@ const maxPrice = Number(process.env.TL_AUTO_CLASSIC_MAX_PRICE ?? 100000);
 const brands = (process.env.TL_AUTO_CLASSIC_BRANDS ??
   "Mercedes-Benz,BMW,Volkswagen,Audi,Porsche,Lexus,Volvo,Maserati,Land Rover,재규어,벤틀리,롤스로이스,페라리,람보르기니,애스턴마틴")
   .split(",").map((value) => value.trim()).filter(Boolean);
+const encarManufacturerByBrand: Record<string, string> = {
+  "Mercedes-Benz": "벤츠", BMW: "BMW", Volkswagen: "폭스바겐", Audi: "아우디",
+  Porsche: "포르쉐", Lexus: "렉서스", Volvo: "볼보", Maserati: "마세라티",
+  "Land Rover": "랜드로버", Jaguar: "재규어", "재규어": "재규어",
+  Bentley: "벤틀리", "벤틀리": "벤틀리", "Rolls-Royce": "롤스로이스", "롤스로이스": "롤스로이스",
+  Ferrari: "페라리", "페라리": "페라리", Lamborghini: "람보르기니", "람보르기니": "람보르기니",
+  "Aston Martin": "애스턴마틴", "애스턴마틴": "애스턴마틴",
+};
+const manufacturers = [...new Set(brands.map((brand) => encarManufacturerByBrand[brand]).filter(Boolean))];
 
 async function main() {
   if (!Number.isInteger(pool) || pool < 1 || pool > 5000) throw new Error("Discovery pool must be 1..5000");
-  if (!Number.isInteger(pages) || pages < 1 || pages > 500) throw new Error("Discovery max pages must be 1..500");
+  if (!Number.isInteger(pagesPerBrand) || pagesPerBrand < 1 || pagesPerBrand > 100)
+    throw new Error("Classic discovery pages per brand must be 1..100");
+  if (!manufacturers.length) throw new Error("No Encar manufacturer filters mapped from the classic brand allowlist");
   if (!Number.isInteger(minYear) || !Number.isInteger(maxYear) || minYear < 190001 || maxYear > 210012 || minYear > maxYear)
     throw new Error("Classic discovery year bounds must be valid YYYYMM values with min <= max");
   if (!Number.isInteger(maxListingAgeDays) || maxListingAgeDays < 1 || maxListingAgeDays > 3650)
@@ -44,7 +55,7 @@ async function main() {
 
   const result = await importEncar({
     target: pool,
-    maxPages: pages,
+    maxPages: pagesPerBrand,
     minYear,
     maxYear,
     minMileage,
@@ -61,10 +72,12 @@ async function main() {
     hybridPages: 0,
     allowedBrands: brands,
     discoveryOnly: true,
+    discoveryManufacturers: manufacturers,
   }) as {
     readOnly: boolean; discoveryOnly: boolean; databaseWrites: number; detailRequests: number;
     candidates: number; uniqueCandidates: number; existingCandidates: number; listPageErrors: unknown[];
     freshCandidates: number;
+    manufacturerDiscoveryCounts: Record<string, number>;
     candidateDrafts: Array<Record<string, unknown> & { sourceListingId: string; brand: string | null; model: string | null; year: number | null; fuelType: string | null }>;
   };
   if (!result.readOnly || !result.discoveryOnly || result.databaseWrites !== 0 || result.detailRequests !== 0)
@@ -98,10 +111,15 @@ async function main() {
       minMileage, maxMileage, minPrice, maxPrice,
       priceUnit: "10,000 KRW",
       requestDelayMs,
+      discoveryMode: "manufacturer-filtered pagination",
+      pagesPerBrand,
+      maxListRequests: pagesPerBrand * manufacturers.length,
+      manufacturers,
       excludeExistingCatalogAndAnyPriorQueue: true },
     readOnly: true, databaseWrites: 0, EncarDetailRequests: 0,
     discovery: { listCandidates: result.candidates, uniqueCandidates: result.uniqueCandidates,
       freshCandidates: result.freshCandidates, returnedPool: result.candidateDrafts.length,
+      fetchedByManufacturer: result.manufacturerDiscoveryCounts,
       alreadyQueuedExcluded: queued.size, neverQueued: fresh.length, configurations: groups.size,
       listPageErrors: result.listPageErrors.length },
     listPageErrors: result.listPageErrors,
