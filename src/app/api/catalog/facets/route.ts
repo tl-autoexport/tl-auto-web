@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabasePublic } from "@/server/supabase/public";
+import { normalizeCatalogBrand } from "@/lib/catalog-brand";
 
 /**
  * Facet counters for the catalogue cascade.
@@ -30,7 +31,14 @@ export async function GET(request: Request) {
   const axes: Record<string, Array<{ value: string; label: string; cars: number }>> = {};
   for (const row of (facets.data ?? []) as FacetRow[]) {
     const bucket = axes[row.axis] ?? [];
-    bucket.push({ value: row.value, label: row.label ?? row.value, cars: row.cars });
+    if (row.axis === "brand") {
+      const label = normalizeCatalogBrand(row.value) ?? row.value;
+      const existing = bucket.find((option) => option.value === label);
+      if (existing) existing.cars += row.cars;
+      else bucket.push({ value: label, label, cars: row.cars });
+    } else {
+      bucket.push({ value: row.value, label: row.label ?? row.value, cars: row.cars });
+    }
     axes[row.axis] = bucket;
   }
   for (const bucket of Object.values(axes)) {
@@ -53,7 +61,7 @@ function buildFilters(params: URLSearchParams): Record<string, unknown> {
   const under160 = params.get("under160") === "1" || params.get("shelf") === "under-160";
 
   const filters: Record<string, unknown> = {
-    brand: params.get("brand") || undefined,
+    brand: normalizeCatalogBrand(params.get("brand")) || undefined,
     model: params.get("model") || undefined,
     generation: params.get("generation") || undefined,
     fuel: params.get("fuel") || undefined,

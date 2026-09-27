@@ -3,6 +3,7 @@ import { createSupabaseAdmin } from "@/server/supabase/admin";
 import { createSupabasePublic } from "@/server/supabase/public";
 import { normalizeColor, normalizeDrive } from "@/server/normalization/vehicles";
 import { bodyTypeValues, transmissionValues } from "@/lib/catalog-filter-values";
+import { catalogBrandValues, normalizeCatalogBrand } from "@/lib/catalog-brand";
 
 const buildWithoutCatalog =
   process.env.TL_AUTO_BUILD_WITHOUT_CATALOG === "true";
@@ -298,7 +299,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   if (source) query = query.eq("primary_source", source);
   if (maxPowerHp) query = query.lte("power_hp", maxPowerHp);
   if (search) query = query.or(catalogSearchExpression(search));
-  if (brand) query = query.eq("brand", brand);
+  if (brand) query = query.in("brand", catalogBrandValues(brand));
   if (generation) query = query.eq("generation_code", generation);
   if (model) {
     // Keep old shared links with a combined `model=Kia K7` value working.
@@ -380,7 +381,7 @@ export async function getCatalogCardPage(
   if (filters.source) query = query.eq("primary_source", filters.source);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
   if (filters.search) query = query.or(catalogSearchExpression(filters.search));
-  if (filters.brand) query = query.eq("brand", filters.brand);
+  if (filters.brand) query = query.in("brand", catalogBrandValues(filters.brand));
   if (filters.generation) query = query.eq("generation_code", filters.generation);
   if (filters.model) query = !filters.brand && /\s/.test(filters.model)
     ? query.or(catalogSearchExpression(filters.model))
@@ -769,12 +770,15 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
     if (batch.length < pageSize) break;
   }
 
-  return facets;
+  return facets.map((car) => ({
+    ...car,
+    brand: normalizeCatalogBrand(car.brand),
+  }));
 }
 
 const getCachedCatalogFacetCars = unstable_cache(
   fetchCatalogFacetCars,
-  ["catalog-filter-facets-v2"],
+  ["catalog-filter-facets-v3-normalized-brands"],
   { revalidate: 3600 },
 );
 

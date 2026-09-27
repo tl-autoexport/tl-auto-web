@@ -28,6 +28,7 @@ import { LiveCatalogCount } from "./LiveCatalogCount";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import { PassoCatalogCard } from "@/components/catalog/PassoCatalogCard";
 import { sourceDisplayName } from "@/lib/source-url";
+import { normalizeCatalogBrand } from "@/lib/catalog-brand";
 import { CatalogSearchBar } from "./CatalogSearchBar";
 import { CatalogInfiniteGrid } from "./CatalogInfiniteGrid";
 import { GenerationCascade } from "./GenerationCascade";
@@ -87,7 +88,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const sort = isSort(sortValue) ? sortValue : "fresh";
 
   const filters: CatalogFilters = {
-    brand: value("brand") || undefined,
+    brand: normalizeCatalogBrand(value("brand")) || undefined,
     generation: value("generation") || undefined,
     model: value("model") || undefined,
     search: value("search") || undefined,
