@@ -1,0 +1,37 @@
+{
+  "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+  "source": "EncarRus product detail captured in user-supplied HAR files on 2026-09-27",
+  "status": "preliminary_source_derived",
+  "configurations": [
+    {
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2023,
+      "engineCc": 1598,
+      "fuelType": "hybrid",
+      "expectedListings": 11,
+      "sourceUrl": "https://encarrus.ru/korea/product/2443224/?city_price=1",
+      "captureFile": "encarrus.ru27093.har",
+      "systemPowerPs": 230,
+      "enginePowerPs": 180,
+      "sourceStatedUtilPowerPs": 207,
+      "derivedElectric30MinPs": 27,
+      "note": "The source explicitly says 'for recycling fee 207 hp'; 27 hp is derived as 207 minus 180 and must remain preliminary."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2022,
+      "engineCc": 2359,
+      "fuelType": "hybrid",
+      "expectedListings": 3,
+      "sourceUrl": "https://encarrus.ru/korea/product/2544695/?city_price=1",
+      "captureFile": "encarrus.ru27095.har",
+      "systemPowerPs": 200,
+      "enginePowerPs": 159,
+      "sourceStatedUtilPowerPs": 182,
+      "derivedElectric30MinPs": 23,
+      "note": "The source explicitly says 'for recycling fee 182 hp'; 23 hp is derived as 182 minus 159 and must remain preliminary."
+    }
+  ]
+}

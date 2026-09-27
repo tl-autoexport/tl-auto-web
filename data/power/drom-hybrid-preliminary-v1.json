@@ -1,0 +1,1337 @@
+{
+  "version": "drom-hybrid-preliminary-v1",
+  "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+  "generatedAt": "2026-09-27T03:43:07.735Z",
+  "status": "draft_preliminary_not_approved_for_calculation",
+  "rows": [
+    {
+      "specKey": "drom-hybrid-kia-sorento-2024-1598-2wd-f2eb73b9a5",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sorento",
+      "generation": null,
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sorento 1.6 T-GDI Hybrid AT 2WD Prestige 5 seats (08.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sorento/506306/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 2WD Prestige 5 seats"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42738088",
+        "42757182",
+        "42759015",
+        "42760237",
+        "42761212",
+        "42788135"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-carnival-2024-1598-any-drive-88970c70e1",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Carnival",
+      "generation": null,
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Carnival 1.6 T-GDI Hybrid AT 2WD Noblesse 7 seats (12.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/carnival/482643/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 2WD Noblesse 7 seats"
+      },
+      "powers": {
+        "combinedPs": 204,
+        "enginePs": 180,
+        "electric30MinPs": 24,
+        "combinedKw": 150.0418,
+        "engineKw": 132.3898,
+        "electric30MinKw": 17.652
+      },
+      "listingIds": [
+        "42747966",
+        "42763901",
+        "42771867",
+        "42772339",
+        "42781241"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-k5-2023-1999-any-drive-f150b0d6a1",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "K5",
+      "generation": null,
+      "year": 2023,
+      "engineCc": 1999,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia K5 2.0 GDi HEV AT 2WD Prestige (11.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/k5/507119/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "2.0 GDi HEV AT 2WD Prestige"
+      },
+      "powers": {
+        "combinedPs": 172,
+        "enginePs": 152,
+        "electric30MinPs": 20,
+        "combinedKw": 126.5058,
+        "engineKw": 111.7958,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42744029",
+        "42745330",
+        "42747637",
+        "42769913",
+        "42791708"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-k8-2022-1598-any-drive-73679d0792",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "K8",
+      "generation": null,
+      "year": 2022,
+      "engineCc": 1598,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia K8 HEV 1.6 T AT 2WD Nobless Light (04.2021 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/k8/489242/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "HEV 1.6 T AT 2WD Nobless Light"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42753147",
+        "42776841",
+        "42786366",
+        "42787291",
+        "42787873"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-santafe-2024-1598-2wd-d5cf44efb1",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "generation": "MX5",
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Santa Fe 1.6 T-GDI HEV AT 2WD Exclusive 5 seats (08.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/santa_fe/492997/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI HEV AT 2WD Exclusive 5 seats"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42747425",
+        "42760768",
+        "42772324",
+        "42781879"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-santafe-2022-1598-2wd-58ab257071",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "generation": null,
+      "year": 2022,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Santa Fe 1.6 T-GDI HEV 2WD AT Exclusive 5 seats (07.2021 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/santa_fe/443494/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI HEV 2WD AT Exclusive 5 seats"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42758381",
+        "42758615",
+        "42773219",
+        "42786437"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-k8-2023-1598-any-drive-21b37d17cc",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "K8",
+      "generation": null,
+      "year": 2023,
+      "engineCc": 1598,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia K8 HEV 1.6 T AT 2WD Nobless Light (04.2021 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/k8/489242/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "HEV 1.6 T AT 2WD Nobless Light"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42762294",
+        "42779035",
+        "42783412",
+        "42787587"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-niro-2022-1580-any-drive-2bd70007e8",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Niro",
+      "generation": null,
+      "year": 2022,
+      "engineCc": 1580,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Niro 1.6 Hybrid DCT 2WD Trendy (01.2022 - 02.2023) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/niro/546837/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 Hybrid DCT 2WD Trendy"
+      },
+      "powers": {
+        "combinedPs": 119,
+        "enginePs": 105,
+        "electric30MinPs": 14,
+        "combinedKw": 87.5244,
+        "engineKw": 77.2274,
+        "electric30MinKw": 10.297
+      },
+      "listingIds": [
+        "42750157",
+        "42758380",
+        "42768434",
+        "42769721"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sportage-2022-1598-2wd-ac9b77772c",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": null,
+      "year": 2022,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sportage 1.6 T-GDI AT Hybrid Prestige (07.2021 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sportage/434282/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI AT Hybrid Prestige"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42739732",
+        "42755062",
+        "42759023",
+        "42767867"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-santafe-2025-1598-2wd-b313677db4",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "generation": "MX5",
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Santa Fe 1.6 T-GDI HEV AT 2WD Exclusive 5 seats (08.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/santa_fe/492997/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI HEV AT 2WD Exclusive 5 seats"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42761900",
+        "42766654",
+        "42789386"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-sonata-2023-1999-any-drive-793a6210a9",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "generation": "DN8",
+      "year": 2023,
+      "engineCc": 1999,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Sonata 2.0 HEV AT 2WD Premium (05.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/sonata/482580/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "2.0 HEV AT 2WD Premium"
+      },
+      "powers": {
+        "combinedPs": 184,
+        "enginePs": 152,
+        "electric30MinPs": 32,
+        "combinedKw": 135.3318,
+        "engineKw": 111.7958,
+        "electric30MinKw": 23.536
+      },
+      "listingIds": [
+        "42742111",
+        "42752312",
+        "42753127"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-niro-2021-1580-any-drive-5c681a5106",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Niro",
+      "generation": null,
+      "year": 2021,
+      "engineCc": 1580,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Niro 1.6 Hybrid GDi DCT 2WD Luxury (03.2019 - 06.2021) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/niro/546397/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 Hybrid GDi DCT 2WD Luxury"
+      },
+      "powers": {
+        "combinedPs": 119,
+        "enginePs": 105,
+        "electric30MinPs": 14,
+        "combinedKw": 87.5244,
+        "engineKw": 77.2274,
+        "electric30MinKw": 10.297
+      },
+      "listingIds": [
+        "42751292",
+        "42758258",
+        "42777712"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sorento-2026-1598-2wd-89a236d1d6",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sorento",
+      "generation": null,
+      "year": 2026,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sorento 1.6 T-GDI Hybrid AT 2WD Prestige 5 seats (08.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sorento/506306/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 2WD Prestige 5 seats"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42747134",
+        "42768989",
+        "42789911"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sorento-2022-1598-2wd-450f2b4004",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sorento",
+      "generation": null,
+      "year": 2022,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sorento HEV 1.6 AT 2WD Prestige (03.2020 - 07.2023) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sorento/446429/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "HEV 1.6 AT 2WD Prestige"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42753962",
+        "42776006",
+        "42789053"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sportage-2024-1598-2wd-ac83a615f1",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": null,
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sportage 1.6 T-GDI AT 2WD Hybrid Prestige (11.2024 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sportage/519615/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI AT 2WD Hybrid Prestige"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42753289",
+        "42784017",
+        "42790860"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-santafe-2023-1598-4wd-1af39e1cb3",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "generation": "MX5",
+      "year": 2023,
+      "engineCc": 1598,
+      "driveType": "4WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Santa Fe 1.6 T-GDI HEV AT 4WD Exclusive 5 seats (08.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/santa_fe/493022/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI HEV AT 4WD Exclusive 5 seats"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42746971",
+        "42761388"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-santafe-2021-1598-2wd-c445eaaa96",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "generation": null,
+      "year": 2021,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Santa Fe 1.6 T-GDI HEV 2WD AT Exclusive 5 seats (07.2021 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/santa_fe/443494/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI HEV 2WD AT Exclusive 5 seats"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42759993",
+        "42779362"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-tucson-2024-1598-2wd-92752e77a2",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Tucson 1.6 T-GDI Hybrid AT 2WD Modern (12.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/tucson/484863/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 2WD Modern"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42752944",
+        "42787946"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-k5-2021-1999-any-drive-fb71561131",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "K5",
+      "generation": null,
+      "year": 2021,
+      "engineCc": 1999,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia K5 2.0 GDi HEV AT 2WD Trendy (12.2019 - 10.2023) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/k5/448369/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "2.0 GDi HEV AT 2WD Trendy"
+      },
+      "powers": {
+        "combinedPs": 172,
+        "enginePs": 152,
+        "electric30MinPs": 20,
+        "combinedKw": 126.5058,
+        "engineKw": 111.7958,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42764051",
+        "42780847"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-k5-2022-1999-any-drive-bd437d870b",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "K5",
+      "generation": null,
+      "year": 2022,
+      "engineCc": 1999,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia K5 2.0 GDi HEV AT 2WD Trendy (12.2019 - 10.2023) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/k5/448369/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "2.0 GDi HEV AT 2WD Trendy"
+      },
+      "powers": {
+        "combinedPs": 172,
+        "enginePs": 152,
+        "electric30MinPs": 20,
+        "combinedKw": 126.5058,
+        "engineKw": 111.7958,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42769871",
+        "42792122"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-k8-2021-1598-any-drive-b53611b7b4",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "K8",
+      "generation": null,
+      "year": 2021,
+      "engineCc": 1598,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia K8 HEV 1.6 T AT 2WD Nobless Light (04.2021 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/k8/489242/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "HEV 1.6 T AT 2WD Nobless Light"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42739854",
+        "42768777"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-k8-2024-1598-any-drive-de47dc7c24",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "K8",
+      "generation": null,
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia K8 HEV 1.6 T-GDI AT 2WD Noblesse Light (08.2024 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/k8/539877/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "HEV 1.6 T-GDI AT 2WD Noblesse Light"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42752145",
+        "42764830"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sorento-2025-1598-2wd-737be79920",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sorento",
+      "generation": null,
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sorento 1.6 T-GDI Hybrid AT 2WD Prestige 5 seats (08.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sorento/506306/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 2WD Prestige 5 seats"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42744043",
+        "42761189"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sorento-2023-1598-2wd-af57f5139e",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sorento",
+      "generation": null,
+      "year": 2023,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sorento 1.6 T-GDI Hybrid AT 2WD Prestige 5 seats (08.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sorento/506306/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 2WD Prestige 5 seats"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42768600",
+        "42781977"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-kona-2023-1580-any-drive-8950f8a4b2",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "generation": "SX2",
+      "year": 2023,
+      "engineCc": 1580,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Kona 1.6 GDi HEV DCT 2WD Modern (01.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/kona/464954/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 GDi HEV DCT 2WD Modern"
+      },
+      "powers": {
+        "combinedPs": 119,
+        "enginePs": 105,
+        "electric30MinPs": 14,
+        "combinedKw": 87.5244,
+        "engineKw": 77.2274,
+        "electric30MinKw": 10.297
+      },
+      "listingIds": [
+        "42762825"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-kona-2024-1580-any-drive-6bfb20be3c",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "generation": "SX2",
+      "year": 2024,
+      "engineCc": 1580,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Kona 1.6 GDi HEV DCT 2WD Modern (01.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/kona/464954/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 GDi HEV DCT 2WD Modern"
+      },
+      "powers": {
+        "combinedPs": 119,
+        "enginePs": 105,
+        "electric30MinPs": 14,
+        "combinedKw": 87.5244,
+        "engineKw": 77.2274,
+        "electric30MinKw": 10.297
+      },
+      "listingIds": [
+        "42775632"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-kona-2025-1580-any-drive-9b5970db25",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "generation": "SX2",
+      "year": 2025,
+      "engineCc": 1580,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Kona 1.6 GDi HEV DCT 2WD Modern (01.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/kona/464954/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 GDi HEV DCT 2WD Modern"
+      },
+      "powers": {
+        "combinedPs": 119,
+        "enginePs": 105,
+        "electric30MinPs": 14,
+        "combinedKw": 87.5244,
+        "engineKw": 77.2274,
+        "electric30MinKw": 10.297
+      },
+      "listingIds": [
+        "42776121"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-kona-2022-1580-any-drive-da623f3bae",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Kona",
+      "generation": null,
+      "year": 2022,
+      "engineCc": 1580,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Kona 1.6 GDi HEV DCT 2WD Smart (10.2020 - 08.2023) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/kona/483797/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 GDi HEV DCT 2WD Smart"
+      },
+      "powers": {
+        "combinedPs": 119,
+        "enginePs": 105,
+        "electric30MinPs": 14,
+        "combinedKw": 87.5244,
+        "engineKw": 77.2274,
+        "electric30MinKw": 10.297
+      },
+      "listingIds": [
+        "42778727"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-santafe-2023-1598-2wd-4fbd45bf4a",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Santafe",
+      "generation": "MX5",
+      "year": 2023,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Santa Fe 1.6 T-GDI HEV AT 2WD Exclusive 5 seats (08.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/santa_fe/492997/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI HEV AT 2WD Exclusive 5 seats"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42746315"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-sonata-2024-1999-any-drive-2fb4095972",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "generation": "DN8",
+      "year": 2024,
+      "engineCc": 1999,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Sonata 2.0 HEV AT 2WD Premium (05.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/sonata/482580/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "2.0 HEV AT 2WD Premium"
+      },
+      "powers": {
+        "combinedPs": 184,
+        "enginePs": 152,
+        "electric30MinPs": 32,
+        "combinedKw": 135.3318,
+        "engineKw": 111.7958,
+        "electric30MinKw": 23.536
+      },
+      "listingIds": [
+        "42772139"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-sonata-2021-1999-any-drive-8214a9be64",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "generation": "DN8",
+      "year": 2021,
+      "engineCc": 1999,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Sonata 2.0 HEV AT Premium (03.2019 - 03.2021) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/sonata/442221/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "2.0 HEV AT Premium"
+      },
+      "powers": {
+        "combinedPs": 172,
+        "enginePs": 152,
+        "electric30MinPs": 20,
+        "combinedKw": 126.5058,
+        "engineKw": 111.7958,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42791352"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-tucson-2025-1598-2wd-fe29894577",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Tucson 1.6 T-GDI Hybrid AT 2WD Modern (12.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/tucson/484863/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 2WD Modern"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42761230"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-tucson-2025-1598-4wd-8ee8df5f77",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": "4WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Tucson 1.6 T-GDI Hybrid AT 4WD Modern (12.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/tucson/484878/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 4WD Modern"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42769187"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-tucson-2021-1598-2wd-e1a261e131",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2021,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Tucson 1.6 HEV GDI AT 2WD Modern (10.2020 - 12.2023) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/tucson/458295/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 HEV GDI AT 2WD Modern"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42784178"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-tucson-2022-1598-2wd-f7248409e3",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2022,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Tucson 1.6 HEV GDI AT 2WD Modern (10.2020 - 12.2023) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/tucson/458295/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 HEV GDI AT 2WD Modern"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42787189"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-hyundai-tucson-2023-1598-2wd-ced4512637",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2023,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Hyundai Tucson 1.6 T-GDI Hybrid AT 2WD Modern (12.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/hyundai/tucson/484863/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 2WD Modern"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42789243"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-carnival-2024-1600-any-drive-171a42998a",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Carnival",
+      "generation": null,
+      "year": 2024,
+      "engineCc": 1600,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Carnival 1.6 T-GDI Hybrid AT 2WD Noblesse 7 seats (12.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/carnival/482643/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 2WD Noblesse 7 seats"
+      },
+      "powers": {
+        "combinedPs": 204,
+        "enginePs": 180,
+        "electric30MinPs": 24,
+        "combinedKw": 150.0418,
+        "engineKw": 132.3898,
+        "electric30MinKw": 17.652
+      },
+      "listingIds": [
+        "42767512"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-k8-2025-1598-any-drive-375e35301b",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "K8",
+      "generation": null,
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": null,
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia K8 HEV 1.6 T-GDI AT 2WD Noblesse Light (08.2024 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/k8/539877/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "HEV 1.6 T-GDI AT 2WD Noblesse Light"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42778518"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sorento-2024-1598-4wd-77bce49c9a",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sorento",
+      "generation": null,
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": "4WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sorento 1.6 T-GDI Hybrid AT 4WD Prestige 5 seats (08.2023 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sorento/506606/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI Hybrid AT 4WD Prestige 5 seats"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42768636"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sorento-2021-1598-4wd-bb140e34cf",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sorento",
+      "generation": null,
+      "year": 2021,
+      "engineCc": 1598,
+      "driveType": "4WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sorento HEV 1.6 AT 4WD Prestige (03.2020 - 07.2023) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sorento/446432/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "HEV 1.6 AT 4WD Prestige"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42768798"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sorento-2022-1598-4wd-61cd46f01c",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sorento",
+      "generation": null,
+      "year": 2022,
+      "engineCc": 1598,
+      "driveType": "4WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sorento HEV 1.6 AT 4WD Prestige (03.2020 - 07.2023) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sorento/446432/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "HEV 1.6 AT 4WD Prestige"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42775824"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sportage-2025-1598-2wd-79350710b2",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": null,
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sportage 1.6 T-GDI AT 2WD Hybrid Prestige (11.2024 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sportage/519615/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI AT 2WD Hybrid Prestige"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42739395"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sportage-2021-1598-2wd-16844a8a43",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": null,
+      "year": 2021,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sportage 1.6 T-GDI AT Hybrid Prestige (07.2021 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sportage/434282/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI AT Hybrid Prestige"
+      },
+      "powers": {
+        "combinedPs": 199,
+        "enginePs": 180,
+        "electric30MinPs": 19,
+        "combinedKw": 146.3643,
+        "engineKw": 132.3898,
+        "electric30MinKw": 13.9745
+      },
+      "listingIds": [
+        "42767741"
+      ]
+    },
+    {
+      "specKey": "drom-hybrid-kia-sportage-2025-1598-4wd-dd1cbda737",
+      "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": null,
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": "4WD",
+      "fuelType": "hybrid",
+      "propulsionType": "hybrid_parallel",
+      "source": {
+        "title": "Kia Sportage 1.6 T-GDI AT 4WD Hybrid Prestige (11.2024 - н.в.) - технические характеристики",
+        "uri": "https://www.drom.ru/catalog/kia/sportage/519628/",
+        "retrievedAt": "2026-09-27T03:43:07.735Z",
+        "trim": "1.6 T-GDI AT 4WD Hybrid Prestige"
+      },
+      "powers": {
+        "combinedPs": 200,
+        "enginePs": 180,
+        "electric30MinPs": 20,
+        "combinedKw": 147.0998,
+        "engineKw": 132.3898,
+        "electric30MinKw": 14.71
+      },
+      "listingIds": [
+        "42774209"
+      ]
+    }
+  ]
+}
