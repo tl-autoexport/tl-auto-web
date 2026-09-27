@@ -1,3 +1,5 @@
+import { normalizeDrive } from "./vehicles";
+
 const KOREAN_RE = /[\u3131-\u318e\uac00-\ud7a3]/;
 
 const EXACT_OPTION_MAP: Record<string, string> = {
@@ -326,6 +328,14 @@ export function translateFuel(value: string | null | undefined) {
     전기: "Электро",
   };
   return map[String(value ?? "").trim()] ?? cleanDisplay(value);
+}
+
+export function translateDrive(value: string | null | undefined) {
+  const drive = normalizeDrive(value);
+  if (drive === "FWD") return "Передний";
+  if (drive === "RWD") return "Задний";
+  if (drive === "2WD" || drive === "4WD") return drive;
+  return null;
 }
 
 export function translateTransmission(value: string | null | undefined) {

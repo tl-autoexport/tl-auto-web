@@ -11,7 +11,7 @@ import { RemoteImage } from "@/components/site/RemoteImage";
 import { useDestination } from "@/components/site/DestinationProvider";
 import { vehicleClientMessage, whatsappContactUrl } from "@/lib/contact";
 import { publicCarPath } from "@/lib/car-url";
-import { translateFuel, translateTransmission } from "@/server/normalization/display";
+import { translateDrive, translateFuel, translateTransmission } from "@/server/normalization/display";
 import { showcasePhotoUrl } from "@/lib/showcase-photo";
 import type { CatalogCar, CatalogCardSummary } from "@/server/cars/repository";
 
@@ -75,6 +75,7 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
   const secondaryFacts = [
     car.trim || car.badge,
     car.fuel_type ? translateFuel(car.fuel_type) : null,
+    translateDrive(car.drive_type),
     car.power_hp ? `${car.power_hp} л.с.` : null,
     bodyShapeForCard(car),
     seats,

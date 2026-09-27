@@ -25,6 +25,7 @@ import {
   translateConditionDescription,
   translateConditionLabel,
   translateColor,
+  translateDrive,
   translateFuel,
   translateOption,
   translateTransmission,
@@ -197,6 +198,7 @@ export default async function CarDetailPage({
               </div>
               <div className="mt-3 grid gap-2.5 text-[13px] sm:mt-4 sm:gap-3 sm:text-sm">
                 <Spec label="Топливо" value={translateFuel(car.fuel_type)} />
+                {translateDrive(car.drive_type) ? <Spec label="Привод" value={translateDrive(car.drive_type)!} /> : null}
                 <Spec
                   label="КПП"
                   value={translateTransmission(car.transmission)}

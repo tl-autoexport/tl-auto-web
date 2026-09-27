@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { translateDrive } from "./display";
 import {
   driveTypesCompatible,
   normalizeColor,
@@ -44,6 +45,13 @@ assert.equal(normalizeDrive("HTRAC"), "4WD");
 assert.equal(normalizeDrive("quattro"), "4WD");
 assert.equal(normalizeDrive("Кузов"), null);
 assert.equal(normalizeDrive(null), null);
+assert.equal(translateDrive("전륜구동"), "Передний");
+assert.equal(translateDrive("후륜"), "Задний");
+assert.equal(translateDrive("2WD"), "2WD");
+assert.equal(translateDrive("4WD"), "4WD");
+assert.equal(translateDrive("передний-задний"), null);
+assert.equal(translateDrive("неопределено"), null);
+assert.equal(translateDrive(null), null);
 
 // A reference row that only knows "2WD" must still match a card that states a
 // concrete axle, but must not stretch to full-wheel drive.
