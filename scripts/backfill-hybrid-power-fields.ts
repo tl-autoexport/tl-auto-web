@@ -26,7 +26,8 @@ async function main() {
   try {
     const { rows } = await db.query(`
       select id, spec_key, propulsion_type, power_basis, calculation_power_kw,
-             engine_power_hp, electric_power_kw_30min, hybrid_type, customs_power_hp
+             engine_power_hp, electric_power_kw_30min, hybrid_electric_motor_power_kw,
+             hybrid_type, customs_power_hp
       from public.vehicle_power_specs order by spec_key`);
 
     const planned: Array<Record<string, unknown>> = [];
@@ -40,9 +41,13 @@ async function main() {
       const iceHp = row.engine_power_hp == null
         ? (row.power_basis === "combustion_engine" ? Math.round(Number(row.calculation_power_kw) * KW_TO_PS * 100) / 100 : null)
         : Number(row.engine_power_hp);
-      const electricHp = row.electric_power_kw_30min == null
+      const electric30MinHp = row.electric_power_kw_30min == null
         ? null
         : Math.round(Number(row.electric_power_kw_30min) * KW_TO_PS * 100) / 100;
+      const electricMotorHp = row.hybrid_electric_motor_power_kw == null
+        ? null
+        : Math.round(Number(row.hybrid_electric_motor_power_kw) * KW_TO_PS * 100) / 100;
+      const electricHp = electricMotorHp ?? electric30MinHp;
 
       let customsHp: number | null = null;
       if (hybridType === "none" && iceHp != null) customsHp = iceHp;
@@ -51,7 +56,8 @@ async function main() {
 
       if (hybridType !== "none" && customsHp == null) invalidComposition++;
 
-      planned.push({ id: row.id, spec_key: row.spec_key, hybridType, iceHp, electricHp, customsHp,
+      planned.push({ id: row.id, spec_key: row.spec_key, hybridType, iceHp, electricHp,
+        electric30MinHp, electricMotorHp, customsHp,
         previousCustoms: row.customs_power_hp });
     }
 
@@ -62,9 +68,11 @@ async function main() {
         for (const item of planned) {
           const result = await db.query(
             `update public.vehicle_power_specs
-                set hybrid_type=$2, power_ice_hp=$3, power_electric_30min_hp=$4, customs_power_hp=$5, updated_at=now()
+                set hybrid_type=$2, power_ice_hp=$3, power_electric_30min_hp=$4,
+                    power_electric_motor_hp=$5, customs_power_hp=$6, updated_at=now()
               where id=$1`,
-            [item.id, item.hybridType, item.iceHp, item.electricHp, item.customsHp],
+            [item.id, item.hybridType, item.iceHp,
+              item.electric30MinHp, item.electricMotorHp, item.customsHp],
           );
           written += result.rowCount ?? 0;
         }

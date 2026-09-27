@@ -1,0 +1,73 @@
+{
+  "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
+  "reviewedAt": "2026-09-27",
+  "policy": "Run-scoped preliminary decisions; do not promote to global matching without separate review.",
+  "entries": [
+    {
+      "sourceListingId": "42775951",
+      "sourceKind": "drom",
+      "sourceUrl": "https://www.drom.ru/catalog/kia/seltos/549130/",
+      "selectedTrim": "HEV 1.6 GDI DCT 2WD Trendy",
+      "enginePowerPs": 105,
+      "electric30MinPs": 14,
+      "peakOrSystemPowerPs": null,
+      "minimumEvidenceCards": 1,
+      "rationale": "Drom reports ICE 105 PS plus electric 30-minute power 14 PS (119 PS calculation total); same 1.6 HEV 2WD powertrain as the listing, despite a Prestige trim label. Preliminary, run-scoped match."
+    },
+    {
+      "sourceListingId": "42775980",
+      "sourceKind": "drom",
+      "sourceUrl": "https://www.drom.ru/catalog/kia/seltos/549130/",
+      "selectedTrim": "HEV 1.6 GDI DCT 2WD Trendy",
+      "enginePowerPs": 105,
+      "electric30MinPs": 14,
+      "peakOrSystemPowerPs": null,
+      "minimumEvidenceCards": 1,
+      "rationale": "Drom reports ICE 105 PS plus electric 30-minute power 14 PS (119 PS calculation total); selected Trendy trim matches this listing. Preliminary, run-scoped match."
+    },
+    {
+      "sourceListingId": "42738019",
+      "sourceKind": "encarrus_catalog",
+      "sourceUrl": "https://encarrus.ru/korea/kia/ray/",
+      "selectedTrim": "Air",
+      "enginePowerPs": null,
+      "electric30MinPs": 39,
+      "peakOrSystemPowerPs": 87,
+      "minimumEvidenceCards": 5,
+      "rationale": "EncarRus has five 2024 Air cards with 87 PS peak and 39 PS 30-minute power; the listing is 2024 Ray 2-seat Air. The 2-seat body label differs, but the powertrain/grade and power evidence align. Preliminary."
+    },
+    {
+      "sourceListingId": "42759595",
+      "sourceKind": "encarrus_catalog",
+      "sourceUrl": "https://encarrus.ru/korea/kia/ray/",
+      "selectedTrim": "Air",
+      "enginePowerPs": null,
+      "electric30MinPs": 39,
+      "peakOrSystemPowerPs": 87,
+      "minimumEvidenceCards": 5,
+      "rationale": "EncarRus has five 2024 Air cards with 87 PS peak and 39 PS 30-minute power; the listing is 2024 Ray 2-seat Air. The 2-seat body label differs, but the powertrain/grade and power evidence align. Preliminary."
+    },
+    {
+      "sourceListingId": "42793135",
+      "sourceKind": "encarrus_catalog",
+      "sourceUrl": "https://encarrus.ru/korea/kia/ev9/",
+      "selectedTrim": "Long Range 4WD",
+      "enginePowerPs": null,
+      "electric30MinPs": 173,
+      "peakOrSystemPowerPs": 385,
+      "minimumEvidenceCards": 8,
+      "rationale": "Encar badge is GT Line / Long Range 4WD; eight matching 2023 Long Range 4WD cards report 385 PS peak and 173 PS 30-minute power, versus one 204/92 PS card. Select the high-output GT Line variant; preliminary due catalog-level matching."
+    },
+    {
+      "sourceListingId": "42778227",
+      "sourceKind": "encarrus_catalog",
+      "sourceUrl": "https://encarrus.ru/korea/hyundai/ioniq6/",
+      "selectedTrim": "Long Range",
+      "enginePowerPs": null,
+      "electric30MinPs": 103,
+      "peakOrSystemPowerPs": 229,
+      "minimumEvidenceCards": 12,
+      "rationale": "Encar badge says Long Range and does not specify AWD. EncarRus has 12 matching 2023 Long Range 2WD cards at 229 PS peak / 103 PS 30-minute power, versus one Long Range AWD card at 325/146. Select 2WD as the likely run-scoped preliminary match; drive is not explicit in the Encar snapshot, so retain as provisional."
+    }
+  ]
+}

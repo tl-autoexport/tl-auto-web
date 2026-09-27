@@ -23,6 +23,7 @@ type Control = {
   power_hp: number | null;
   power_kw: number | null;
   hybrid_dvs_power_kw: number | null;
+  hybrid_electric_motor_power_kw: number | null;
   hybrid_electric_power_kw_30min: number | null;
   observed_util_coefficient: number;
   response_snapshot: { query?: Record<string, string> };
@@ -38,7 +39,7 @@ async function main() {
   try {
     const result = await client.query<Control>(
       `select id, propulsion_type, age_code, engine_cc, power_hp, power_kw,
-              hybrid_dvs_power_kw, hybrid_electric_power_kw_30min,
+              hybrid_dvs_power_kw, hybrid_electric_motor_power_kw, hybrid_electric_power_kw_30min,
               observed_util_coefficient, response_snapshot
        from public.tks_calculation_controls
        where review_status <> 'rejected'
@@ -64,7 +65,8 @@ async function main() {
       if (control.propulsion_type === "hybrid_parallel") {
         const dvs = number(control.hybrid_dvs_power_kw)
           ?? (query.power_hybrid_dvs_edizm === "ls" ? (number(query.power_hybrid_dvs) == null ? null : number(query.power_hybrid_dvs)! * KW_PER_HP) : number(query.power_hybrid_dvs));
-        const electric = number(control.hybrid_electric_power_kw_30min)
+        const electric = number(control.hybrid_electric_motor_power_kw)
+          ?? number(control.hybrid_electric_power_kw_30min)
           ?? (query.power_hybrid_electro_edizm === "kvt" ? number(query.power_hybrid_electro) : query.power_hybrid_electro_edizm === "ls" ? (number(query.power_hybrid_electro) == null ? null : number(query.power_hybrid_electro)! * KW_PER_HP) : null);
         if (dvs != null && electric != null) powerKw = dvs + electric;
       }

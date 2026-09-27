@@ -1,6 +1,6 @@
 {
   "runId": "21a687ee-6717-4610-a9cc-97c64608bbb9",
-  "generatedAt": "2026-09-27T04:47:24.640Z",
+  "generatedAt": "2026-09-27T07:39:57.789Z",
   "readOnly": true,
   "databaseWrites": 0,
   "publications": 0,
@@ -12,18 +12,36 @@
   },
   "counts": {
     "target": 244,
-    "drom": 97,
+    "drom": 99,
     "encarrusHar": 14,
-    "electricCatalog": 73,
-    "unresolved": 60,
+    "electricCatalog": 77,
+    "unresolved": 54,
     "unresolvedByReason": {
-      "no_card_matching_encar_grade": 5,
       "encarrus_card_missing": 4,
-      "multiple_30min_powers_after_grade_match": 2,
-      "calculation_power_not_found": 49
+      "no_card_matching_encar_grade": 3,
+      "calculation_power_not_found": 47
     }
   },
   "entries": [
+    {
+      "sourceListingId": "42738019",
+      "brand": "Kia",
+      "model": "RAY",
+      "year": 2024,
+      "fuelType": "electric",
+      "sourceKind": "encarrus_catalog",
+      "sourceUrl": "https://encarrus.ru/korea/kia/ray/",
+      "sourceNote": "EncarRus has five 2024 Air cards with 87 PS peak and 39 PS 30-minute power; the listing is 2024 Ray 2-seat Air. The 2-seat body label differs, but the powertrain/grade and power evidence align. Preliminary.; selected catalog trim: Air; corroborating cards: 5",
+      "powerBasis": "electric_30min",
+      "customsPowerPs": 39,
+      "calculationPowerKw": 28.6845,
+      "enginePowerPs": null,
+      "electric30MinPs": 39,
+      "peakOrSystemPowerPs": 87,
+      "sourceSpecKey": null,
+      "grade": "Van",
+      "gradeDetail": "2-Seater AIr"
+    },
     {
       "sourceListingId": "42738088",
       "brand": "Kia",
@@ -1203,6 +1221,25 @@
       "gradeDetail": null
     },
     {
+      "sourceListingId": "42759595",
+      "brand": "Kia",
+      "model": "RAY",
+      "year": 2024,
+      "fuelType": "electric",
+      "sourceKind": "encarrus_catalog",
+      "sourceUrl": "https://encarrus.ru/korea/kia/ray/",
+      "sourceNote": "EncarRus has five 2024 Air cards with 87 PS peak and 39 PS 30-minute power; the listing is 2024 Ray 2-seat Air. The 2-seat body label differs, but the powertrain/grade and power evidence align. Preliminary.; selected catalog trim: Air; corroborating cards: 5",
+      "powerBasis": "electric_30min",
+      "customsPowerPs": 39,
+      "calculationPowerKw": 28.6845,
+      "enginePowerPs": null,
+      "electric30MinPs": 39,
+      "peakOrSystemPowerPs": 87,
+      "sourceSpecKey": null,
+      "grade": "Van",
+      "gradeDetail": "2-Seater AIr"
+    },
+    {
       "sourceListingId": "42759857",
       "brand": "Hyundai",
       "model": "Ioniq 5",
@@ -2362,6 +2399,44 @@
       "gradeDetail": "Signature"
     },
     {
+      "sourceListingId": "42775951",
+      "brand": "Kia",
+      "model": "Seltos",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "drom",
+      "sourceUrl": "https://www.drom.ru/catalog/kia/seltos/549130/",
+      "sourceNote": "Drom reports ICE 105 PS plus electric 30-minute power 14 PS (119 PS calculation total); same 1.6 HEV 2WD powertrain as the listing, despite a Prestige trim label. Preliminary, run-scoped match.; selected Drom trim: HEV 1.6 GDI DCT 2WD Trendy",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 119,
+      "calculationPowerKw": 87.5244,
+      "enginePowerPs": 105,
+      "electric30MinPs": 14,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "drom-reviewed-21a687ee-42775951",
+      "grade": "HEV 1.6 2WD",
+      "gradeDetail": "Prestige"
+    },
+    {
+      "sourceListingId": "42775980",
+      "brand": "Kia",
+      "model": "Seltos",
+      "year": 2026,
+      "fuelType": "hybrid",
+      "sourceKind": "drom",
+      "sourceUrl": "https://www.drom.ru/catalog/kia/seltos/549130/",
+      "sourceNote": "Drom reports ICE 105 PS plus electric 30-minute power 14 PS (119 PS calculation total); selected Trendy trim matches this listing. Preliminary, run-scoped match.; selected Drom trim: HEV 1.6 GDI DCT 2WD Trendy",
+      "powerBasis": "parallel_sum",
+      "customsPowerPs": 119,
+      "calculationPowerKw": 87.5244,
+      "enginePowerPs": 105,
+      "electric30MinPs": 14,
+      "peakOrSystemPowerPs": null,
+      "sourceSpecKey": "drom-reviewed-21a687ee-42775980",
+      "grade": "HEV 1.6 2WD",
+      "gradeDetail": "Trendy"
+    },
+    {
       "sourceListingId": "42776006",
       "brand": "Kia",
       "model": "Sorento",
@@ -2474,6 +2549,25 @@
       "sourceSpecKey": null,
       "grade": "40 Premium",
       "gradeDetail": null
+    },
+    {
+      "sourceListingId": "42778227",
+      "brand": "Hyundai",
+      "model": "Ioniq 6",
+      "year": 2023,
+      "fuelType": "electric",
+      "sourceKind": "encarrus_catalog",
+      "sourceUrl": "https://encarrus.ru/korea/hyundai/ioniq6/",
+      "sourceNote": "Encar badge says Long Range and does not specify AWD. EncarRus has 12 matching 2023 Long Range 2WD cards at 229 PS peak / 103 PS 30-minute power, versus one Long Range AWD card at 325/146. Select 2WD as the likely run-scoped preliminary match; drive is not explicit in the Encar snapshot, so retain as provisional.; selected catalog trim: Long Range; corroborating cards: 12",
+      "powerBasis": "electric_30min",
+      "customsPowerPs": 103,
+      "calculationPowerKw": 75.7564,
+      "enginePowerPs": null,
+      "electric30MinPs": 103,
+      "peakOrSystemPowerPs": 229,
+      "sourceSpecKey": null,
+      "grade": "Long Range",
+      "gradeDetail": "Prestige"
     },
     {
       "sourceListingId": "42778390",
@@ -3483,6 +3577,25 @@
       "gradeDetail": "Prestige"
     },
     {
+      "sourceListingId": "42793135",
+      "brand": "Kia",
+      "model": "EV9",
+      "year": 2023,
+      "fuelType": "electric",
+      "sourceKind": "encarrus_catalog",
+      "sourceUrl": "https://encarrus.ru/korea/kia/ev9/",
+      "sourceNote": "Encar badge is GT Line / Long Range 4WD; eight matching 2023 Long Range 4WD cards report 385 PS peak and 173 PS 30-minute power, versus one 204/92 PS card. Select the high-output GT Line variant; preliminary due catalog-level matching.; selected catalog trim: Long Range 4WD; corroborating cards: 8",
+      "powerBasis": "electric_30min",
+      "customsPowerPs": 173,
+      "calculationPowerKw": 127.2413,
+      "enginePowerPs": null,
+      "electric30MinPs": 173,
+      "peakOrSystemPowerPs": 385,
+      "sourceSpecKey": null,
+      "grade": "Long Range 4WD",
+      "gradeDetail": "GT Line"
+    },
+    {
       "sourceListingId": "42793964",
       "brand": "Kia",
       "model": "RAY",
@@ -3522,12 +3635,6 @@
     }
   ],
   "unresolved": [
-    {
-      "sourceListingId": "42738019",
-      "fuelType": "electric",
-      "reason": "no_card_matching_encar_grade",
-      "candidates30MinPs": []
-    },
     {
       "sourceListingId": "42738051",
       "fuelType": "hybrid",
@@ -3612,12 +3719,6 @@
       "sourceListingId": "42759303",
       "fuelType": "hybrid",
       "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42759595",
-      "fuelType": "electric",
-      "reason": "no_card_matching_encar_grade",
-      "candidates30MinPs": []
     },
     {
       "sourceListingId": "42760048",
@@ -3707,16 +3808,6 @@
       "reason": "calculation_power_not_found"
     },
     {
-      "sourceListingId": "42775951",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42775980",
-      "fuelType": "hybrid",
-      "reason": "calculation_power_not_found"
-    },
-    {
       "sourceListingId": "42776407",
       "fuelType": "hybrid",
       "reason": "calculation_power_not_found"
@@ -3735,15 +3826,6 @@
       "sourceListingId": "42778090",
       "fuelType": "hybrid",
       "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42778227",
-      "fuelType": "electric",
-      "reason": "multiple_30min_powers_after_grade_match",
-      "candidates30MinPs": [
-        103,
-        146
-      ]
     },
     {
       "sourceListingId": "42778760",
@@ -3825,15 +3907,6 @@
       "sourceListingId": "42792964",
       "fuelType": "hybrid",
       "reason": "calculation_power_not_found"
-    },
-    {
-      "sourceListingId": "42793135",
-      "fuelType": "electric",
-      "reason": "multiple_30min_powers_after_grade_match",
-      "candidates30MinPs": [
-        92,
-        173
-      ]
     }
   ]
 }

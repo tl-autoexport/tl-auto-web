@@ -132,9 +132,10 @@ async function main() {
       await client.query(
         `insert into public.tks_calculation_controls
           (source_row_id, vehicle_category, propulsion_type, importer_type, age_code, age_band,
-           cost_amount, currency_code, engine_cc, power_hp, power_kw, hybrid_dvs_power_kw, hybrid_electric_power_kw_30min,
-         observed_util_coefficient, observed_util_rub, observed_customs_fee_rub, observed_duty_rub, response_snapshot)
-         values ($1, 'M1', $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17::jsonb)
+           cost_amount, currency_code, engine_cc, power_hp, power_kw, hybrid_dvs_power_kw,
+           hybrid_electric_motor_power_kw, hybrid_electric_power_kw_30min,
+           observed_util_coefficient, observed_util_rub, observed_customs_fee_rub, observed_duty_rub, response_snapshot)
+         values ($1, 'M1', $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18::jsonb)
          on conflict (source_row_id) do update set
            vehicle_category = excluded.vehicle_category,
            propulsion_type = excluded.propulsion_type,
@@ -147,6 +148,7 @@ async function main() {
            power_hp = excluded.power_hp,
            power_kw = excluded.power_kw,
            hybrid_dvs_power_kw = excluded.hybrid_dvs_power_kw,
+           hybrid_electric_motor_power_kw = excluded.hybrid_electric_motor_power_kw,
            hybrid_electric_power_kw_30min = excluded.hybrid_electric_power_kw_30min,
            observed_util_coefficient = excluded.observed_util_coefficient,
            observed_util_rub = excluded.observed_util_rub,
@@ -164,8 +166,13 @@ async function main() {
           parseRussianNumber(query.volume),
           query.power_edizm === "ls" ? parseRussianNumber(query.power) : null,
           query.power_edizm === "kvt" ? parseRussianNumber(query.power) : null,
-          query.power_hybrid_dvs_edizm === "kvt" ? parseRussianNumber(query.power_hybrid_dvs) : null,
-          query.power_hybrid_electro_edizm === "kvt" ? parseRussianNumber(query.power_hybrid_electro) : null,
+          query.power_hybrid_dvs_edizm === "kvt" ? parseRussianNumber(query.power_hybrid_dvs)
+            : query.power_hybrid_dvs_edizm === "ls" && parseRussianNumber(query.power_hybrid_dvs) != null
+              ? parseRussianNumber(query.power_hybrid_dvs)! * 0.73549875 : null,
+          query.power_hybrid_electro_edizm === "kvt" ? parseRussianNumber(query.power_hybrid_electro)
+            : query.power_hybrid_electro_edizm === "ls" && parseRussianNumber(query.power_hybrid_electro) != null
+              ? parseRussianNumber(query.power_hybrid_electro)! * 0.73549875 : null,
+          null,
           control.util?.coefficient ?? null,
           control.util?.rub ?? null,
           control.customsFeeRub == null ? null : Math.round(control.customsFeeRub),

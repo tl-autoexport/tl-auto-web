@@ -116,6 +116,8 @@
     "import:drom:hybrid-preliminary": "tsx scripts/import-drom-hybrid-preliminary.ts",
     "test:encarrus-power": "tsx src/server/catalog/encarrus-power.test.ts",
     "publish:electrified:21a687ee": "tsx scripts/publish-electrified-cohort.ts",
+    "prepare:electrified:hybrid-motor": "tsx scripts/prepare-electrified-hybrid-motor-candidates.ts",
+    "import:electrified:hybrid-motor": "tsx scripts/import-electrified-hybrid-motor-candidates.ts",
     "audit:auto-candidate-power": "tsx scripts/audit-auto-candidate-power.ts",
     "resolve:auto-candidate-power": "tsx scripts/resolve-auto-candidate-power.ts",
     "import:chestny:verified": "tsx scripts/import-verified-chestny-catalog.ts",

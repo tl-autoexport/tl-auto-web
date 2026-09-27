@@ -11,20 +11,25 @@ const runId = "21a687ee-6717-4610-a9cc-97c64608bbb9";
 const planPath = "output/tl-auto-electrified-21a687ee-power-plan.json";
 const encarrusPath = "output/tl-auto-electrified-encarrus.json";
 const dromPath = "data/power/drom-hybrid-preliminary-v1.json";
+const dromResearchPath = "output/tl-auto-electrified-21a687ee-drom-hybrid-research.json";
 const harPath = "data/power/encarrus-hybrid-har-21a687ee.json";
+const decisionsPath = "data/power/electrified-21a687ee-reviewed-decisions.json";
 const outputPath = "data/power/electrified-21a687ee-power-reference.json";
 const write = process.env.TL_AUTO_ELECTRIFIED_REFERENCE_WRITE === "true";
 const PS_TO_KW = 0.73549875;
 
 type Json = Record<string, unknown>;
 type Group = { brand: string; model: string; year: number; engineCc: number; fuelType: string; driveType: string | null; listingIds: string[] };
-type Card = { trim: string; driveText: string | null; displayedPowerHp: number | null; displayedPower30MinHp: number | null; url: string };
+type Card = { trim: string; year: number; driveText: string | null; displayedPowerHp: number | null; displayedPower30MinHp: number | null; url: string };
 type Resolved = { sourceListingId: string; brand: string; model: string; year: number; fuelType: "hybrid" | "electric";
   sourceKind: "drom" | "encarrus_catalog" | "encarrus_detail_har"; sourceUrl: string; sourceNote: string;
   powerBasis: "parallel_sum" | "electric_30min"; customsPowerPs: number; calculationPowerKw: number;
   enginePowerPs: number | null; electric30MinPs: number; peakOrSystemPowerPs: number | null;
   sourceSpecKey: string | null; grade: string | null; gradeDetail: string | null };
 type Unresolved = { sourceListingId: string; fuelType: string; reason: string; candidates30MinPs?: number[] };
+type ReviewedDecision = { sourceListingId: string; sourceKind: "drom" | "encarrus_catalog"; sourceUrl: string;
+  selectedTrim: string; enginePowerPs: number | null; electric30MinPs: number; peakOrSystemPowerPs: number | null;
+  minimumEvidenceCards: number; rationale: string };
 
 const sha256 = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const kw = (ps: number) => Number((ps * PS_TO_KW).toFixed(4));
@@ -46,9 +51,10 @@ function gradeMatches(grade: string, trim: string) {
 async function main() {
   const dbUrl = process.env.SUPABASE_DB_URL;
   if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
-  const [plan, enc, drom, har] = await Promise.all([planPath, encarrusPath, dromPath, harPath]
+  const [plan, enc, drom, har, dromResearch, decisions] = await Promise.all([planPath, encarrusPath, dromPath, harPath, dromResearchPath, decisionsPath]
     .map(async (path) => JSON.parse(await readFile(path, "utf8"))));
-  if ([plan.runId, enc.runId, drom.runId, har.runId].some((id) => id !== runId)) throw new Error("Input run IDs differ");
+  if ([plan.runId, enc.runId, drom.runId, har.runId, dromResearch.summary?.runId, decisions.runId].some((id) => id !== runId))
+    throw new Error("Input run IDs differ");
   if (enc.databaseWrites !== 0 || drom.status !== "draft_preliminary_not_approved_for_calculation") throw new Error("Unexpected input status");
   const groups = plan.externalSearch.worklist as Group[];
   const targetIds = groups.flatMap((group) => group.listingIds.map(String));
@@ -115,6 +121,54 @@ async function main() {
     }
   }
 
+  for (const decision of decisions.entries as ReviewedDecision[]) {
+    const group = groupById.get(decision.sourceListingId);
+    if (!group || resolved.has(decision.sourceListingId) || !decision.sourceUrl.startsWith("https://"))
+      throw new Error(`Invalid or duplicate reviewed decision: ${decision.sourceListingId}`);
+    const category = obj(stageById.get(decision.sourceListingId)?.category);
+    if (decision.sourceKind === "drom") {
+      const evidence = (dromResearch.results as Array<Json>).find((row) =>
+        Array.isArray(row.listingIds) && (row.listingIds as string[]).includes(decision.sourceListingId));
+      const spec = obj(evidence?.drom), engine = obj(spec.engineMaxPower), motor30 = obj(spec.motor30minPower);
+      if (!evidence || evidence.dromPageStatus !== "ok" || evidence.brand !== group.brand || evidence.model !== group.model ||
+          evidence.year !== group.year || evidence.engineCc !== group.engineCc || evidence.driveType !== group.driveType ||
+          spec.url !== decision.sourceUrl || spec.trim !== decision.selectedTrim ||
+          engine.value !== decision.enginePowerPs || motor30.value !== decision.electric30MinPs ||
+          group.fuelType !== "hybrid" || decision.enginePowerPs == null ||
+          decision.minimumEvidenceCards !== 1)
+        throw new Error(`Drom evidence no longer supports reviewed decision ${decision.sourceListingId}`);
+      const combined = decision.enginePowerPs + decision.electric30MinPs;
+      put({ sourceListingId: decision.sourceListingId, brand: group.brand, model: group.model, year: group.year,
+        fuelType: "hybrid", sourceKind: "drom", sourceUrl: decision.sourceUrl,
+        sourceNote: `${decision.rationale}; selected Drom trim: ${decision.selectedTrim}`,
+        powerBasis: "parallel_sum", customsPowerPs: combined,
+        calculationPowerKw: Number((kw(decision.enginePowerPs) + kw(decision.electric30MinPs)).toFixed(4)),
+        enginePowerPs: decision.enginePowerPs, electric30MinPs: decision.electric30MinPs,
+        peakOrSystemPowerPs: decision.peakOrSystemPowerPs, sourceSpecKey: `drom-reviewed-${runId.slice(0, 8)}-${decision.sourceListingId}`,
+        grade: String(category.gradeEnglishName ?? category.gradeName ?? "") || null,
+        gradeDetail: String(category.gradeDetailEnglishName ?? category.gradeDetailName ?? "") || null });
+      continue;
+    }
+
+    const evidence = (enc.results as Array<{ group: Group; matchedCards: Card[] }>).find((row) =>
+      row.group.listingIds.includes(decision.sourceListingId));
+    const selectedCards = (evidence?.matchedCards ?? []).filter((card) => card.year === group.year &&
+      sourceTrim(card) === decision.selectedTrim && card.url === decision.sourceUrl &&
+      card.displayedPowerHp === decision.peakOrSystemPowerPs && card.displayedPower30MinHp === decision.electric30MinPs &&
+      (!group.driveType || card.driveText === group.driveType));
+    if (!evidence || group.fuelType !== "electric" || decision.enginePowerPs !== null ||
+        selectedCards.length < decision.minimumEvidenceCards || decision.minimumEvidenceCards < 1)
+      throw new Error(`EncarRus cards no longer support reviewed decision ${decision.sourceListingId}`);
+    put({ sourceListingId: decision.sourceListingId, brand: group.brand, model: group.model, year: group.year,
+      fuelType: "electric", sourceKind: "encarrus_catalog", sourceUrl: decision.sourceUrl,
+      sourceNote: `${decision.rationale}; selected catalog trim: ${decision.selectedTrim}; corroborating cards: ${selectedCards.length}`,
+      powerBasis: "electric_30min", customsPowerPs: decision.electric30MinPs,
+      calculationPowerKw: kw(decision.electric30MinPs), enginePowerPs: null,
+      electric30MinPs: decision.electric30MinPs, peakOrSystemPowerPs: decision.peakOrSystemPowerPs,
+      sourceSpecKey: null, grade: String(category.gradeEnglishName ?? category.gradeName ?? "") || decision.selectedTrim,
+      gradeDetail: String(category.gradeDetailEnglishName ?? category.gradeDetailName ?? "") || null });
+  }
+
   for (const item of enc.results as Array<{ group: Group; matchedCards: Card[] }>) {
     const group = groups.find((candidate) => sameGroup(candidate, item.group));
     if (!group) throw new Error(`EncarRus group does not belong to run: ${item.group.listingIds.join(",")}`);
@@ -124,6 +178,7 @@ async function main() {
       const grade = String(category.gradeEnglishName ?? "").trim();
       const detail = String(category.gradeDetailEnglishName ?? "").trim();
       const powered = (item.matchedCards ?? []).filter((card) => Number.isFinite(card.displayedPower30MinHp) && Number(card.displayedPower30MinHp) > 0);
+      if (resolved.has(id)) continue;
       if (!powered.length) { unresolved.push({ sourceListingId: id, fuelType: "electric", reason: "encarrus_card_missing" }); continue; }
       let candidates = powered.filter((card) => gradeMatches(grade, sourceTrim(card)));
       if (group.driveType) candidates = candidates.filter((card) => card.driveText === group.driveType);
