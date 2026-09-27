@@ -301,6 +301,8 @@ export type ImportOptions = {
   maxListingAgeDays?: number;
   allowedModels?: string[];
   allowedBrands?: string[];
+  /** List-only discovery: do not load detail pages, rates, or option catalogs. */
+  discoveryOnly?: boolean;
   brandMinimums?: Record<string, number>;
   modelMinimums?: Record<string, number>;
   priorityBrandPages?: Record<string, number>;
@@ -1458,6 +1460,9 @@ export async function importEncar(options: ImportOptions = {}) {
   const maxListingAgeDays =
     options.maxListingAgeDays ??
     positiveInt(process.env.CATALOG_MAX_LISTING_AGE_DAYS, 30);
+  const listRequestDelayMs = Number(process.env.ENCAR_LIST_REQUEST_DELAY_MS ?? 0);
+  if (!Number.isInteger(listRequestDelayMs) || listRequestDelayMs < 0 || listRequestDelayMs > 60_000)
+    throw new Error("ENCAR_LIST_REQUEST_DELAY_MS must be an integer from 0 to 60000");
   const allowedModels = new Set(
     (options.allowedModels ?? [])
       .map((value) => value.trim().toLowerCase().replace(/[^a-zа-яё0-9]+/gi, ""))
@@ -1506,11 +1511,7 @@ export async function importEncar(options: ImportOptions = {}) {
       `Encar model minimums (${requiredModelCars}) exceed target (${target})`,
     );
   }
-  const rateSnapshot = await getCbrCalcRates();
   const mapped: NonNullable<Awaited<ReturnType<typeof mapCar>>>[] = [];
-  const optionCatalog = fastMode
-    ? { options: [] as EncarOptionDefinition[] }
-    : await fetchStandardOptionCatalog();
   const identities = new Set<string>();
 
   const candidates: EncarListCar[] = [];
@@ -1538,6 +1539,7 @@ export async function importEncar(options: ImportOptions = {}) {
           page * ENCAR_PAGE_SIZE,
           manufacturer,
         );
+        if (listRequestDelayMs) await sleep(listRequestDelayMs);
         if (!list.length) break;
         candidates.push(...list);
       } catch (error) {
@@ -1554,6 +1556,7 @@ export async function importEncar(options: ImportOptions = {}) {
     let list: EncarListCar[];
     try {
       list = await fetchListPage(page * ENCAR_PAGE_SIZE);
+      if (listRequestDelayMs) await sleep(listRequestDelayMs);
     } catch (error) {
       listPageErrors.push({
         page: page + 1,
@@ -1572,6 +1575,7 @@ export async function importEncar(options: ImportOptions = {}) {
         undefined,
         "electric",
       );
+      if (listRequestDelayMs) await sleep(listRequestDelayMs);
       if (!list.length) break;
       candidates.push(...list);
     } catch (error) {
@@ -1590,6 +1594,7 @@ export async function importEncar(options: ImportOptions = {}) {
         undefined,
         "hybrid",
       );
+      if (listRequestDelayMs) await sleep(listRequestDelayMs);
       if (!list.length) break;
       candidates.push(...list);
     } catch (error) {
@@ -1645,6 +1650,45 @@ export async function importEncar(options: ImportOptions = {}) {
       );
     })
     .sort((left, right) => Number(right.Id) - Number(left.Id));
+
+  if (options.discoveryOnly) {
+    const candidateDrafts = freshCandidates.slice(0, target).map((item) => {
+      const { year, month } = normalizeYear(item.Year);
+      return {
+        source: "encar" as const,
+        sourceListingId: String(item.Id),
+        sourceUrl: `https://fem.encar.com/cars/detail/${item.Id}`,
+        brand: normalizeBrand(item.Manufacturer),
+        model: normalizeModel(item.Model),
+        year,
+        manufactureMonthFromListing: month,
+        fuelType: normalizeFuel(item.FuelType),
+        badge: item.Badge ?? null,
+        badgeDetail: item.BadgeDetail ?? null,
+        mileageKm: Number(item.Mileage) || null,
+        priceKrw: Number(item.Price) ? Number(item.Price) * 10_000 : null,
+        hasPhoto: Boolean(item.Photo || item.Photos?.some((photo) => photo.location)),
+      };
+    });
+    return {
+      readOnly: true,
+      discoveryOnly: true,
+      databaseWrites: 0,
+      detailRequests: 0,
+      candidates: candidates.length,
+      uniqueCandidates: uniqueCandidates.length,
+      onlyNew,
+      existingCandidates: existingSourceIds.size,
+      listPageErrors,
+      freshCandidates: freshCandidates.length,
+      candidateDrafts,
+    };
+  }
+
+  const rateSnapshot = await getCbrCalcRates();
+  const optionCatalog = fastMode
+    ? { options: [] as EncarOptionDefinition[] }
+    : await fetchStandardOptionCatalog();
 
   const attemptedSourceIds = new Set<string>();
   const mappedBrandCounts: Record<string, number> = {};
