@@ -15,7 +15,8 @@ type Model = { id: number | string; name: string; url: string; count: number; ge
 type Card = {
   encarrusListingId: string; name: string; trim: string; year: number | null;
   engineText: string | null; engineCcApprox: number | null; fuelType: string | null;
-  displayedPowerText: string | null; displayedPowerHp: number | null; powerBasis: string;
+  displayedPowerText: string | null; displayedPowerHp: number | null;
+  displayedPower30MinText: string | null; displayedPower30MinHp: number | null; powerBasis: string;
   driveText: string | null; url: string;
 };
 
@@ -99,7 +100,8 @@ function parseCards(html: string, modelUrl: string): Card[] {
     const id = starts[index][1];
     const name = clean(cardHtml.match(/class="c-name">([^<]*)</)?.[1] ?? "");
     const trim = clean(cardHtml.match(/class="c-trim">([^<]*)</)?.[1] ?? "");
-    const props = new Map([...cardHtml.matchAll(/<span class="c-prop-k">([^<]+)<\/span>\s*<span class="c-prop-v">([^<]+)<\/span>/g)]
+    // Capture the entire value node, including nested .power-30min spans.
+    const props = new Map([...cardHtml.matchAll(/<div class="c-prop">\s*<span class="c-prop-k">([^<]+)<\/span>\s*<span class="c-prop-v">([\s\S]*?)<\/div>/g)]
       .map((match) => [clean(match[1]), clean(match[2])]));
     const engineText = props.get("Двиг.") ?? null;
     const engineLiters = engineText?.match(/(\d+(?:[.,]\d+)?)/)?.[1];
@@ -108,11 +110,14 @@ function parseCards(html: string, modelUrl: string): Card[] {
       : engineText && /электр|электро|electric/i.test(engineText) ? "electric" : null;
     const displayedPowerText = props.get("Мощн.") ?? null;
     const power = displayedPowerText?.match(/(\d+(?:[.,]\d+)?)\s*(?:л\.?\s*с\.?|hp|ps)/i)?.[1];
+    const power30Min = displayedPowerText?.match(/30\s*[-–]?\s*мин(?:\w*)?\D{0,12}(\d+(?:[.,]\d+)?)/i)?.[1];
     const year = Number(trim.match(/\b(20\d{2})\b/)?.[1]) || null;
     cards.push({
       encarrusListingId: id, name, trim, year, engineText, engineCcApprox, fuelType,
       displayedPowerText, displayedPowerHp: power ? Number(power.replace(",", ".")) : null,
-      powerBasis: fuelType === "electric" ? "displayed_rating_not_30min" : fuelType === "hybrid" ? "displayed_rating_basis_unspecified" : "combustion_or_unspecified",
+      displayedPower30MinText: power30Min ? `${power30Min} л.с.` : null,
+      displayedPower30MinHp: power30Min ? Number(power30Min.replace(",", ".")) : null,
+      powerBasis: fuelType === "electric" ? "displayed_peak_and_30min_source_fields" : fuelType === "hybrid" ? "displayed_rating_basis_unspecified" : "combustion_or_unspecified",
       driveText: props.get("Привод") ?? null,
       url: `https://encarrus.ru${modelUrl}`,
     });
@@ -194,13 +199,15 @@ async function main() {
     const model = modelForGroup.get(group) ?? null;
     const cards = matches.get(group) ?? [];
     const powers = [...new Set(cards.map((card) => card.displayedPowerHp).filter((power): power is number => power != null))];
+    const powers30Min = [...new Set(cards.map((card) => card.displayedPower30MinHp).filter((power): power is number => power != null))];
     return {
       group, encarrusModel: model ? { id: model.id, name: model.name, url: `https://encarrus.ru${model.url}` } : null,
       scannedPages: tasksForGroup(group, tasks), matchedCards: cards,
       displayedPowerCandidatesHp: powers,
+      displayedPower30MinCandidatesHp: powers30Min,
       result: cards.length ? "listing_candidates_found" : "no_matching_listing_in_scanned_pages",
       thirtyMinutePower: null,
-      note: "EncarRus listing power is captured as displayed, not approved. It does not provide a verified EV 30-minute rating; hybrid displayed power basis is unspecified.",
+      note: "EncarRus listing power and its explicit 30-minute field are captured as published source evidence, not independently verified or automatically approved. Hybrid displayed power basis is unspecified.",
     };
   });
   const summary = {
@@ -210,7 +217,7 @@ async function main() {
     modelGenerationTasks: tasks.size, ajaxRequests: requestLog.length,
     configurationsWithMatchingCards: results.filter((row) => row.matchedCards.length > 0).length,
     withDisplayedPower: results.filter((row) => row.matchedCards.some((card) => card.displayedPowerHp != null)).length,
-    withThirtyMinutePower: 0,
+    withThirtyMinutePower: results.filter((row) => row.matchedCards.some((card) => card.displayedPower30MinHp != null)).length,
     output: outputPath,
   };
   await mkdir("output", { recursive: true });
