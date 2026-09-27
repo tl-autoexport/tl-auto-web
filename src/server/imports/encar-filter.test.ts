@@ -4,29 +4,41 @@ import { buildFilter } from "./encar";
 
 assert.equal(
   buildFilter(),
-  "(And.Hidden.N._.Year.range(202100..202700)._.Mileage.range(..120000)._.Price.range(700..15000).)",
+  "(And.Hidden.N._.Year.range(202100..202700)._.Mileage.range(0..120000)._.Price.range(700..15000).)",
 );
 assert.equal(
   buildFilter("BMW"),
-  "(And.Hidden.N._.Manufacturer.BMW._.Year.range(202100..202700)._.Mileage.range(..120000)._.Price.range(700..15000).)",
+  "(And.Hidden.N._.Manufacturer.BMW._.Year.range(202100..202700)._.Mileage.range(0..120000)._.Price.range(700..15000).)",
 );
 assert.equal(
   buildFilter(undefined, "electric"),
-  "(And.Hidden.N._.FuelType.전기._.Year.range(202100..202700)._.Mileage.range(..120000)._.Price.range(700..15000).)",
+  "(And.Hidden.N._.FuelType.전기._.Year.range(202100..202700)._.Mileage.range(0..120000)._.Price.range(700..15000).)",
 );
 assert.equal(
   buildFilter(undefined, "hybrid"),
-  "(And.Hidden.N._.FuelType.가솔린+전기._.Year.range(202100..202700)._.Mileage.range(..120000)._.Price.range(700..15000).)",
+  "(And.Hidden.N._.FuelType.가솔린+전기._.Year.range(202100..202700)._.Mileage.range(0..120000)._.Price.range(700..15000).)",
 );
 assert.equal(
   buildFilter(undefined, undefined, {
     minYear: 201800,
     maxYear: 202700,
+    minMileage: 0,
     maxMileage: 180000,
     minPrice: 100,
     maxPrice: 15000,
   }),
-  "(And.Hidden.N._.Year.range(201800..202700)._.Mileage.range(..180000)._.Price.range(100..15000).)",
+  "(And.Hidden.N._.Year.range(201800..202700)._.Mileage.range(0..180000)._.Price.range(100..15000).)",
+);
+assert.equal(
+  buildFilter(undefined, undefined, {
+    minYear: 196001,
+    maxYear: 199608,
+    minMileage: 0,
+    maxMileage: 999999,
+    minPrice: 0,
+    maxPrice: 100000,
+  }),
+  "(And.Hidden.N._.Year.range(196001..199608)._.Mileage.range(0..999999)._.Price.range(0..100000).)",
 );
 assert.equal(normalizeFuel("전기"), "electric");
 assert.equal(normalizeFuel("가솔린+전기"), "hybrid");

@@ -293,6 +293,10 @@ export type ImportOptions = {
   /** Optional manufacture-year bounds, in Encar YYYYMM format. */
   minYear?: number;
   maxYear?: number;
+  minMileage?: number;
+  maxMileage?: number;
+  minPrice?: number;
+  maxPrice?: number;
   electricTarget?: number;
   electricPages?: number;
   hybridTarget?: number;
@@ -316,6 +320,7 @@ export type ImportOptions = {
 type EncarFilterBounds = {
   minYear: number;
   maxYear: number;
+  minMileage: number;
   maxMileage: number;
   minPrice: number;
   maxPrice: number;
@@ -357,7 +362,7 @@ export function buildFilter(
       : fuelType === "hybrid"
         ? "_.FuelType.가솔린+전기."
         : "";
-  return `(And.Hidden.N.${manufacturerFilter}${fuelFilter}_.Year.range(${bounds.minYear}..${bounds.maxYear})._.Mileage.range(..${bounds.maxMileage})._.Price.range(${bounds.minPrice}..${bounds.maxPrice}).)`;
+  return `(And.Hidden.N.${manufacturerFilter}${fuelFilter}_.Year.range(${bounds.minYear}..${bounds.maxYear})._.Mileage.range(${bounds.minMileage}..${bounds.maxMileage})._.Price.range(${bounds.minPrice}..${bounds.maxPrice}).)`;
 }
 
 function nonNegativeInt(value: string | undefined, fallback: number) {
@@ -369,6 +374,7 @@ function getEncarFilterBounds(): EncarFilterBounds {
   return {
     minYear: nonNegativeInt(process.env.ENCAR_MIN_YEAR, 202100),
     maxYear: nonNegativeInt(process.env.ENCAR_MAX_YEAR, 202700),
+    minMileage: nonNegativeInt(process.env.ENCAR_MIN_MILEAGE, 0),
     maxMileage: nonNegativeInt(process.env.ENCAR_MAX_MILEAGE, 120000),
     minPrice: nonNegativeInt(process.env.ENCAR_MIN_PRICE, 700),
     maxPrice: nonNegativeInt(process.env.ENCAR_MAX_PRICE, 15000),
@@ -1469,6 +1475,10 @@ export async function importEncar(options: ImportOptions = {}) {
     ...getEncarFilterBounds(),
     ...(options.minYear === undefined ? {} : { minYear: options.minYear }),
     ...(options.maxYear === undefined ? {} : { maxYear: options.maxYear }),
+    ...(options.minMileage === undefined ? {} : { minMileage: options.minMileage }),
+    ...(options.maxMileage === undefined ? {} : { maxMileage: options.maxMileage }),
+    ...(options.minPrice === undefined ? {} : { minPrice: options.minPrice }),
+    ...(options.maxPrice === undefined ? {} : { maxPrice: options.maxPrice }),
   };
   if (!Number.isInteger(filterBounds.minYear) || !Number.isInteger(filterBounds.maxYear) ||
       filterBounds.minYear < 190001 || filterBounds.maxYear > 210012 ||
@@ -1645,7 +1655,7 @@ export async function importEncar(options: ImportOptions = {}) {
   const freshCandidates = uniqueCandidates
     .filter((item) => !onlyNew || !existingSourceIds.has(String(item.Id)))
     .filter((item) =>
-      isFreshListing(item.Photos?.[0]?.updatedDate, maxListingAgeDays),
+      (options.discoveryOnly || isFreshListing(item.Photos?.[0]?.updatedDate, maxListingAgeDays)),
     )
     .filter((item) => !allowedBrands.size || allowedBrands.has(normalizeBrand(item.Manufacturer) ?? ""))
     .filter((item) => {

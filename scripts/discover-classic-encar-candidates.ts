@@ -15,6 +15,12 @@ const minYear = Number(process.env.TL_AUTO_CLASSIC_MIN_YEAR ?? 196001);
 const maxYear = Number(process.env.TL_AUTO_CLASSIC_MAX_YEAR ?? 199608);
 const maxListingAgeDays = Number(process.env.TL_AUTO_CLASSIC_MAX_LISTING_AGE_DAYS ?? 365);
 const requestDelayMs = Number(process.env.TL_AUTO_CLASSIC_REQUEST_DELAY_MS ?? 900);
+// Encar price values are in 10,000 KRW units. Classic listings can exceed the
+// normal importer mileage ceiling and price band, so discovery uses broad bounds.
+const minMileage = Number(process.env.TL_AUTO_CLASSIC_MIN_MILEAGE ?? 0);
+const maxMileage = Number(process.env.TL_AUTO_CLASSIC_MAX_MILEAGE ?? 999999);
+const minPrice = Number(process.env.TL_AUTO_CLASSIC_MIN_PRICE ?? 0);
+const maxPrice = Number(process.env.TL_AUTO_CLASSIC_MAX_PRICE ?? 100000);
 const brands = (process.env.TL_AUTO_CLASSIC_BRANDS ??
   "Mercedes-Benz,BMW,Volkswagen,Audi,Porsche,Lexus,Volvo,Maserati,Land Rover,재규어,벤틀리,롤스로이스,페라리,람보르기니,애스턴마틴")
   .split(",").map((value) => value.trim()).filter(Boolean);
@@ -28,6 +34,9 @@ async function main() {
     throw new Error("Classic discovery max listing age must be 1..3650 days");
   if (!Number.isInteger(requestDelayMs) || requestDelayMs < 0 || requestDelayMs > 60_000)
     throw new Error("Classic discovery request delay must be 0..60000 ms");
+  if (![minMileage, maxMileage, minPrice, maxPrice].every(Number.isInteger) ||
+      minMileage < 0 || maxMileage < minMileage || minPrice < 0 || maxPrice < minPrice)
+    throw new Error("Classic discovery mileage/price bounds must be non-negative integers with min <= max");
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
   if (!url || !key) throw new Error("Supabase URL and service key are required for read-only duplicate exclusion");
@@ -38,6 +47,10 @@ async function main() {
     maxPages: pages,
     minYear,
     maxYear,
+    minMileage,
+    maxMileage,
+    minPrice,
+    maxPrice,
     maxListingAgeDays,
     onlyNew: true,
     dryRun: true,
@@ -80,7 +93,10 @@ async function main() {
     generatedAt: new Date().toISOString(),
     policy: { manufactureYearMin: minYear,
       manufactureYearMonthMax: maxYear,
-      brands, listingUpdatedWithinDays: maxListingAgeDays,
+      brands, listingUpdatedWithinDays: null,
+      freshnessFilter: "disabled for discovery; Encar Hidden.N list results are treated as active",
+      minMileage, maxMileage, minPrice, maxPrice,
+      priceUnit: "10,000 KRW",
       requestDelayMs,
       excludeExistingCatalogAndAnyPriorQueue: true },
     readOnly: true, databaseWrites: 0, EncarDetailRequests: 0,
