@@ -1,6 +1,12 @@
 /** Read-only EncarRus AJAX catalog research for one electrified Encar run. */
 import { config } from "dotenv";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import {
+  encarrusModelAliases,
+  parseEncarrusListingPower,
+  parseEncarrusProductPower,
+  type EncarrusPowerEvidence,
+} from "../src/server/catalog/encarrus-power";
 
 config({ path: ".env.local", override: true, quiet: true });
 config({ path: ".env", quiet: true });
@@ -16,8 +22,11 @@ type Card = {
   encarrusListingId: string; name: string; trim: string; year: number | null;
   engineText: string | null; engineCcApprox: number | null; fuelType: string | null;
   displayedPowerText: string | null; displayedPowerHp: number | null;
+  hybridCombinedPowerHp: number | null; hybridEnginePowerHp: number | null; recyclingPowerHp: number | null;
   displayedPower30MinText: string | null; displayedPower30MinHp: number | null; powerBasis: string;
-  driveText: string | null; url: string;
+  driveText: string | null; url: string; productUrl: string | null;
+  detailStatus: "not_requested" | "parsed" | "unavailable";
+  detailPower: EncarrusPowerEvidence | null;
 };
 
 const inputPath = process.env.TL_AUTO_POWER_PLAN ?? "output/tl-auto-electrified-21a687ee-power-plan.json";
@@ -25,6 +34,7 @@ const outputPath = process.env.ENCARRUS_ELECTRIFIED_OUTPUT ?? "output/tl-auto-el
 const delayMs = Math.max(900, Number(process.env.ENCARRUS_DELAY_MS ?? 1200));
 const timeoutMs = Math.max(2000, Number(process.env.ENCARRUS_TIMEOUT_MS ?? 20000));
 const maxPagesPerGeneration = Math.max(1, Math.min(20, Number(process.env.ENCARRUS_MAX_PAGES_PER_GENERATION ?? 4)));
+const detailSamplesPerConfiguration = Math.max(0, Math.min(3, Number(process.env.ENCARRUS_DETAIL_SAMPLES_PER_CONFIGURATION ?? 1)));
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const headers = {
   "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36",
@@ -54,7 +64,8 @@ function modelNameFor(group: Group, models: Model[]): Model | null {
     const name = normalize(candidate.name);
     const brandFits = !brand || name.includes(brand) || (brand === "mercedesbenz" && name.includes("mercedes"));
     const modelPart = brand && name.startsWith(brand) ? name.slice(brand.length) : name;
-    const modelFits = model && modelPart === model;
+    const aliases = encarrusModelAliases(group.brand, group.model).map(normalize);
+    const modelFits = modelPart === model || aliases.includes(modelPart);
     return brandFits && modelFits;
   });
   return matches.length === 1 ? matches[0] : null;
@@ -69,6 +80,20 @@ async function fetchJson(url: string, referer: string) {
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   try { return JSON.parse(body) as Record<string, unknown>; }
   catch { throw new Error(`Expected JSON from ${new URL(url).pathname}`); }
+}
+
+async function fetchProductHtml(url: string, referer: string) {
+  const response = await fetch(url, {
+    headers: { ...headers, referer, accept: "text/html,application/xhtml+xml" },
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+  const body = await response.text();
+  if (/KillBot user verification|captcha|human verification/i.test(body.slice(0, 5000))) {
+    throw new Error("EncarRus verification page returned; stopping detail requests without bypassing it");
+  }
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  if (!/<div class="pd-spec">/i.test(body)) throw new Error("Product page has no expected .pd-spec data");
+  return body;
 }
 
 async function fetchAllModels(): Promise<Model[]> {
@@ -108,18 +133,21 @@ function parseCards(html: string, modelUrl: string): Card[] {
     const engineCcApprox = engineLiters ? Math.round(Number(engineLiters.replace(",", ".")) * 1000) : null;
     const fuelType = engineText && /гибрид|hybrid/i.test(engineText) ? "hybrid"
       : engineText && /электр|электро|electric/i.test(engineText) ? "electric" : null;
-    const displayedPowerText = props.get("Мощн.") ?? null;
-    const power = displayedPowerText?.match(/(\d+(?:[.,]\d+)?)\s*(?:л\.?\s*с\.?|hp|ps)/i)?.[1];
-    const power30Min = displayedPowerText?.match(/30\s*[-–]?\s*мин(?:\w*)?\D{0,12}(\d+(?:[.,]\d+)?)/i)?.[1];
+    const evidence = parseEncarrusListingPower(cardHtml, fuelType);
     const year = Number(trim.match(/\b(20\d{2})\b/)?.[1]) || null;
+    const productPath = cardHtml.match(/href="([^"]*\/korea\/product\/\d+\/[^\"]*)"/i)?.[1] ?? null;
     cards.push({
       encarrusListingId: id, name, trim, year, engineText, engineCcApprox, fuelType,
-      displayedPowerText, displayedPowerHp: power ? Number(power.replace(",", ".")) : null,
-      displayedPower30MinText: power30Min ? `${power30Min} л.с.` : null,
-      displayedPower30MinHp: power30Min ? Number(power30Min.replace(",", ".")) : null,
-      powerBasis: fuelType === "electric" ? "displayed_peak_and_30min_source_fields" : fuelType === "hybrid" ? "displayed_rating_basis_unspecified" : "combustion_or_unspecified",
+      displayedPowerText: evidence.rawPowerText, displayedPowerHp: evidence.displayedPowerHp,
+      hybridCombinedPowerHp: evidence.hybridCombinedPowerHp,
+      hybridEnginePowerHp: evidence.hybridEnginePowerHp, recyclingPowerHp: evidence.recyclingPowerHp,
+      displayedPower30MinText: evidence.electric30MinPowerHp == null ? null : `${evidence.electric30MinPowerHp} л.с.`,
+      displayedPower30MinHp: evidence.electric30MinPowerHp, powerBasis: evidence.powerBasis,
       driveText: props.get("Привод") ?? null,
       url: `https://encarrus.ru${modelUrl}`,
+      productUrl: productPath ? new URL(productPath, "https://encarrus.ru").toString() : null,
+      detailStatus: "not_requested",
+      detailPower: null,
     });
   }
   return cards;
@@ -195,6 +223,38 @@ async function main() {
     if (completed % 10 === 0) console.log(JSON.stringify({ event: "progress", modelGenerationTasks: completed, total: tasks.size }));
   }
 
+  const detailLog: Array<{ url: string; status: "parsed" | "error"; error?: string }> = [];
+  const detailCache = new Map<string, EncarrusPowerEvidence | null>();
+  let stopDetailRequests = false;
+  if (detailSamplesPerConfiguration > 0) {
+    outer: for (const group of groups) {
+      const cards = matches.get(group) ?? [];
+      const selected = cards.filter((card) => card.productUrl).slice(0, detailSamplesPerConfiguration);
+      for (const card of selected) {
+        if (!card.productUrl) continue;
+        if (!detailCache.has(card.productUrl)) {
+          if (detailCache.size > 0) await sleep(delayMs);
+          try {
+            const html = await fetchProductHtml(card.productUrl, card.url);
+            detailCache.set(card.productUrl, parseEncarrusProductPower(html, card.fuelType));
+            detailLog.push({ url: card.productUrl, status: "parsed" });
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            detailCache.set(card.productUrl, null);
+            detailLog.push({ url: card.productUrl, status: "error", error: message });
+            if (/verification page returned|HTTP (?:403|429)/i.test(message)) {
+              stopDetailRequests = true;
+              break outer;
+            }
+          }
+        }
+        const detailPower = detailCache.get(card.productUrl) ?? null;
+        card.detailPower = detailPower;
+        card.detailStatus = detailPower ? "parsed" : "unavailable";
+      }
+    }
+  }
+
   const results = groups.map((group) => {
     const model = modelForGroup.get(group) ?? null;
     const cards = matches.get(group) ?? [];
@@ -205,9 +265,11 @@ async function main() {
       scannedPages: tasksForGroup(group, tasks), matchedCards: cards,
       displayedPowerCandidatesHp: powers,
       displayedPower30MinCandidatesHp: powers30Min,
+      hybridCombinedPowerCandidatesHp: [...new Set(cards.map((card) => card.detailPower?.hybridCombinedPowerHp).filter((power): power is number => power != null))],
+      hybridEnginePowerCandidatesHp: [...new Set(cards.map((card) => card.detailPower?.hybridEnginePowerHp).filter((power): power is number => power != null))],
+      recyclingPowerCandidatesHp: [...new Set(cards.map((card) => card.detailPower?.recyclingPowerHp).filter((power): power is number => power != null))],
       result: cards.length ? "listing_candidates_found" : "no_matching_listing_in_scanned_pages",
-      thirtyMinutePower: null,
-      note: "EncarRus listing power and its explicit 30-minute field are captured as published source evidence, not independently verified or automatically approved. Hybrid displayed power basis is unspecified.",
+      note: "Listing and product-detail power fields are preserved as source evidence by basis. Values are not independently verified or automatically approved; unavailable or unrequested detail fields remain null.",
     };
   });
   const summary = {
@@ -218,10 +280,14 @@ async function main() {
     configurationsWithMatchingCards: results.filter((row) => row.matchedCards.length > 0).length,
     withDisplayedPower: results.filter((row) => row.matchedCards.some((card) => card.displayedPowerHp != null)).length,
     withThirtyMinutePower: results.filter((row) => row.matchedCards.some((card) => card.displayedPower30MinHp != null)).length,
+    detailRequests: detailLog.length,
+    detailParsed: detailLog.filter((row) => row.status === "parsed").length,
+    detailErrors: detailLog.filter((row) => row.status === "error").length,
+    detailRequestsStoppedOnProtection: stopDetailRequests,
     output: outputPath,
   };
   await mkdir("output", { recursive: true });
-  await writeFile(outputPath, `${JSON.stringify({ ...summary, input: inputPath, unmapped, requestLog, results }, null, 2)}\n`);
+  await writeFile(outputPath, `${JSON.stringify({ ...summary, input: inputPath, unmapped, requestLog, detailLog, results }, null, 2)}\n`);
   console.log(JSON.stringify(summary, null, 2));
 }
 
