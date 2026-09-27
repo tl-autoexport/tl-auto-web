@@ -1225,6 +1225,9 @@ export function normalizeBrand(value: unknown) {
 export function normalizeModel(value: unknown) {
   const raw = String(value ?? "").trim();
   const lower = raw.toLowerCase();
+  // CLS-Class contains "S-Class" as a substring. Resolve the longer model
+  // token first so an Encar CLS is never classified as an S-Class.
+  if (/\bcls(?:\s*-?\s*class)?\b/.test(lower)) return "CLS";
   // Match Mercedes SUV model tokens, not arbitrary substrings: `Wrangler`
   // contains the letters `gle` and was incorrectly normalized to `GLE`.
   if (/\bglc(?:\s*-?\s*\d{3})?\b/.test(lower)) return "GLC";
