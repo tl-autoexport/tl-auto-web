@@ -12,8 +12,18 @@ const target = Number(process.env.ENCAR_NEW_STAGING_TARGET ?? 50);
 const maxPages = Number(process.env.ENCAR_NEW_STAGING_MAX_PAGES ?? 6);
 const discoveryPool = Math.max(target, Number(process.env.ENCAR_NEW_DISCOVERY_POOL ?? target * 2));
 const preflightConcurrency = Math.max(1, Math.min(6, Number(process.env.ENCAR_NEW_PREFLIGHT_CONCURRENCY ?? 3)));
+const requestedFuelTypes = (process.env.ENCAR_NEW_STAGING_FUEL_TYPES ?? "gasoline,diesel")
+  .split(",").map((value) => value.trim().toLowerCase()).filter(Boolean);
+const allowedFuelTypes = new Set(requestedFuelTypes);
+const allowedBrands = (process.env.ENCAR_NEW_STAGING_BRANDS ?? "")
+  .split(",").map((value) => value.trim()).filter(Boolean);
+const fuelPages = Number(process.env.ENCAR_NEW_STAGING_FUEL_PAGES ?? 30);
 if (!Number.isInteger(target) || target < 1) throw new Error("ENCAR_NEW_STAGING_TARGET must be a positive integer");
 if (!Number.isInteger(maxPages) || maxPages < 1) throw new Error("ENCAR_NEW_STAGING_MAX_PAGES must be a positive integer");
+if (!Number.isInteger(fuelPages) || fuelPages < 0) throw new Error("ENCAR_NEW_STAGING_FUEL_PAGES must be a non-negative integer");
+if (!requestedFuelTypes.length || requestedFuelTypes.some((fuel) => !["gasoline", "diesel", "electric", "hybrid"].includes(fuel))) {
+  throw new Error("ENCAR_NEW_STAGING_FUEL_TYPES must contain gasoline, diesel, electric, or hybrid");
+}
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
@@ -28,6 +38,7 @@ type CandidateDraft = {
   brand: string | null;
   model: string | null;
   year: number | null;
+  fuelType?: string | null;
 };
 
 type Preflight = NewEncarPreflightRow<CandidateDraft>;
@@ -66,18 +77,21 @@ async function inParallel<T, R>(items: T[], concurrency: number, fn: (item: T) =
 
 async function main() {
   // This calls Encar but stays dry-run: no rows are inserted into cars.
+  const combustionRequested = allowedFuelTypes.has("gasoline") || allowedFuelTypes.has("diesel");
   const discovery = await importEncar({
     target: discoveryPool,
-    maxPages,
+    maxPages: combustionRequested ? maxPages : 0,
     onlyNew: true,
     dryRun: true,
     electricTarget: 0,
-    electricPages: 0,
+    electricPages: allowedFuelTypes.has("electric") ? fuelPages : 0,
     hybridTarget: 0,
-    hybridPages: 0,
+    hybridPages: allowedFuelTypes.has("hybrid") ? fuelPages : 0,
+    allowedBrands,
     collectNewCandidateDrafts: "raw",
   });
-  const discovered = (discovery.candidateDrafts ?? []) as CandidateDraft[];
+  const discovered = ((discovery.candidateDrafts ?? []) as CandidateDraft[])
+    .filter((candidate) => allowedFuelTypes.has(String(candidate.fuelType ?? "").toLowerCase()));
   if (discovered.length < target) {
     throw new Error(`Only ${discovered.length} new candidates passed discovery; target is ${target}. No staging run was created.`);
   }
@@ -125,6 +139,14 @@ async function main() {
     const counts = Object.fromEntries(["ready", "unknown", "dummy", "contract", "duplicate_vehicle"].map((status) => [status, preflightRows.filter((row) => row.status === status).length]));
     throw new Error(`Only ${candidates.length} candidates passed preflight; target is ${target}. Increase ENCAR_NEW_DISCOVERY_POOL. ${JSON.stringify(counts)}`);
   }
+  const selectedFuelCounts = Object.fromEntries([...allowedFuelTypes].map((fuel) => [
+    fuel, candidates.filter((row) => String(row.candidate.fuelType ?? "").toLowerCase() === fuel).length,
+  ]));
+  const selectedBrandCounts = candidates.reduce<Record<string, number>>((counts, row) => {
+    const brand = row.candidate.brand ?? "unknown";
+    counts[brand] = (counts[brand] ?? 0) + 1;
+    return counts;
+  }, {});
   const { data: run, error: runError } = await db
     .from("encar_enrichment_runs")
     .insert({
@@ -138,8 +160,13 @@ async function main() {
       summary: {
         source: "encar",
         onlyNew: true,
+        allowedFuelTypes: [...allowedFuelTypes],
+        allowedBrands: allowedBrands.length ? allowedBrands : null,
+        selectedFuelCounts,
+        selectedBrandCounts,
         electricTarget: 0,
         hybridTarget: 0,
+        fuelPages,
         maxPages,
         discovery: {
           candidates: discovery.candidates,
@@ -178,10 +205,12 @@ async function main() {
   console.log(JSON.stringify({
     run,
     staged: candidates.length,
-    sourcePolicy: "only Encar IDs absent from cars and all prior Encar enrichment queues; combustion only; preflight excludes dummy, CONTRACT and active/in-batch vehicle-number duplicates; transient preflight errors are retained; no cars inserted; no publication",
+    sourcePolicy: `only Encar IDs absent from cars and all prior Encar enrichment queues; fuel=${[...allowedFuelTypes].join(",")}; brands=${allowedBrands.join(",") || "all"}; preflight excludes dummy, CONTRACT and active/in-batch vehicle-number duplicates; transient preflight errors are retained; no cars inserted; no publication`,
     discovery: { candidates: discovery.candidates, existingCandidates: discovery.existingCandidates, freshCandidates: discovery.freshCandidates, seen: discovery.seen },
     excludedPreviouslyQueued: previouslyQueuedIds.size,
     preflight: Object.fromEntries(["ready", "unknown", "dummy", "contract", "duplicate_vehicle"].map((status) => [status, preflightRows.filter((row) => row.status === status).length])),
+    selectedFuelCounts,
+    selectedBrandCounts,
   }, null, 2));
 }
 

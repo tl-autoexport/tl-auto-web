@@ -299,6 +299,7 @@ export type ImportOptions = {
   replaceCatalog?: boolean;
   maxListingAgeDays?: number;
   allowedModels?: string[];
+  allowedBrands?: string[];
   brandMinimums?: Record<string, number>;
   modelMinimums?: Record<string, number>;
   priorityBrandPages?: Record<string, number>;
@@ -1302,6 +1303,11 @@ export async function importEncar(options: ImportOptions = {}) {
       .map((value) => value.trim().toLowerCase().replace(/[^a-zа-яё0-9]+/gi, ""))
       .filter(Boolean),
   );
+  const allowedBrands = new Set(
+    (options.allowedBrands ?? [])
+      .map((value) => normalizeBrand(value))
+      .filter((value): value is string => Boolean(value)),
+  );
   const brandMinimums: Record<string, number> = {};
   for (const [brand, configuredMinimum] of Object.entries(
     options.brandMinimums ?? {},
@@ -1462,6 +1468,7 @@ export async function importEncar(options: ImportOptions = {}) {
     .filter((item) =>
       isFreshListing(item.Photos?.[0]?.updatedDate, maxListingAgeDays),
     )
+    .filter((item) => !allowedBrands.size || allowedBrands.has(normalizeBrand(item.Manufacturer) ?? ""))
     .filter((item) => {
       if (allowedModels.size) {
         const identity = `${normalizeBrand(item.Manufacturer) ?? ""}${normalizeModel(item.Model) ?? ""}`
@@ -1650,9 +1657,9 @@ export async function importEncar(options: ImportOptions = {}) {
             year: item.car.year,
           }))
           : freshCandidates
-            .filter((item) => {
-              const fuel = normalizeFuel(item.FuelType);
-              return fuel === "gasoline" || fuel === "diesel";
+          .filter((item) => {
+            const fuel = normalizeFuel(item.FuelType);
+              return fuel === "gasoline" || fuel === "diesel" || fuel === "electric" || fuel === "hybrid";
             })
             .slice(0, target)
             .map((item) => ({
@@ -1662,6 +1669,7 @@ export async function importEncar(options: ImportOptions = {}) {
               brand: normalizeBrand(item.Manufacturer),
               model: normalizeModel(item.Model),
               year: Number(item.Year) || null,
+              fuelType: normalizeFuel(item.FuelType),
             })))
         : undefined,
     };
