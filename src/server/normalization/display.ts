@@ -1,4 +1,4 @@
-import { normalizeDrive } from "./vehicles";
+import { normalizeBrand, normalizeDrive, normalizeModel } from "./vehicles";
 
 const KOREAN_RE = /[\u3131-\u318e\uac00-\ud7a3]/;
 
@@ -279,6 +279,70 @@ export function cleanDisplay(value: unknown, fallback = "-") {
   return text;
 }
 
+const DISPLAY_NAME_OVERRIDES: Record<string, string> = {
+  "astonmartin": "Aston Martin",
+  "kgm": "KGM",
+  "mini": "MINI",
+  "bmw": "BMW",
+  "amg": "AMG",
+  "avante": "Avante",
+  "аванте": "Avante",
+  "아반떼": "Avante",
+  "i10": "i10",
+  "i20": "i20",
+  "i30": "i30",
+  "i40": "i40",
+  "ix1": "iX1",
+  "ix3": "iX3",
+  "ix5": "iX5",
+  "e": "e",
+  "ioniq": "Ioniq",
+  "xdrive": "xDrive",
+};
+const DISPLAY_UPPERCASE_TOKENS = new Set([
+  "BMW", "KGM", "AMG", "EV", "HEV", "PHEV", "SUV", "GT", "CLS", "GLA", "GLB", "GLC", "GLE", "GLS",
+  "AWD", "FWD", "RWD", "2WD", "4WD", "TDI", "TFSI", "GDI", "LPG", "RS",
+]);
+
+function displayNameCase(value: string) {
+  return value.split(/(\s+|-|\/)/).map((part) => {
+    if (!part || /^\s+$/.test(part) || part === "-" || part === "/") return part;
+    const override = DISPLAY_NAME_OVERRIDES[part.toLowerCase()];
+    if (override) return override;
+    if (DISPLAY_UPPERCASE_TOKENS.has(part) || /\d/.test(part) && /^[A-Z0-9-]+$/.test(part)) return part;
+    return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+  }).join("");
+}
+
+function displayNameKey(value: string) {
+  return value.toLowerCase().replace(/[аеорсхуктмвні]/g, (letter) => ({
+    а: "a", е: "e", о: "o", р: "p", с: "c", х: "x", у: "y", к: "k", т: "t", м: "m", в: "b", н: "h", і: "i",
+  })[letter] ?? letter);
+}
+
+export function translateBrand(value: string | null | undefined) {
+  const normalized = normalizeBrand(value);
+  if (!normalized) return "";
+  const clean = cleanDisplay(normalized, "");
+  return clean ? displayNameCase(clean) : "";
+}
+
+export function translateModel(_brand: string | null | undefined, value: string | null | undefined) {
+  const raw = String(value ?? "").replace(/\s+/g, " ").trim();
+  const key = displayNameKey(raw);
+  if (!raw || hasKorean(raw) && !DISPLAY_NAME_OVERRIDES[key]) return "";
+  const mapped = DISPLAY_NAME_OVERRIDES[key] ?? normalizeModel(raw) ?? raw;
+  const clean = cleanDisplay(mapped, "");
+  return clean ? displayNameCase(clean) : "";
+}
+
+export function translateTrim(value: string | null | undefined) {
+  const raw = String(value ?? "").replace(/\s+/g, " ").trim();
+  if (!raw || /^(?:-|unknown|null|undefined|n\/a)$/i.test(raw)) return null;
+  const translated = translateBadge(raw) ?? cleanDisplay(raw, "");
+  return translated ? displayNameCase(translated) : null;
+}
+
 export function translateBadge(value: string | null | undefined) {
   if (!value) return null;
   const translated = value
@@ -312,7 +376,7 @@ export function translateBadge(value: string | null | undefined) {
     .replace(/\s+/g, " ")
     .trim();
 
-  return hasKorean(translated) ? null : translated;
+  return hasKorean(translated) ? null : displayNameCase(translated);
 }
 
 export function translateFuel(value: string | null | undefined) {
@@ -476,6 +540,5 @@ export function carDisplayTitle(car: {
   badge?: string | null;
   badge_detail?: string | null;
 }) {
-  const badge = translateBadge(car.badge_detail) ?? translateBadge(car.badge);
-  return [cleanDisplay(car.brand, ""), cleanDisplay(car.model, ""), badge].filter(Boolean).join(" ").trim();
+  return [translateBrand(car.brand), translateModel(car.brand, car.model)].filter(Boolean).join(" ").trim();
 }

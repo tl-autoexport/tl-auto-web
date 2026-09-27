@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight, LoaderCircle, RotateCcw, X } from "lucide-react";
+import { translateBrand, translateModel } from "@/server/normalization/display";
 
 type FacetOption = { value: string; label: string; cars: number };
 type FacetsResponse = { total: number; axes: Record<string, FacetOption[]> };
@@ -126,7 +127,7 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
       <div className="hidden grid-cols-3 gap-3 md:grid">
         {(["brand", "model", "generation"] as Level[]).map((item) => {
           const disabled = (item === "model" && !selection.brand) || (item === "generation" && !selection.model);
-          const shownValue = item === "generation" ? generationLabel : selection[item];
+          const shownValue = item === "generation" ? generationLabel : item === "brand" ? translateBrand(selection.brand) : translateModel(selection.brand, selection.model);
           return (
             <button className={`grid min-h-[68px] grid-cols-[1fr_auto] items-center rounded-xl border px-4 text-left transition ${level === item && open ? "border-[#a98239] bg-[#fffaf0] shadow-[0_0_0_2px_rgba(169,130,57,0.12)]" : shownValue ? "border-[#c7a55a] bg-white" : "border-[#d7dee8] bg-white"} ${disabled ? "cursor-not-allowed opacity-50" : "hover:border-[#a98239]"}`} disabled={disabled} key={item} onClick={() => show(item)} type="button">
               <span className="min-w-0">
@@ -155,7 +156,7 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
               {(["brand", "model", "generation"] as Level[]).map((item, index) => (
                 <span className="inline-flex shrink-0 items-center gap-1" key={item}>
                   {index ? <ChevronRight className="text-[#b0b7c2]" size={14} /> : null}
-                  <button className={level === item ? "font-semibold text-[#956f2c]" : "text-[#647084]"} onClick={() => show(item)} type="button">{item === "generation" ? generationLabel || LEVEL_LABEL[item] : selection[item] || LEVEL_LABEL[item]}</button>
+                  <button className={level === item ? "font-semibold text-[#956f2c]" : "text-[#647084]"} onClick={() => show(item)} type="button">{item === "generation" ? generationLabel || LEVEL_LABEL[item] : item === "brand" ? translateBrand(selection.brand) || LEVEL_LABEL[item] : translateModel(selection.brand, selection.model) || LEVEL_LABEL[item]}</button>
                 </span>
               ))}
             </div>
@@ -165,7 +166,8 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
                 <p className="flex items-center gap-2 p-4 text-sm text-[#647084]"><LoaderCircle className="animate-spin" size={17} /> Загружаем варианты</p>
               ) : options.length ? options.map((option) => {
                 const selected = selection[level] === option.value;
-                return <button className={`flex min-h-12 w-full items-center justify-between gap-3 border-b border-[#eef1f5] px-4 text-left text-sm transition md:border-r ${selected ? "bg-[#fbf7ed]" : "hover:bg-[#f7f9fc]"}`} key={`${level}-${option.value}`} onClick={() => pick(option)} type="button"><span className="min-w-0 truncate font-medium text-[#273246]">{option.label}</span>{level === "model" ? <span aria-hidden="true" className={`grid size-5 shrink-0 place-items-center rounded border text-xs ${selected ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span> : <span className="shrink-0 text-xs text-[#7a8798]">{option.cars}</span>}</button>;
+                const label = level === "brand" ? translateBrand(option.label) : level === "model" ? translateModel(selection.brand, option.label) : option.label;
+                return <button className={`flex min-h-12 w-full items-center justify-between gap-3 border-b border-[#eef1f5] px-4 text-left text-sm transition md:border-r ${selected ? "bg-[#fbf7ed]" : "hover:bg-[#f7f9fc]"}`} key={`${level}-${option.value}`} onClick={() => pick(option)} type="button"><span className="min-w-0 truncate font-medium text-[#273246]">{label || option.label}</span>{level === "model" ? <span aria-hidden="true" className={`grid size-5 shrink-0 place-items-center rounded border text-xs ${selected ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span> : <span className="shrink-0 text-xs text-[#7a8798]">{option.cars}</span>}</button>;
               }) : <p className="p-4 text-sm text-[#647084]">{level === "generation" ? "Для этой марки и модели пока нет подтверждённых данных о поколениях." : "Нет вариантов для текущего отбора."}</p>}
             </div>
 

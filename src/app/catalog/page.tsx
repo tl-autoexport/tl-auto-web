@@ -22,7 +22,7 @@ import {
   type CatalogFilters,
   type StagingCatalogType,
 } from "@/server/cars/repository";
-import { translateFuel, translateTransmission } from "@/server/normalization/display";
+import { translateFuel, translateTransmission, translateTrim } from "@/server/normalization/display";
 import { bodyTypeFilterValue, transmissionFilterValue } from "@/lib/catalog-filter-values";
 import { LiveCatalogCount } from "./LiveCatalogCount";
 import { getCbrCalcRates } from "@/server/calc/rates";
@@ -374,7 +374,7 @@ function CatalogFilterForm({
       <FilterInput inputMode="numeric" label="Пробег до, км" name="mileageMax" placeholder="Например, 80 000" value={value("mileageMax")} />
       <FilterInput inputMode="numeric" label="Пробег от, км" name="mileageMin" placeholder="Например, 10 000" value={value("mileageMin")} />
       <FilterInput inputMode="numeric" label="Мощность до, л.с." name="powerMax" placeholder="Например, 160" value={value("powerMax")} />
-      <FilterSelect label="Комплектация" name="trim" options={trims} placeholder="Любая" value={value("trim")} />
+      <FilterSelect label="Комплектация" name="trim" options={trims} placeholder="Любая" translate={(item) => translateTrim(item) ?? item} value={value("trim")} />
       <FilterSelect label="Кузов" name="body" options={bodies} placeholder="Любой" translate={translateBody} value={value("body")} />
       <FilterSelect label="Цвет кузова" name="color" options={colors} placeholder="Любой" value={value("color")} />
       <FilterSelect label="Месяц выпуска" name="month" options={Array.from({ length: 12 }, (_, index) => String(index + 1))} placeholder="Любой" translate={translateMonth} value={value("month")} />

@@ -28,6 +28,7 @@ import {
   translateDrive,
   translateFuel,
   translateOption,
+  translateTrim,
   translateTransmission,
 } from "@/server/normalization/display";
 import { CarMediaShowcase } from "./CarMediaShowcase";
@@ -204,6 +205,7 @@ export default async function CarDetailPage({
                   value={translateTransmission(car.transmission)}
                 />
                 <Spec label="Цвет" value={translateColor(car.color)} />
+                {translateTrim(car.trim || car.badge_detail || car.badge) ? <Spec label="Комплектация" value={translateTrim(car.trim || car.badge_detail || car.badge)!} /> : null}
                 {typeof car.vehicle_specs?.seats === "number" && car.vehicle_specs.seats > 0 ? (
                   <Spec label="Места" value={`${car.vehicle_specs.seats} мест`} />
                 ) : null}

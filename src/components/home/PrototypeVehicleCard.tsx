@@ -11,7 +11,7 @@ import { RemoteImage } from "@/components/site/RemoteImage";
 import { useDestination } from "@/components/site/DestinationProvider";
 import { vehicleClientMessage, whatsappContactUrl } from "@/lib/contact";
 import { publicCarPath } from "@/lib/car-url";
-import { translateDrive, translateFuel, translateTransmission } from "@/server/normalization/display";
+import { translateBrand, translateDrive, translateFuel, translateModel, translateTransmission, translateTrim } from "@/server/normalization/display";
 import { showcasePhotoUrl } from "@/lib/showcase-photo";
 import type { CatalogCar, CatalogCardSummary } from "@/server/cars/repository";
 
@@ -57,7 +57,9 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
     car.primary_thumbnail_url ?? car.primary_image_url ?? ("car_media" in car ? showcasePhotoUrl(car.car_media) : null),
   [car]);
   const [shareNotice, setShareNotice] = useState("");
-  const title = [car.brand, car.model].filter(Boolean).join(" ") || "Автомобиль из Кореи";
+  const brand = translateBrand(car.brand);
+  const model = translateModel(car.brand, car.model);
+  const title = [brand, model].filter(Boolean).join(" ") || "Автомобиль из Кореи";
   const detailsHref = publicCarPath(car.primary_source, car.source_id);
   const message = vehicleClientMessage({ source: car.primary_source, sourceId: car.source_id, title });
   const seatsValue = car.seats ?? ("vehicle_specs" in car && typeof car.vehicle_specs?.seats === "number" ? car.vehicle_specs.seats : null);
@@ -65,15 +67,15 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
     ? `${seatsValue} мест`
     : null;
   const primaryFacts = [
-    car.brand,
-    car.model,
+    brand,
+    model,
     car.engine_cc ? `${engine.format(car.engine_cc / 1000)} л` : null,
     car.transmission ? translateTransmission(car.transmission) : null,
     car.year ? `${car.year} г.` : null,
     car.mileage_km ? `${rub.format(car.mileage_km)} км` : null,
   ].filter((value): value is string => Boolean(value));
   const secondaryFacts = [
-    car.trim || car.badge,
+    translateTrim(car.trim || car.badge_detail || car.badge),
     car.fuel_type ? translateFuel(car.fuel_type) : null,
     translateDrive(car.drive_type),
     car.power_hp ? `${car.power_hp} л.с.` : null,
