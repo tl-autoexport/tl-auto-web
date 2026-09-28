@@ -5,6 +5,8 @@ assert.equal(encarrusFuelType("1.6 л (бензин)"), "gasoline");
 assert.equal(encarrusFuelType("2.2 л дизель"), "diesel");
 assert.equal(encarrusFuelType("1.6 л гибрид"), null);
 assert.equal(encarrusEngineCc("1.6 л (бензин)"), 1600);
+assert.equal(encarrusEngineCc("1.5 бензин"), 1500);
+assert.equal(encarrusEngineCc("2.0 дизель"), 2000);
 assert.equal(encarrusEngineCc("1998 см³"), 1998);
 assert.equal(encarrusIceModelNameMatches({
   brand: "KG_Mobility_Ssangyong", model: "Torres",

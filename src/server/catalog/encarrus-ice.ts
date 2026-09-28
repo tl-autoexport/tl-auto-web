@@ -103,6 +103,12 @@ export function encarrusEngineCc(value: string | null): number | null {
   if (cc) return Number(cc[1]);
   const liters = text.match(/(\d(?:\.\d{1,2})?)\s*(?:л(?:итр(?:а|ов)?)?|l)(?![a-zа-я])/i);
   if (liters) return Math.round(Number(liters[1]) * 1000);
+  // EncarRus listing cards commonly omit the unit: "1.5 бензин" / "2.0 дизель".
+  // Infer liters only when the same engine field explicitly identifies ICE fuel.
+  if (encarrusFuelType(text)) {
+    const implicitLiters = text.match(/^\s*(\d(?:\.\d{1,2})?)\s+(?=[^\d]*$)/);
+    if (implicitLiters) return Math.round(Number(implicitLiters[1]) * 1000);
+  }
   return null;
 }
 
