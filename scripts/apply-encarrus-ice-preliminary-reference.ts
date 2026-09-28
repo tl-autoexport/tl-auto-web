@@ -187,29 +187,41 @@ async function main() {
     );
     const existingByKey = new Map(existing.rows.map((row) => [row.configuration_key, row]));
     const proposedByKey = new Map(references.map((row) => [row.configuration_key, row]));
-    const conflicts = existing.rows.flatMap((row) => {
+    const protectedRefs = existing.rows.filter((row) => row.status !== "automatic");
+    if (protectedRefs.length) {
+      throw new Error(`Protected non-automatic refs; refusing import: ${JSON.stringify(protectedRefs)}`);
+    }
+    const heldConflicts = existing.rows.flatMap((row) => {
       const proposed = proposedByKey.get(row.configuration_key);
-      if (row.status === "automatic" && proposed && Number(row.power_hp) === proposed.power_hp) return [];
-      return [{
+      if (!proposed || Number(row.power_hp) === proposed.power_hp) return [];
+      const candidate = selected.find((item) => referenceKey(item) === row.configuration_key);
+      return candidate ? [{
         configuration_key: row.configuration_key,
-        existingStatus: row.status,
+        brand: candidate.group.brand,
+        model: candidate.group.model,
+        year: candidate.group.year,
+        listingCount: candidate.group.listingIds.length,
+        listingIds: candidate.group.listingIds,
         existingSource: row.source,
         existingPowerHp: Number(row.power_hp),
-        proposedPowerHp: proposed?.power_hp ?? null,
-      }];
+        proposedPowerHp: proposed.power_hp,
+        badgeExamples: candidate.group.badgeExamples ?? [],
+      }] : [];
     });
-    if (conflicts.length) {
-      throw new Error(`Existing power conflicts/protected refs; refusing import: ${JSON.stringify(conflicts)}`);
-    }
-    const pending = references.filter((row) => !existingByKey.has(row.configuration_key));
+    const heldKeys = new Set(heldConflicts.map((row) => row.configuration_key));
+    const safeSelected = selected.filter((row) => !heldKeys.has(referenceKey(row)));
+    const safeReferences = references.filter((row) => !heldKeys.has(row.configuration_key));
+    const safeKeys = safeReferences.map((row) => row.configuration_key);
+    const safeListingCount = safeSelected.reduce((sum, row) => sum + row.group.listingIds.length, 0);
+    const pending = safeReferences.filter((row) => !existingByKey.has(row.configuration_key));
     const liveReferences = await db.query<AutomaticPowerReferenceRow>(
       `select configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,
               year_from,year_to,power_hp::double precision as power_hp,
               power_kw::double precision as power_kw,source,status
          from public.vehicle_power_automatic_reference where status <> 'retired'`,
     );
-    const combined = [...liveReferences.rows, ...references];
-    const resolverConflicts = selected.flatMap((row) => {
+    const combined = [...liveReferences.rows, ...safeReferences];
+    const resolverConflicts = safeSelected.flatMap((row) => {
       const group = row.group;
       const badges = [...new Set(group.badgeExamples?.length ? group.badgeExamples : [null])];
       return badges.flatMap((badge) => {
@@ -237,17 +249,22 @@ async function main() {
       status: "automatic (preliminary; T4 evidence)",
       configurationsInAudit: audit.preliminaryConfigurations,
       listingsInAudit: audit.preliminaryListings,
+      heldForExistingPowerConflict: {
+        configurations: heldConflicts.length,
+        listings: heldConflicts.reduce((sum, row) => sum + row.listingCount, 0),
+        details: heldConflicts,
+      },
       excludedConflictingConfigurations: excluded.map((row) => ({
         brand: row.group.brand, model: row.group.model, year: row.group.year,
         engineCc: row.group.engineCc, listingCount: row.group.listingIds.length,
       })),
-      configurationsToRecord: selected.length,
-      listingsCovered: listingCount,
-      alreadyRecorded: references.length - pending.length,
+      configurationsToRecord: safeSelected.length,
+      listingsCovered: safeListingCount,
+      alreadyRecorded: safeReferences.length - pending.length,
       newReferences: pending.length,
       resolverConflicts: resolverConflicts.length,
       powersByFuel: Object.fromEntries(["gasoline", "diesel"].map((fuel) => [
-        fuel, selected.filter((row) => row.group.fuelType === fuel).length,
+        fuel, safeSelected.filter((row) => row.group.fuelType === fuel).length,
       ])),
       effects: { carsChanged: 0, calculationsChanged: 0, pricesChanged: 0, publications: 0 },
     }, null, 2));
@@ -268,17 +285,28 @@ async function main() {
         [JSON.stringify(pending)],
       );
     }
-    const verify = await db.query<{ count: string }>(
-      `select count(*)::text as count
+    const verify = await db.query<{ configuration_key: string; power_hp: string; status: string }>(
+      `select configuration_key,power_hp::text,status
          from public.vehicle_power_automatic_reference
-        where configuration_key=any($1::text[]) and source='encarrus_ice_catalog' and status='automatic'`,
-      [keys],
+        where configuration_key=any($1::text[])`,
+      [safeKeys],
     );
-    if (Number(verify.rows[0]?.count) !== references.length) {
-      throw new Error(`Post-write verification failed: ${verify.rows[0]?.count}/${references.length}`);
+    const verifiedByKey = new Map(verify.rows.map((row) => [row.configuration_key, row]));
+    const verificationFailures = safeReferences.flatMap((reference) => {
+      const row = verifiedByKey.get(reference.configuration_key);
+      return row?.status === "automatic" && Number(row.power_hp) === reference.power_hp ? [] : [{
+        configuration_key: reference.configuration_key,
+        expectedPowerHp: reference.power_hp,
+        actualPowerHp: row?.power_hp ?? null,
+        actualStatus: row?.status ?? null,
+      }];
+    });
+    if (verificationFailures.length) {
+      throw new Error(`Post-write verification failed: ${JSON.stringify(verificationFailures)}`);
     }
     await db.query("commit");
-    console.log(JSON.stringify({ applied: pending.length, totalReferences: references.length,
+    console.log(JSON.stringify({ applied: pending.length, safeConfigurations: safeReferences.length,
+      heldConflicts: heldConflicts.length, verified: safeReferences.length,
       referenceOnly: true, carsChanged: 0, calculationsChanged: 0, pricesChanged: 0, publications: 0 }));
   } catch (error) {
     if (write) await db.query("rollback").catch(() => undefined);
