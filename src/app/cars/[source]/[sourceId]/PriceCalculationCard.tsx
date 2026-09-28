@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 
 import { isPreliminaryConfidence, isPreliminaryFinality } from "@/server/cars/calculation-contract";
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import {
   BadgeCheck,
   Calculator,
@@ -123,6 +123,47 @@ function wholeRate(value: number) {
   return new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(value);
 }
 
+const PAYMENT_STAGE_COLORS = [
+  "bg-[#65758c]",
+  "bg-[#3568c6]",
+  "bg-[#1683a7]",
+  "bg-[#7752c9]",
+  "bg-[#a98239]",
+] as const;
+
+function paymentStages(source: string) {
+  // Both current catalog sources sell vehicles from South Korea. The wording
+  // stays tied to the listing source, never to the buyer's destination.
+  const purchaseCountry = ["encar", "korea", "chestny_prigon"].includes(source)
+    ? "Южной Корее"
+    : "стране покупки";
+  return [
+    {
+      title: "ОСМОТР",
+      summary: "профессиональный осмотр авто 15.000₽",
+      detail: "если вы сомневаетесь переводить большие суммы на начальных этапах мы начинаем работать с минимальной оплаты за осмотр вами выбранного автомобиля. Профессиональный специалист по осмотру сделает подробный осмотр с фото, видео фиксацией состояния автомобиля, проверкой ЛКП толщиномером, визуальным и техническим осмотром, а также компьютерной диагностикой.",
+    },
+    {
+      title: "БРОНИРОВАНИЕ",
+      summary: "залог для бронирования 50.000₽",
+      detail: "Он является суммой бронирования авто, далее учитывается в счет нашей комиссии услуги под ключ",
+      note: "залог может быть больше в зависимости от условий диллера и стоимости авто",
+    },
+    {
+      title: "ВЫКУП",
+      summary: `Оплата по Инвойс. На этом этапе оплачивается стоимость автомобиля и расходы в ${purchaseCountry}`,
+    },
+    {
+      title: "ТАМОЖНЯ",
+      summary: "Оплата Таможенных платежей и утильсбора",
+    },
+    {
+      title: "ДОСТАВКА",
+      summary: "Оплата услуги брокера и доставки до вашего города",
+    },
+  ];
+}
+
 export function PriceCalculationCard(props: PriceCalculationCardProps) {
   const { country, city } = useDestination();
   if (country.countryCode !== "RU" || !["vladivostok", "ussuriysk"].includes(city.id)) return <PendingDestinationCard {...props} />;
@@ -146,8 +187,10 @@ function RuPriceCalculationCard({
 }: PriceCalculationCardProps) {
   const { city } = useDestination();
   const [isModalOpen, setModalOpen] = useState(false);
+  const [selectedPaymentStage, setSelectedPaymentStage] = useState<number | null>(null);
   const [currency, setCurrency] = useState<"RUB" | "USD">("RUB");
   const calculationTitleId = useId();
+  const paymentStageDetailId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [refreshedCalc, setRefreshedCalc] = useState<{
@@ -232,20 +275,7 @@ function RuPriceCalculationCard({
     vehicleClientMessage({ source, sourceId, title }),
   );
 
-  const portions = useMemo(
-    () =>
-      [
-        { label: "Стоимость авто", value: car, color: "bg-[#65758c]" },
-        { label: "Расходы в Южной Корее", value: korea, color: "bg-[#3568c6]" },
-        {
-          label: "Расходы в России",
-          value: russia,
-          color: "bg-[#1683a7]",
-        },
-        { label: "Таможенные платежи", value: customs, color: "bg-[#7752c9]" },
-      ].filter((item) => item.value > 0),
-    [car, customs, korea, russia],
-  );
+  const stages = paymentStages(source);
 
   useDialogAccessibility({
     dialogRef,
@@ -302,33 +332,49 @@ function RuPriceCalculationCard({
           </label>
         </div>
 
-        <div className="mt-5 overflow-hidden rounded-full bg-[#edf0f5] p-0.5">
-          <div className="flex h-7 gap-0.5 overflow-hidden rounded-full">
-            {portions.map((portion) => {
-              const percent = total
-                ? Math.max(5, Math.round((portion.value / total) * 100))
-                : 25;
-              return (
-                <div
-                  className={`${portion.color} flex items-center justify-center text-xs font-semibold text-white`}
-                  key={portion.label}
-                  style={{ width: `${percent}%` }}
-                  title={`${portion.label}: ${money(portion.value)}`}
+        <section aria-label="Этапы оплат" className="mt-5">
+          <h2 className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#647084]">Этапы оплат</h2>
+          <div className="overflow-hidden rounded-full bg-[#edf0f5] p-0.5">
+            <div className="flex h-7 gap-0.5 overflow-hidden rounded-full">
+              {stages.map((stage, index) => (
+                <button
+                  aria-controls={selectedPaymentStage === index ? paymentStageDetailId : undefined}
+                  aria-label={`${index + 1}. ${stage.title}: ${stage.summary}`}
+                  aria-pressed={selectedPaymentStage === index}
+                  className={`${PAYMENT_STAGE_COLORS[index]} flex min-w-0 flex-1 items-center justify-center text-xs font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white ${selectedPaymentStage === index ? "brightness-110" : "hover:brightness-110"}`}
+                  key={stage.title}
+                  onClick={() => setSelectedPaymentStage(selectedPaymentStage === index ? null : index)}
+                  type="button"
                 >
-                  {percent >= 8 ? `${percent}%` : null}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] leading-4 text-[#4e5b6d] sm:gap-x-4 sm:text-xs">
-          {portions.map((portion) => (
-            <div className="flex items-center gap-2" key={portion.label}>
-              <span className={`h-2 w-2 rounded-full ${portion.color}`} />
-              {portion.label}
+                  {index + 1}
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] leading-4 text-[#4e5b6d] sm:gap-x-4 sm:text-xs">
+            {stages.map((stage, index) => (
+              <button
+                aria-controls={selectedPaymentStage === index ? paymentStageDetailId : undefined}
+                aria-pressed={selectedPaymentStage === index}
+                className={`flex items-center gap-2 text-left transition hover:text-[#121722] ${selectedPaymentStage === index ? "font-semibold text-[#121722]" : ""}`}
+                key={stage.title}
+                onClick={() => setSelectedPaymentStage(selectedPaymentStage === index ? null : index)}
+                type="button"
+              >
+                <span aria-hidden="true" className={`h-2 w-2 shrink-0 rounded-full ${PAYMENT_STAGE_COLORS[index]}`} />
+                {stage.title}
+              </button>
+            ))}
+          </div>
+          {selectedPaymentStage !== null ? (
+            <div className="mt-3 rounded-lg border border-[#d8dde6] bg-[#fafbfc] px-3 py-3 text-xs leading-5 text-[#39475a] sm:text-sm" id={paymentStageDetailId}>
+              <p className="font-semibold text-[#121722]">{stages[selectedPaymentStage].title}</p>
+              <p className="mt-1">{stages[selectedPaymentStage].summary}</p>
+              {stages[selectedPaymentStage].detail ? <p className="mt-2">{stages[selectedPaymentStage].detail}</p> : null}
+              {stages[selectedPaymentStage].note ? <p className="mt-2 border-t border-[#d8dde6] pt-2 text-[#647084]">* {stages[selectedPaymentStage].note}</p> : null}
+            </div>
+          ) : null}
+        </section>
 
         {isPreliminaryFinality(powerFinality) || isPreliminaryConfidence(powerConfidence) ? (
           <div className="mt-5 rounded border border-[#d8dde6] bg-[#fafbfc] px-3 py-3 text-left text-xs font-semibold leading-4 text-[#39475a] sm:text-sm">
