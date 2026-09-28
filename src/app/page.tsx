@@ -62,7 +62,7 @@ export default async function Home() {
             />
             <DodoStoryCard
               title="Мы в соцсетях"
-              href="/#contacts"
+              href="/social"
               image="/assets/stories/social-v2.png"
               position="object-center"
             />

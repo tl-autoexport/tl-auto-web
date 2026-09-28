@@ -48,7 +48,7 @@ const topLinks = [
 
 const clientWhatsAppPhone = "+82 10 7626 0741";
 
-type SocialKind = "telegram" | "max" | "whatsapp" | "youtube" | "instagram" | "tiktok" | "vk";
+export type SocialKind = "telegram" | "max" | "whatsapp" | "youtube" | "instagram" | "tiktok" | "vk";
 
 const socialLinks = [
   { label: "Telegram", href: "https://t.me/TL_Auto_export", kind: "telegram" },
@@ -60,7 +60,7 @@ const socialLinks = [
   { label: "VK", href: null, kind: "vk" },
 ] as const;
 
-function SocialIcon({ kind, size = 17 }: { kind: SocialKind; size?: number }) {
+export function SocialIcon({ kind, size = 17 }: { kind: SocialKind; size?: number }) {
   const commonProps = {
     "aria-hidden": true,
     className: "block",
