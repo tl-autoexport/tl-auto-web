@@ -15,7 +15,7 @@ const execFileAsync = promisify(execFile);
 let proxyAgent: ProxyAgent | undefined;
 let configuredProxyUrl: string | undefined;
 
-type Car = { id: string; source_id: string; source_url: string | null; price_krw: number | null; encar_check_attempts: number };
+type Car = { id: string; primary_source: string; source_id: string; source_url: string | null; price_krw: number | null; encar_check_attempts: number };
 type Detail = { manage?: { modifyDateTime?: string }; advertisement?: { price?: number; salesStatus?: string; status?: string }; price?: number; salePrice?: number; sellPrice?: number; spec?: { price?: number; salePrice?: number } };
 
 function positiveInt(value: string | undefined, fallback: number) {
@@ -77,10 +77,11 @@ async function main() {
       .map((value) => value.trim())
       .filter(Boolean);
     let query = db.from("cars")
-      .select("id,source_id,source_url,price_krw,encar_check_attempts")
-      // TL Auto publishes the catalog sourced from Chesty; Encar is used only
-      // as the live authority for availability and current price.
-      .eq("primary_source", "chestny_prigon").eq("is_available", true)
+      .select("id,primary_source,source_id,source_url,price_krw,encar_check_attempts")
+      // Check every active public catalog source against Encar. Both sources
+      // use the Encar detail endpoint as the live authority for availability
+      // and current price.
+      .in("primary_source", ["chestny_prigon", "encar"]).eq("is_available", true)
       .or(`next_encar_check_at.is.null,next_encar_check_at.lte.${new Date().toISOString()}`);
     if (sourceIds.length) query = query.in("source_id", sourceIds);
     const { data, error } = await query
@@ -90,11 +91,12 @@ async function main() {
     const cars = (data ?? []) as Car[];
     const errorSamples: Array<{ sourceId: string; error: string }> = [];
     const priceChangedIds: string[] = [];
-    const summary = { dryRun, requested: cars.length, checked: 0, active: 0, unavailable: 0, priceChanged: 0, priceMissing: 0, errors: 0 };
+    const summary = { dryRun, requested: cars.length, checked: 0, active: 0, unavailable: 0, priceChanged: 0, priceMissing: 0, errors: 0, bySource: { chestny_prigon: 0, encar: 0 } };
     for (const car of cars) {
       const checkedAt = new Date().toISOString();
       try {
         summary.checked++;
+        if (car.primary_source === "chestny_prigon" || car.primary_source === "encar") summary.bySource[car.primary_source]++;
         const sourceId = encarId(car);
         const response = await fetchDetail(sourceId, positiveInt(process.env.TL_AUTO_ENCAR_ATTEMPTS, 5));
         if (response.status === 404 || response.status === 410) {
