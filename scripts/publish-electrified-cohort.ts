@@ -7,7 +7,9 @@ import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
 import { evaluatePublication, resolveCalculationMonth, storedPowerFinality } from "../src/server/cars/calculation-contract";
 import { normalizeColor, normalizePlate } from "../src/server/normalization/vehicles";
-import { categorizeOption, translateOption } from "../src/server/normalization/display";
+import { fetchStandardOptionCatalog } from "../src/server/imports/encar";
+import { mapEncarOptions } from "../src/server/imports/encar-options";
+import type { EncarOptionRow } from "../src/server/imports/encar-options";
 
 config({ path: ".env.local", override: true, quiet: true });
 config({ path: ".env", quiet: true });
@@ -43,7 +45,7 @@ type Stage = {
 type Prepared = {
   id: string; stage: Stage; car: Obj; calculation: ReturnType<typeof calculateRuVladivostok>;
   reviewedPriceRub: number;
-  photos: Array<{ category: string; url: string }>; options: Array<{ category: string; name_original: string; name_ru: string; price_krw: number | null }>;
+  photos: Array<{ category: string; url: string }>; options: EncarOptionRow[];
 };
 
 const obj = (value: unknown): Obj => value && typeof value === "object" && !Array.isArray(value) ? value as Obj : {};
@@ -77,19 +79,14 @@ function photosFrom(payload: Obj) {
     .sort((a, b) => Number(a.category !== "outer") - Number(b.category !== "outer"));
 }
 
-function optionsFrom(payload: Obj) {
-  const options = payload.choiceOptions;
-  if (!Array.isArray(options)) return [];
-  return options.flatMap((raw) => {
-    const option = obj(raw), original = str(option.optionName);
-    if (!original) return [];
-    const translated = translateOption(original);
-    return [{ category: categorizeOption(original, translated), name_original: original, name_ru: translated ?? original,
-      price_krw: num(option.price) }];
-  });
+function optionsFrom(payload: Obj, catalog: Awaited<ReturnType<typeof fetchStandardOptionCatalog>>) {
+  const detail = obj(payload.detail);
+  const codes = Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).map(String) : [];
+  return mapEncarOptions(catalog, codes, payload.choiceOptions);
 }
 
 async function main() {
+  const optionCatalog = await fetchStandardOptionCatalog();
   if (!DB_URL) throw new Error("SUPABASE_DB_URL is required");
   if (!Number.isInteger(BATCH_SIZE) || BATCH_SIZE < 1 || BATCH_SIZE > 50) throw new Error("Batch size must be 1..50");
   const [powerText, planText, readinessText, publicationText, baselineText] = await Promise.all([
@@ -165,7 +162,7 @@ async function main() {
       const priceUnits = positive(ad.price), priceKrw = priceUnits == null ? null : Math.round(priceUnits * 10_000);
       const registeredAt = str(manage.registDateTime);
       const month = resolveCalculationMonth({ registrationDate: registeredAt });
-      const photos = photosFrom(payload), options = optionsFrom(payload);
+      const photos = photosFrom(payload), options = optionsFrom(payload, optionCatalog);
       if (ad.status !== "ADVERTISE" || manage.dummy === true || ad.salesStatus === "CONTRACT")
         throw new Error(`Saved Encar snapshot is not publishable for ${id}`);
       if (!year || !engineCc || !priceKrw || !photos.some((photo) => photo.category === "outer"))
@@ -322,9 +319,9 @@ async function main() {
             select $1,'encar','image',p.category,p.url,p.url,p.sort_order,p.is_primary,'external_url'
             from jsonb_to_recordset($2::jsonb) as p(category text,url text,sort_order integer,is_primary boolean)`,
           [carId, JSON.stringify(item.photos.map((photo, index) => ({ ...photo, sort_order: index, is_primary: index === 0 })))]);
-          if (item.options.length) await db.query(`insert into public.car_options(car_id,source,category,name_original,name_ru,price_krw,is_present,sort_order)
-            select $1,'encar',o.category,o.name_original,o.name_ru,o.price_krw,true,o.sort_order
-            from jsonb_to_recordset($2::jsonb) as o(category text,name_original text,name_ru text,price_krw bigint,sort_order integer)`,
+          if (item.options.length) await db.query(`insert into public.car_options(car_id,source,category,source_code,name_original,name_ru,value_original,value_ru,price_krw,description_original,description_ru,is_present,sort_order)
+            select $1,'encar',o.category,o.source_code,o.name_original,o.name_ru,o.value_original,o.value_ru,o.price_krw,o.description_original,o.description_ru,true,o.sort_order
+            from jsonb_to_recordset($2::jsonb) as o(category text,source_code text,name_original text,name_ru text,value_original text,value_ru text,price_krw bigint,description_original text,description_ru text,sort_order integer)`,
           [carId, JSON.stringify(item.options.map((option, index) => ({ ...option, sort_order: 1000 + index })))]);
           await db.query(`insert into public.calc_snapshots(car_id,country_code,destination_city,importer_type,calc_version,inputs,rates,result,
               car_price_rub,duty_rub,fees_rub,util_rub,freight_rub,broker_rub,total_rub)

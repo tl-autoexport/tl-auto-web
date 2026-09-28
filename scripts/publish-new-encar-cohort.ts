@@ -8,7 +8,9 @@ import { getCbrCalcRates } from "../src/server/calc/rates";
 import { evaluatePublication, powerBasisForFuel, resolveCalculationMonth, storedPowerFinality } from "../src/server/cars/calculation-contract";
 import { resolveAutomaticPowerReference, type AutomaticPowerReferenceRow } from "../src/server/catalog/automatic-power-reference";
 import { normalizeColor, normalizePlate } from "../src/server/normalization/vehicles";
-import { categorizeOption, translateOption, translateInspectionLabel, translateInspectionStatus } from "../src/server/normalization/display";
+import { translateInspectionLabel, translateInspectionStatus } from "../src/server/normalization/display";
+import { fetchStandardOptionCatalog } from "../src/server/imports/encar";
+import { mapEncarOptions } from "../src/server/imports/encar-options";
 
 config({ path: ".env.local", override: true, quiet: true });
 config({ path: ".env", quiet: true });
@@ -67,17 +69,10 @@ function gallery(payload: Obj) {
   }).sort((a, b) => Number(a.category !== "outer") - Number(b.category !== "outer"));
 }
 
-function choiceOptions(payload: Obj) {
-  const options = payload.choiceOptions;
-  if (!Array.isArray(options)) return [];
-  return options.flatMap((raw) => {
-    const option = obj(raw);
-    const name = str(option.optionName);
-    if (!name) return [];
-    const translated = translateOption(name);
-    return [{ category: categorizeOption(name, translated), name_original: name, name_ru: translated,
-      price_krw: num(option.price), is_present: true }];
-  });
+function choiceOptions(payload: Obj, catalog: Awaited<ReturnType<typeof fetchStandardOptionCatalog>>) {
+  const detail = obj(payload.detail);
+  const codes = Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).map(String) : [];
+  return mapEncarOptions(catalog, codes, payload.choiceOptions);
 }
 
 function inspectionReport(payload: Obj) {
@@ -104,6 +99,7 @@ async function loadJson(path: string): Promise<Plan> {
 }
 
 async function main() {
+  const optionCatalog = await fetchStandardOptionCatalog();
   const original = await loadJson("output/tl-auto-new-encar-power-plan-original-500.json");
   const refreshed = await loadJson("output/tl-auto-new-encar-power-plan.json");
   if (original.runId !== originalRunId || refreshed.runId !== refreshRunId) throw new Error("Power plan run IDs do not match the approved cohort");
@@ -170,7 +166,7 @@ async function main() {
       const c = plan.configuration;
       const year = positive(c.year), engineCc = positive(c.engineCc ?? spec.displacement), priceUnits = positive(ad.price);
       const fuel = str(c.fuelType), brand = str(c.brand), model = str(c.model);
-      const photos = gallery(payload), options = choiceOptions(payload), inspection = inspectionReport(payload);
+      const photos = gallery(payload), options = choiceOptions(payload, optionCatalog), inspection = inspectionReport(payload);
       if (!year || !engineCc || !priceUnits || !fuel || !brand || !model || !row.source_url || !photos.some((p) => p.category === "outer"))
         throw new Error(`Core source data incomplete: ${id}`);
       const month = resolveCalculationMonth({ registrationDate: str(manage.registDateTime) });
@@ -252,9 +248,9 @@ async function main() {
         select $1,'encar','image',p.category,p.url,p.url,p.sort_order,p.is_primary,'external_url'
         from jsonb_to_recordset($2::jsonb) as p(category text,url text,sort_order integer,is_primary boolean)`,
         [carId, JSON.stringify(p.photos.map((photo, i) => ({ ...photo, sort_order: i, is_primary: i === 0 })))]);
-      if (p.options.length) await db.query(`insert into public.car_options(car_id,source,category,name_original,name_ru,price_krw,is_present,sort_order)
-        select $1,'encar',o.category,o.name_original,o.name_ru,o.price_krw,true,o.sort_order
-        from jsonb_to_recordset($2::jsonb) as o(category text,name_original text,name_ru text,price_krw bigint,sort_order integer)`,
+      if (p.options.length) await db.query(`insert into public.car_options(car_id,source,category,source_code,name_original,name_ru,value_original,value_ru,price_krw,description_original,description_ru,is_present,sort_order)
+        select $1,'encar',o.category,o.source_code,o.name_original,o.name_ru,o.value_original,o.value_ru,o.price_krw,o.description_original,o.description_ru,true,o.sort_order
+        from jsonb_to_recordset($2::jsonb) as o(category text,source_code text,name_original text,name_ru text,value_original text,value_ru text,price_krw bigint,description_original text,description_ru text,sort_order integer)`,
         [carId, JSON.stringify(p.options.map((option, i) => ({ ...option, sort_order: 1000 + i })))]);
       if (p.inspection) await db.query(`insert into public.car_condition_reports(car_id,source,report_type,summary,items,raw_payload) values ($1,'encar','encar_inspection',$2,$3,$4)`,
         [carId, JSON.stringify(p.inspection.summary), JSON.stringify(p.inspection.items), JSON.stringify(p.inspection.raw_payload)]);

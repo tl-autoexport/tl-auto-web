@@ -11,7 +11,7 @@
  *     and whose Korean original `translateOption` cannot translate;
  *   * `flattenInspectionItems` (page.tsx:925-949) reads only `label_ru`/`status_ru`.
  */
-import { mapStandardOptions, type EncarOptionCatalog, type EncarOptionRow } from "../imports/encar";
+import { isEncarOptionDisplayable, mapEncarOptions, mapStandardOptions, type EncarOptionCatalog, type EncarOptionRow } from "../imports/encar-options";
 import { translateInspectionLabel, translateInspectionStatus, translateOption } from "../normalization/display";
 
 export type ChestnyRow = Record<string, unknown>;
@@ -34,7 +34,7 @@ export function hasContent(value: unknown, depth = 0): boolean {
 
 /** Whether `buildOptionGroups` would actually render this row. */
 export function isOptionRowDisplayable(row: Pick<EncarOptionRow, "name_ru" | "name_original">): boolean {
-  return Boolean(row.name_ru) || Boolean(translateOption(row.name_original));
+  return isEncarOptionDisplayable(row);
 }
 
 /** Options carried by Encar standard-option codes that Chestny already stores. */
@@ -62,6 +62,11 @@ export function optionRowsFromChoice(reportOptions: unknown): EncarOptionRow[] {
       sort_order: 1000 + index,
     } satisfies EncarOptionRow;
   });
+}
+
+/** Merge Encar standard-code options with Chestny's optional choice list. */
+export function optionRowsFromEncar(catalog: EncarOptionCatalog, codes: string[], choices: unknown): EncarOptionRow[] {
+  return mapEncarOptions(catalog, codes, choices).filter(isOptionRowDisplayable);
 }
 
 /**

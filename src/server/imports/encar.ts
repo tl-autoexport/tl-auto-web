@@ -19,10 +19,13 @@ import {
 import {
   translateInspectionLabel,
   translateInspectionStatus,
-  translateOption,
   translateTransmission,
 } from "@/server/normalization/display";
 import { encarClient } from "@/server/imports/encar-client";
+import { mapChoiceOptions, mapStandardOptions, type EncarOptionCatalog, type EncarOptionRow } from "@/server/imports/encar-options";
+
+export { mapStandardOptions } from "@/server/imports/encar-options";
+export type { EncarOptionCatalog, EncarOptionRow } from "@/server/imports/encar-options";
 
 const ENCAR_BASE_URL = "https://api.encar.com/search/car/list/general";
 const ENCAR_PAGE_SIZE = 50;
@@ -145,22 +148,6 @@ type EncarDetailPayload = {
   }>;
 };
 
-type EncarOptionDefinition = {
-  optionCd?: string;
-  optionName?: string;
-  optionTypeCd?: string | null;
-  sort?: number;
-  description?: string | null;
-  optionTitle?: string | null;
-  groupOptionName?: string | null;
-  subOptions?: EncarOptionDefinition[] | null;
-};
-
-export type EncarOptionCatalog = {
-  metas?: Array<{ key?: string | null; value?: string | null }>;
-  options?: EncarOptionDefinition[];
-};
-
 type EncarInspectionNode = {
   type?: { code?: string | null; title?: string | null } | null;
   statusType?: { code?: string | null; title?: string | null } | null;
@@ -253,20 +240,6 @@ type EncarHistoryResult =
   | { status: "available"; payload: EncarHistoryPayload }
   | { status: "unavailable"; reason: string };
 
-export type EncarOptionRow = {
-  category: string;
-  source_code: string | null;
-  name_original: string | null;
-  name_ru: string | null;
-  value_original: string | null;
-  value_ru: string | null;
-  price_krw: number | null;
-  description_original: string | null;
-  description_ru: string | null;
-  is_present: boolean | null;
-  sort_order: number;
-};
-
 type EncarConditionReport = {
   source: "encar";
   report_type: string;
@@ -278,10 +251,14 @@ type EncarConditionReport = {
 function compactOptionRow(option: EncarOptionRow) {
   return {
     category: option.category,
+    source_code: option.source_code,
     name_original: option.name_original,
     name_ru: option.name_ru,
     value_original: option.value_original,
     value_ru: option.value_ru,
+    price_krw: option.price_krw,
+    description_original: option.description_original,
+    description_ru: option.description_ru,
     is_present: option.is_present,
     sort_order: option.sort_order,
   };
@@ -659,68 +636,6 @@ export async function fetchStandardOptionCatalog() {
   );
 }
 
-const OPTION_CATEGORY_RU: Record<string, string> = {
-  "01": "Экстерьер и интерьер",
-  "02": "Безопасность",
-  "03": "Комфорт и мультимедиа",
-  "04": "Сиденья",
-};
-
-function selectedOptionNames(
-  option: EncarOptionDefinition,
-  selectedCodes: Set<string>,
-) {
-  const selectedSubOptions = (option.subOptions ?? []).filter(
-    (subOption) => subOption.optionCd && selectedCodes.has(subOption.optionCd),
-  );
-  const names = selectedSubOptions
-    .map((subOption) => subOption.groupOptionName ?? subOption.optionName)
-    .filter((name): name is string => Boolean(name));
-  return {
-    original: names.join(", ") || null,
-    ru:
-      names
-        .map((name) => translateOption(name))
-        .filter(Boolean)
-        .join(", ") || null,
-  };
-}
-
-export function mapStandardOptions(
-  catalog: EncarOptionCatalog,
-  installedCodes: string[],
-): EncarOptionRow[] {
-  const selectedCodes = new Set(installedCodes);
-  return (catalog.options ?? []).map((option, index) => {
-    const sourceCode = option.optionCd ?? null;
-    const selectedSubOption = selectedOptionNames(option, selectedCodes);
-    const present = Boolean(
-      (sourceCode && selectedCodes.has(sourceCode)) ||
-      (option.subOptions ?? []).some(
-        (subOption) =>
-          subOption.optionCd && selectedCodes.has(subOption.optionCd),
-      ),
-    );
-    const originalName =
-      option.optionTitle ?? option.groupOptionName ?? option.optionName ?? null;
-
-    return {
-      category:
-        OPTION_CATEGORY_RU[String(option.optionTypeCd ?? "")] ?? "Другое",
-      source_code: sourceCode,
-      name_original: originalName,
-      name_ru: translateOption(originalName),
-      value_original: selectedSubOption.original,
-      value_ru: selectedSubOption.ru,
-      price_krw: null,
-      description_original: option.description ?? null,
-      description_ru: null,
-      is_present: installedCodes.length ? present : null,
-      sort_order: option.sort ?? index,
-    };
-  });
-}
-
 async function fetchChoiceOptions(
   vehicleId: string,
 ): Promise<EncarOptionRow[]> {
@@ -728,21 +643,7 @@ async function fetchChoiceOptions(
   try {
     const data =
       await fetchJson<Array<{ optionName?: string; price?: number }>>(url, 1);
-    return Array.isArray(data)
-      ? data.map((option, index) => ({
-          category: "Дополнительные опции",
-          source_code: null,
-          name_original: option.optionName ?? null,
-          name_ru: translateOption(option.optionName),
-          value_original: null,
-          value_ru: null,
-          price_krw: option.price ?? null,
-          description_original: null,
-          description_ru: null,
-          is_present: true,
-          sort_order: 1000 + index,
-        }))
-      : [];
+    return mapChoiceOptions(data);
   } catch {
     return [];
   }
@@ -1763,7 +1664,7 @@ export async function importEncar(options: ImportOptions = {}) {
 
   const rateSnapshot = await getCbrCalcRates();
   const optionCatalog = fastMode
-    ? { options: [] as EncarOptionDefinition[] }
+    ? { options: [] }
     : await fetchStandardOptionCatalog();
 
   const attemptedSourceIds = new Set<string>();

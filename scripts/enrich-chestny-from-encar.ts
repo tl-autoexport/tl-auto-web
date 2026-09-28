@@ -2,11 +2,10 @@ import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
 import {
-  categorizeOption,
   translateInspectionLabel,
   translateInspectionStatus,
-  translateOption,
 } from "../src/server/normalization/display";
+import { mapEncarOptions, type EncarOptionCatalog } from "../src/server/imports/encar-options";
 import {
   normalizeColor,
   normalizeDrive,
@@ -39,11 +38,6 @@ type ChestnyVehicle = {
   source_listing_id: string; fuel_type: string | null; drive_type: string | null; exterior_color: string | null;
   trim: string | null; generation: string | null;
 };
-type StandardOption = {
-  optionCd?: string; optionName?: string; optionTitle?: string; groupOptionName?: string;
-  optionTypeCd?: string; sort?: number; description?: string; subOptions?: StandardOption[];
-};
-
 function object(value: unknown): RecordValue { return value && typeof value === "object" ? value as RecordValue : {}; }
 function text(value: unknown) { return typeof value === "string" && value.trim() ? value.trim() : null; }
 function number(value: unknown) { return typeof value === "number" && Number.isFinite(value) ? value : null; }
@@ -85,23 +79,6 @@ function normalizeInspection(node: unknown): RecordValue {
     description_original: text(item.description), price: typeof item.price === "number" ? item.price : null,
     children: Array.isArray(item.children) ? item.children.map(normalizeInspection) : [],
   };
-}
-
-function selectedOptions(catalog: StandardOption[], codes: string[]) {
-  const selected = new Set(codes);
-  return catalog.flatMap((option, index) => {
-    const subOptions = (option.subOptions ?? []).filter((sub) => Boolean(sub.optionCd && selected.has(sub.optionCd)));
-    const present = Boolean(option.optionCd && selected.has(option.optionCd)) || subOptions.length > 0;
-    if (!present) return [];
-    const nameOriginal = option.optionTitle ?? option.groupOptionName ?? option.optionName ?? null;
-    const values = subOptions.map((sub) => sub.groupOptionName ?? sub.optionName).filter((value): value is string => Boolean(value));
-    return [{
-      source: "encar", category: categorizeOption(nameOriginal, translateOption(nameOriginal)), source_code: option.optionCd ?? null,
-      name_original: nameOriginal, name_ru: translateOption(nameOriginal), value_original: values.join(", ") || null,
-      value_ru: values.map(translateOption).filter(Boolean).join(", ") || null, description_original: option.description ?? null,
-      description_ru: null, price_krw: null, is_present: true, sort_order: Number(option.sort ?? index),
-    }];
-  });
 }
 
 async function main() {
@@ -162,7 +139,7 @@ async function main() {
       for (const row of (data ?? []) as ChestnyVehicle[]) chestnyBySourceId.set(row.source_listing_id, row);
     }
   }
-  const catalog = await getJson<{ options?: StandardOption[] }>("https://api.encar.com/v1/readside/vehicles/car/options/standard");
+  const catalog = await getJson<EncarOptionCatalog>("https://api.encar.com/v1/readside/vehicles/car/options/standard");
   const results: Array<RecordValue> = []; let cursor = 0;
 
   async function enrich(car: Car) {
@@ -195,10 +172,8 @@ async function main() {
       const optionCodes = Array.isArray(standardCodes)
         ? standardCodes.filter((value): value is string => typeof value === "string")
         : [];
-      const options = [
-        ...selectedOptions(catalog.options ?? [], optionCodes),
-        ...choices.map((option, index) => ({ source: "encar", category: categorizeOption(option.optionName, translateOption(option.optionName)), source_code: null, name_original: option.optionName ?? null, name_ru: translateOption(option.optionName), value_original: null, value_ru: null, description_original: null, description_ru: null, price_krw: option.price ?? null, is_present: true, sort_order: 1000 + index })),
-      ];
+      const options = mapEncarOptions(catalog, optionCodes, choices)
+        .map((option) => ({ source: "encar", ...option }));
       const inspectionData = object(inspection); const master = object(inspectionData.master); const masterDetail = object(master.detail);
       const images = Array.isArray(inspectionData.images) ? inspectionData.images.flatMap((value, index) => {
         const item = object(value); const path = text(item.path); return path ? [{ car_id: car.id, source: "encar", media_type: "image", category: "encar_inspection_document", url: imageUrl(path), thumbnail_url: imageUrl(path), sort_order: 2000 + index, is_primary: false, legal_mode: "external_url" }] : [];

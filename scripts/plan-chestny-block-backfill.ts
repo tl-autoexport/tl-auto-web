@@ -168,8 +168,8 @@ async function main() {
     const optionCatalog = await fetchStandardOptionCatalog();
     const catalogCodes = new Set<string>();
     for (const option of optionCatalog.options ?? []) {
-      if (option.optionCd) catalogCodes.add(option.optionCd);
-      for (const sub of option.subOptions ?? []) if (sub.optionCd) catalogCodes.add(sub.optionCd);
+      if (option.optionCd) catalogCodes.add(String(option.optionCd));
+      for (const sub of option.subOptions ?? []) if (sub.optionCd) catalogCodes.add(String(sub.optionCd));
     }
 
     const counts = {

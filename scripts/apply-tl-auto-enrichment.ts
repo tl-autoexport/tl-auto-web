@@ -20,7 +20,9 @@
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 import { Client } from "pg";
-import { categorizeOption, translateInspectionLabel, translateInspectionStatus, translateOption } from "../src/server/normalization/display";
+import { translateInspectionLabel, translateInspectionStatus } from "../src/server/normalization/display";
+import { fetchStandardOptionCatalog } from "../src/server/imports/encar";
+import { mapEncarOptions, type EncarOptionCatalog } from "../src/server/imports/encar-options";
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 
@@ -45,6 +47,12 @@ const ready = (q: Queue, task: string) => {
   const probe = task === "insurance" ? "inspection" : task === "gallery" ? "detail" : task;
   const probes = obj(obj(q.result).probes);
   return Boolean(obj(probes[probe]).classification === "ready");
+};
+const optionsAvailable = (payload: Obj) => {
+  const detail = obj(payload.detail);
+  const codes = obj(detail.options).standard;
+  return (Array.isArray(codes) && codes.length > 0) ||
+    (Array.isArray(payload.choiceOptions) && payload.choiceOptions.length > 0);
 };
 
 type SelectedRows = ReturnType<ReturnType<typeof db.from>["select"]>;
@@ -74,14 +82,12 @@ function inspectionReport(carId: string, payload: Obj) {
 }
 
 /** Only options the card can actually render are written. */
-function options(carId: string, payload: Obj) {
-  if (!Array.isArray(payload.choiceOptions)) return [];
-  return payload.choiceOptions.flatMap((raw, index) => {
-    const option = obj(raw); const original = text(option.optionName);
-    const nameRu = translateOption(original);
-    if (!nameRu) return [];
-    return [{ car_id: carId, source: "encar", category: categorizeOption(original, nameRu), source_code: null, name_original: original, name_ru: nameRu, value_original: null, value_ru: null, description_original: null, description_ru: null, price_krw: typeof option.price === "number" ? option.price : null, is_present: true, sort_order: 1000 + index }];
-  });
+function options(carId: string, payload: Obj, catalog: EncarOptionCatalog) {
+  const detail = obj(payload.detail);
+  const codes = Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).map(String) : [];
+  return mapEncarOptions(catalog, codes, payload.choiceOptions)
+    .filter((option) => option.name_ru || option.name_original)
+    .map((option) => ({ car_id: carId, source: "encar", ...option }));
 }
 
 function gallery(carId: string, payload: Obj) {
@@ -99,6 +105,7 @@ type CardResult = {
 };
 
 async function main() {
+  const optionCatalog = await fetchStandardOptionCatalog();
   const [queue, staging, cars] = await Promise.all([
     pages<Queue>("encar_enrichment_queue", "source_listing_id,status,task,result", (q) => q.eq("run_id", runId)),
     pages<Stage>("encar_enrichment_staging", "source_listing_id,raw_payload", (q) => q.eq("run_id", runId)),
@@ -142,11 +149,11 @@ async function main() {
     for (const q of work) {
       const car = carBySource.get(q.source_listing_id)!; const payload = stageBySource.get(q.source_listing_id)!.raw_payload!;
       const inspection = ready(q, "insurance") ? inspectionReport(car.id, payload) : null;
-      const optionRows = ready(q, "options") ? options(car.id, payload) : [];
+      const optionRows = (ready(q, "options") || optionsAvailable(payload)) ? options(car.id, payload, optionCatalog) : [];
       const galleryRows = ready(q, "gallery") ? gallery(car.id, payload) : [];
 
       if (inspection && !inspection.items.length) report.plans.skippedEmptyInspection++;
-      if (ready(q, "options") && !optionRows.length) report.plans.skippedEmptyOptions++;
+      if ((ready(q, "options") || optionsAvailable(payload)) && !optionRows.length) report.plans.skippedEmptyOptions++;
       if (ready(q, "gallery") && !galleryRows.length) report.plans.skippedEmptyGallery++;
 
       const writeInspection = Boolean(inspection && inspection.items.length);
