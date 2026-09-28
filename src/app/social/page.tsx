@@ -1,12 +1,6 @@
-import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, MessageCircle, MoveRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { SocialIcon, type SocialKind } from "@/components/site/SiteHeader";
-import {
-  CLIENT_CONTACT,
-  telegramContactUrl,
-  whatsappContactUrl,
-  whatsappPowersportsContactUrl,
-} from "@/lib/contact";
+import { CLIENT_CONTACT, telegramContactUrl, whatsappContactUrl, whatsappPowersportsContactUrl } from "@/lib/contact";
 
 const channels: Array<{
   name: string;
@@ -86,24 +80,12 @@ export default function SocialPage() {
     <main className="min-h-[calc(100vh-160px)] bg-[#f5f6f8] text-[#101827]">
       <section className="relative isolate overflow-hidden border-b border-[#dce2eb] bg-white">
         <div aria-hidden="true" className="absolute -right-24 -top-32 -z-10 size-96 rounded-full bg-[#f4ead3] blur-3xl" />
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:py-16">
-          <Link className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-[#68758a] transition hover:text-[#956f2c]" href="/">
-            <ArrowLeft aria-hidden="true" size={17} /> На главную
-          </Link>
+        <div className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10 lg:py-12">
           <div className="max-w-3xl">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#a98239]">TL Auto · На связи</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">Мы в соцсетях</h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-[#68758a] sm:text-lg">
+            <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">Мы в соцсетях</h1>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-[#68758a] sm:text-lg">
               Следите за новыми автомобилями из Кореи, смотрите обзоры и выбирайте удобный способ связаться с нашей командой.
             </p>
-          </div>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#111827] px-5 text-sm font-semibold text-white transition hover:bg-[#263247]" href="/catalog">
-              Смотреть каталог <MoveRight aria-hidden="true" size={17} />
-            </Link>
-            <a className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#dce2eb] bg-white px-5 text-sm font-semibold text-[#263247] transition hover:border-[#a98239]" href={whatsappContactUrl()} rel="noreferrer" target="_blank">
-              <MessageCircle aria-hidden="true" size={17} /> Задать вопрос
-            </a>
           </div>
         </div>
       </section>
