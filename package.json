@@ -112,6 +112,8 @@
     "publish:encar:manifest": "tsx scripts/publish-encar-manifest.ts",
     "dry-run:new-encar-preliminary-calculation": "tsx scripts/dry-run-new-encar-preliminary-calculation.ts",
     "apply:ai-preliminary-power": "tsx scripts/apply-ai-preliminary-power-reference.ts",
+    "apply:encarrus-ice-preliminary-power": "tsx scripts/apply-encarrus-ice-preliminary-reference.ts",
+    "recalculate:provisional-ev-prices": "tsx scripts/recalculate-provisional-ev-prices.ts",
     "test:automatic-power-reference": "tsx src/server/catalog/automatic-power-reference.test.ts",
     "research:power:ai": "tsx scripts/research-encar-power-with-gemini.ts",
     "query:power:external-catalogs": "tsx scripts/query-new-encar-external-catalogs.ts",
