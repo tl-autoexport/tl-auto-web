@@ -95,8 +95,8 @@ async function main() {
     task.groups.push(group); grouped.set(key, task);
   }
 
-  const resultsByKey = new Map<string, { group: Group; model: Model | null; matchedCards: EncarrusIceCard[]; rejections: Record<string, number>; pages: number[]; errors: string[] }>();
-  for (const group of groups) resultsByKey.set(groupKey(group), { group, model: modelFor(group, models), matchedCards: [], rejections: {}, pages: [], errors: [] });
+  const resultsByKey = new Map<string, { group: Group; model: Model | null; matchedCards: EncarrusIceCard[]; rejections: Record<string, number>; rejectedCardExamples: Array<Record<string, unknown>>; pages: number[]; errors: string[] }>();
+  for (const group of groups) resultsByKey.set(groupKey(group), { group, model: modelFor(group, models), matchedCards: [], rejections: {}, rejectedCardExamples: [], pages: [], errors: [] });
   const requestLog: Array<Record<string, unknown>> = [];
   let stoppedOnProtection = false;
   let completed = 0;
@@ -128,7 +128,20 @@ async function main() {
               const match = encarrusIceMatch(card, group);
               if (match.matched) {
                 if (!target.matchedCards.some((existing) => existing.encarrusListingId === card.encarrusListingId)) target.matchedCards.push(card);
-              } else target.rejections[match.reason] = (target.rejections[match.reason] ?? 0) + 1;
+              } else {
+                target.rejections[match.reason] = (target.rejections[match.reason] ?? 0) + 1;
+                if (target.rejectedCardExamples.length < 12) target.rejectedCardExamples.push({
+                  reason: match.reason,
+                  encarrusListingId: card.encarrusListingId,
+                  name: card.name,
+                  trim: card.trim,
+                  engineText: card.engineText,
+                  parsedEngineCc: card.engineCc,
+                  parsedFuelType: card.fuelType,
+                  driveText: card.driveText,
+                  displayedPowerText: card.displayedPowerText,
+                });
+              }
             }
           }
           const totalPages = Number(payload.total_pages ?? 0);
@@ -174,7 +187,7 @@ async function main() {
     }
   }
 
-  const results = [...resultsByKey.values()].map(({ group, model, matchedCards, rejections, pages, errors }) => {
+  const results = [...resultsByKey.values()].map(({ group, model, matchedCards, rejections, rejectedCardExamples, pages, errors }) => {
     const powers = [...new Set(matchedCards.map((card) => card.displayedPowerHp).filter((value): value is number => value != null))];
     const hasUnverifiedDrive = matchedCards.some((card) => group.driveType && !card.driveText);
     return {
@@ -183,6 +196,7 @@ async function main() {
       matchedCards,
       scannedPages: [...new Set(pages)],
       rejectedCardCounts: rejections,
+      rejectedCardExamples,
       errors,
       powerCandidatesHp: powers,
       suggestedPowerHp: powers.length === 1 && !hasUnverifiedDrive ? powers[0] : null,
