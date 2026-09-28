@@ -58,7 +58,7 @@ without interrupting the project that is already running.
 
 ## First controlled run
 
-Before enabling the 500-item schedule, run a 10-item write test:
+Before enabling the 1000-item schedule, run a 10-item write test:
 
 ```bash
 sudo -u tl-auto env TL_AUTO_ENCAR_BATCH_SIZE=10 TL_AUTO_ENCAR_DELAY_MS=1500 npm run check:encar:queue:write
