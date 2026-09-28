@@ -2,7 +2,7 @@
 import { config } from "dotenv";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { parseEncarrusProductPower } from "../src/server/catalog/encarrus-power";
-import { encarrusIceMatch, normalizeEncarrusText, parseEncarrusIceCards, type EncarrusIceCard } from "../src/server/catalog/encarrus-ice";
+import { encarrusIceMatch, encarrusIceModelNameMatches, parseEncarrusIceCards, type EncarrusIceCard } from "../src/server/catalog/encarrus-ice";
 
 config({ path: ".env.local", override: true, quiet: true });
 config({ path: ".env", quiet: true });
@@ -11,6 +11,10 @@ type Group = {
   brand: string | null; model: string | null; generation: string | null; year: number | null;
   engineCc: number | null; fuelType: string | null; driveType: string | null;
   listingIds: string[]; badgeExamples: string[];
+  sourceExamples?: Array<{
+    snapshotBrand?: string | null; snapshotModel?: string | null; detailManufacturer?: string | null;
+    detailModel?: string | null; detailModelGroup?: string | null;
+  }>;
 };
 type Generation = { id: number | string; name: string; count: number };
 type Model = { id: number | string; name: string; url: string; count: number; generations: Generation[] };
@@ -28,20 +32,14 @@ const headers = {
   accept: "application/json, text/plain, */*", "accept-language": "ru-RU,ru;q=0.9,en;q=0.8",
   "x-requested-with": "XMLHttpRequest",
 };
-const normalize = normalizeEncarrusText;
 
 function yearRange(label: string) {
   const values = [...label.matchAll(/(?:19|20)\d{2}/g)].map((match) => Number(match[0]));
   return values.length ? { from: Math.min(...values), to: Math.max(...values) } : null;
 }
 function modelFor(group: Group, models: Model[]): Model | null {
-  const brand = normalize(group.brand);
-  const model = normalize(group.model);
   const matches = models.filter((item) => {
-    const name = normalize(item.name);
-    const brandFits = !brand || name.includes(brand) || (brand === "mercedesbenz" && name.includes("mercedes"));
-    const modelPart = brand && name.startsWith(brand) ? name.slice(brand.length) : name;
-    return brandFits && modelPart === model;
+    return encarrusIceModelNameMatches(group, item.name);
   });
   return matches.length === 1 ? matches[0] : null;
 }

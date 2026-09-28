@@ -25,7 +25,66 @@ function clean(value: string) {
 }
 
 export function normalizeEncarrusText(value: string | null | undefined) {
-  return String(value ?? "").toLowerCase().replace(/ё/g, "е").replace(/[^a-zа-я0-9]/g, "");
+  return String(value ?? "").toLowerCase().replace(/ё/g, "е").replace(/[^a-zа-я가-힣0-9]/g, "");
+}
+
+export type EncarrusIceGroupIdentity = {
+  brand: string | null;
+  model: string | null;
+  sourceExamples?: Array<{
+    snapshotBrand?: string | null;
+    snapshotModel?: string | null;
+    detailManufacturer?: string | null;
+    detailModel?: string | null;
+    detailModelGroup?: string | null;
+  }>;
+};
+
+const BRAND_SEARCH_ALIASES: Record<string, string[]> = {
+  kgm: ["kgm", "kgmobility", "ssangyong", "kg모빌리티", "쌍용"],
+  kgmobilityssangyong: ["kgm", "kgmobility", "ssangyong", "kg모빌리티", "쌍용"],
+  ssangyong: ["kgm", "kgmobility", "ssangyong", "kg모빌리티", "쌍용"],
+  mercedesbenz: ["mercedesbenz", "mercedes", "벤츠", "메르세데스벤츠"],
+  hyundai: ["hyundai", "현대"],
+  kia: ["kia", "기아"],
+  genesis: ["genesis", "제네시스"],
+  audi: ["audi", "아우디"],
+  volkswagen: ["volkswagen", "vw", "폭스바겐"],
+  bmw: ["bmw", "비엠더블유"],
+  chevrolet: ["chevrolet", "쉐보레"],
+  "renaultkorea": ["renaultkorea", "르노코리아", "르노삼성"],
+  toyota: ["toyota", "토요타", "도요타"],
+  lexus: ["lexus", "렉서스"],
+  porsche: ["porsche", "포르쉐"],
+  volvo: ["volvo", "볼보"],
+  landrover: ["landrover", "랜드로버"],
+  jaguar: ["jaguar", "재규어"],
+  ford: ["ford", "포드"],
+  lincoln: ["lincoln", "링컨"],
+  honda: ["honda", "혼다"],
+  jeep: ["jeep", "지프"],
+  maserati: ["maserati", "마세라티"],
+  bentley: ["bentley", "벤틀리"],
+  "rollsroyce": ["rollsroyce", "롤스로이스"],
+  ferrari: ["ferrari", "페라리"],
+  lamborghini: ["lamborghini", "람보르기니"],
+  "astonmartin": ["astonmartin", "애스턴마틴"],
+};
+
+export function encarrusIceModelNameMatches(group: EncarrusIceGroupIdentity, candidateName: string) {
+  const candidate = normalizeEncarrusText(candidateName);
+  const brandKey = normalizeEncarrusText(group.brand);
+  const brandAliases = BRAND_SEARCH_ALIASES[brandKey] ?? [brandKey];
+  const modelAliases = [...new Set([
+    group.model,
+    ...(group.sourceExamples ?? []).flatMap((example) => [example.snapshotModel, example.detailModel, example.detailModelGroup]),
+  ].map(normalizeEncarrusText).filter(Boolean))];
+  for (const brandAlias of brandAliases.filter(Boolean)) {
+    if (!candidate.startsWith(brandAlias)) continue;
+    const modelPart = candidate.slice(brandAlias.length);
+    if (modelAliases.includes(modelPart)) return true;
+  }
+  return false;
 }
 
 export function encarrusFuelType(value: string | null): "gasoline" | "diesel" | null {

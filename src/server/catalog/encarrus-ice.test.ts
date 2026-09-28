@@ -1,11 +1,19 @@
 import assert from "node:assert/strict";
-import { encarrusEngineCc, encarrusFuelType, encarrusIceMatch, parseEncarrusIceCards } from "./encarrus-ice";
+import { encarrusEngineCc, encarrusFuelType, encarrusIceMatch, encarrusIceModelNameMatches, parseEncarrusIceCards } from "./encarrus-ice";
 
 assert.equal(encarrusFuelType("1.6 л (бензин)"), "gasoline");
 assert.equal(encarrusFuelType("2.2 л дизель"), "diesel");
 assert.equal(encarrusFuelType("1.6 л гибрид"), null);
 assert.equal(encarrusEngineCc("1.6 л (бензин)"), 1600);
 assert.equal(encarrusEngineCc("1998 см³"), 1998);
+assert.equal(encarrusIceModelNameMatches({
+  brand: "KG_Mobility_Ssangyong", model: "Torres",
+  sourceExamples: [{ snapshotBrand: "KGM", snapshotModel: "Torres", detailModel: "토레스" }],
+}, "KG모빌리티 토레스"), true);
+assert.equal(encarrusIceModelNameMatches({
+  brand: "KG_Mobility_Ssangyong", model: "Torres",
+  sourceExamples: [{ detailModel: "토레스" }],
+}, "현대 토레스"), false);
 
 const html = `<div class="element--wrapper" id="card_123"><div class="c-name">BMW 320i</div>
 <div class="c-trim">2022년식</div><div class="c-prop"><span class="c-prop-k">Двиг.</span><span class="c-prop-v">2.0 л (бензин)</div>
