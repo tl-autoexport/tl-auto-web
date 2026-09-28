@@ -22,8 +22,8 @@ import {
   type CatalogFilters,
   type StagingCatalogType,
 } from "@/server/cars/repository";
-import { translateFuel, translateTransmission, translateTrim } from "@/server/normalization/display";
-import { bodyTypeFilterValue, transmissionFilterValue } from "@/lib/catalog-filter-values";
+import { translateDrive, translateFuel, translateTransmission, translateTrim } from "@/server/normalization/display";
+import { bodyTypeFilterValue, driveTypeFilterValue, transmissionFilterValue } from "@/lib/catalog-filter-values";
 import { LiveCatalogCount } from "./LiveCatalogCount";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import { PassoCatalogCard } from "@/components/catalog/PassoCatalogCard";
@@ -101,7 +101,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     registrationMonth: numberParam(value("month")),
     trim: value("trim") || undefined,
     bodyType: value("body") || undefined,
-    driveType: value("drive") || undefined,
+    driveType: driveTypeFilterValue(value("drive")) || undefined,
     color: value("color") || undefined,
     minOwners: numberParam(value("ownersMin")),
     maxOwners: numberParam(value("ownersMax")),
@@ -136,6 +136,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   // Keep Hybrid selectable even if the current facet sample has no hybrid rows.
   const fuels = unique([...optionCars.map((car) => car.fuel_type), "hybrid"]);
   const transmissions = unique(optionCars.map((car) => transmissionFilterValue(car.transmission)));
+  const driveTypes = unique(["FWD", "RWD", "2WD", "4WD", ...optionCars.map((car) => driveTypeFilterValue(car.drive_type))]);
   const trims = unique(optionCars.map((car) => car.trim));
   const bodies = unique(optionCars.map((car) => bodyTypeFilterValue(car.body_type)));
   const colors = unique(optionCars.map((car) => car.color));
@@ -157,6 +158,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     modelsByBrand,
     fuels,
     transmissions,
+    driveTypes,
     trims,
     bodies,
     colors,
@@ -332,6 +334,7 @@ type CatalogFilterFormProps = {
   model: string;
   fuels: string[];
   transmissions: string[];
+  driveTypes: string[];
   trims: string[];
   bodies: string[];
   colors: string[];
@@ -355,6 +358,7 @@ function CatalogFilterForm({
   sort,
   totalCars,
   transmissions,
+  driveTypes,
   trims,
   bodies,
   colors,
@@ -376,6 +380,7 @@ function CatalogFilterForm({
       <FilterInput inputMode="numeric" label="Мощность до, л.с." name="powerMax" placeholder="Например, 160" value={value("powerMax")} />
       <FilterSelect label="Комплектация" name="trim" options={trims} placeholder="Любая" translate={(item) => translateTrim(item) ?? item} value={value("trim")} />
       <FilterSelect label="Кузов" name="body" options={bodies} placeholder="Любой" translate={translateBody} value={value("body")} />
+      <FilterSelect label="Привод" name="drive" options={driveTypes} placeholder="Любой" translate={(item) => translateDrive(item) ?? item} value={value("drive")} />
       <FilterSelect label="Цвет кузова" name="color" options={colors} placeholder="Любой" value={value("color")} />
       <FilterSelect label="Месяц выпуска" name="month" options={Array.from({ length: 12 }, (_, index) => String(index + 1))} placeholder="Любой" translate={translateMonth} value={value("month")} />
       <RangeField label="Количество владельцев" maxName="ownersMax" maxValue={value("ownersMax")} minName="ownersMin" minValue={value("ownersMin")} />
@@ -394,6 +399,7 @@ function CatalogFilterForm({
           {mainFields}
           <FilterSelect label="Топливо" name="fuel" options={fuels} placeholder="Любое" translate={translateFuel} value={value("fuel")} />
           <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} />
+          <FilterSelect label="Привод" name="drive" options={driveTypes} placeholder="Любой" translate={(item) => translateDrive(item) ?? item} value={value("drive")} />
           {!mobile ? <LiveCatalogCount initialCount={totalCars} /> : null}
         </div>
         {mobile ? (
@@ -525,7 +531,7 @@ function buildActiveFilterChips(rawParams: Record<string, string | string[] | un
   // The generation is shown in Russian from the approved dictionary; the URL
   // keeps the stable code.
   if (value("generation")) add("generation", generationLabels[value("generation")] ?? value("generation"));
-  if (value("drive")) add("drive", `Привод: ${value("drive")}`);
+  if (value("drive")) add("drive", `Привод: ${translateDrive(value("drive"))}`);
   if (value("search")) add("search", value("search"));
   if (value("fuel")) add("fuel", translateFuel(value("fuel")));
   if (value("transmission")) add("transmission", translateTransmission(value("transmission")));

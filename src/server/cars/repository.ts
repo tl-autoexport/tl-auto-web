@@ -2,7 +2,7 @@ import { unstable_cache } from "next/cache";
 import { createSupabaseAdmin } from "@/server/supabase/admin";
 import { createSupabasePublic } from "@/server/supabase/public";
 import { normalizeColor, normalizeDrive } from "@/server/normalization/vehicles";
-import { bodyTypeValues, transmissionValues } from "@/lib/catalog-filter-values";
+import { bodyTypeValues, driveTypeValues, transmissionValues } from "@/lib/catalog-filter-values";
 import { catalogBrandValues, normalizeCatalogBrand } from "@/lib/catalog-brand";
 
 const buildWithoutCatalog =
@@ -317,7 +317,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   if (registrationMonth) query = query.eq("registration_month", registrationMonth);
   if (trim) query = query.eq("trim", trim);
   if (bodyType) query = query.in("body_type", bodyTypeValues(bodyType));
-  if (driveType) query = query.eq("drive_type", driveType);
+  if (driveType) query = query.in("drive_type", driveTypeValues(driveType));
   if (color) query = query.eq("color", color);
   if (minOwners) query = query.gte("owners_count", minOwners);
   if (maxOwners) query = query.lte("owners_count", maxOwners);
@@ -395,7 +395,7 @@ export async function getCatalogCardPage(
   if (filters.registrationMonth) query = query.eq("registration_month", filters.registrationMonth);
   if (filters.trim) query = query.eq("trim", filters.trim);
   if (filters.bodyType) query = query.in("body_type", bodyTypeValues(filters.bodyType));
-  if (filters.driveType) query = query.eq("drive_type", filters.driveType);
+  if (filters.driveType) query = query.in("drive_type", driveTypeValues(filters.driveType));
   if (filters.color) query = query.eq("color", filters.color);
   if (filters.minOwners) query = query.gte("owners_count", filters.minOwners);
   if (filters.maxOwners) query = query.lte("owners_count", filters.maxOwners);
@@ -507,7 +507,7 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
   if (filters.registrationMonth) query = query.eq("registration_month", filters.registrationMonth);
   if (filters.trim) query = query.eq("trim", filters.trim);
   if (filters.bodyType) query = query.in("body_type", bodyTypeValues(filters.bodyType));
-  if (filters.driveType) query = query.eq("drive_type", filters.driveType);
+  if (filters.driveType) query = query.in("drive_type", driveTypeValues(filters.driveType));
   if (filters.color) query = query.eq("color", filters.color);
   if (filters.minOwners) query = query.gte("owners_count", filters.minOwners);
   if (filters.maxOwners) query = query.lte("owners_count", filters.maxOwners);
