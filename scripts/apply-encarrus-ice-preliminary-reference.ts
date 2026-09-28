@@ -186,11 +186,21 @@ async function main() {
       [keys],
     );
     const existingByKey = new Map(existing.rows.map((row) => [row.configuration_key, row]));
-    const conflicts = existing.rows.filter((row) =>
-      row.status !== "automatic" || row.source !== "encarrus_ice_catalog" ||
-      Number(row.power_hp) !== references.find((candidate) => candidate.configuration_key === row.configuration_key)?.power_hp
-    );
-    if (conflicts.length) throw new Error(`Existing conflicting/protected refs; refusing: ${JSON.stringify(conflicts)}`);
+    const proposedByKey = new Map(references.map((row) => [row.configuration_key, row]));
+    const conflicts = existing.rows.flatMap((row) => {
+      const proposed = proposedByKey.get(row.configuration_key);
+      if (row.status === "automatic" && proposed && Number(row.power_hp) === proposed.power_hp) return [];
+      return [{
+        configuration_key: row.configuration_key,
+        existingStatus: row.status,
+        existingSource: row.source,
+        existingPowerHp: Number(row.power_hp),
+        proposedPowerHp: proposed?.power_hp ?? null,
+      }];
+    });
+    if (conflicts.length) {
+      throw new Error(`Existing power conflicts/protected refs; refusing import: ${JSON.stringify(conflicts)}`);
+    }
     const pending = references.filter((row) => !existingByKey.has(row.configuration_key));
     const liveReferences = await db.query<AutomaticPowerReferenceRow>(
       `select configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,
