@@ -30,3 +30,12 @@ export function deduplicateNewEncarPreflightRows<T>(
     return row;
   });
 }
+
+export function selectNewEncarStagingRows<T>(
+  rows: NewEncarPreflightRow<T>[], target: number, minimum: number,
+) {
+  if (!Number.isInteger(target) || !Number.isInteger(minimum) || minimum < 1 || minimum > target)
+    throw new Error("Invalid new Encar staging range");
+  const candidates = rows.filter((row) => row.status === "ready" || row.status === "unknown").slice(0, target);
+  return { candidates, meetsMinimum: candidates.length >= minimum };
+}

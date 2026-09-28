@@ -292,7 +292,7 @@ export type ImportOptions = {
   brandMinimums?: Record<string, number>;
   modelMinimums?: Record<string, number>;
   priorityBrandPages?: Record<string, number>;
-  /** Return safe queue payloads during a dry run without inserting cars. */
+  /** "raw" returns fresh list-page drafts without fetching details or calculating prices. */
   collectNewCandidateDrafts?: boolean | "raw";
 };
 
@@ -1602,6 +1602,30 @@ export async function importEncar(options: ImportOptions = {}) {
     })
     .sort((left, right) => Number(right.Id) - Number(left.Id));
 
+  if (options.collectNewCandidateDrafts === "raw") {
+    if (!dryRun) throw new Error("Raw Encar candidate discovery must be read-only");
+    return {
+      dryRun: true,
+      candidates: candidates.length,
+      uniqueCandidates: uniqueCandidates.length,
+      onlyNew,
+      existingCandidates: existingSourceIds.size,
+      listPageErrors,
+      freshCandidates: freshCandidates.length,
+      seen: 0,
+      written: 0,
+      candidateDrafts: freshCandidates.slice(0, target).map((item) => ({
+        source: "encar" as const,
+        sourceListingId: String(item.Id),
+        sourceUrl: `https://fem.encar.com/cars/detail/${item.Id}`,
+        brand: normalizeBrand(item.Manufacturer),
+        model: normalizeModel(item.Model),
+        year: Number(item.Year) || null,
+        fuelType: normalizeFuel(item.FuelType),
+      })),
+    };
+  }
+
   if (options.discoveryOnly) {
     let selectedCandidates = freshCandidates.slice(0, target);
     if (options.discoveryManufacturers?.length && freshCandidates.length > target) {
@@ -1828,8 +1852,7 @@ export async function importEncar(options: ImportOptions = {}) {
         reportTypes: item.reports.map((report) => report.report_type),
       })),
       candidateDrafts: options.collectNewCandidateDrafts
-        ? (options.collectNewCandidateDrafts === true
-          ? mapped.map((item) => ({
+        ? mapped.map((item) => ({
             source: "encar",
             sourceListingId: item.car.source_id,
             sourceUrl: item.car.source_url,
@@ -1837,21 +1860,6 @@ export async function importEncar(options: ImportOptions = {}) {
             model: item.car.model,
             year: item.car.year,
           }))
-          : freshCandidates
-          .filter((item) => {
-            const fuel = normalizeFuel(item.FuelType);
-              return fuel === "gasoline" || fuel === "diesel" || fuel === "electric" || fuel === "hybrid";
-            })
-            .slice(0, target)
-            .map((item) => ({
-              source: "encar",
-              sourceListingId: String(item.Id),
-              sourceUrl: `https://fem.encar.com/cars/detail/${item.Id}`,
-              brand: normalizeBrand(item.Manufacturer),
-              model: normalizeModel(item.Model),
-              year: Number(item.Year) || null,
-              fuelType: normalizeFuel(item.FuelType),
-            })))
         : undefined,
     };
   }
