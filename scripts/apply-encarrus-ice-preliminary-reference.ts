@@ -191,11 +191,16 @@ async function main() {
     if (protectedRefs.length) {
       throw new Error(`Protected non-automatic refs; refusing import: ${JSON.stringify(protectedRefs)}`);
     }
-    const heldConflicts = existing.rows.flatMap((row) => {
+    const heldConflicts: Array<Record<string, unknown> & { configuration_key: string; listingCount: number }> = [];
+    const heldKeys = new Set<string>();
+    for (const row of existing.rows) {
       const proposed = proposedByKey.get(row.configuration_key);
-      if (!proposed || Number(row.power_hp) === proposed.power_hp) return [];
+      if (!proposed || Number(row.power_hp) === proposed.power_hp) continue;
       const candidate = selected.find((item) => referenceKey(item) === row.configuration_key);
-      return candidate ? [{
+      if (!candidate) continue;
+      heldKeys.add(row.configuration_key);
+      heldConflicts.push({
+        reason: "existing_key_power_mismatch",
         configuration_key: row.configuration_key,
         brand: candidate.group.brand,
         model: candidate.group.model,
@@ -206,41 +211,65 @@ async function main() {
         existingPowerHp: Number(row.power_hp),
         proposedPowerHp: proposed.power_hp,
         badgeExamples: candidate.group.badgeExamples ?? [],
-      }] : [];
-    });
-    const heldKeys = new Set(heldConflicts.map((row) => row.configuration_key));
-    const safeSelected = selected.filter((row) => !heldKeys.has(referenceKey(row)));
-    const safeReferences = references.filter((row) => !heldKeys.has(row.configuration_key));
-    const safeKeys = safeReferences.map((row) => row.configuration_key);
-    const safeListingCount = safeSelected.reduce((sum, row) => sum + row.group.listingIds.length, 0);
-    const pending = safeReferences.filter((row) => !existingByKey.has(row.configuration_key));
+      });
+    }
     const liveReferences = await db.query<AutomaticPowerReferenceRow>(
       `select configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,
               year_from,year_to,power_hp::double precision as power_hp,
               power_kw::double precision as power_kw,source,status
          from public.vehicle_power_automatic_reference where status <> 'retired'`,
     );
-    const combined = [...liveReferences.rows, ...safeReferences];
-    const resolverConflicts = safeSelected.flatMap((row) => {
-      const group = row.group;
-      const badges = [...new Set(group.badgeExamples?.length ? group.badgeExamples : [null])];
-      return badges.flatMap((badge) => {
-        const input: ReferenceInput = {
-          brand: group.brand, model: group.model, fuel_type: group.fuelType,
-          engine_cc: group.engineCc, drive_type: group.driveType,
-          badge, badge_detail: null, year: group.year,
-        };
-        const resolved = resolveAutomaticPowerReference(input, combined);
-        return resolved?.power_hp === row.suggestedPowerHp ? [] : [{
-          brand: group.brand, model: group.model, year: group.year, badge,
-          expectedPowerHp: row.suggestedPowerHp, resolvedPowerHp: resolved?.power_hp ?? null,
-          resolvedKey: resolved?.configuration_key ?? null,
-        }];
+    let safeSelected = selected.filter((row) => !heldKeys.has(referenceKey(row)));
+    let safeReferences = references.filter((row) => !heldKeys.has(row.configuration_key));
+    let resolverConflicts: Array<Record<string, unknown>> = [];
+    for (let pass = 0; pass <= selected.length; pass += 1) {
+      const combined = [...liveReferences.rows, ...safeReferences];
+      resolverConflicts = safeSelected.flatMap((row) => {
+        const group = row.group;
+        const badges = [...new Set(group.badgeExamples?.length ? group.badgeExamples : [null])];
+        const mismatches = badges.flatMap((badge) => {
+          const input: ReferenceInput = {
+            brand: group.brand, model: group.model, fuel_type: group.fuelType,
+            engine_cc: group.engineCc, drive_type: group.driveType,
+            badge, badge_detail: null, year: group.year,
+          };
+          const resolved = resolveAutomaticPowerReference(input, combined);
+          return resolved?.power_hp === row.suggestedPowerHp ? [] : [{
+            configuration_key: referenceKey(row),
+            brand: group.brand,
+            model: group.model,
+            year: group.year,
+            listingCount: group.listingIds.length,
+            badge,
+            expectedPowerHp: row.suggestedPowerHp,
+            resolvedPowerHp: resolved?.power_hp ?? null,
+            resolvedKey: resolved?.configuration_key ?? null,
+          }];
+        });
+        return mismatches.length ? [{
+          ...mismatches[0],
+          mismatchedBadges: mismatches.map((item) => item.badge),
+          reason: "resolver_precedence_mismatch",
+        }] : [];
       });
-    });
-    if (resolverConflicts.length) {
-      throw new Error(`Existing resolver precedence conflicts; refusing: ${JSON.stringify(resolverConflicts)}`);
+      const newlyHeld = resolverConflicts.filter((row) =>
+        typeof row.configuration_key === "string" && !heldKeys.has(row.configuration_key));
+      if (!newlyHeld.length) break;
+      for (const conflict of newlyHeld) {
+        const key = conflict.configuration_key as string;
+        heldKeys.add(key);
+        heldConflicts.push(conflict as typeof heldConflicts[number]);
+      }
+      safeSelected = selected.filter((row) => !heldKeys.has(referenceKey(row)));
+      safeReferences = references.filter((row) => !heldKeys.has(row.configuration_key));
     }
+    if (resolverConflicts.length) {
+      throw new Error(`Resolver conflicts remain after holding affected groups; refusing import: ${JSON.stringify(resolverConflicts)}`);
+    }
+
+    const safeKeys = safeReferences.map((row) => row.configuration_key);
+    const safeListingCount = safeSelected.reduce((sum, row) => sum + row.group.listingIds.length, 0);
+    const pending = safeReferences.filter((row) => !existingByKey.has(row.configuration_key));
 
     console.log(JSON.stringify({
       write,
@@ -249,9 +278,9 @@ async function main() {
       status: "automatic (preliminary; T4 evidence)",
       configurationsInAudit: audit.preliminaryConfigurations,
       listingsInAudit: audit.preliminaryListings,
-      heldForExistingPowerConflict: {
+      heldForPowerOrResolverConflict: {
         configurations: heldConflicts.length,
-        listings: heldConflicts.reduce((sum, row) => sum + row.listingCount, 0),
+        listings: heldConflicts.reduce((sum, row) => sum + Number(row.listingCount), 0),
         details: heldConflicts,
       },
       excludedConflictingConfigurations: excluded.map((row) => ({
