@@ -4,6 +4,7 @@ import { CALC_VERSION } from "@/server/calc/ru";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import { createSupabaseAdmin } from "@/server/supabase/admin";
 import { resolveAutomaticPowerReference, type AutomaticPowerReferenceRow } from "@/server/catalog/automatic-power-reference";
+import { electricRecalculationPowerKw } from "@/server/cars/recalculation-power";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -124,10 +125,13 @@ async function main() {
     // A reference may omit trim details and then act as a preliminary fallback;
     // explicit conflicting trims do not match. Hybrid and EV keep dedicated
     // legal inputs until their approved power basis is available.
-    // Only a final value may be used as the exact tariff input. `matched` alone
-    // cannot separate an approved value from a rehearsal, which is what let a
-    // preliminary power be re-priced and re-labelled as approved.
+    // Final power remains authoritative. An agreed provisional EV calculation
+    // may also use its stored 30-minute value, but must retain provisional status.
     const approvedPowerKw = car.power_finality === "final" ? car.calculation_power_kw : null;
+    // EV display hp is peak power. Even for an agreed provisional price, the
+    // customs calculation must use the stored 30-minute power, never peak hp.
+    const evThirtyMinutePowerKw = electricRecalculationPowerKw(car);
+    const tariffPowerKw = approvedPowerKw ?? evThirtyMinutePowerKw;
     // The automatic reference is deliberately still allowed to price a provisional card.
     // A measured dry-run showed that removing it moves 35 cards by up to 97%: a Kia K5 2.0
     // priced from a 150 hp reference becomes ~twice as expensive when its stored 240 hp is
@@ -135,7 +139,7 @@ async function main() {
     // stored power is wrong. Which of the two is right is not decidable automatically.
     // This reference affects the calculated price and its provenance; the write below
     // does not replace cars.power_hp or cars.calculation_power_kw.
-    const reference = approvedPowerKw != null || car.fuel_type === "hybrid" || car.fuel_type === "electric"
+    const reference = tariffPowerKw != null || car.fuel_type === "hybrid" || car.fuel_type === "electric"
       ? null
       : resolveAutomaticPowerReference(car, automaticReferences);
     const resolvedPowerHp = reference?.power_hp ?? car.power_hp;
@@ -144,6 +148,7 @@ async function main() {
       !car.price_krw ||
       !car.year ||
       (needsEngineCc && !car.engine_cc) ||
+      (car.fuel_type === "electric" && evThirtyMinutePowerKw == null) ||
       (!approvedPowerKw && !resolvedPowerHp && !car.hybrid_dvs_power_hp)
     ) {
       return null;
@@ -155,9 +160,9 @@ async function main() {
       month: car.registration_month ?? 6,
       engineCc: car.engine_cc,
       powerHp: resolvedPowerHp ?? undefined,
-      // Confirmed power is passed directly in kW. This is the exact tariff
-      // input: it avoids reconstructing a TKS boundary from a rounded hp value.
-      powerKw: approvedPowerKw ?? undefined,
+      // Pass the selected tariff power directly in kW; EV peak display hp must
+      // never substitute for the stored 30-minute value.
+      powerKw: tariffPowerKw ?? undefined,
       hybridDvsPowerHp: car.hybrid_dvs_power_hp ?? undefined,
       hybridElectricPowerKw: car.hybrid_electric_power_kw ?? undefined,
       hybridDvsAboveElectric30Min: car.hybrid_dvs_above_electric_30min ?? undefined,
@@ -169,6 +174,7 @@ async function main() {
       ratesSource: rateSnapshot.source,
       rateDetails: rateSnapshot.rateDetails,
     });
+    if (!Number.isFinite(calc.totalRub) || calc.totalRub <= 0) return null;
     const oldPriceRub = car.price_rub;
     const automaticPowerChanged = reference != null && reference.power_hp !== car.power_hp;
     // `calculation_power_kw` is the tariff input and can deliberately differ
@@ -199,7 +205,7 @@ async function main() {
         storedCalculationKw: car.calculation_power_kw,
         storedBasis: car.power_basis,
         resolvedHp: resolvedPowerHp,
-        resolvedKw: approvedPowerKw ?? reference?.power_kw ?? null,
+        resolvedKw: tariffPowerKw ?? reference?.power_kw ?? null,
         referenceKey: reference?.configuration_key ?? null,
       },
       // True only when this run selects a different automatic reference.
