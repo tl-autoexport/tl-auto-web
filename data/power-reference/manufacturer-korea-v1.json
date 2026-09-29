@@ -3,6 +3,48 @@
   "description": "Curated Korean-manufacturer specifications. Each entry is limited to the engine, years and drive types stated or reconfirmed by the linked manufacturer material. PS values are converted to kW with the exact factor 0.73549875; no tariff rounding is applied.",
   "specifications": [
     {
+      "specKey": "mini-cooper-c-1998-163ps-2025",
+      "brand": "MINI",
+      "model": "Cooper",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2025, 2025],
+      "power": { "value": 163, "unit": "PS", "kw": 119.88629625 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "MINI Korea New MINI Cooper C — 1,998 cc, 163 PS, 2025 Korean specification",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0449119KO/mini-%EC%BD%94%EB%A6%AC%EC%95%84-%EB%89%B4-mini-%EC%BF%A0%ED%8D%BC-c-5-%EB%8F%84%EC%96%B4%E2%80%99-%EA%B5%AD%EB%82%B4-%EA%B3%B5%EC%8B%9D-%EC%B6%9C%EC%8B%9C?showMedia=photo",
+        "supportingUri": "https://www.press.bmwgroup.com/korea/article/detail/T0444988KO/mini-T%20D-t-mini-%20%7C-c-3-%20%20%20-m%20-%20%20-",
+        "retrievedAt": "2026-09-29",
+        "note": "MINI Korea's 2025 Cooper C 5-door technical table explicitly gives 1,998 cc and 163 PS for Essential and Classic; its official 3-door launch also identifies Cooper C Classic at 163 PS. This resolves the Encar 2025 Cooper C Classic 1,998 cc listing without transferring older-generation Cooper S power."
+      },
+      "matches": [
+        { "trim": "Classic", "badge": "Classic", "yearFrom": 2025, "yearTo": 2025, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mini-countryman-jcw-all4-u25-1998-317ps-2024",
+      "brand": "MINI",
+      "model": "Countryman",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2024, 2024],
+      "power": { "value": 317, "unit": "PS", "kw": 233.15310375 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "MINI Korea New JCW Countryman ALL4 — 317 PS, 2024 Korean launch",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0444350KO/%EC%8B%9C%EB%8C%80%EB%A5%BC-%EC%97%AC%EB%8A%94-%EC%95%84%EC%9D%B4%EC%BD%98%EC%9D%98-%EC%9E%AC%ED%83%84%EC%83%9D-%EB%89%B4-mini-%ED%8C%A8%EB%B0%80%EB%A6%AC-mini-%EC%BD%94%EB%A6%AC%EC%95%84-%EB%B3%B4%EB%8B%A4-%EC%99%84%EB%B2%BD%ED%95%98%EA%B2%8C-%EC%A7%84%ED%99%94%ED%95%9C-%EB%89%B4-mini-%EC%BB%A8%ED%8A%B8%EB%A6%AC%EB%A7%A8%E2%80%99-%EA%B5%AD%EB%82%B4-%EA%B3%B5%EC%8B%9D-%EC%B6%9C%EC%8B%9C",
+        "supportingUri": "https://www.mini.co.kr/ko_KR/home/range/mini-countryman/driving-experience.html",
+        "retrievedAt": "2026-09-29",
+        "note": "MINI Korea's 2024 launch identifies the new-generation JCW Countryman ALL4 at 317 PS and states that all new Countryman models have ALL4; MINI Korea's current Countryman technical page confirms 317 PS / 233 kW. Applied only to the Encar-confirmed 2024 1,998 cc ALL4 JCW listing."
+      },
+      "matches": [
+        { "trim": "ALL4 JCW", "badge": "ALL4 JCW", "driveType": "4WD", "yearFrom": 2024, "yearTo": 2024, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
       "specKey": "mini-countryman-f60-cooper-1499-136ps-2021",
       "brand": "MINI",
       "model": "Countryman",
