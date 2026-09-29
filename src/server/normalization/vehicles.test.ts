@@ -39,6 +39,7 @@ assert.equal(normalizeDrive("전륜구동"), "FWD");
 assert.equal(normalizeDrive("후륜"), "RWD");
 assert.equal(normalizeDrive("2륜"), "2WD");
 assert.equal(normalizeDrive("xDrive 20d"), "4WD");
+assert.equal(normalizeDrive("ALL4 Classic"), "4WD");
 assert.equal(normalizeDrive("4MATIC"), "4WD");
 assert.equal(normalizeDrive("4MOTION"), "4WD");
 assert.equal(normalizeDrive("HTRAC"), "4WD");

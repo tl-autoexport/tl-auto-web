@@ -3,6 +3,87 @@
   "description": "Curated Korean-manufacturer specifications. Each entry is limited to the engine, years and drive types stated or reconfirmed by the linked manufacturer material. PS values are converted to kW with the exact factor 0.73549875; no tariff rounding is applied.",
   "specifications": [
     {
+      "specKey": "mini-countryman-f60-cooper-1499-136ps-2021",
+      "brand": "MINI",
+      "model": "Countryman",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1499,
+      "years": [2021, 2021],
+      "power": { "value": 136, "unit": "PS", "kw": 100.02783 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "MINI Korea F60 Countryman Cooper — 1,499 cc, 136 PS",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0318450KO/mini-%EC%BD%94%EB%A6%AC%EC%95%84-%EB%8B%A4%EC%9E%AC%EB%8A%A5%ED%95%9C-sav-%E2%80%98%EB%89%B4-mini-%EC%BB%A8%ED%8A%B8%EB%A6%AC%EB%A7%A8%E2%80%99-%EA%B5%AD%EB%82%B4-%EC%B6%9C%EC%8B%9C",
+        "retrievedAt": "2026-09-29",
+        "note": "MINI Korea's official F60 Countryman technical table lists the 1,499 cc Cooper gasoline engine at 136 PS. Restricted to the Encar-confirmed 2021 second-generation Countryman Standard configuration."
+      },
+      "matches": [
+        { "generation": "2nd", "trim": "2nd", "badge": "Standard", "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 1490, "engineCcTo": 1505 }
+      ]
+    },
+    {
+      "specKey": "mini-countryman-f60-cooper-d-all4-1995-150ps-2021",
+      "brand": "MINI",
+      "model": "Countryman",
+      "fuelType": "diesel",
+      "propulsionType": "ice",
+      "engineCc": 1995,
+      "years": [2021, 2021],
+      "power": { "value": 150, "unit": "PS", "kw": 110.3248125 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "MINI Korea F60 Countryman Cooper D ALL4 — 1,995 cc, 150 PS",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0318450KO/mini-%EC%BD%94%EB%A6%AC%EC%95%84-%EB%8B%A4%EC%9E%AC%EB%8A%A5%ED%95%9C-sav-%E2%80%98%EB%89%B4-mini-%EC%BB%A8%ED%8A%B8%EB%A6%AC%EB%A7%A8%E2%80%99-%EA%B5%AD%EB%82%B4-%EC%B6%9C%EC%8B%9C",
+        "retrievedAt": "2026-09-29",
+        "note": "MINI Korea's F60 facelift technical table lists Cooper D ALL4 at 1,995 cc and 150 PS, distinct from Cooper SD ALL4 at 190 PS. Restricted to the Encar-confirmed 2021 Cooper D Countryman ALL4 configuration."
+      },
+      "matches": [
+        { "generation": "2nd", "trim": "2nd", "badge": "ALL4", "driveType": "4WD", "yearFrom": 2021, "yearTo": 2021, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mini-countryman-f60-cooper-s-all4-1998-192ps-2023",
+      "brand": "MINI",
+      "model": "Countryman",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2023, 2023],
+      "power": { "value": 192, "unit": "PS", "kw": 141.21576 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "MINI Korea F60 Countryman Cooper S ALL4 — 1,998 cc, 192 PS",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0318450KO/mini-%EC%BD%94%EB%A6%AC%EC%95%84-%EB%8B%A4%EC%9E%AC%EB%8A%A5%ED%95%9C-sav-%E2%80%98%EB%89%B4-mini-%EC%BB%A8%ED%8A%B8%EB%A6%AC%EB%A7%A8%E2%80%99-%EA%B5%AD%EB%82%B4-%EC%B6%9C%EC%8B%9C",
+        "retrievedAt": "2026-09-29",
+        "note": "MINI Korea's F60 Countryman technical table identifies Cooper S ALL4 at 1,998 cc and 192 PS. Encar staging identifies the 2023 listing as second-generation Cooper S Countryman ALL4 Classic; this rule is limited to that Korean configuration."
+      },
+      "matches": [
+        { "generation": "2nd", "trim": "2nd", "badge": "ALL4 Classic", "driveType": "4WD", "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
+      "specKey": "mini-cooper-convertible-f57-cooper-s-1998-192ps-2023",
+      "brand": "MINI",
+      "model": "Cooper",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1998,
+      "years": [2023, 2023],
+      "power": { "value": 192, "unit": "PS", "kw": 141.21576 },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "MINI Korea Cooper S Convertible F57 — 1,998 cc, 192 PS",
+        "uri": "https://www.press.bmwgroup.com/korea/article/detail/T0259066KO/%EB%89%B4-mini-%EC%BB%A8%EB%B2%84%ED%84%B0%EB%B8%94-%EA%B3%B5%EC%8B%9D-%EC%B6%9C%EC%8B%9C",
+        "supportingUri": "https://www.press.bmwgroup.com/korea/article/detail/T0337669KO/mini-%EC%BD%94%EB%A6%AC%EC%95%84-%EA%B3%A0%EA%B8%89%EA%B0%90%C2%B7%ED%8E%B8%EC%9D%98%EC%84%B1-%EA%B0%95%ED%99%94%EB%90%9C-%EB%89%B4-mini-%ED%8C%A8%EB%B0%80%EB%A6%AC-%EA%B5%AD%EB%82%B4-%EC%B6%9C%EC%8B%9C",
+        "retrievedAt": "2026-09-29",
+        "note": "MINI Korea's official Convertible specification lists Cooper S at 1,998 cc and 192 PS; the later Korean MINI family release reconfirms Cooper S at 192 PS. Restricted to the 2023 third-generation Cooper S Convertible Classic Encar records in this cohort."
+      },
+      "matches": [
+        { "generation": "Third Generation", "trim": "Third Generation", "badge": "Classic", "yearFrom": 2023, "yearTo": 2023, "engineCcFrom": 1990, "engineCcTo": 2005 }
+      ]
+    },
+    {
       "specKey": "kia-carnival-ka4-2.2d-2151-2019-provisional",
       "brand": "Kia",
       "model": "Carnival",

@@ -1420,6 +1420,7 @@ const FOUR_WHEEL_TOKENS = [
   "awd",
   "4x4",
   "xdrive",
+  "all4",
   "quattro",
   "콰트로",
   "4matic",

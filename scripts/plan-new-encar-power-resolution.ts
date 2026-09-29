@@ -127,6 +127,13 @@ function inputFor(row: CandidateRow) {
   );
   const engineCc = canonicalEngineCc(spec.displacement ?? detail.displacement ?? snapshot.engineCc);
   const badge = category.gradeEnglishName ?? snapshot.badge ?? snapshot.badgeDetail;
+  const rawModelName = text(category.modelName);
+  const rawEnglishGeneration = text(category.gradeDetailEnglishName);
+  const modelNameHasGeneration = Boolean(rawModelName && /세대|더 넥스트|더 뉴|올 뉴/.test(rawModelName));
+  const miniCooperCDisplacementConflict =
+    canonicalEncarBrand(category.manufacturerEnglishName ?? snapshot.brand) === "Mini" &&
+    Boolean(rawModelName && /쿠퍼\s*C/i.test(rawModelName)) &&
+    engineCc === 1998;
   const driveText = [
     category.gradeEnglishName,
     category.gradeDetailEnglishName,
@@ -145,7 +152,9 @@ function inputFor(row: CandidateRow) {
       category.modelGroupEnglishName ?? snapshot.model,
       category.generation, category.modelName, detail.generation, detail.modelName,
       contents.generation, contents.modelName, snapshot.generation,
-    ),
+    ) ?? (!miniCooperCDisplacementConflict && rawEnglishGeneration && /^(?:\d+(?:st|nd|rd|th)|(?:first|second|third|fourth) generation)$/i.test(rawEnglishGeneration)
+      ? rawEnglishGeneration
+      : !miniCooperCDisplacementConflict && modelNameHasGeneration ? rawModelName : null),
     // A full Encar grade often contains engine/drivetrain descriptors rather
     // than a trim. Keep that text as the badge and only use a detailed grade
     // as trim, avoiding false exact-trim exclusions.

@@ -53,19 +53,29 @@ function assertPower(spec: Specification) {
 
 async function main() {
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as Manifest;
-  manifest.specifications.forEach(assertPower);
-  const sourceSha256 = sha256(manifest);
+  const requestedKeys = (process.env.MANUFACTURER_POWER_SPEC_KEYS ?? "")
+    .split(",").map((key) => key.trim()).filter(Boolean);
+  const specifications = requestedKeys.length
+    ? manifest.specifications.filter((spec) => requestedKeys.includes(spec.specKey))
+    : manifest.specifications;
+  if (requestedKeys.length && specifications.length !== new Set(requestedKeys).size) {
+    const found = new Set(specifications.map((spec) => spec.specKey));
+    throw new Error(`Manifest is missing requested spec keys: ${requestedKeys.filter((key) => !found.has(key)).join(", ")}`);
+  }
+  const selectedManifest: Manifest = { ...manifest, specifications };
+  specifications.forEach(assertPower);
+  const sourceSha256 = sha256(selectedManifest);
   const summary = {
     dryRun,
     manifestPath,
     manifestVersion: manifest.version,
-    specifications: manifest.specifications.length,
-    matches: manifest.specifications.reduce((total, spec) => total + spec.matches.length, 0),
+    specifications: specifications.length,
+    matches: specifications.reduce((total, spec) => total + spec.matches.length, 0),
     sourceSha256,
     policy: "Only manufacturer/OEM technical documents with restricted configuration matches are approved. Existing car power and prices are unchanged by this import.",
   };
   if (dryRun) {
-    console.log(JSON.stringify({ ...summary, rows: manifest.specifications }, null, 2));
+    console.log(JSON.stringify({ ...summary, rows: specifications }, null, 2));
     return;
   }
 
@@ -88,7 +98,7 @@ async function main() {
     if (!batchId) throw new Error("Source batch was not created");
 
     let created = 0;
-    for (const [index, spec] of manifest.specifications.entries()) {
+    for (const [index, spec] of specifications.entries()) {
       const rawRow = await client.query<{ id: string }>(
         `insert into public.vehicle_power_source_rows
            (batch_id, source_sheet, source_row_number, raw_record, raw_vehicle_name, raw_power_text, parse_status)
