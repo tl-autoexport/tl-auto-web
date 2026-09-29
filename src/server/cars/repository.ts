@@ -294,7 +294,8 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
+    .not("price_rub", "is", null)
+    .not("power_hp", "is", null);
 
   if (source) query = query.eq("primary_source", source);
   if (maxPowerHp) query = query.lte("power_hp", maxPowerHp);
@@ -376,7 +377,8 @@ export async function getCatalogCardPage(
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
+    .not("price_rub", "is", null)
+    .not("power_hp", "is", null);
 
   if (filters.source) query = query.eq("primary_source", filters.source);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
@@ -486,7 +488,8 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
+    .not("price_rub", "is", null)
+    .not("power_hp", "is", null);
 
   if (filters.source) query = query.eq("primary_source", filters.source);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
@@ -756,7 +759,8 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
       .eq("is_available", true)
       .in("primary_source", ["encar", "chestny_prigon"])
       .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-      .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
+      .not("price_rub", "is", null)
+      .not("power_hp", "is", null)
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
 
