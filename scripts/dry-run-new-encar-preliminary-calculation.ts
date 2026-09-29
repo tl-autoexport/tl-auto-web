@@ -136,7 +136,7 @@ async function main() {
       calculations, skipped,
     };
     await mkdir("output", { recursive: true });
-    const output = "output/tl-auto-new-encar-preliminary-calculation-dry-run.json";
+    const output = process.env.TL_AUTO_PRELIMINARY_CALC_OUTPUT ?? "output/tl-auto-new-encar-preliminary-calculation-dry-run.json";
     await writeFile(output, `${JSON.stringify(report, null, 2)}\n`);
     console.log(JSON.stringify({ ...report, calculations: undefined, skipped: undefined, output }, null, 2));
     await db.query("rollback");
