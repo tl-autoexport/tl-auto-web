@@ -1596,6 +1596,7 @@ export async function importEncar(options: ImportOptions = {}) {
       return (
         fuel === "gasoline" ||
         fuel === "diesel" ||
+        fuel === "lpg" ||
         fuel === "electric" ||
         fuel === "hybrid"
       );

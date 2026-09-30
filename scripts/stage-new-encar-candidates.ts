@@ -27,8 +27,8 @@ if (!Number.isInteger(minimum) || minimum < 1 || minimum > target) throw new Err
 if (minimum < target && !checkpointPath) throw new Error("ENCAR_NEW_STAGING_CHECKPOINT is required when accepting a partial cohort");
 if (!Number.isInteger(maxPages) || maxPages < 1) throw new Error("ENCAR_NEW_STAGING_MAX_PAGES must be a positive integer");
 if (!Number.isInteger(fuelPages) || fuelPages < 0) throw new Error("ENCAR_NEW_STAGING_FUEL_PAGES must be a non-negative integer");
-if (!requestedFuelTypes.length || requestedFuelTypes.some((fuel) => !["gasoline", "diesel", "electric", "hybrid"].includes(fuel))) {
-  throw new Error("ENCAR_NEW_STAGING_FUEL_TYPES must contain gasoline, diesel, electric, or hybrid");
+if (!requestedFuelTypes.length || requestedFuelTypes.some((fuel) => !["gasoline", "diesel", "lpg", "electric", "hybrid"].includes(fuel))) {
+  throw new Error("ENCAR_NEW_STAGING_FUEL_TYPES must contain gasoline, diesel, lpg, electric, or hybrid");
 }
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
