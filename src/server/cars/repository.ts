@@ -192,6 +192,41 @@ export type CatalogFilters = {
   sort?: "fresh" | "price_asc" | "price_desc" | "mileage_asc" | "year_desc";
 };
 
+const CATALOG_QUERY_SLOW_MS = 1_500;
+
+/** Log only filter names, never search text or other user-supplied values. */
+function catalogQueryContext(filters: CatalogFilters) {
+  const activeFilters = Object.entries({
+    source: filters.source,
+    maxPowerHp: filters.maxPowerHp,
+    search: filters.search,
+    brand: filters.brand,
+    generation: filters.generation,
+    model: filters.model,
+    fuelType: filters.fuelType,
+    transmission: filters.transmission,
+    engineRange: filters.minEngineCc !== undefined || filters.maxEngineCc !== undefined,
+    yearRange: filters.minYear !== undefined || filters.maxYear !== undefined,
+    registrationMonth: filters.registrationMonth,
+    trim: filters.trim,
+    bodyType: filters.bodyType,
+    driveType: filters.driveType,
+    color: filters.color,
+    ownersRange: filters.minOwners !== undefined || filters.maxOwners !== undefined,
+    mileageRange: filters.minMileageKm !== undefined || filters.maxMileageKm !== undefined,
+    priceRange: filters.minPriceRub !== undefined || filters.maxPriceRub !== undefined,
+    noAccidents: filters.noAccidents,
+    noInsurance: filters.noInsurance,
+    insurancePayoutRange: filters.minInsurancePayoutKrw !== undefined || filters.maxInsurancePayoutKrw !== undefined,
+    passable: filters.passable,
+    sourceId: filters.sourceId,
+  })
+    .filter(([, value]) => Boolean(value))
+    .map(([name]) => name);
+
+  return { sort: filters.sort ?? "fresh", activeFilters };
+}
+
 export type StagingCatalogType = "motorcycle" | "scooter" | "jetski";
 
 export type CatalogMetrics = {
@@ -418,13 +453,30 @@ export async function getCatalogCardPage(
     query = query.or(cursorExpression(sortConfig.column, sortConfig.ascending, decodedCursor));
   }
 
+  const startedAt = Date.now();
   const { data, error } = await query
     .order(sortConfig.column, { ascending: sortConfig.ascending, nullsFirst: false })
     .order("id", { ascending: true })
     .limit(limit + 1);
+  const durationMs = Date.now() - startedAt;
+  const queryContext = {
+    ...catalogQueryContext(filters),
+    durationMs,
+    limit,
+    cursorUsed: Boolean(cursor),
+  };
   if (error) {
-    console.error("[cars] Catalogue card page query failed", error);
+    console.error("[cars] Catalogue card page query failed", {
+      ...queryContext,
+      error: { code: error.code, message: error.message, details: error.details, hint: error.hint },
+    });
     throw error;
+  }
+  if (durationMs >= CATALOG_QUERY_SLOW_MS) {
+    console.warn("[cars] Catalogue card page query slow", {
+      ...queryContext,
+      returnedRows: data?.length ?? 0,
+    });
   }
 
   const rows = (data ?? []) as CatalogCardSummary[];
@@ -525,10 +577,19 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
   if (filters.passable) query = query.or(passableFilterExpression());
   if (filters.sourceId) query = query.eq("source_id", filters.sourceId);
 
+  const startedAt = Date.now();
   const { count, error } = await query;
+  const durationMs = Date.now() - startedAt;
+  const queryContext = { ...catalogQueryContext(filters), durationMs };
   if (error) {
-    console.error("[cars] Catalog count query failed", error);
+    console.error("[cars] Catalog count query failed", {
+      ...queryContext,
+      error: { code: error.code, message: error.message, details: error.details, hint: error.hint },
+    });
     throw error;
+  }
+  if (durationMs >= CATALOG_QUERY_SLOW_MS) {
+    console.warn("[cars] Catalog count query slow", queryContext);
   }
   return count ?? 0;
 }
