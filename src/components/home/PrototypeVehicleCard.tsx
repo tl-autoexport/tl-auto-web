@@ -11,7 +11,7 @@ import { RemoteImage } from "@/components/site/RemoteImage";
 import { useDestination } from "@/components/site/DestinationProvider";
 import { vehicleClientMessage, whatsappContactUrl } from "@/lib/contact";
 import { publicCarPath } from "@/lib/car-url";
-import { translateBrand, translateDrive, translateFuel, translateModel, translateTransmission, translateTrim } from "@/server/normalization/display";
+import { translateBrand, translateDrive, translateFuel, translateModel, translateTransmission } from "@/server/normalization/display";
 import { showcasePhotoUrl } from "@/lib/showcase-photo";
 import type { CatalogCar, CatalogCardSummary } from "@/server/cars/repository";
 
@@ -75,7 +75,6 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
     car.mileage_km ? `${rub.format(car.mileage_km)} км` : null,
   ].filter((value): value is string => Boolean(value));
   const secondaryFacts = [
-    translateTrim(car.trim || car.badge_detail || car.badge),
     car.fuel_type ? translateFuel(car.fuel_type) : null,
     translateDrive(car.drive_type),
     car.power_hp ? `${car.power_hp} л.с.` : null,
