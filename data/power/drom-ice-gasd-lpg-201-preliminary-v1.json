@@ -1,0 +1,124 @@
+{
+  "version": "drom-ice-gasd-lpg-201-preliminary-v1",
+  "runIds": [
+    "5f278fea-f4dc-417d-b0fa-c05983854516",
+    "d50f740a-3cfb-4eea-8e9d-84adba3d0e52"
+  ],
+  "status": "preliminary_only_not_approved_tks_evidence",
+  "scope": "Drom Korean-market ICE/LPG candidate power matches found while reviewing the 201-listing gasoline/diesel/LPG run",
+  "records": [
+    {
+      "brand": "Renault Korea",
+      "model": "QM6",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "lpg",
+      "powerPs": 140,
+      "listingIds": ["42708180", "42739952", "42818013"],
+      "sourceUrl": "https://www.drom.ru/catalog/renault_samsung/qm6/2022/",
+      "note": "Drom Korean-market QM6 HZG 2.0 LPG, engine M4RV, 140 PS. Model/year/displacement/fuel/2WD align with the run group. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Renault Korea",
+      "model": "QM6",
+      "year": 2021,
+      "engineCc": 1998,
+      "fuelType": "lpg",
+      "powerPs": 140,
+      "listingIds": ["42805444"],
+      "sourceUrl": "https://www.drom.ru/catalog/renault_samsung/qm6/2021/",
+      "note": "Drom Korean-market QM6 HZG 2.0 LPG, engine M4RV, 140 PS. Model/year/displacement/fuel/2WD align with the run group. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Renault Korea",
+      "model": "SM6",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "lpg",
+      "powerPs": 140,
+      "listingIds": ["42759403"],
+      "sourceUrl": "https://www.drom.ru/catalog/renault_samsung/sm6/513036/",
+      "note": "Drom Korean-market SM6 LFD 2.0 LPG, engine M4RV, 140 PS. Listing group matches model/year/displacement/fuel; drive was not supplied in the no-match export. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2021,
+      "engineCc": 2999,
+      "fuelType": "lpg",
+      "powerPs": 235,
+      "listingIds": ["42728435", "42804250"],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/grandeur/2021/",
+      "note": "Drom Korean-market Grandeur IG 3.0 LPG, engine L6DB, 235 PS. Run group matches model/year/displacement/fuel. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Staria",
+      "year": 2021,
+      "engineCc": 3470,
+      "fuelType": "lpg",
+      "powerPs": 240,
+      "listingIds": ["42800725"],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/staria/specs/engine_capacity/",
+      "note": "Drom Korean-market Staria US4 3.5 LPG, engine L6DC, 240 PS. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Staria",
+      "year": 2023,
+      "engineCc": 3470,
+      "fuelType": "lpg",
+      "powerPs": 240,
+      "listingIds": ["42805932", "42813180"],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/staria/2023/",
+      "note": "Drom Korean-market Staria US4 3.5 LPG, engine L6DC, 240 PS. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Staria",
+      "year": 2025,
+      "engineCc": 3470,
+      "fuelType": "lpg",
+      "powerPs": 240,
+      "listingIds": ["42800078"],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/staria/2025/",
+      "note": "Drom Korean-market Staria US4 3.5 LPG, engine L6DC, 240 PS. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Renault Korea",
+      "model": "XM3",
+      "year": 2021,
+      "engineCc": 1332,
+      "fuelType": "gasoline",
+      "powerPs": 152,
+      "listingIds": ["42804369"],
+      "sourceUrl": "https://www.drom.ru/catalog/renault_samsung/xm3/2022/",
+      "note": "Drom Korean-market XM3 LJL 1.3 TCe260, engine H5Ht, 152 PS; specification spans production starting 2020. Run group matches model/year/displacement/fuel. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Renault Korea",
+      "model": "XM3",
+      "year": 2022,
+      "engineCc": 1332,
+      "fuelType": "gasoline",
+      "powerPs": 152,
+      "listingIds": ["42734612", "42786633"],
+      "sourceUrl": "https://www.drom.ru/catalog/renault_samsung/xm3/2022/",
+      "note": "Drom Korean-market XM3 LJL 1.3 TCe260, engine H5Ht, 152 PS. Run group matches model/year/displacement/fuel. Preliminary secondary-source match; not yet imported into calculation references."
+    }
+  ],
+  "candidateListingCount": 14,
+  "notIncluded": [
+    {
+      "brand": "Hyundai",
+      "model": "Solati",
+      "year": 2024,
+      "engineCc": 2497,
+      "fuelType": "diesel",
+      "listingIds": ["42798537"],
+      "candidatePowerPs": 170,
+      "sourceUrl": "https://www.hyundai.com/kr/ko/c/products/bus/solati",
+      "reason": "Hyundai Korea's current Solati material gives 170 PS / 2,497 cc, but the retrieved catalog is model year 2026, not the exact 2024 listing. Keep out of the 14-count until same-version/year applicability is confirmed."
+    }
+  ]
+}
