@@ -7,7 +7,7 @@ export type EncarrusIceCard = {
   year: number | null;
   engineText: string | null;
   engineCc: number | null;
-  fuelType: "gasoline" | "diesel" | null;
+  fuelType: "gasoline" | "diesel" | "lpg" | null;
   displayedPowerText: string | null;
   displayedPowerHp: number | null;
   powerBasis: EncarrusPowerEvidence["powerBasis"];
@@ -87,13 +87,14 @@ export function encarrusIceModelNameMatches(group: EncarrusIceGroupIdentity, can
   return false;
 }
 
-export function encarrusFuelType(value: string | null): "gasoline" | "diesel" | null {
+export function encarrusFuelType(value: string | null): "gasoline" | "diesel" | "lpg" | null {
   if (!value) return null;
   const text = value.toLowerCase();
   const gasoline = /бензин|бензинов|gasoline|petrol|가솔린/.test(text);
   const diesel = /дизел|diesel|경유/.test(text);
-  if (gasoline === diesel) return null;
-  return gasoline ? "gasoline" : "diesel";
+  const lpg = /\blpg\b|\blpi\b|autogas|газобаллон|сжиженн\w* нефтян\w* газ|액화석유가스|엘피지/.test(text);
+  if (Number(gasoline) + Number(diesel) + Number(lpg) !== 1) return null;
+  return gasoline ? "gasoline" : diesel ? "diesel" : "lpg";
 }
 
 export function encarrusEngineCc(value: string | null): number | null {

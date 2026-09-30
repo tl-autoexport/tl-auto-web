@@ -19,13 +19,17 @@ type Group = {
 type Generation = { id: number | string; name: string; count: number };
 type Model = { id: number | string; name: string; url: string; count: number; generations: Generation[] };
 
-const inputPath = process.env.TL_AUTO_POWER_PLAN ?? "output/tl-auto-new-encar-power-plan.json";
+const inputPaths = (process.env.TL_AUTO_POWER_PLANS ?? process.env.TL_AUTO_POWER_PLAN ?? "output/tl-auto-new-encar-power-plan.json")
+  .split(",").map((path) => path.trim()).filter(Boolean);
 const outputPath = process.env.ENCARRUS_ICE_OUTPUT ?? "output/tl-auto-encarrus-ice-power.json";
 const delayMs = Math.max(1500, Number(process.env.ENCARRUS_ICE_DELAY_MS ?? 2000));
 const timeoutMs = Math.max(3000, Number(process.env.ENCARRUS_ICE_TIMEOUT_MS ?? 20000));
 const maxPages = Math.max(1, Math.min(20, Number(process.env.ENCARRUS_ICE_MAX_PAGES_PER_GENERATION ?? 4)));
 const detailSamples = Math.max(0, Math.min(2, Number(process.env.ENCARRUS_ICE_DETAIL_SAMPLES_PER_CONFIGURATION ?? 0)));
 const limit = Math.max(1, Number(process.env.ENCARRUS_ICE_LIMIT ?? 1000));
+const allowedFuelTypes = new Set((process.env.ENCARRUS_ICE_FUEL_TYPES ?? "gasoline,diesel")
+  .split(",").map((fuel) => fuel.trim().toLowerCase()).filter(Boolean));
+const supportedFuelTypes = new Set(["gasoline", "diesel", "lpg"]);
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const headers = {
   "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36",
@@ -78,12 +82,52 @@ async function fetchModels(): Promise<Model[]> {
 function groupKey(group: Group) { return `${group.brand}|${group.model}|${group.generation}|${group.year}|${group.engineCc}|${group.fuelType}|${group.driveType}`; }
 
 async function main() {
-  const plan = JSON.parse(await readFile(inputPath, "utf8")) as { runId: string; externalSearch?: { worklist?: Group[] } };
-  const sourceGroups = plan.externalSearch?.worklist;
-  if (!Array.isArray(sourceGroups)) throw new Error(`No externalSearch.worklist in ${inputPath}`);
-  const badFuel = sourceGroups.filter((group) => !["gasoline", "diesel"].includes(String(group.fuelType)));
-  if (badFuel.length) throw new Error(`Expected gasoline/diesel-only plan; found ${badFuel.length} rows with other/unknown fuel`);
-  const groups = sourceGroups.slice(0, limit);
+  const plans = await Promise.all(inputPaths.map(async (path) => ({
+    path,
+    plan: JSON.parse(await readFile(path, "utf8")) as { runId: string; externalSearch?: { worklist?: Group[] } },
+  })));
+  const allSourceGroups = plans.flatMap(({ path, plan }) => {
+    const worklist = plan.externalSearch?.worklist;
+    if (!Array.isArray(worklist)) throw new Error(`No externalSearch.worklist in ${path}`);
+    return worklist;
+  });
+  const invalidFuelTypes = [...allowedFuelTypes].filter((fuel) => !supportedFuelTypes.has(fuel));
+  if (invalidFuelTypes.length || !allowedFuelTypes.size) throw new Error(`Unsupported/empty ENCARRUS_ICE_FUEL_TYPES: ${invalidFuelTypes.join(",") || "empty"}`);
+  const excludedFuelCounts = allSourceGroups.filter((group) => !allowedFuelTypes.has(String(group.fuelType).toLowerCase()))
+    .reduce<Record<string, number>>((counts, group) => {
+      const fuel = String(group.fuelType ?? "unknown");
+      counts[fuel] = (counts[fuel] ?? 0) + group.listingIds.length;
+      return counts;
+    }, {});
+  const sourceGroups = allSourceGroups.filter((group) => allowedFuelTypes.has(String(group.fuelType).toLowerCase()));
+  const mergedGroups = new Map<string, Group>();
+  for (const group of sourceGroups) {
+    const key = groupKey(group);
+    const existing = mergedGroups.get(key);
+    if (!existing) {
+      mergedGroups.set(key, {
+        ...group,
+        listingIds: [...new Set(group.listingIds.map(String))],
+        badgeExamples: [...new Set(group.badgeExamples ?? [])],
+        sourceExamples: [...new Map((group.sourceExamples ?? []).map((example) => [JSON.stringify(example), example])).values()],
+      });
+      continue;
+    }
+    existing.listingIds = [...new Set([...existing.listingIds, ...group.listingIds.map(String)])];
+    existing.badgeExamples = [...new Set([...existing.badgeExamples, ...(group.badgeExamples ?? [])])];
+    existing.sourceExamples = [...new Map([...(existing.sourceExamples ?? []), ...(group.sourceExamples ?? [])]
+      .map((example) => [JSON.stringify(example), example])).values()];
+  }
+  const groups = [...mergedGroups.values()].slice(0, limit);
+  const allListingIds = groups.flatMap((group) => group.listingIds);
+  if (new Set(allListingIds).size !== allListingIds.length) throw new Error("A source listing ID appears in multiple EncarRus worklist groups");
+  const targetFuelCounts = groups.reduce<Record<string, number>>((counts, group) => {
+    const fuel = String(group.fuelType ?? "unknown");
+    counts[fuel] = (counts[fuel] ?? 0) + group.listingIds.length;
+    return counts;
+  }, {});
+  const targetListings = groups.reduce((count, group) => count + group.listingIds.length, 0);
+  const runIds = [...new Set(plans.map(({ plan }) => plan.runId))];
   const models = await fetchModels();
   const grouped = new Map<string, { model: Model; groups: Group[] }>();
   const unmapped: Array<{ group: Group; reason: string }> = [];
@@ -204,13 +248,15 @@ async function main() {
     };
   });
   const report = {
-    generatedAt: new Date().toISOString(), runId: plan.runId, source: "EncarRus Meili AJAX catalogue (ICE)",
-    input: inputPath, readOnly: true, databaseWrites: 0, publications: 0,
+    generatedAt: new Date().toISOString(), runId: runIds.length === 1 ? runIds[0] : null, runIds,
+    source: "EncarRus Meili AJAX catalogue (ICE)", input: inputPaths, allowedFuelTypes: [...allowedFuelTypes],
+    readOnly: true, databaseWrites: 0, publications: 0, targetListings, targetFuelCounts, excludedFuelCounts,
     targetConfigurations: groups.length, mappedConfigurations: groups.length - unmapped.length,
     unmappedConfigurations: unmapped.length, modelYearTasks: grouped.size, ajaxRequests: requestLog.length,
     configurationsWithMatchingCards: results.filter((row) => row.matchedCards.length).length,
     withDisplayedPower: results.filter((row) => row.matchedCards.some((card) => card.displayedPowerHp != null)).length,
     classifications: Object.fromEntries(["preliminary_candidate", "review_match_or_power", "matched_without_power", "no_matching_card", "source_error"].map((key) => [key, results.filter((row) => row.classification === key).length])),
+    classificationListings: Object.fromEntries(["preliminary_candidate", "review_match_or_power", "matched_without_power", "no_matching_card", "source_error"].map((key) => [key, results.filter((row) => row.classification === key).reduce((count, row) => count + row.group.listingIds.length, 0)])),
     detailSamplesRequested: detailSamples, detailPagesParsed: detailLog.filter((entry) => entry.status === "parsed").length,
     stoppedOnProtection, delayMs, maxPagesPerGeneration: maxPages, output: outputPath,
     unmapped, requestLog, detailLog, results,
@@ -218,12 +264,14 @@ async function main() {
   await mkdir("output", { recursive: true });
   await writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify({
-    generatedAt: report.generatedAt, runId: report.runId, source: report.source,
+    generatedAt: report.generatedAt, runId: report.runId, runIds: report.runIds, source: report.source,
     readOnly: report.readOnly, databaseWrites: report.databaseWrites, publications: report.publications,
+    targetListings: report.targetListings, targetFuelCounts: report.targetFuelCounts, excludedFuelCounts: report.excludedFuelCounts,
     targetConfigurations: report.targetConfigurations, mappedConfigurations: report.mappedConfigurations,
     unmappedConfigurations: report.unmappedConfigurations, modelYearTasks: report.modelYearTasks,
     ajaxRequests: report.ajaxRequests, configurationsWithMatchingCards: report.configurationsWithMatchingCards,
     withDisplayedPower: report.withDisplayedPower, classifications: report.classifications,
+    classificationListings: report.classificationListings,
     detailSamplesRequested: report.detailSamplesRequested, detailPagesParsed: report.detailPagesParsed,
     stoppedOnProtection: report.stoppedOnProtection, delayMs: report.delayMs,
     maxPagesPerGeneration: report.maxPagesPerGeneration, output: report.output,

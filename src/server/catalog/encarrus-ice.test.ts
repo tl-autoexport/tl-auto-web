@@ -3,10 +3,13 @@ import { encarrusEngineCc, encarrusFuelType, encarrusIceMatch, encarrusIceModelN
 
 assert.equal(encarrusFuelType("1.6 л (бензин)"), "gasoline");
 assert.equal(encarrusFuelType("2.2 л дизель"), "diesel");
+assert.equal(encarrusFuelType("2.0 LPG"), "lpg");
+assert.equal(encarrusFuelType("1.6 액화석유가스"), "lpg");
 assert.equal(encarrusFuelType("1.6 л гибрид"), null);
 assert.equal(encarrusEngineCc("1.6 л (бензин)"), 1600);
 assert.equal(encarrusEngineCc("1.5 бензин"), 1500);
 assert.equal(encarrusEngineCc("2.0 дизель"), 2000);
+assert.equal(encarrusEngineCc("2.0 LPG"), 2000);
 assert.equal(encarrusEngineCc("1998 см³"), 1998);
 assert.equal(encarrusIceModelNameMatches({
   brand: "KG_Mobility_Ssangyong", model: "Torres",
@@ -34,5 +37,11 @@ assert.deepEqual(encarrusIceMatch(card, { year: 2022, engineCc: 1998, fuelType: 
 });
 assert.equal(encarrusIceMatch(card, { year: 2022, engineCc: 1998, fuelType: "diesel", driveType: "2WD" }).matched, false);
 assert.equal(encarrusIceMatch(card, { year: 2022, engineCc: 1998, fuelType: "gasoline", driveType: "4WD" }).matched, false);
+const lpgCardHtml = html.replace("id=\"card_123\"", "id=\"card_124\"")
+  .replace("2.0 л (бензин)", "2.0 LPG");
+const [lpgCard] = parseEncarrusIceCards(lpgCardHtml, "/korea/bmw/3-series/");
+assert.equal(lpgCard.fuelType, "lpg");
+assert.equal(lpgCard.engineCc, 2000);
+assert.equal(encarrusIceMatch(lpgCard, { year: 2022, engineCc: 1998, fuelType: "lpg", driveType: "2WD" }).matched, true);
 
 console.log("EncarRus ICE adapter tests passed");
