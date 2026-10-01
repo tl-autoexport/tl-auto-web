@@ -4,6 +4,7 @@ import { createSupabasePublic } from "@/server/supabase/public";
 import { normalizeColor, normalizeDrive } from "@/server/normalization/vehicles";
 import { bodyTypeValues, driveTypeValues, transmissionValues } from "@/lib/catalog-filter-values";
 import { catalogBrandValues, normalizeCatalogBrand } from "@/lib/catalog-brand";
+import { homeShowcasePhotoUrl } from "@/lib/showcase-photo";
 
 const buildWithoutCatalog =
   process.env.TL_AUTO_BUILD_WITHOUT_CATALOG === "true";
@@ -780,23 +781,59 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
     // only listings with a known odometer reading up to 1,000 km belong here.
     // The repository filter also excludes null mileage values at the database
     // level, so the shelf cannot silently fall back to arbitrary fresh cars.
-    getCatalogCardPage({ maxMileageKm: 1000 }, null, 16),
-    getCatalogCardPage({ maxPowerHp: 160 }, null, 16),
-    getCatalogCardPage({ passable: true }, null, 12),
-    getCatalogCardPage({ bodyType: "Кроссовер", driveType: "4WD" }, null, 16),
+    getCatalogCardPage({ maxMileageKm: 1000 }, null, 48),
+    getCatalogCardPage({ maxPowerHp: 160 }, null, 48),
+    getCatalogCardPage({ passable: true }, null, 48),
+    getCatalogCardPage({ bodyType: "Кроссовер", driveType: "4WD" }, null, 48),
   ]);
 
+  const carIds = [...new Set([cars, under160Cars, passableCars, fourWheelDriveCrossovers]
+    .flatMap((page) => page.cars.map((car) => car.id)))];
+  const covers = new Map<string, string>();
+  if (carIds.length) {
+    // One bounded, cached read for all shelves, with no full gallery payloads.
+    const { data, error } = await createSupabaseServerRead()
+      .from("car_media")
+      .select("car_id, url, category, media_type")
+      .in("car_id", carIds)
+      .eq("media_type", "image")
+      .in("category", ["outer", "outside", "outside_image", "exterior"])
+      .or("url.like.*_001.*,url.like.*_002.*,url.like.*_003.*,url.like.*_004.*")
+      .limit(1000);
+    if (error) {
+      console.error("[cars] Homepage exterior covers query failed", error);
+      throw error;
+    }
+    const mediaByCar = new Map<string, NonNullable<typeof data>>();
+    for (const item of data ?? []) {
+      const media = mediaByCar.get(item.car_id) ?? [];
+      media.push(item);
+      mediaByCar.set(item.car_id, media);
+    }
+    for (const [id, media] of mediaByCar) {
+      const url = homeShowcasePhotoUrl(media);
+      if (url) covers.set(id, url);
+    }
+  }
+
+  const presentableCars = (page: CatalogPageResult, limit: number) => page.cars
+    .flatMap((car) => {
+      const url = covers.get(car.id);
+      return url ? [{ ...car, primary_image_url: url, primary_thumbnail_url: url }] : [];
+    })
+    .slice(0, limit);
+
   return {
-    cars: cars.cars,
-    under160Cars: under160Cars.cars,
-    passableCars: passableCars.cars,
-    fourWheelDriveCrossovers: fourWheelDriveCrossovers.cars,
+    cars: presentableCars(cars, 16),
+    under160Cars: presentableCars(under160Cars, 16),
+    passableCars: presentableCars(passableCars, 12),
+    fourWheelDriveCrossovers: presentableCars(fourWheelDriveCrossovers, 16),
   };
 }
 
 const getCachedHomeCatalogData = unstable_cache(
   fetchHomeCatalogData,
-  ["home-catalog-showcases-v4-mileage-new", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  ["home-catalog-showcases-v5-exterior-covers", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
   { revalidate: 60 },
 );
 

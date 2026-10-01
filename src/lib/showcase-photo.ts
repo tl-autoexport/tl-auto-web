@@ -6,6 +6,22 @@ type ShowcaseMedia = {
   sort_order?: number | null;
 };
 
+/** Strict homepage selection: only known Encar whole-car exterior frames. */
+export function homeShowcasePhotoUrl(media: ShowcaseMedia[] | null | undefined) {
+  const exteriorCategories = ["outer", "outside", "outside_image", "exterior"];
+  const preference = [1, 3, 2, 4];
+  const candidates = (media ?? []).flatMap((item) => {
+    if (item.media_type !== "image" || !exteriorCategories.includes(item.category?.toLowerCase() ?? "")) return [];
+    // Detail frames (005/006/031/032/033) can also be labelled "outer".
+    // An unknown sequence is not sufficient evidence for a homepage cover.
+    const match = item.url.match(/^https:\/\/ci\.encar\.com\/carpicture[^?#]*_(00[1-4])\.(?:jpg|jpeg|webp)(?:\?.*)?$/i);
+    if (!match) return [];
+    return [{ url: item.url, rank: preference.indexOf(Number(match[1])) }];
+  });
+  candidates.sort((left, right) => left.rank - right.rank);
+  return candidates[0]?.url ?? null;
+}
+
 const NON_SHOWCASE_CATEGORIES = [
   "inner",
   "inside",
