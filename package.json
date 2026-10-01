@@ -65,6 +65,7 @@
     "refresh:encar:history:write": "ENCAR_HISTORY_DRY_RUN=false tsx scripts/refresh-encar-history.ts",
     "backfill:encar:inspection": "tsx scripts/backfill-encar-inspection.ts",
     "backfill:encar:card-data": "tsx scripts/backfill-encar-card-data.ts",
+    "backfill:chestny:card-data": "tsx scripts/backfill-chestny-card-data.ts",
     "test:encar:card-data": "tsx src/server/imports/encar-card-data.test.ts",
     "backfill:encar:inspection:write": "ENCAR_INSPECTION_DRY_RUN=false tsx scripts/backfill-encar-inspection.ts",
     "backfill:encar:seats": "tsx scripts/backfill-encar-seats.ts",

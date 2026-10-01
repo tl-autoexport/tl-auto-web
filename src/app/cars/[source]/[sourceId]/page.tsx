@@ -770,17 +770,11 @@ type InspectionGroup = {
 function buildInspectionGroups(
   reports: Array<{ report_type: string; items: unknown }>,
 ): InspectionGroup[] {
-  // A report that exists but carries no items must not hide a structured report from
-  // the other source: an empty `encar_inspection` used to make this return [] and the
-  // Chestny inspection was never reached. Encar still wins when it has content.
-  const hasItems = (report?: { items: unknown }) => Array.isArray(report?.items) && report.items.length > 0;
-  const report = reports.find((item) => item.report_type === "encar_inspection" && hasItems(item))
-    ?? reports.find((item) => item.report_type === "chestny_inspection" && hasItems(item))
-    ?? reports.find((item) => item.report_type === "encar_inspection")
-    ?? reports.find((item) => item.report_type === "chestny_inspection");
-  if (!Array.isArray(report?.items)) return [];
-
-  return report.items
+  // Merge both available sources: a partial report from one source must not hide
+  // additional confirmed checks from the other.
+  const ordered = ["encar_inspection", "chestny_inspection"]
+    .flatMap((type) => reports.filter((item) => item.report_type === type));
+  const groups = ordered.flatMap((report) => Array.isArray(report.items) ? report.items : [])
     .map((node) => {
       const record = getObject(node);
       if (!record) return null;
@@ -791,6 +785,21 @@ function buildInspectionGroups(
       return { title, items };
     })
     .filter((group): group is InspectionGroup => Boolean(group));
+  const merged = new Map<string, InspectionGroup>();
+  for (const group of groups) {
+    const key = group.title.trim().toLocaleLowerCase();
+    const current = merged.get(key);
+    if (!current) {
+      merged.set(key, { ...group, items: [...group.items] });
+      continue;
+    }
+    const seen = new Set(current.items.map((item) => `${item.label}|${item.status}|${item.statusCode ?? ""}`));
+    for (const item of group.items) {
+      const itemKey = `${item.label}|${item.status}|${item.statusCode ?? ""}`;
+      if (!seen.has(itemKey)) current.items.push(item);
+    }
+  }
+  return [...merged.values()];
 }
 
 function flattenInspectionItems(value: unknown): InspectionItem[] {
@@ -928,17 +937,39 @@ function getCarHistory(
   const encarResolved = (
     encarHistory ? { ...getObject(encarHistory.summary), ...getObject(encarHistory.raw_payload) } : null
   );
-  if (encarResolved) return encarResolved;
   const history = reports.find((report) => report.report_type === "carhistory");
-  if (history) return { ...getObject(history.summary), ...getObject(history.raw_payload) };
-  // A Chestny history is a separate source: it is used only when no other report
-  // exists, and it never overwrites Encar data.
   const chestnyHistory = reports.find(
     (report) => report.report_type === "chestny_carhistory",
   );
-  return (
-    getObject(chestnyHistory?.summary) ?? getObject(chestnyHistory?.raw_payload)
-  );
+  const otherResolved = history
+    ? { ...getObject(history.summary), ...getObject(history.raw_payload) }
+    : null;
+  const chestnyResolved = chestnyHistory
+    ? { ...getObject(chestnyHistory.summary), ...getObject(chestnyHistory.raw_payload) }
+    : null;
+  const primary = encarResolved ?? otherResolved;
+  if (!primary) return chestnyResolved;
+  if (!chestnyResolved) return primary;
+  return {
+    ...chestnyResolved,
+    ...primary,
+    owner_changed_count: chestnyResolved.owner_changed_count ?? primary.owner_changed_count,
+    loan_count: chestnyResolved.loan_count ?? primary.loan_count,
+    theft_count: chestnyResolved.theft_count ?? primary.theft_count,
+    total_loss_count: chestnyResolved.total_loss_count ?? primary.total_loss_count,
+    flood_part_loss_count: chestnyResolved.flood_part_loss_count ?? primary.flood_part_loss_count,
+    flood_total_loss_count: chestnyResolved.flood_total_loss_count ?? primary.flood_total_loss_count,
+    other_accident_count: chestnyResolved.other_accident_count ?? primary.other_accident_count,
+    my_car_accident_count: primary.my_car_accident_count ?? chestnyResolved.my_car_accident_count,
+    my_car_accident_cost: primary.my_car_accident_cost ?? chestnyResolved.my_car_accident_cost,
+    other_car_accident_cost: primary.other_car_accident_cost ?? chestnyResolved.other_car_accident_cost,
+    accidentHistoryResponse: Array.isArray(primary.accidentHistoryResponse)
+      ? primary.accidentHistoryResponse
+      : [],
+    chestnyAccidentHistoryResponse: Array.isArray(chestnyResolved.accidentHistoryResponse)
+      ? chestnyResolved.accidentHistoryResponse
+      : [],
+  };
 }
 
 
@@ -952,7 +983,10 @@ function buildInsuranceEvents(carHistory: Record<string, unknown> | null) {
   const encarEvents = Array.isArray(carHistory?.accidentHistoryResponse)
     ? carHistory.accidentHistoryResponse
     : [];
-  return [
+  const chestnyEvents = Array.isArray(carHistory?.chestnyAccidentHistoryResponse)
+    ? carHistory.chestnyAccidentHistoryResponse
+    : [];
+  const events = [
     ...ownEvents.map((event) =>
       buildInsuranceEvent(event, "Выплата по этому авто"),
     ),
@@ -960,9 +994,14 @@ function buildInsuranceEvents(carHistory: Record<string, unknown> | null) {
       buildInsuranceEvent(event, "Выплата другому участнику"),
     ),
     ...encarEvents.map((event) => buildInsuranceEvent(event, null)),
-  ]
-    .filter((event): event is InsuranceEvent => Boolean(event))
-    .sort((a, b) => b.date.localeCompare(a.date));
+    ...chestnyEvents.map((event) => buildInsuranceEvent(event, null)),
+  ].filter((event): event is InsuranceEvent => Boolean(event));
+  const unique = new Map<string, InsuranceEvent>();
+  for (const event of events) {
+    const key = [event.date, event.amount, event.wage ?? "", event.component ?? "", event.painting ?? ""].join("|");
+    if (!unique.has(key)) unique.set(key, event);
+  }
+  return [...unique.values()].sort((a, b) => b.date.localeCompare(a.date));
 }
 
 type InsuranceEvent = {
@@ -996,6 +1035,7 @@ function buildInsuranceEvent(
   if (!date || amount === null) return null;
   const eventKind =
     kind ??
+    (typeof record.kind === "string" ? record.kind : null) ??
     translateEncarAccidentType(
       typeof record.accidentType === "string" ? record.accidentType : null,
     );
@@ -1006,7 +1046,9 @@ function buildInsuranceEvent(
     kind: Boolean(record.is_severe_accident)
       ? `${eventKind} · серьёзный случай`
       : eventKind,
-    operations: translateRepairOperations(
+    operations: Array.isArray(record.operations)
+      ? record.operations.filter((value): value is string => typeof value === "string")
+      : translateRepairOperations(
       typeof record.wage_description === "string"
         ? record.wage_description
         : null,
@@ -1035,7 +1077,20 @@ function buildBodyMarks(
   const encarFindings = Array.isArray(rawInspection?.outers)
     ? rawInspection.outers
     : [];
-  const marks = encarFindings.map((finding) => normalizeEncarBodyFinding(finding));
+  const chestny = reports.find((report) => report.report_type === "chestny_inspection");
+  const chestnyRaw = getObject(chestny?.raw_payload);
+  const chestnyFindings = Array.isArray(chestnyRaw?.bodyFindings) ? chestnyRaw.bodyFindings : [];
+  const chestnyMarks = chestnyFindings.map((value) => {
+    const finding = getObject(value);
+    if (!finding || typeof finding.title !== "string") return null;
+    const statuses = Array.isArray(finding.statuses) ? finding.statuses : [];
+    const status = getObject(statuses[0]);
+    const part = encarBodyPart(`${finding.title} ${typeof finding.code === "string" ? finding.code : ""}`);
+    if (!part) return null;
+    const repair = typeof status?.status === "string" ? status.status : "";
+    return { part, repair, impression: repair };
+  });
+  const marks = [...encarFindings.map((finding) => normalizeEncarBodyFinding(finding)), ...chestnyMarks];
 
   return marks
     .map((finding) => {
