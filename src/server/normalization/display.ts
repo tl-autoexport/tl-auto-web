@@ -233,6 +233,10 @@ const INSPECTION_STATUS_MAP: Record<string, string> = {
   부족: "Недостаточно",
   과다: "Выше нормы",
   불량: "Неисправно",
+  교환: "Замена детали",
+  교체: "Замена детали",
+  "교환(교체)": "Замена детали",
+  "교환 (교체)": "Замена детали",
 };
 
 const OPTION_MAP: Array<[string, string]> = [
@@ -501,6 +505,35 @@ export function translateInspectionLabel(value: string | null | undefined) {
 export function translateInspectionStatus(value: string | null | undefined) {
   const text = String(value ?? "").trim();
   return INSPECTION_STATUS_MAP[text] ?? (hasKorean(text) ? null : text || null);
+}
+
+/** Normalize Encar's Korean body-part names to the card's canonical body map keys. */
+export function normalizeEncarBodyPart(value: string | null | undefined) {
+  const normalized = String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+  if (!normalized) return null;
+  const code = normalized.split(/\s+/)[0];
+  const sourceParts: Record<string, string> = {
+    p033: "door_rear_driver",
+    p061: "fender_rear_driver",
+    p181: "rear_panel",
+  };
+  if (sourceParts[code]) return sourceParts[code];
+  const aliases: Array<[string[], string]> = [
+    [["front_bumper", "front bumper", "앞범퍼", "전범퍼"], "front_bumper"],
+    [["rear_bumper", "rear bumper", "back bumper", "뒤범퍼", "후범퍼"], "rear_bumper"],
+    [["hood", "bonnet", "후드", "보닛", "본네트"], "hood"],
+    [["trunk", "boot", "트렁크", "테일게이트"], "trunk"],
+    [["roof", "루프"], "roof"],
+    [["front_fender", "front fender", "프론트 휀더", "프론트휀더", "프론트 펜더", "프론트펜더", "프런트 휀더", "프런트펜더", "앞 휀더", "앞휀더", "전 휀더", "전휀더", "앞휀다", "전휀다"], "fender_front_driver"],
+    [["rear_fender", "rear fender", "뒤휀더", "후휀더", "리어 휀더", "리어펜더", "쿼터"], "fender_rear_driver"],
+    [["front_door", "front door", "앞도어", "전도어", "프론트 도어", "프론트도어"], "door_front_driver"],
+    [["rear_door", "rear door", "뒤도어", "후도어", "리어 도어", "리어도어"], "door_rear_driver"],
+    [["side_sil", "side sill", "rocker", "사이드실", "사이드스텝"], "side_sil_panel_driver"],
+  ];
+  const part = aliases.find(([tokens]) => tokens.some((token) => normalized.includes(token)))?.[1] ?? null;
+  if (!part) return null;
+  if (/\(우\)|우측|오른쪽|right|passenger/.test(normalized)) return part.replace("_driver", "_passenger");
+  return part;
 }
 
 export function translateConditionLabel(value: string | null | undefined) {

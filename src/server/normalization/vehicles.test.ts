@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
-import { translateBrand, translateDrive } from "./display";
+import {
+  normalizeEncarBodyPart,
+  translateBrand,
+  translateDrive,
+  translateInspectionStatus,
+} from "./display";
 import {
   driveTypesCompatible,
   normalizeColor,
@@ -55,6 +60,15 @@ assert.equal(translateDrive("4WD"), "4WD");
 assert.equal(translateDrive("передний-задний"), null);
 assert.equal(translateDrive("неопределено"), null);
 assert.equal(translateDrive(null), null);
+
+// Encar body inspection uses Korean transliterations and side markers. Normalize
+// these to the shared body map and translate the repair status instead of leaking
+// source text into the Russian card.
+assert.equal(normalizeEncarBodyPart("프론트 휀더(우)"), "fender_front_passenger");
+assert.equal(normalizeEncarBodyPart("프론트 휀더(좌)"), "fender_front_driver");
+assert.equal(normalizeEncarBodyPart("P033 리어 도어"), "door_rear_driver");
+assert.equal(translateInspectionStatus("교환(교체)"), "Замена детали");
+assert.equal(translateInspectionStatus("교환"), "Замена детали");
 
 // A reference row that only knows "2WD" must still match a card that states a
 // concrete axle, but must not stretch to full-wheel drive.

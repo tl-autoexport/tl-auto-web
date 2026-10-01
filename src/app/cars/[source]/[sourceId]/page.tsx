@@ -30,6 +30,7 @@ import {
   translateTransmission,
   translateInspectionLabel,
   translateInspectionStatus,
+  normalizeEncarBodyPart,
 } from "@/server/normalization/display";
 import { CarMediaShowcase } from "./CarMediaShowcase";
 import { CarDetailToolbar } from "./CarDetailToolbar";
@@ -411,8 +412,16 @@ function ConditionOverview({
           const type = getObject(finding?.type);
           const statuses = Array.isArray(finding?.statusTypes) ? finding.statusTypes : [];
           const part = encarBodyPart(String(type?.code ?? "") + " " + String(type?.title ?? ""));
-          return <Spec key={index} label={part ? translateBodyPart(part) : translateInspectionLabel(type?.title as string) || String(type?.title ?? "")}
-            value={statuses.map(status => translateInspectionStatus(getObject(status)?.title as string) || String(getObject(status)?.title ?? "")).join(", ")} />;
+          const rawLabel = String(type?.title ?? "");
+          const translatedLabel = translateInspectionLabel(rawLabel);
+          const displayLabel = part
+            ? translateBodyPart(part)
+            : translatedLabel ?? (/[가-힣]/.test(rawLabel) ? "Элемент кузова" : rawLabel);
+          const translatedStatuses = statuses.map(status => {
+            const rawStatus = String(getObject(status)?.title ?? "");
+            return translateInspectionStatus(rawStatus) ?? (/[가-힣]/.test(rawStatus) ? "Указано в отчёте" : rawStatus);
+          }).filter(Boolean);
+          return <Spec key={index} label={displayLabel} value={translatedStatuses.join(", ")} />;
         })}</div>}
         <div className="grid content-start gap-x-6 gap-y-3 text-sm md:grid-cols-2">
           <Spec
@@ -1136,28 +1145,7 @@ function normalizeEncarBodyFinding(value: unknown) {
 }
 
 function encarBodyPart(value: string) {
-  const normalized = value.toLowerCase();
-  const code = normalized.split(/\s+/)[0];
-  const sourceParts: Record<string, string> = {
-    p033: "door_rear_driver",
-    p061: "fender_rear_driver",
-    p181: "rear_panel",
-  };
-  if (sourceParts[code]) return sourceParts[code];
-  const aliases: Array<[string[], string]> = [
-    [["front_bumper", "front bumper", "앞범퍼", "전범퍼"], "front_bumper"],
-    [["rear_bumper", "rear bumper", "back bumper", "뒤범퍼", "후범퍼"], "rear_bumper"],
-    [["hood", "bonnet", "후드", "본네트"], "hood"],
-    [["trunk", "boot", "트렁크", "테일게이트"], "trunk"],
-    [["roof", "루프"], "roof"],
-    [["front_fender", "front fender", "앞휀더", "전휀더"], "fender_front_driver"],
-    [["rear_fender", "rear fender", "뒤휀더", "후휀더", "쿼터"], "fender_rear_driver"],
-    [["front_door", "front door", "앞도어", "전도어"], "door_front_driver"],
-    [["rear_door", "rear door", "뒤도어", "후도어"], "door_rear_driver"],
-    [["side_sil", "side sill", "rocker", "사이드실", "사이드스텝"], "side_sil_panel_driver"],
-  ];
-  const part = aliases.find(([tokens]) => tokens.some((token) => normalized.includes(token)))?.[1] ?? null;
-  return part && /\(우\)|우측|right|passenger/.test(normalized) ? part.replace("_driver", "_passenger") : part;
+  return normalizeEncarBodyPart(value);
 }
 
 function damageCode(record: Record<string, unknown>): BodyMark["code"] {
