@@ -20,8 +20,6 @@ import {
 import {
   categorizeOption,
   carDisplayTitle,
-  translateHeyDealerNote,
-  translateHeyDealerText,
   translateConditionDescription,
   translateConditionLabel,
   translateColor,
@@ -30,11 +28,12 @@ import {
   translateOption,
   translateTrim,
   translateTransmission,
+  translateInspectionLabel,
+  translateInspectionStatus,
 } from "@/server/normalization/display";
 import { CarMediaShowcase } from "./CarMediaShowcase";
 import { CarDetailToolbar } from "./CarDetailToolbar";
 import { InspectionPhotoGallery } from "./InspectionPhotoGallery";
-import type { ThermalEntry, ThermalReference } from "./thermalTypes";
 import { PriceCalculationCard } from "./PriceCalculationCard";
 import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
 import { publicCarPath } from "@/lib/car-url";
@@ -111,21 +110,9 @@ export default async function CarDetailPage({
     car.car_condition_reports ?? [],
   );
   const conditionItems = buildConditionItems(car.car_condition_reports ?? []);
-  const eyeReport = getEyeReport(car.car_condition_reports ?? []);
   const carHistory = getCarHistory(car.car_condition_reports ?? []);
   const imageMedia = (car.car_media ?? []).filter(
     (media) => media.media_type === "image",
-  );
-  const thermalMedia = imageMedia.filter(
-    (media) =>
-      media.category?.startsWith("thermal_") &&
-      media.category !== "thermal_reference",
-  );
-  const thermalReferenceMedia = imageMedia.filter(
-    (media) => media.category === "thermal_reference",
-  );
-  const inspectionRecordMedia = imageMedia.filter(
-    (media) => media.category === "inspection_record",
   );
   const inspectionImages = imageMedia.filter(
     (media) => media.category === "encar_inspection_document",
@@ -205,6 +192,7 @@ export default async function CarDetailPage({
                   value={translateTransmission(car.transmission)}
                 />
                 <Spec label="Цвет" value={translateColor(car.color)} />
+                {typeof car.vehicle_specs?.first_registration_date === "string" && <Spec label="Дата регистрации" value={car.vehicle_specs.first_registration_date} />}
                 {translateTrim(car.trim || car.badge_detail || car.badge) ? <Spec label="Комплектация" value={translateTrim(car.trim || car.badge_detail || car.badge)!} /> : null}
                 {typeof car.vehicle_specs?.seats === "number" && car.vehicle_specs.seats > 0 ? (
                   <Spec label="Места" value={`${car.vehicle_specs.seats} мест`} />
@@ -216,7 +204,6 @@ export default async function CarDetailPage({
               car={car}
               carHistory={carHistory}
               conditionItems={conditionItems}
-              eyeReport={eyeReport}
               reports={car.car_condition_reports ?? []}
             />
 
@@ -278,16 +265,6 @@ function KeyFact({ label, value }: { label: string; value: string }) {
   );
 }
 
-function formatHeyDealerMeasurement(value: string) {
-  const number = Number.parseFloat(value.replaceAll(",", ""));
-  if (!Number.isFinite(number)) return value;
-  if (/km\/ℓ/i.test(value)) {
-    return `${number.toLocaleString("ru-RU", { maximumFractionDigits: 1 })} км/л`;
-  }
-  if (/mm/i.test(value)) return `${rub.format(Math.round(number))} мм`;
-  return value;
-}
-
 function OptionStatusIcon({ present }: { present: boolean | null }) {
   if (present === true) {
     return (
@@ -309,140 +286,6 @@ function OptionStatusIcon({ present }: { present: boolean | null }) {
     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded bg-[#fff4d8] text-[#a56b00]">
       <Minus size={13} strokeWidth={2.5} />
     </span>
-  );
-}
-
-function HeyDealerEquipmentSummary({
-  details,
-  groups,
-}: {
-  details: HeyDealerDetails;
-  groups: ReturnType<typeof buildOptionGroups>;
-}) {
-  const installedGroups = groups
-    .map((group) => ({
-      title: heyDealerGroupTitle(group.title),
-      items: group.items.filter((item) => item.present === true),
-    }))
-    .filter((group) => group.items.length > 0);
-  const installedCount = installedGroups.reduce(
-    (sum, group) => sum + group.items.length,
-    0,
-  );
-  const hasContent = installedCount > 0 || details.hasFactoryContent;
-
-  if (!hasContent) {
-    return (
-      <div className="mt-5 flex items-center gap-3 text-sm text-[#647084]">
-        <ShieldAlert size={18} />
-        Данные о комплектации отсутствуют в источнике.
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-5">
-      {installedCount > 0 && (
-        <>
-          <div className="flex items-center gap-3 text-sm">
-            <span className="font-medium text-[#5f6c80]">Основные опции</span>
-            <span className="h-px flex-1 border-t border-dashed border-[#b8c0cd]" />
-            <strong className="text-lg text-[#121722]">{installedCount}</strong>
-          </div>
-
-          <div className="mt-6 grid gap-x-12 gap-y-7 sm:grid-cols-2">
-            {installedGroups.map((group) => (
-              <section key={group.title}>
-                <h3 className="text-base font-semibold text-[#242b37]">
-                  {group.title}
-                </h3>
-                <ul className="mt-3 grid gap-2 text-sm leading-6 text-[#3a4353]">
-                  {group.items.map((item) => (
-                    <li
-                      className="flex items-start gap-2.5"
-                      key={`${group.title}-${item.name}`}
-                    >
-                      <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#121722]" />
-                      <span>{item.name}</span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-          </div>
-        </>
-      )}
-
-      {(details.factoryDescription.length > 0 ||
-        details.packages.length > 0) && (
-        <div className="mt-7 border-t border-[#e3e7ee] pt-6">
-          <h3 className="text-base font-semibold text-[#242b37]">
-            Заводская комплектация
-          </h3>
-          {details.factoryDescription.length > 0 && (
-            <EquipmentTextList
-              className="mt-3"
-              items={details.factoryDescription}
-            />
-          )}
-          {details.packages.map((item) => (
-            <div className="mt-5" key={`${item.name}-${item.items.join("-")}`}>
-              <h4 className="text-sm font-semibold text-[#242b37]">
-                {item.name}
-              </h4>
-              <EquipmentTextList className="mt-3" items={item.items} />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {details.recommendations.length > 0 && (
-        <div className="mt-7 rounded bg-[#f3f5f8] p-4 md:p-5">
-          <h3 className="text-sm font-semibold text-[#242b37]">
-            Почему автомобиль рекомендуют
-          </h3>
-          <EquipmentTextList className="mt-3" items={details.recommendations} />
-        </div>
-      )}
-
-      {details.inspectorNotes.length > 0 && (
-        <div className="mt-5 border-l-2 border-[#a98239] bg-[#f7fbfa] px-4 py-3">
-          <h3 className="text-sm font-semibold text-[#242b37]">
-            Комментарий инспектора
-          </h3>
-          <EquipmentTextList className="mt-2" items={details.inspectorNotes} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function heyDealerGroupTitle(title: string) {
-  const labels: Record<string, string> = {
-    "Экстерьер и интерьер": "Интерьер и экстерьер",
-    "Комфорт и мультимедиа": "Мультимедиа и комфорт",
-  };
-  return labels[title] ?? title;
-}
-
-function EquipmentTextList({
-  className,
-  items,
-}: {
-  className?: string;
-  items: string[];
-}) {
-  return (
-    <ul
-      className={`grid gap-2 text-sm leading-6 text-[#3a4353] ${className ?? ""}`}
-    >
-      {items.map((item, index) => (
-        <li className="flex items-start gap-2.5" key={`${item}-${index}`}>
-          <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#a98239]" />
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
   );
 }
 
@@ -517,7 +360,6 @@ function ConditionOverview({
   car,
   carHistory,
   conditionItems,
-  eyeReport,
   reports,
 }: {
   car: {
@@ -528,16 +370,22 @@ function ConditionOverview({
   };
   carHistory: Record<string, unknown> | null;
   conditionItems: Array<{ label: string; description: string | null }>;
-  eyeReport: Record<string, unknown> | null;
   reports: Array<{ report_type: string; raw_payload?: unknown }>;
 }) {
-  const accident = getObject(eyeReport?.accident);
-  const exchangeCount = asNumber(accident?.outer_panel_exchange_count);
-  const weldCount = asNumber(accident?.outer_panel_weld_count);
-  const bodyMarks = buildBodyMarks(eyeReport, reports);
+  const bodyMarks = buildBodyMarks(reports);
+  const inspection = reports.find((report) => report.report_type === "encar_inspection");
+  const findings = getObject(getObject(inspection?.raw_payload)?.inspection)?.outers;
+  const countFindings = (code: string) => Array.isArray(findings)
+    ? findings.filter((finding) => {
+        const statuses = getObject(finding)?.statusTypes;
+        return Array.isArray(statuses) && statuses.some((status) => getObject(status)?.code === code);
+      }).length
+    : null;
+  const exchangeCount = countFindings("X");
+  const weldCount = countFindings("W");
   const insuranceEvents = buildInsuranceEvents(carHistory);
   const ownerCount =
-    asNumber(carHistory?.owner_changed_count) ?? car.owners_count;
+    asNumber(carHistory?.owner_changed_count);
   const accidentCount =
     asNumber(carHistory?.my_car_accident_count) ?? car.accident_count;
   const payoutTotal =
@@ -558,10 +406,18 @@ function ConditionOverview({
       </div>
       <div className="mt-4 grid gap-4 sm:gap-5">
         <BodyConditionMap marks={bodyMarks} insuranceEvents={insuranceEvents} />
+        {Array.isArray(findings) && findings.length > 0 && <div className="grid gap-2 text-sm">{findings.map((value, index) => {
+          const finding = getObject(value);
+          const type = getObject(finding?.type);
+          const statuses = Array.isArray(finding?.statusTypes) ? finding.statusTypes : [];
+          const part = encarBodyPart(String(type?.code ?? "") + " " + String(type?.title ?? ""));
+          return <Spec key={index} label={part ? translateBodyPart(part) : translateInspectionLabel(type?.title as string) || String(type?.title ?? "")}
+            value={statuses.map(status => translateInspectionStatus(getObject(status)?.title as string) || String(getObject(status)?.title ?? "")).join(", ")} />;
+        })}</div>}
         <div className="grid content-start gap-x-6 gap-y-3 text-sm md:grid-cols-2">
           <Spec
-            label="Владельцы"
-            value={ownerCount ? String(ownerCount) : "Нет данных"}
+            label="Смены владельца"
+            value={ownerCount !== null ? String(ownerCount) : "Нет данных"}
           />
           <Spec
             label="Страховые случаи"
@@ -587,6 +443,12 @@ function ConditionOverview({
               value={String(nonInsurancePeriods)}
             />
           )}
+          <Spec label="Использование в прокате" value={asNumber(carHistory?.loan_count) === null ? "Нет данных" : Number(carHistory?.loan_count) > 0 ? "Да" : "Нет"} />
+          {Array.isArray(carHistory?.ownerHistoryResponse) && carHistory.ownerHistoryResponse.map((value, index) => {
+            const change = getObject(value);
+            const date = change?.acquisitionDate ?? change?.registrationDate;
+            return typeof date === "string" ? <Spec key={`owner-${index}`} label="Смена владельца" value={date} /> : null;
+          })}
           <Spec
             label="Замена внешних панелей"
             value={
@@ -923,7 +785,7 @@ function buildInspectionGroups(
       const record = getObject(node);
       if (!record) return null;
       const title =
-        typeof record.label_ru === "string" ? record.label_ru : null;
+        typeof record.label_ru === "string" ? record.label_ru : translateInspectionLabel(getObject(record.type)?.title as string);
       const items = flattenInspectionItems(record.children);
       if (!title || !items.length) return null;
       return { title, items };
@@ -937,9 +799,9 @@ function flattenInspectionItems(value: unknown): InspectionItem[] {
     const record = getObject(node);
     if (!record) return [];
     const nested = flattenInspectionItems(record.children);
-    const label = typeof record.label_ru === "string" ? record.label_ru : null;
+    const label = typeof record.label_ru === "string" ? record.label_ru : translateInspectionLabel(getObject(record.type)?.title as string);
     const status =
-      typeof record.status_ru === "string" ? record.status_ru : null;
+      typeof record.status_ru === "string" ? record.status_ru : translateInspectionStatus(getObject(record.statusType)?.title as string);
     const current =
       label && status
         ? [
@@ -1053,145 +915,6 @@ function buildConditionItems(
     .slice(0, 5);
 }
 
-function buildInspectionRecordImages(
-  reports: Array<{ report_type: string; raw_payload?: unknown }>,
-  media: Array<{
-    url: string;
-    thumbnail_url: string | null;
-    category: string | null;
-  }>,
-) {
-  const eye = reports.find((report) => report.report_type === "heydealer_eye");
-  const raw = getObject(eye?.raw_payload);
-  const inspectionRecords = getObject(raw?.inspection_records);
-  const rawImages = Array.isArray(inspectionRecords?.images)
-    ? inspectionRecords.images
-    : [];
-  const fromReport = rawImages
-    .map((item) => {
-      const record = getObject(item);
-      if (!record) return null;
-      const url = typeof record?.url === "string" ? record.url : null;
-      if (!url) return null;
-      return {
-        url,
-        width: asNumber(record.width),
-        height: asNumber(record.height),
-      };
-    })
-    .filter(
-      (
-        item,
-      ): item is { url: string; width: number | null; height: number | null } =>
-        Boolean(item),
-    );
-
-  if (fromReport.length > 0) return fromReport;
-
-  return media.map((item) => ({
-    url: item.thumbnail_url ?? item.url,
-    width: null,
-    height: null,
-  }));
-}
-
-type HeyDealerDetails = {
-  technical: {
-    efficiency: string | null;
-    length: string | null;
-    width: string | null;
-    factoryPriceKrw: number | null;
-  };
-  factoryDescription: string[];
-  packages: Array<{ name: string; items: string[] }>;
-  inspectorNotes: string[];
-  recommendations: string[];
-  hasFactoryContent: boolean;
-};
-
-function buildHeyDealerDetails(
-  reports: Array<{ report_type: string; summary?: unknown }>,
-): HeyDealerDetails {
-  const report = reports.find(
-    (item) => item.report_type === "source_description",
-  );
-  const summary = getObject(report?.summary);
-  const technical = getObject(summary?.technical_specs);
-  const carSpec = getObject(summary?.car_spec);
-  const factoryDescription = translateHeyDealerNote(
-    typeof carSpec?.description === "string" ? carSpec.description : null,
-  );
-  const rawPackages = Array.isArray(carSpec?.option_packages)
-    ? carSpec.option_packages
-    : [];
-  const packages = rawPackages
-    .map((item) => {
-      const record = getObject(item);
-      const rawName = typeof record?.name === "string" ? record.name : null;
-      const translatedName = translateHeyDealerText(rawName);
-      const items = Array.isArray(record?.detail_items)
-        ? record.detail_items
-            .map((entry) =>
-              translateHeyDealerText(typeof entry === "string" ? entry : null),
-            )
-            .filter((entry): entry is string => Boolean(entry))
-        : [];
-      if (!translatedName || !items.length) return null;
-      return {
-        name: translatedName.startsWith("Пакет")
-          ? translatedName
-          : `Пакет «${translatedName}»`,
-        items,
-      };
-    })
-    .filter((item): item is { name: string; items: string[] } => Boolean(item));
-
-  const inspectorNotes = [
-    ...translateHeyDealerNote(
-      typeof summary?.inspector_comment === "string"
-        ? summary.inspector_comment
-        : null,
-    ),
-    ...translateHeyDealerNote(
-      typeof summary?.customer_comment === "string"
-        ? summary.customer_comment
-        : null,
-    ),
-  ].filter((item, index, all) => all.indexOf(item) === index);
-  const recommendations = translateHeyDealerNote(
-    typeof summary?.recommendation_comment === "string"
-      ? summary.recommendation_comment
-      : null,
-  );
-
-  return {
-    technical: {
-      efficiency:
-        typeof technical?.efficiency === "string" ? technical.efficiency : null,
-      length: typeof technical?.length === "string" ? technical.length : null,
-      width: typeof technical?.width === "string" ? technical.width : null,
-      factoryPriceKrw: asNumber(technical?.factory_price_krw),
-    },
-    factoryDescription,
-    packages,
-    inspectorNotes,
-    recommendations,
-    hasFactoryContent:
-      factoryDescription.length > 0 ||
-      packages.length > 0 ||
-      inspectorNotes.length > 0 ||
-      recommendations.length > 0,
-  };
-}
-
-function getEyeReport(
-  reports: Array<{ report_type: string; raw_payload?: unknown }>,
-) {
-  const eye = reports.find((report) => report.report_type === "heydealer_eye");
-  const raw = getObject(eye?.raw_payload);
-  return getObject(raw?.eye_report);
-}
-
 function getCarHistory(
   reports: Array<{
     report_type: string;
@@ -1199,16 +922,15 @@ function getCarHistory(
     raw_payload?: unknown;
   }>,
 ) {
-  const history = reports.find((report) => report.report_type === "carhistory");
-  if (history)
-    return getObject(history.summary) ?? getObject(history.raw_payload);
   const encarHistory = reports.find(
     (report) => report.report_type === "encar_carhistory",
   );
   const encarResolved = (
-    getObject(encarHistory?.raw_payload) ?? getObject(encarHistory?.summary)
+    encarHistory ? { ...getObject(encarHistory.summary), ...getObject(encarHistory.raw_payload) } : null
   );
   if (encarResolved) return encarResolved;
+  const history = reports.find((report) => report.report_type === "carhistory");
+  if (history) return { ...getObject(history.summary), ...getObject(history.raw_payload) };
   // A Chestny history is a separate source: it is used only when no other report
   // exists, and it never overwrites Encar data.
   const chestnyHistory = reports.find(
@@ -1304,12 +1026,8 @@ function translateEncarAccidentType(value: string | null) {
 }
 
 function buildBodyMarks(
-  eyeReport: Record<string, unknown> | null,
   reports: Array<{ report_type: string; raw_payload?: unknown }>,
 ): BodyMark[] {
-  const accident = getObject(eyeReport?.accident);
-  const scan = getObject(accident?.thermographic_scan);
-  const eyeFindings = Array.isArray(scan?.findings) ? scan.findings : [];
   const inspection = reports.find(
     (report) => report.report_type === "encar_inspection",
   );
@@ -1317,9 +1035,7 @@ function buildBodyMarks(
   const encarFindings = Array.isArray(rawInspection?.outers)
     ? rawInspection.outers
     : [];
-  const marks = eyeFindings.length > 0
-    ? eyeFindings
-    : encarFindings.map((finding) => normalizeEncarBodyFinding(finding));
+  const marks = encarFindings.map((finding) => normalizeEncarBodyFinding(finding));
 
   return marks
     .map((finding) => {
@@ -1366,6 +1082,13 @@ function normalizeEncarBodyFinding(value: unknown) {
 
 function encarBodyPart(value: string) {
   const normalized = value.toLowerCase();
+  const code = normalized.split(/\s+/)[0];
+  const sourceParts: Record<string, string> = {
+    p033: "door_rear_driver",
+    p061: "fender_rear_driver",
+    p181: "rear_panel",
+  };
+  if (sourceParts[code]) return sourceParts[code];
   const aliases: Array<[string[], string]> = [
     [["front_bumper", "front bumper", "앞범퍼", "전범퍼"], "front_bumper"],
     [["rear_bumper", "rear bumper", "back bumper", "뒤범퍼", "후범퍼"], "rear_bumper"],
@@ -1378,7 +1101,8 @@ function encarBodyPart(value: string) {
     [["rear_door", "rear door", "뒤도어", "후도어"], "door_rear_driver"],
     [["side_sil", "side sill", "rocker", "사이드실", "사이드스텝"], "side_sil_panel_driver"],
   ];
-  return aliases.find(([tokens]) => tokens.some((token) => normalized.includes(token)))?.[1] ?? null;
+  const part = aliases.find(([tokens]) => tokens.some((token) => normalized.includes(token)))?.[1] ?? null;
+  return part && /\(우\)|우측|right|passenger/.test(normalized) ? part.replace("_driver", "_passenger") : part;
 }
 
 function damageCode(record: Record<string, unknown>): BodyMark["code"] {
@@ -1421,6 +1145,7 @@ const BODY_PART_POSITIONS: Record<string, { x: number; y: number }> = {
   roof: { x: 50, y: 50 },
   front_bumper: { x: 50, y: 7 },
   rear_bumper: { x: 50, y: 93 },
+  rear_panel: { x: 50, y: 88 },
 };
 
 function translateBodyPart(part: string) {
@@ -1440,6 +1165,7 @@ function translateBodyPart(part: string) {
     roof: "крыша",
     front_bumper: "передний бампер",
     rear_bumper: "задний бампер",
+    rear_panel: "задняя панель кузова",
   };
   return labels[part] ?? part.replaceAll("_", " ");
 }
@@ -1511,117 +1237,6 @@ function translateRepairOperation(value: string) {
     )
     .trim();
   return /[가-힣]/.test(result) ? null : result;
-}
-
-function buildEyeSummary(eyeReport: Record<string, unknown> | null) {
-  const accident = getObject(eyeReport?.accident);
-  const summary =
-    typeof accident?.accident_repairs_summary === "string"
-      ? accident.accident_repairs_summary
-      : null;
-  const exchangeCount = asNumber(accident?.outer_panel_exchange_count);
-  const repairCount = asNumber(accident?.outer_panel_weld_count);
-
-  return {
-    accidentSummary: translateAccidentSummary(summary),
-    exchangeCount,
-    repairCount,
-  };
-}
-
-function translateAccidentSummary(summary: string | null) {
-  if (summary === "complete_no_accident") return "Полностью без ДТП";
-  if (summary === "simple_repair") return "Косметический ремонт";
-  if (summary === "accident") return "Есть история ДТП";
-  return "Нет данных";
-}
-
-function buildThermalInspection(
-  eyeReport: Record<string, unknown> | null,
-  thermalMedia: Array<{
-    url: string;
-    category: string | null;
-    thumbnail_url: string | null;
-  }>,
-  thermalReferenceMedia: Array<{
-    url: string;
-    category: string | null;
-    thumbnail_url: string | null;
-  }>,
-): { entries: ThermalEntry[]; references: ThermalReference[] } {
-  const accident = getObject(eyeReport?.accident);
-  const scan = getObject(accident?.thermographic_scan);
-  const resultImages = Array.isArray(scan?.result_images)
-    ? scan.result_images
-    : [];
-  const entries = resultImages
-    .map((item) => {
-      const record = getObject(item);
-      if (!record) return null;
-      const url =
-        typeof record?.image_url === "string" ? record.image_url : null;
-      if (!url) return null;
-      return {
-        url,
-        type: typeof record.type === "string" ? record.type : "thermal",
-        width: asNumber(record.image_width),
-        height: asNumber(record.image_height),
-        boxes: buildThermalBoxes(record.boxes),
-      };
-    })
-    .filter((item): item is ThermalEntry => Boolean(item));
-
-  const fallbackEntries =
-    entries.length > 0
-      ? []
-      : thermalMedia.map((media) => ({
-          url: media.url,
-          type: media.category ?? "thermal",
-          width: null,
-          height: null,
-          boxes: [],
-        }));
-
-  const outsideImages = Array.isArray(scan?.outside_images)
-    ? scan.outside_images
-    : [];
-  const referencesFromReport = outsideImages
-    .map((item) => {
-      const record = getObject(item);
-      return typeof record?.image_url === "string"
-        ? { url: record.image_url }
-        : null;
-    })
-    .filter((item): item is ThermalReference => Boolean(item));
-  const fallbackReferences = referencesFromReport.length
-    ? []
-    : thermalReferenceMedia.map((media) => ({ url: media.url }));
-
-  return {
-    entries: entries.length ? entries : fallbackEntries,
-    references: referencesFromReport.length
-      ? referencesFromReport
-      : fallbackReferences,
-  };
-}
-
-function buildThermalBoxes(value: unknown): ThermalEntry["boxes"] {
-  if (!Array.isArray(value)) return [];
-  return value
-    .map((item) => {
-      const record = getObject(item);
-      const rawBox = Array.isArray(record?.box) ? record.box : [];
-      if (
-        rawBox.length !== 4 ||
-        rawBox.some((part) => typeof part !== "number")
-      )
-        return null;
-      return {
-        part: typeof record?.part === "string" ? record.part : null,
-        box: rawBox as [number, number, number, number],
-      };
-    })
-    .filter((item): item is ThermalEntry["boxes"][number] => Boolean(item));
 }
 
 function getObject(value: unknown): Record<string, unknown> | null {

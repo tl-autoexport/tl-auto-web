@@ -22,6 +22,7 @@ import {
   translateTransmission,
 } from "@/server/normalization/display";
 import { encarClient } from "@/server/imports/encar-client";
+import { mapEncarOpenHistory } from "@/server/imports/encar-history";
 import { mapChoiceOptions, mapStandardOptions, type EncarOptionCatalog, type EncarOptionRow } from "@/server/imports/encar-options";
 
 export { mapStandardOptions } from "@/server/imports/encar-options";
@@ -197,6 +198,7 @@ type EncarHistoryAccident = {
 };
 
 type EncarHistoryPayload = {
+  recordOpen?: EncarRecordOpenPayload;
   releaseResponse?: {
     registerDate?: string | null;
     firstRegisterDate?: string | null;
@@ -215,6 +217,9 @@ type EncarHistoryPayload = {
 };
 
 type EncarRecordOpenPayload = {
+  ownerChangeCnt?: number;
+  loan?: number;
+  firstDate?: string;
   openData?: boolean;
   carNo?: string | null;
   accidents?: Array<{
@@ -537,6 +542,7 @@ function normalizeRecordOpenPayload(
   const owners = (payload.ownerChanges ?? []).map((date) => ({ date }));
   return {
     accidentHistoryResponse: accidents,
+    recordOpen: payload,
     nonInsurancePeriodResponse: periods,
     ownerHistoryResponse: owners,
   };
@@ -638,12 +644,13 @@ export async function fetchStandardOptionCatalog() {
 
 async function fetchChoiceOptions(
   vehicleId: string,
+  selectedCodes?: Array<string | number>,
 ): Promise<EncarOptionRow[]> {
   const url = `https://api.encar.com/v1/readside/vehicles/car/${vehicleId}/options/choice`;
   try {
     const data =
       await fetchJson<Array<{ optionName?: string; price?: number }>>(url, 1);
-    return mapChoiceOptions(data);
+    return mapChoiceOptions(data, selectedCodes);
   } catch {
     return [];
   }
@@ -760,18 +767,19 @@ function sanitizeHistoryAccident(event: EncarHistoryAccident) {
 }
 
 function sanitizeNonInsurancePeriod(value: Record<string, unknown>) {
+  const period = typeof value.period === "string" ? value.period.split("~") : [];
   return {
     startDate:
       nullableText(value.startDate) ??
       nullableText(value.beginDate) ??
-      nullableText(value.fromDate),
-    endDate: nullableText(value.endDate) ?? nullableText(value.toDate),
+      nullableText(value.fromDate) ?? nullableText(period[0]),
+    endDate: nullableText(value.endDate) ?? nullableText(value.toDate) ?? nullableText(period[1]),
   };
 }
 
 function sanitizeOwnerHistory(value: Record<string, unknown>) {
   return {
-    acquisitionDate: nullableText(value.acquisitionDate),
+    acquisitionDate: nullableText(value.acquisitionDate) ?? nullableText(value.date),
     endDate: nullableText(value.endDate),
     registrationDate: nullableText(value.registrationDate),
     transferType: nullableText(value.transferType),
@@ -783,6 +791,8 @@ function sanitizeOwnerHistory(value: Record<string, unknown>) {
 export function buildEncarHistoryReport(
   payload: EncarHistoryPayload,
 ): EncarConditionReport {
+  const open = payload.recordOpen && mapEncarOpenHistory(payload.recordOpen as Record<string, unknown>);
+  if (open) return { source: "encar", report_type: "encar_carhistory", ...open };
   const accidents = (payload.accidentHistoryResponse ?? []).map(
     sanitizeHistoryAccident,
   );
@@ -806,10 +816,15 @@ export function buildEncarHistoryReport(
       insurance_payout_total_krw: payoutTotalKrw,
       non_insurance_period_count: nonInsurancePeriods.length,
       owner_history_count: ownerHistory.length,
+      owner_changed_count: payload.recordOpen?.ownerChangeCnt ?? ownerHistory.length,
+      loan_count: payload.recordOpen?.loan ?? null,
     },
     items: accidents,
     raw_payload: {
       accidentHistoryResponse: accidents,
+      ownerHistoryResponse: ownerHistory,
+      nonInsurancePeriodResponse: nonInsurancePeriods,
+      recordOpen: payload.recordOpen ?? null,
     },
   };
 }
@@ -822,7 +837,7 @@ async function fetchEnrichment(
 ) {
   let inspectionError: string | null = null;
   const [choiceOptions, inspectionResult, diagnosis] = await Promise.all([
-    fetchChoiceOptions(vehicleId),
+    fetchChoiceOptions(vehicleId, (detail?.raw as { options?: { choice?: string[] } } | undefined)?.options?.choice),
     hasInspection || detail?.inspectionFormats.length
       ? fetchInspection(vehicleId).catch((error) => {
           inspectionError =
@@ -1118,7 +1133,7 @@ async function mapCar(
       year,
       registration_year: year,
       registration_month: month,
-      registration_date: null,
+      registration_date: historyResult.status === "available" ? historyResult.payload.recordOpen?.firstDate ?? null : null,
       mileage_km: listCar.Mileage ?? null,
       price_krw: priceKrw || null,
       price_rub: calc ? Math.round(calc.totalRub) : null,

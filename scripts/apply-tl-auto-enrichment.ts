@@ -85,7 +85,8 @@ function inspectionReport(carId: string, payload: Obj) {
 function options(carId: string, payload: Obj, catalog: EncarOptionCatalog) {
   const detail = obj(payload.detail);
   const codes = Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).map(String) : [];
-  return mapEncarOptions(catalog, codes, payload.choiceOptions)
+  const selected = obj(detail.options).choice;
+  return mapEncarOptions(catalog, codes, payload.choiceOptions, Array.isArray(selected) ? selected.map(String) : undefined)
     .filter((option) => option.name_ru || option.name_original)
     .map((option) => ({ car_id: carId, source: "encar", ...option }));
 }

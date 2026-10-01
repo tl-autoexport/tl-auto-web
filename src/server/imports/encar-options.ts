@@ -72,7 +72,7 @@ export function mapStandardOptions(
     const sourceCode = code(option.optionCd);
     const selectedSubOption = selectedOptionNames(option, selectedCodes);
     const present = Boolean(
-      (sourceCode && selectedCodes.has(sourceCode)) ||
+      (!(option.subOptions?.length) && sourceCode && selectedCodes.has(sourceCode)) ||
       (option.subOptions ?? []).some((subOption) => {
         const optionCode = code(subOption.optionCd);
         return optionCode != null && selectedCodes.has(optionCode);
@@ -89,34 +89,36 @@ export function mapStandardOptions(
       price_krw: null,
       description_original: option.description ?? null,
       description_ru: null,
-      is_present: normalizedCodes.length ? present : null,
+      is_present: present,
       sort_order: option.sort ?? index,
     };
   });
 }
 
 /** Map Encar's optional choice list. */
-export function mapChoiceOptions(value: unknown): EncarOptionRow[] {
+export function mapChoiceOptions(value: unknown, selectedCodes?: Array<string | number>): EncarOptionRow[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((raw, index) => {
     if (!raw || typeof raw !== "object" || Array.isArray(raw)) return [];
-    const option = raw as { optionName?: unknown; price?: unknown };
+    const option = raw as { optionName?: unknown; price?: unknown; optionCd?: string | number; description?: string };
     const original = typeof option.optionName === "string" && option.optionName.trim()
       ? option.optionName.trim()
       : null;
     if (!original) return [];
-    const translated = translateOption(original);
+    const translated = translateOption(original) ?? ({
+      "컨비니언스": "Пакет Convenience", "컴포트": "Пакет Comfort", "스타일": "Пакет Style",
+    } as Record<string,string>)[original] ?? null;
     return [{
       category: categorizeOption(original, translated),
-      source_code: null,
+      source_code: code(option.optionCd),
       name_original: original,
       name_ru: translated,
       value_original: null,
       value_ru: null,
       price_krw: typeof option.price === "number" && Number.isFinite(option.price) ? option.price : null,
-      description_original: null,
+      description_original: option.description ?? null,
       description_ru: null,
-      is_present: true,
+      is_present: selectedCodes === undefined ? null : selectedCodes.map(String).includes(String(option.optionCd)),
       sort_order: 1000 + index,
     }];
   });
@@ -127,9 +129,10 @@ export function mapEncarOptions(
   catalog: EncarOptionCatalog,
   installedCodes: Array<string | number>,
   choiceOptions: unknown,
+  selectedChoiceCodes?: Array<string | number>,
 ): EncarOptionRow[] {
-  const standard = mapStandardOptions(catalog, installedCodes).filter((row) => row.is_present === true);
-  const choices = mapChoiceOptions(choiceOptions);
+  const standard = mapStandardOptions(catalog, installedCodes);
+  const choices = mapChoiceOptions(choiceOptions, selectedChoiceCodes);
   const seen = new Set<string>();
   return [...standard, ...choices].filter((row) => {
     const key = `${row.category.toLocaleLowerCase()}|${(row.name_original ?? "").trim().toLocaleLowerCase()}|${row.price_krw ?? ""}`;

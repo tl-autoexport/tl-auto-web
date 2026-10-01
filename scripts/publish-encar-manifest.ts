@@ -78,7 +78,8 @@ function gallery(payload: Obj) {
 function choiceOptions(payload: Obj, catalog: Awaited<ReturnType<typeof fetchStandardOptionCatalog>>) {
   const detail = obj(payload.detail);
   const codes = Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).map(String) : [];
-  return mapEncarOptions(catalog, codes, payload.choiceOptions);
+  const selected = obj(detail.options).choice;
+  return mapEncarOptions(catalog, codes, payload.choiceOptions, Array.isArray(selected) ? selected.map(String) : undefined);
 }
 
 function inspectionReport(payload: Obj) {
