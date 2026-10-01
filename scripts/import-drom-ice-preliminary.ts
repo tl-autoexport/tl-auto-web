@@ -14,7 +14,7 @@ config({ path: ".env", quiet: true });
 const manifestPath = process.env.DROM_ICE_MANIFEST ?? "data/power/drom-ice-gasd-lpg-201-preliminary-v1.json";
 const write = process.env.DROM_ICE_PRELIMINARY_WRITE === "true";
 const dbUrl = process.env.SUPABASE_DB_URL;
-const verificationRunId = "bd5481a2-04a1-458a-810a-30c3ae130fc5";
+const verificationRunId = process.env.DROM_ICE_VERIFICATION_RUN_ID ?? "bd5481a2-04a1-458a-810a-30c3ae130fc5";
 const PS_TO_KW = 0.73549875;
 
 type ManifestRecord = {
@@ -22,10 +22,11 @@ type ManifestRecord = {
   model: string;
   year: number;
   engineCc: number;
-  fuelType: "gasoline" | "lpg";
+  fuelType: "gasoline" | "diesel" | "lpg";
   powerPs: number;
   listingIds: string[];
   sourceUrl: string;
+  sourceTitle?: string;
   note: string;
 };
 
@@ -56,17 +57,31 @@ function specKey(row: ManifestRecord) {
 function normalizedFuel(snapshotFuel: unknown): string {
   const value = String(snapshotFuel ?? "").toLowerCase();
   if (value.includes("lpg") || value.includes("газ")) return "lpg";
+  if (value.includes("diesel") || value.includes("диз")) return "diesel";
   if (value.includes("gasoline") || value.includes("бензин")) return "gasoline";
   return value;
 }
 
+function normalizedModel(value: unknown): string {
+  return String(value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function modelMatches(recordModel: string, snapshotModel: unknown, category: Record<string, any>): boolean {
+  const expected = recordModel.replace(/\s+(?:w|f|g|u|x)\d+\b.*$/i, "").replace(/\s+n$/i, "").trim();
+  const expectedNormalized = normalizedModel(expected);
+  const observed = [snapshotModel, category.modelGroupEnglishName, category.modelName]
+    .map(normalizedModel)
+    .filter(Boolean);
+  return observed.some((model) => model.includes(expectedNormalized) || expectedNormalized.includes(model));
+}
+
 async function main() {
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as Manifest;
-  if (manifest.version !== "drom-ice-gasd-lpg-201-preliminary-v1" || manifest.status !== "preliminary_only_not_approved_tks_evidence") {
+  if (!manifest.version.startsWith("drom-ice-gasd-lpg-201-preliminary-v") || manifest.status !== "preliminary_only_not_approved_tks_evidence") {
     throw new Error("Unexpected manifest version/status; refusing import");
   }
   const ids = manifest.records.flatMap((row) => row.listingIds.map(String));
-  if (ids.length !== manifest.candidateListingCount || new Set(ids).size !== ids.length || ids.length !== 14) {
+  if (!manifest.runIds.includes(verificationRunId) || ids.length !== manifest.candidateListingCount || new Set(ids).size !== ids.length) {
     throw new Error(`Manifest ID/count check failed: ${ids.length}`);
   }
   if (!dbUrl) throw new Error("SUPABASE_DB_URL is required for Encar evidence preflight");
@@ -99,7 +114,7 @@ async function main() {
           throw new Error(`Encar identity mismatch for ${id}: year=${actualYear}, fuel=${actualFuel}, cc=${actualCc}; expected ${record.year}/${record.fuelType}/${record.engineCc}`);
         }
         const snapshotModel = String(snapshot.model ?? "").toLowerCase();
-        if (!snapshotModel.includes(record.model.toLowerCase()) && !(record.model === "SM6" && snapshotModel.includes("sm6"))) {
+        if (!modelMatches(record.model, snapshot.model, category) && !(record.model === "SM6" && snapshotModel.includes("sm6"))) {
           throw new Error(`Encar model mismatch for ${id}: ${snapshot.model} != ${record.model}`);
         }
         const badge = String(category.gradeEnglishName ?? category.gradeName ?? "").trim();
@@ -140,7 +155,7 @@ async function main() {
         listingIds: row.listingIds, trims: row.listingEvidence.map((x) => ({ id: x.listingId, yearMonth: x.yearMonth, badge: x.badge })),
         sourceUrl: row.sourceUrl,
       })),
-      policy: "Drom-derived preliminary ICE evidence is inserted as draft only; draft specs are excluded from approved resolution and publication.",
+      policy: "Manually researched preliminary ICE evidence is inserted as draft only; draft specs are excluded from approved resolution and publication.",
     };
 
     if (!write) {
@@ -153,7 +168,7 @@ async function main() {
       const manifestHash = sha(JSON.stringify(manifest));
       const batch = await db.query<{ id: string }>(
         `insert into public.vehicle_power_source_batches(source_kind,source_name,source_sha256,source_version,imported_by,metadata)
-         values ('manual','Drom Korean ICE/LPG preliminary candidates',$1,$2,'drom-ice-preliminary-import-v1',$3::jsonb)
+         values ('manual','Korean-market ICE preliminary candidates',$1,$2,'manual-ice-preliminary-import-v2',$3::jsonb)
          on conflict (source_kind,source_sha256) do update set metadata=excluded.metadata returning id`,
         [manifestHash, manifest.version, JSON.stringify({ status: "draft_only", configurations: verified.length, listings: ids.length })],
       );
@@ -173,11 +188,11 @@ async function main() {
              (batch_id,source_row_id,source_kind,source_uri,document_reference,source_title,source_retrieved_at,captured_at,
               vehicle_category,brand,model,trim,fuel_type,production_year_from,production_year_to,propulsion_type,
               dvs_power_kw,source_units,reliability,review_status,verification_status,review_note,evidence_note)
-           values ($1,$2,'manual',$3,$4,'Drom Korean-market catalog',now(),current_date,'M1',$5,$6,$7,$8,$9,$9,'ice',$10,'PS','medium','draft','draft',$11,$11)
+           values ($1,$2,'manual',$3,$4,$5,now(),current_date,'M1',$6,$7,$8,$9,$10,$10,'ice',$11,'PS','medium','draft','draft',$12,$12)
            returning id`,
-          [batchId, raw.rows[0]?.id, row.sourceUrl, `Encar listings ${row.listingIds.join(", ")}`, row.brand, row.model,
+          [batchId, raw.rows[0]?.id, row.sourceUrl, `Encar listings ${row.listingIds.join(", ")}`, row.sourceTitle ?? "Drom Korean-market catalog", row.brand, row.model,
             row.listingEvidence.map((x) => x.badge).filter((v, i, a) => a.indexOf(v) === i).join(" / "), row.fuelType, row.year, kw,
-            `Preliminary secondary-source match only. Drom rated engine output ${row.powerPs} PS (${kw} kW); not an official TKS/OTTS confirmation. Run-scoped IDs: ${row.listingIds.join(", ")}.`],
+            `Preliminary source match only. ${row.sourceTitle ?? "Drom Korean-market catalog"} reports engine output ${row.powerPs} PS (${kw} kW); not an official TKS/OTTS confirmation. Run-scoped IDs: ${row.listingIds.join(", ")}.`],
         );
         const spec = await db.query<{ id: string }>(
           `insert into public.vehicle_power_specs

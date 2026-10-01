@@ -1,0 +1,503 @@
+{
+  "version": "drom-ice-gasd-lpg-201-preliminary-v2",
+  "runIds": [
+    "bd5481a2-04a1-458a-810a-30c3ae130fc5"
+  ],
+  "status": "preliminary_only_not_approved_tks_evidence",
+  "scope": "Drom Korean-market ICE/LPG candidate power matches for the 201-listing gasoline/diesel/LPG Encar run. Draft evidence only.",
+  "candidateListingCount": 44,
+  "records": [
+    {
+      "brand": "Renault Korea",
+      "model": "QM6",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "lpg",
+      "powerPs": 140,
+      "listingIds": [
+        "42708180",
+        "42739952",
+        "42818013"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/renault_samsung/qm6/2022/",
+      "note": "Drom Korean-market QM6 HZG 2.0 LPG, engine M4RV, 140 PS. Model/year/displacement/fuel/2WD align with the run group. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Renault Korea",
+      "model": "QM6",
+      "year": 2021,
+      "engineCc": 1998,
+      "fuelType": "lpg",
+      "powerPs": 140,
+      "listingIds": [
+        "42805444"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/renault_samsung/qm6/2021/",
+      "note": "Drom Korean-market QM6 HZG 2.0 LPG, engine M4RV, 140 PS. Model/year/displacement/fuel/2WD align with the run group. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Renault Korea",
+      "model": "SM6",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "lpg",
+      "powerPs": 140,
+      "listingIds": [
+        "42759403"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/renault_samsung/sm6/513036/",
+      "note": "Drom Korean-market SM6 LFD 2.0 LPG, engine M4RV, 140 PS. Listing group matches model/year/displacement/fuel; drive was not supplied in the no-match export. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2021,
+      "engineCc": 2999,
+      "fuelType": "lpg",
+      "powerPs": 235,
+      "listingIds": [
+        "42728435",
+        "42804250"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/grandeur/2021/",
+      "note": "Drom Korean-market Grandeur IG 3.0 LPG, engine L6DB, 235 PS. Run group matches model/year/displacement/fuel. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Staria",
+      "year": 2021,
+      "engineCc": 3470,
+      "fuelType": "lpg",
+      "powerPs": 240,
+      "listingIds": [
+        "42800725"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/staria/specs/engine_capacity/",
+      "note": "Drom Korean-market Staria US4 3.5 LPG, engine L6DC, 240 PS. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Staria",
+      "year": 2023,
+      "engineCc": 3470,
+      "fuelType": "lpg",
+      "powerPs": 240,
+      "listingIds": [
+        "42805932",
+        "42813180"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/staria/2023/",
+      "note": "Drom Korean-market Staria US4 3.5 LPG, engine L6DC, 240 PS. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Staria",
+      "year": 2025,
+      "engineCc": 3470,
+      "fuelType": "lpg",
+      "powerPs": 240,
+      "listingIds": [
+        "42800078"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/staria/2025/",
+      "note": "Drom Korean-market Staria US4 3.5 LPG, engine L6DC, 240 PS. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Renault Korea",
+      "model": "XM3",
+      "year": 2021,
+      "engineCc": 1332,
+      "fuelType": "gasoline",
+      "powerPs": 152,
+      "listingIds": [
+        "42804369"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/renault_samsung/xm3/2022/",
+      "note": "Drom Korean-market XM3 LJL 1.3 TCe260, engine H5Ht, 152 PS; specification spans production starting 2020. Run group matches model/year/displacement/fuel. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "Renault Korea",
+      "model": "XM3",
+      "year": 2022,
+      "engineCc": 1332,
+      "fuelType": "gasoline",
+      "powerPs": 152,
+      "listingIds": [
+        "42734612",
+        "42786633"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/renault_samsung/xm3/2022/",
+      "note": "Drom Korean-market XM3 LJL 1.3 TCe260, engine H5Ht, 152 PS. Run group matches model/year/displacement/fuel. Preliminary secondary-source match; not yet imported into calculation references."
+    },
+    {
+      "brand": "BMW",
+      "model": "X2 (F39)",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 192,
+      "listingIds": [
+        "42718238"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x2/2023/",
+      "note": "Korea section: first-generation X2 xDrive20i DCT M Sport, B48A20M1, F39/YH31, 192 PS; production range includes this listing's 2022 model-year configuration. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "BMW",
+      "model": "2-Series",
+      "year": 2026,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 204,
+      "listingIds": [
+        "42760321"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/2-series/2026/",
+      "note": "Korea-market 220i DCT M Sport, B48B20R, F74, 204 PS; listing badge is 220 M Sport Design and engine volume matches. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "BMW",
+      "model": "4 Series",
+      "year": 2025,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 190,
+      "listingIds": [
+        "42794942",
+        "42814711"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/4-series/2025/",
+      "note": "Korea-market G22/G23/G26 420i, B48B20M0, 190 PS; both run rows identify 420i 2.0 configurations, including convertible/Gran Coupe body variants. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "BMW",
+      "model": "4 Series",
+      "year": 2026,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 190,
+      "listingIds": [
+        "42815437"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/4-series/2025/",
+      "note": "Korea-market 420i, 2.0 turbo, 190 PS; listing is a 2026 420i body variant in the same listed generation/engine family. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2024,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 381,
+      "listingIds": [
+        "42792851"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x5/2024/",
+      "note": "Korea section: G05 xDrive40i AT M Sport, B58B30M2, 381 PS; unlike the M Sport Pro row, this trim is not marked hybrid on the cited Korea page. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2025,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 381,
+      "listingIds": [
+        "42709872"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x5/2025/",
+      "note": "Korea section: G05 xDrive40i AT M Sport, B58B30M2, 381 PS; M Sport Pro is separately classified as hybrid by Drom and is not the proposed trim. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "BMW",
+      "model": "X6",
+      "year": 2025,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 381,
+      "listingIds": [
+        "42742135"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x6/2024/",
+      "note": "Korea-market G06 xDrive40i AT M Sport, B58B30M2, 381 PS, production from 03.2023. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "BMW",
+      "model": "X6",
+      "year": 2023,
+      "engineCc": 2993,
+      "fuelType": "diesel",
+      "powerPs": 286,
+      "listingIds": [
+        "42810563"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x6/2024/",
+      "note": "Korea-market G06 xDrive30d AT M Sport, B57D30, 286 PS, production from 03.2023. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "BMW",
+      "model": "X6",
+      "year": 2026,
+      "engineCc": 2993,
+      "fuelType": "diesel",
+      "powerPs": 286,
+      "listingIds": [
+        "42800518"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x6/2024/",
+      "note": "Korea-market G06 xDrive30d AT M Sport, B57D30, 286 PS; source's stated period covers the listing model year. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "BMW",
+      "model": "5 Series",
+      "year": 2026,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 258,
+      "listingIds": [
+        "42814308"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/5-series/2026/",
+      "note": "Korea-market G60 530i AT xDrive, B48B20, 258 PS; run identity is 2.0 gasoline and AWD. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Genesis",
+      "model": "G80",
+      "year": 2025,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 304,
+      "listingIds": [
+        "42760813",
+        "42801914"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/g80/2025/",
+      "note": "Korea-market RG3 2.5 T-GDI AWD Black, G4KR, 304 PS; Korean production range for Black begins 01.2025. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Genesis",
+      "model": "G80",
+      "year": 2021,
+      "engineCc": 3470,
+      "fuelType": "gasoline",
+      "powerPs": 380,
+      "listingIds": [
+        "42817975"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/g80/2021/",
+      "note": "Korea-market RG3 3.5 T-GDI 2WD, G6DS, 380 PS; listing's 3,470 cc and rear-drive identity align. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Genesis",
+      "model": "GV70",
+      "year": 2026,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 304,
+      "listingIds": [
+        "42712076"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/gv70/2026/",
+      "note": "Korea-market JK1 2.5 AT 2WD, G4KR, 304 PS; listing is 2.5T, 2WD. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Genesis",
+      "model": "GV70",
+      "year": 2026,
+      "engineCc": 3470,
+      "fuelType": "gasoline",
+      "powerPs": 380,
+      "listingIds": [
+        "42734302"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/gv70/2026/",
+      "note": "Korea-market JK1 3.5 AT 4WD, G6DS, 380 PS; listing is 3.5T AWD. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Genesis",
+      "model": "GV70",
+      "year": 2023,
+      "engineCc": 3470,
+      "fuelType": "gasoline",
+      "powerPs": 380,
+      "listingIds": [
+        "42813753"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/gv70/2023/",
+      "note": "Korea-market pre-facelift JK1 3.5T AWD, G6DS, 380 PS; listing's year and 3,470 cc align. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Genesis",
+      "model": "GV80",
+      "year": 2026,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 304,
+      "listingIds": [
+        "42730308"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/gv80/2026/",
+      "note": "JX1 facelift 2.5T AWD, G4KR, 304 PS; listing is 2.5 gasoline AWD. Korea market trim should be checked during Encar detail preflight. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "year": 2022,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 281,
+      "listingIds": [
+        "42736078"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/santa_fe/2022/",
+      "note": "Korea-market TM 2.5 T-GDI 2WD, G4KP, 281 PS, from 12.2021; listing identity is 2.5 gasoline 2WD. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "year": 2021,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 281,
+      "listingIds": [
+        "42809102"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/santa_fe/2021/",
+      "note": "Korea-market TM 2.5 T-GDI AWD, G4KP, 281 PS; matches the listing's 2.5 gasoline AWD identity. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "year": 2022,
+      "engineCc": 2151,
+      "fuelType": "diesel",
+      "powerPs": 194,
+      "listingIds": [
+        "42797041"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/santa_fe/2022/",
+      "note": "Korea-market TM 2.2 CRDi 2WD DCT, D4HE, 194 PS; Korean production period begins 12.2021, matching this 2022 listing configuration. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Elantra",
+      "year": 2021,
+      "engineCc": 1591,
+      "fuelType": "lpg",
+      "powerPs": 120,
+      "listingIds": [
+        "42734076"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/elantra/2022/",
+      "note": "CN7 Korean-market LPi 1.6, 1,591 cc, 120 PS; listed trim is 1.6 LPi Style. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Elantra",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 280,
+      "listingIds": [
+        "42740712"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/elantra/2022/",
+      "note": "CN7 N 2.0 T-GDI, G4KH, 280 PS; matches the 1,998 cc Elantra N configuration. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Elantra",
+      "year": 2021,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 280,
+      "listingIds": [
+        "42782935"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/elantra/2022/",
+      "note": "CN7 N 2.0 T-GDI, G4KH, 280 PS; model generation and engine configuration span the listing's 2021 model year. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "GLB",
+      "year": 2026,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 224,
+      "listingIds": [
+        "42723064"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/glb/2026/",
+      "note": "Korea-market X247 GLB 250 4MATIC, M260, 224 PS, production from 07.2023; listing trim/drive/volume align. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "year": 2021,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 211,
+      "listingIds": [
+        "42707711"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/e-class/2021/",
+      "note": "Korea-market W213 E250 AT Avantgarde/Exclusive/AMG Line, M274, 211 PS, production 06.2020–08.2023; listing is 2.0 gasoline E250, rear-wheel drive. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "year": 2023,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 211,
+      "listingIds": [
+        "42748717"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/e-class/2021/",
+      "note": "Korea-market W213 E250, M274, 211 PS; documented production range 06.2020–08.2023 includes the listing's 2023 model year. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "year": 2023,
+      "engineCc": 1993,
+      "fuelType": "diesel",
+      "powerPs": 200,
+      "listingIds": [
+        "42777215"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/e-class/g_2020_21337/",
+      "note": "Korea-market W213 E220d 4MATIC, OM654 M, 200 PS from 03.2022 through 08.2023; the earlier 194 PS version ended 01.2022. Listing year is 2023, 1,993 cc diesel AWD. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "E-Class",
+      "year": 2023,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 299,
+      "listingIds": [
+        "42804891",
+        "42809856"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/e-class/g_2020_21337/",
+      "note": "Korea-market W213 E350 4MATIC, M264, 299 PS, production 06.2020–08.2023; exact run grouping is 1,991 cc gasoline AWD E350. Preliminary Drom secondary-source evidence only; draft only, not an approved TKS value."
+    }
+  ],
+  "notIncluded": [
+    {
+      "brand": "Hyundai",
+      "model": "Solati",
+      "year": 2024,
+      "engineCc": 2497,
+      "fuelType": "diesel",
+      "listingIds": [
+        "42798537"
+      ],
+      "candidatePowerPs": 170,
+      "sourceUrl": "https://www.hyundai.com/kr/ko/c/products/bus/solati",
+      "reason": "Hyundai Korea's current Solati material gives 170 PS / 2,497 cc, but the retrieved catalog is model year 2026, not the exact 2024 listing. Keep out of the 14-count until same-version/year applicability is confirmed."
+    }
+  ],
+  "sourceReviewPath": "data/power/drom-ice-gasd-lpg-201-source-review-v2.json"
+}

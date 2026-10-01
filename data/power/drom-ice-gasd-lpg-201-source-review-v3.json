@@ -1,0 +1,659 @@
+{
+  "version": "drom-ice-gasd-lpg-201-source-review-v3",
+  "runIds": [
+    "bd5481a2-04a1-458a-810a-30c3ae130fc5"
+  ],
+  "status": "draft_evidence_imported_not_approved",
+  "scope": "Audit of 79 EncarRus no-match listing IDs. Cumulative draft candidate ledger now contains 53 listing IDs across 44 configurations; 26 IDs remain outside the manifest. No record is approved for calculation or publication.",
+  "sourcePolicy": "Official manufacturer/Korea-market dealer specifications are preferred; Drom and other catalogues are secondary-source candidates. Keep only matches aligned to the run's model/year/engine/fuel/trim. All are preliminary evidence, not legal or TKS confirmation.",
+  "alreadyRecordedInV1ListingCount": 14,
+  "reviewedNoMatchListingCount": 79,
+  "newCandidateListingCount": 39,
+  "newCandidateConfigurationCount": 35,
+  "candidateRecords": [
+    {
+      "brand": "BMW",
+      "model": "X2 (F39)",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 192,
+      "listingIds": [
+        "42718238"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x2/2023/",
+      "sourceMatch": "Korea section: first-generation X2 xDrive20i DCT M Sport, B48A20M1, F39/YH31, 192 PS; production range includes this listing's 2022 model-year configuration.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "BMW",
+      "model": "2 Series",
+      "year": 2026,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 204,
+      "listingIds": [
+        "42760321"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/2-series/2026/",
+      "sourceMatch": "Korea-market 220i DCT M Sport, B48B20R, F74, 204 PS; listing badge is 220 M Sport Design and engine volume matches.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "BMW",
+      "model": "4 Series",
+      "year": 2025,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 190,
+      "listingIds": [
+        "42794942",
+        "42814711"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/4-series/2025/",
+      "sourceMatch": "Korea-market G22/G23/G26 420i, B48B20M0, 190 PS; both run rows identify 420i 2.0 configurations, including convertible/Gran Coupe body variants.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "BMW",
+      "model": "4 Series",
+      "year": 2026,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 190,
+      "listingIds": [
+        "42815437"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/4-series/2025/",
+      "sourceMatch": "Korea-market 420i, 2.0 turbo, 190 PS; listing is a 2026 420i body variant in the same listed generation/engine family.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2024,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 381,
+      "listingIds": [
+        "42792851"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x5/2024/",
+      "sourceMatch": "Korea section: G05 xDrive40i AT M Sport, B58B30M2, 381 PS; unlike the M Sport Pro row, this trim is not marked hybrid on the cited Korea page.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2025,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 381,
+      "listingIds": [
+        "42709872"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x5/2025/",
+      "sourceMatch": "Korea section: G05 xDrive40i AT M Sport, B58B30M2, 381 PS; M Sport Pro is separately classified as hybrid by Drom and is not the proposed trim.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "BMW",
+      "model": "X6",
+      "year": 2025,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 381,
+      "listingIds": [
+        "42742135"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x6/2024/",
+      "sourceMatch": "Korea-market G06 xDrive40i AT M Sport, B58B30M2, 381 PS, production from 03.2023.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "BMW",
+      "model": "X6",
+      "year": 2023,
+      "engineCc": 2993,
+      "fuelType": "diesel",
+      "powerPs": 286,
+      "listingIds": [
+        "42810563"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x6/2024/",
+      "sourceMatch": "Korea-market G06 xDrive30d AT M Sport, B57D30, 286 PS, production from 03.2023.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "BMW",
+      "model": "X6",
+      "year": 2026,
+      "engineCc": 2993,
+      "fuelType": "diesel",
+      "powerPs": 286,
+      "listingIds": [
+        "42800518"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x6/2024/",
+      "sourceMatch": "Korea-market G06 xDrive30d AT M Sport, B57D30, 286 PS; source's stated period covers the listing model year.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "BMW",
+      "model": "5 Series",
+      "year": 2026,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 258,
+      "listingIds": [
+        "42814308"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/5-series/2026/",
+      "sourceMatch": "Korea-market G60 530i AT xDrive, B48B20, 258 PS; run identity is 2.0 gasoline and AWD.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Genesis",
+      "model": "G80",
+      "year": 2025,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 304,
+      "listingIds": [
+        "42760813",
+        "42801914"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/g80/2025/",
+      "sourceMatch": "Korea-market RG3 2.5 T-GDI AWD Black, G4KR, 304 PS; Korean production range for Black begins 01.2025.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Genesis",
+      "model": "G80",
+      "year": 2021,
+      "engineCc": 3470,
+      "fuelType": "gasoline",
+      "powerPs": 380,
+      "listingIds": [
+        "42817975"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/g80/2021/",
+      "sourceMatch": "Korea-market RG3 3.5 T-GDI 2WD, G6DS, 380 PS; listing's 3,470 cc and rear-drive identity align.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Genesis",
+      "model": "GV70",
+      "year": 2026,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 304,
+      "listingIds": [
+        "42712076"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/gv70/2026/",
+      "sourceMatch": "Korea-market JK1 2.5 AT 2WD, G4KR, 304 PS; listing is 2.5T, 2WD.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Genesis",
+      "model": "GV70",
+      "year": 2026,
+      "engineCc": 3470,
+      "fuelType": "gasoline",
+      "powerPs": 380,
+      "listingIds": [
+        "42734302"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/gv70/2026/",
+      "sourceMatch": "Korea-market JK1 3.5 AT 4WD, G6DS, 380 PS; listing is 3.5T AWD.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Genesis",
+      "model": "GV70",
+      "year": 2023,
+      "engineCc": 3470,
+      "fuelType": "gasoline",
+      "powerPs": 380,
+      "listingIds": [
+        "42813753"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/gv70/2023/",
+      "sourceMatch": "Korea-market pre-facelift JK1 3.5T AWD, G6DS, 380 PS; listing's year and 3,470 cc align.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Genesis",
+      "model": "GV80",
+      "year": 2026,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 304,
+      "listingIds": [
+        "42730308"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/genesis/gv80/2026/",
+      "sourceMatch": "JX1 facelift 2.5T AWD, G4KR, 304 PS; listing is 2.5 gasoline AWD. Korea market trim should be checked during Encar detail preflight.",
+      "status": "draft_candidate_needs_trim_preflight"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "year": 2022,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 281,
+      "listingIds": [
+        "42736078"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/santa_fe/2022/",
+      "sourceMatch": "Korea-market TM 2.5 T-GDI 2WD, G4KP, 281 PS, from 12.2021; listing identity is 2.5 gasoline 2WD.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "year": 2021,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 281,
+      "listingIds": [
+        "42809102"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/santa_fe/2021/",
+      "sourceMatch": "Korea-market TM 2.5 T-GDI AWD, G4KP, 281 PS; matches the listing's 2.5 gasoline AWD identity.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Santa Fe",
+      "year": 2022,
+      "engineCc": 2151,
+      "fuelType": "diesel",
+      "powerPs": 194,
+      "listingIds": [
+        "42797041"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/santa_fe/2022/",
+      "sourceMatch": "Korea-market TM 2.2 CRDi 2WD DCT, D4HE, 194 PS; Korean production period begins 12.2021, matching this 2022 listing configuration.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Elantra",
+      "year": 2021,
+      "engineCc": 1591,
+      "fuelType": "lpg",
+      "powerPs": 120,
+      "listingIds": [
+        "42734076"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/elantra/2022/",
+      "sourceMatch": "CN7 Korean-market LPi 1.6, 1,591 cc, 120 PS; listed trim is 1.6 LPi Style.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Elantra N",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 280,
+      "listingIds": [
+        "42740712"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/elantra/2022/",
+      "sourceMatch": "CN7 N 2.0 T-GDI, G4KH, 280 PS; matches the 1,998 cc Elantra N configuration.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Elantra N",
+      "year": 2021,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 280,
+      "listingIds": [
+        "42782935"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/hyundai/elantra/2022/",
+      "sourceMatch": "CN7 N 2.0 T-GDI, G4KH, 280 PS; model generation and engine configuration span the listing's 2021 model year.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "GLB",
+      "year": 2026,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 224,
+      "listingIds": [
+        "42723064"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/glb/2026/",
+      "sourceMatch": "Korea-market X247 GLB 250 4MATIC, M260, 224 PS, production from 07.2023; listing trim/drive/volume align.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "E-Class W213",
+      "year": 2021,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 211,
+      "listingIds": [
+        "42707711"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/e-class/2021/",
+      "sourceMatch": "Korea-market W213 E250 AT Avantgarde/Exclusive/AMG Line, M274, 211 PS, production 06.2020–08.2023; listing is 2.0 gasoline E250, rear-wheel drive.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "E-Class W213",
+      "year": 2023,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 211,
+      "listingIds": [
+        "42748717"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/e-class/2021/",
+      "sourceMatch": "Korea-market W213 E250, M274, 211 PS; documented production range 06.2020–08.2023 includes the listing's 2023 model year.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "E-Class W213",
+      "year": 2023,
+      "engineCc": 1993,
+      "fuelType": "diesel",
+      "powerPs": 200,
+      "listingIds": [
+        "42777215"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/e-class/g_2020_21337/",
+      "sourceMatch": "Korea-market W213 E220d 4MATIC, OM654 M, 200 PS from 03.2022 through 08.2023; the earlier 194 PS version ended 01.2022. Listing year is 2023, 1,993 cc diesel AWD.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "E-Class W213",
+      "year": 2023,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 299,
+      "listingIds": [
+        "42804891",
+        "42809856"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/e-class/g_2020_21337/",
+      "sourceMatch": "Korea-market W213 E350 4MATIC, M264, 299 PS, production 06.2020–08.2023; exact run grouping is 1,991 cc gasoline AWD E350.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Audi",
+      "model": "A6",
+      "year": 2021,
+      "engineCc": 1984,
+      "fuelType": "gasoline",
+      "powerPs": 252,
+      "listingIds": [
+        "42705186",
+        "42813095"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/audi/a6/2021/",
+      "sourceMatch": "Drom South Korea section: C8 2.0 45 TFSI quattro, 252 PS, DLHB, production 12.2018–05.2023. Both Encar rows are 2021 A6 45 TFSI Premium, 1,984 cc gasoline; the Encar detail rows were checked individually.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Kia",
+      "model": "Stinger",
+      "year": 2022,
+      "engineCc": 3342,
+      "fuelType": "gasoline",
+      "powerPs": 373,
+      "listingIds": [
+        "42813643"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/kia/stinger/2022/",
+      "sourceMatch": "Drom South Korea section: facelift Stinger 3.3T GT Acro Edition, G6DP, 3,342 cc, 373 PS; production 09.2021–05.2023. Encar trim is 3.3 GT ACRO EDITION, model year 2021, same displacement and fuel.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Solati",
+      "year": 2024,
+      "engineCc": 2497,
+      "fuelType": "diesel",
+      "powerPs": 170,
+      "listingIds": [
+        "42798537"
+      ],
+      "sourceUrl": "https://www.hyundai.com/kr/ko/c/products/bus/solati",
+      "sourceTitle": "Hyundai Korea official Solati specifications",
+      "sourceMatch": "Hyundai Korea official Solati specification lists A2.5 CRDi diesel, 2,497 cc and 170 PS. Encar row is a 2024 Solati 16-seater, 2,497 cc diesel. Manufacturer source is current; retained as preliminary evidence, not an exact Korean homologation certificate for this listing.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "BMW",
+      "model": "5 Series",
+      "year": 2021,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 252,
+      "listingIds": [
+        "42740536"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/5-series/2021/",
+      "sourceMatch": "Drom South Korea section: G30 530i, B48B20, 1,998 cc, 252 PS; the 2021 production period includes the listing. Encar detail badge is 530i M Sport Package.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Chevrolet",
+      "model": "Trax",
+      "year": 2026,
+      "engineCc": 1199,
+      "fuelType": "gasoline",
+      "powerPs": 137,
+      "listingIds": [
+        "42736701"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/chevrolet/trax/g_2022_24310/",
+      "sourceMatch": "Drom South Korea section for second-generation Trax: 1.2T, GM Ecotec LIH, 1,199 cc, 137 PS; Redline is one listed trim and the Encar badge is 1.2 Red Line, 2026.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Renault Korea",
+      "model": "Master",
+      "year": 2024,
+      "engineCc": 2299,
+      "fuelType": "diesel",
+      "powerPs": 150,
+      "listingIds": [
+        "42753304"
+      ],
+      "sourceUrl": "https://www.renaultkoream.com/upload/asset/catalogue/catalogue_master_202401.pdf",
+      "sourceTitle": "Renault Korea official Master 2024 catalogue",
+      "sourceMatch": "Renault Korea official 2024 Master catalogue lists 2.3 diesel, 2,299 cc and 150 PS at 3,500 rpm for the Van S/L. Encar row is a 2024 Master 2.3 Van S, 2,299 cc diesel.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "AVANTE",
+      "year": 2026,
+      "engineCc": 1999,
+      "fuelType": "gasoline",
+      "powerPs": 149,
+      "listingIds": ["42806931"],
+      "sourceUrl": "https://hyundaimotorgroup.co.kr/ko/news/hyundai-motor-company-all-new-avante",
+      "sourceMatch": "Hyundai Motor Group's 2026-08-05 Korea release for the 8th-generation AVANTE states gasoline 2.0 / 149 PS; Encar queue snapshot year is 2026, with 1,999 cc gasoline and 2026-09 production, while its category formYear separately says 2027. Draft key uses the queue snapshot year; discrepancy is retained in the note.",
+      "status": "draft_candidate"
+    },
+    {
+      "brand": "Jeep",
+      "model": "Wrangler",
+      "year": 2025,
+      "engineCc": 1995,
+      "fuelType": "gasoline",
+      "powerPs": 272,
+      "listingIds": ["42797782"],
+      "sourceUrl": "https://jeepdealer.co.kr/kcc/wrangler/specs/",
+      "sourceMatch": "Korean-market KCC Mobility dealer spec explicitly identifies Rubicon 2-door, 1,995 cc gasoline, 272 PS; Naver Auto's 2025 2-door Wrangler listing corroborates the 2025 configuration. Encar grade is 2.0 Rubicon 2Door, 2025, 1,995 cc gasoline.",
+      "status": "draft_candidate"
+    }
+  ],
+  "explicitlyHeldForSeparateReview": [
+    {
+      "reason": "Drom classifies the Korea-market powertrain/configuration as hybrid or mild-hybrid, while the current review list is the ICE/LPG cohort. Do not transfer the number into the ICE TKS draft until the correct hybrid power basis and exact listing trim are verified.",
+      "listingIds": [
+        "42761649",
+        "42793504",
+        "42798294"
+      ],
+      "models": [
+        "BMW X7 xDrive40i"
+      ],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/x7/2024/"
+    },
+    {
+      "reason": "The candidate listing is not the same configuration as the verified Drom row, or source market/year/trim is not pinned down by the currently retained evidence.",
+      "listingIds": [
+        "42736069",
+        "42774998",
+        "42795359",
+        "42806927"
+      ],
+      "models": [
+        "Mercedes-Benz E/CLE",
+        "BMW X5",
+        "BMW 5 Series",
+        "Genesis G90"
+      ],
+      "note": "This list is a hold/recheck set, not a claim that all have no usable source. Some are candidates already represented above only if confirmed as exact trim; resolve ID-level detail before import."
+    },
+    {
+      "reason": "BMW Korea identifies the 2026 M340i as using 48V mild-hybrid technology. Keep it out of the ICE/LPG batch and resolve under the hybrid power policy.",
+      "listingIds": ["42797330"],
+      "models": ["BMW 3 Series M340i Pro"],
+      "sourceUrl": "https://www.press.bmwgroup.com/korea/article/detail/T0446130KO/"
+    },
+    {
+      "reason": "The Korea-market Drom entry for the 2026 2.0 AMG GLC 43 is explicitly categorized as hybrid; resolve under the hybrid policy rather than importing as ICE.",
+      "listingIds": ["42708991"],
+      "models": ["Mercedes-Benz AMG GLC 43"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/glc-class/2026/"
+    },
+    {
+      "reason": "Encar identifies CLE450 4MATIC Cabriolet, 2,999 cc, model year 2026. Drom's Korea CLE 450 3.0 listing is categorized as hybrid (M256); route to hybrid-policy review, not ICE import.",
+      "listingIds": ["42703871"],
+      "models": ["Mercedes-Benz CLE450 4MATIC Cabriolet"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/cle-class/2023/"
+    },
+    {
+      "reason": "Encar identifies GLE450 4MATIC AMG Line, 2,999 cc, model year 2026. Drom Korea's 3.0 GLE450 381 PS configuration uses M256 and is categorized as hybrid; route to hybrid-policy review.",
+      "listingIds": ["42704855"],
+      "models": ["Mercedes-Benz GLE450 4MATIC AMG Line"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/gle-class/2026/"
+    },
+    {
+      "reason": "Encar identifies Volvo S90 B5 Ultra Dark, 1,969 cc, model year 2026. Drom Korea's B5 configuration is categorized as a mild hybrid; route to hybrid-policy review rather than ICE import.",
+      "listingIds": ["42751333"],
+      "models": ["Volvo S90 B5 Ultra Dark"],
+      "sourceUrl": "https://www.drom.ru/catalog/volvo/s90/2025/"
+    },
+    {
+      "reason": "Encar badge says BMW 630i xDrive M Sport, but the retained Encar spec reports 2,998 cc. Drom Korea lists 630i xDrive as 2.0 L / 258 PS and 640i xDrive as 3.0 L / 340 PS. Do not assign power until the source displacement/trim discrepancy is resolved.",
+      "listingIds": ["42706004"],
+      "models": ["BMW 6 Series Gran Turismo G32"],
+      "sourceUrl": "https://www.drom.ru/catalog/bmw/6-series_gran_turismo/2021/"
+    },
+    {
+      "reason": "The Korea-market Drom entry categorizes the 2022 AMG GLC 43 Coupe as hybrid despite listing the 3.0 M276 gasoline engine. Resolve this source classification conflict before placing it in ICE references.",
+      "listingIds": ["42725980"],
+      "models": ["Mercedes-Benz AMG GLC 43 Coupe"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/glc_coupe/2022/"
+    },
+    {
+      "reason": "Encar identifies S580L 4MATIC, model year 2021, 3,982 cc gasoline. Drom Korea lists S580 4MATIC L as a hybrid powertrain; do not import into ICE references.",
+      "listingIds": ["42735934"],
+      "models": ["Mercedes-Benz S-Class S580L 4MATIC"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/s-class/2021/"
+    },
+    {
+      "reason": "Encar identifies GLE450 4MATIC, model year 2022, 2,999 cc gasoline. Drom Korea classifies the 3.0 GLE450 M256 configuration as hybrid/mild-hybrid; route to hybrid-policy review.",
+      "listingIds": ["42748764"],
+      "models": ["Mercedes-Benz GLE450 4MATIC"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/gle-class/2022/"
+    },
+    {
+      "reason": "Encar identifies Audi A6 45 TFSI, 1,984 cc, production 2024-12 (form year 2025). Drom Korea's 45 TFSI 2.0 configuration is categorized as hybrid; keep out of ICE import until this cohort is reviewed under the hybrid policy.",
+      "listingIds": ["42747464"],
+      "models": ["Audi A6 45 TFSI"],
+      "sourceUrl": "https://www.drom.ru/catalog/audi/a6/2024/"
+    },
+    {
+      "reason": "Encar trim is AMG GLE53 4MATIC+ (2025, 2,999 cc). Drom's Korea-market 2025 GLE catalog places AMG 53 4MATIC+ in the hybrid category; defer this gasoline-labeled listing to the hybrid-power policy rather than the ICE rules.",
+      "listingIds": ["42748666"],
+      "models": ["Mercedes-Benz AMG GLE53 4MATIC+"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/gle-class/2025/"
+    },
+    {
+      "reason": "Encar trim is GLE450 4MATIC (2025, 2,999 cc). Drom's Korea-market GLE450 3.0 M256 configuration is categorized as hybrid; keep out of ICE import pending hybrid-policy review.",
+      "listingIds": ["42748816"],
+      "models": ["Mercedes-Benz GLE450 4MATIC"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/gle-class/2025/"
+    },
+    {
+      "reason": "Encar trim is BMW X5 xDrive40d M Sport Online Exclusive Edition (2024, 2,993 cc diesel). Korea's vehicle certification registry classifies BMW xDrive40d as diesel-hybrid (D-Hybrid); route out of ICE batch. BMW's 48V mild-hybrid documentation is consistent with this classification.",
+      "listingIds": ["42766063"],
+      "models": ["BMW X5 xDrive40d"],
+      "sourceUrl": "https://kencis.me.go.kr/new_kencis/hms/cs01/hmscs01b01.do?pageIndex=835"
+    },
+    {
+      "reason": "Saved Encar category snapshot says E-Class, but detailed payload says CLE-Class / CLE200 Cabriolet (2026, 1,998 cc). This is an identity/category conflict; do not assign power until the exact vehicle identity is reconciled.",
+      "listingIds": ["42780803"],
+      "models": ["Mercedes-Benz E-Class vs CLE200 Cabriolet"],
+      "sourceUrl": null
+    },
+    {
+      "reason": "Encar identifies CLS450 4MATIC, 2023, 2,999 cc. Drom's South Korea section lists CLS450 4MATIC AMG Line as a hybrid powertrain. Keep this out of ICE power references and route it to hybrid review.",
+      "listingIds": ["42806276"],
+      "models": ["Mercedes-Benz CLS450 4MATIC"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/cls-class/2023/"
+    },
+    {
+      "reason": "Encar identifies S450L 4MATIC, 2025, 2,999 cc. Drom's South Korea S450 4MATIC L entry is explicitly categorized as hybrid; the 2025 long-wheelbase Korea lineup is also confirmed by Mercedes-Benz Korea. Route to hybrid policy.",
+      "listingIds": ["42806310"],
+      "models": ["Mercedes-Benz S450 4MATIC L"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/s-class/2025/"
+    },
+    {
+      "reason": "Encar identifies GLC300 4MATIC AMG Line (2026, 1,999 cc). Mercedes-Benz Korea currently classifies GLC300 4MATIC as petrol-electric hybrid; manufacturer source confirms this is not an ICE-only configuration.",
+      "listingIds": ["42808401"],
+      "models": ["Mercedes-Benz GLC300 4MATIC AMG Line"],
+      "sourceUrl": "https://www.mercedes-benz.co.kr/passengercars/buy/new-car/search-results.html/vehicleCategory-new-passenger-cars/modelIdentifier-GLC/sortType-price-asc?emhfuelType=PETROL_ELECTRIC_PLUGIN_HYBRID"
+    },
+    {
+      "reason": "Encar identifies GLE450 4MATIC (2023, 2,999 cc). Drom's South Korea section lists the matching 3.0 M256 GLE450 as hybrid. Route to the hybrid power policy, not ICE.",
+      "listingIds": ["42817220"],
+      "models": ["Mercedes-Benz GLE450 4MATIC"],
+      "sourceUrl": "https://www.drom.ru/catalog/mercedes-benz/gle-class/2023/"
+    },
+    {
+      "reason": "Encar run detail for V220 CDI W447 (2023-06) says 2,200 cc. A Korean vehicle card for the same V220 CDI W447 / June 2023 reports 1,950 cc and 163 PS. Because displacement conflicts, do not write a power rule for this run ID until the Encar displacement or exact engine code is resolved.",
+      "listingIds": ["42819356"],
+      "models": ["Mercedes-Benz V-Class V220 CDI W447"],
+      "sourceUrl": "https://carskorea.shop/mercedes-benz/v-class/uid-4725668/"
+    }
+  ],
+  "notYetCoveredListingCount": 26,
+  "remainingListingIds": [
+    "42703871", "42704855", "42706004", "42708991", "42725980", "42735934", "42736069",
+    "42747464", "42748666", "42748764", "42748816", "42751333", "42761649", "42766063",
+    "42774998", "42780803", "42793504", "42795359", "42797330", "42798294",
+    "42806276", "42806310", "42806927", "42808401", "42817220", "42819356"
+  ],
+  "countingNote": "This ledger accounts for all 79 run-scoped no-match listing IDs: 14 from v1 plus 39 additional unique candidate listings are represented in the cumulative draft manifest (53 IDs, 44 configurations). The remaining 26 are all explicitly held: 17 prior hybrid/identity/source-conflict holds plus 7 newly classified hybrid/mild-hybrid IDs, 1 Encar category/detail identity conflict, and 1 V220 CDI displacement conflict. No remaining ID is counted as a confirmed ICE power match. All imported rules remain draft/unapproved; none is approved for TKS calculation or publication."
+}
