@@ -1,0 +1,1289 @@
+{
+  "version": "encarrus-ice-gasd-lpg-201-preliminary-v1",
+  "runIds": [
+    "bd5481a2-04a1-458a-810a-30c3ae130fc5",
+    "d50f740a-3cfb-4eea-8e9d-84adba3d0e52"
+  ],
+  "status": "preliminary_only_not_approved_tks_evidence",
+  "scope": "EncarRus ICE/LPG preliminary power matches for the 201-listing gasoline/diesel/LPG Encar run; includes unique catalogue matches and reviewed configuration-level matches. Draft evidence only.",
+  "candidateListingCount": 120,
+  "records": [
+    {
+      "brand": "KG_Mobility_Ssangyong",
+      "model": "Torres",
+      "year": 2022,
+      "engineCc": 1497,
+      "fuelType": "gasoline",
+      "powerPs": 170,
+      "listingIds": [
+        "42735257",
+        "42780531",
+        "42800026",
+        "42804803",
+        "42807677",
+        "42816903"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2399846/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · Gasoline 1.5 2WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration KG_Mobility_Ssangyong Torres 2022, 1497 cc, gasoline; badge(s): gasoline 1.5 2wd. All matching cards in the captured search returned 170 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Staria",
+      "year": 2024,
+      "engineCc": 3470,
+      "fuelType": "lpg",
+      "powerPs": 240,
+      "listingIds": [
+        "42726754",
+        "42789484",
+        "42815799"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2761429/",
+      "sourceTitle": "EncarRus Korea catalogue — 2024 · L3.5 Lounge 7-Seater",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Hyundai Staria 2024, 3470 cc, lpg; badge(s): l3.5 cargo 5 seater / l3.5 tourer 11 seater. All matching cards in the captured search returned 240 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "KG_Mobility_Ssangyong",
+      "model": "Tivoli",
+      "year": 2022,
+      "engineCc": 1497,
+      "fuelType": "gasoline",
+      "powerPs": 163,
+      "listingIds": [
+        "42727600",
+        "42797406",
+        "42810898"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2408280/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 1.5 A3 2WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration KG_Mobility_Ssangyong Tivoli 2022, 1497 cc, gasoline; badge(s): gasoline 1.5 2wd / 1.5 a3 2wd. All matching cards in the captured search returned 163 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Kia",
+      "model": "RAY",
+      "year": 2021,
+      "engineCc": 998,
+      "fuelType": "gasoline",
+      "powerPs": 76,
+      "listingIds": [
+        "42716831",
+        "42745684",
+        "42811705"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2419339/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · Prestige",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Kia RAY 2021, 998 cc, gasoline; badge(s): signature / prestige. All matching cards in the captured search returned 76 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Kia",
+      "model": "Tasman",
+      "year": 2025,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 277,
+      "listingIds": [
+        "42777961",
+        "42796755",
+        "42803623"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2457121/",
+      "sourceTitle": "EncarRus Korea catalogue — 2025 · 2.5T Gasoline 4WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Kia Tasman 2025, 2497 cc, gasoline; badge(s): 2.5t gasoline 4wd. All matching cards in the captured search returned 277 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Cadillac",
+      "model": "Escalade",
+      "year": 2023,
+      "engineCc": 6162,
+      "fuelType": "gasoline",
+      "powerPs": 420,
+      "listingIds": [
+        "42703261",
+        "42781077"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2192032/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 6.2",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Cadillac Escalade 2023, 6162 cc, gasoline; badge(s): 6.2 / 6.2 esv. All matching cards in the captured search returned 420 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Genesis",
+      "model": "GV80",
+      "year": 2024,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 304,
+      "listingIds": [
+        "42806101",
+        "42808755"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2549910/",
+      "sourceTitle": "EncarRus Korea catalogue — 2024 · 2.5T Gasoline 2WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Genesis GV80 2024, 2497 cc, gasoline; badge(s): 2.5t gasoline 2wd. All matching cards in the captured search returned 304 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Elantra",
+      "year": 2023,
+      "engineCc": 1591,
+      "fuelType": "lpg",
+      "powerPs": 120,
+      "listingIds": [
+        "42728772",
+        "42798426"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2586821/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 1.6 LPi",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Hyundai Elantra 2023, 1591 cc, lpg; badge(s): 1.6 lpi. All matching cards in the captured search returned 120 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2022,
+      "engineCc": 2999,
+      "fuelType": "lpg",
+      "powerPs": 235,
+      "listingIds": [
+        "42728750",
+        "42730141"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2586755/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 3.0 LPi (Taxi)",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Hyundai Grandeur 2022, 2999 cc, lpg; badge(s): 3.0 lpi rent car. All matching cards in the captured search returned 235 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Kia",
+      "model": "K5",
+      "year": 2023,
+      "engineCc": 1999,
+      "fuelType": "lpg",
+      "powerPs": 146,
+      "listingIds": [
+        "42748445",
+        "42758891"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/735201/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 2.0 LPI(Renter car)",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Kia K5 2023, 1999 cc, lpg; badge(s): 2.0 lpi(renter car) / 2.0 lpi. All matching cards in the captured search returned 146 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "year": 2022,
+      "engineCc": 1999,
+      "fuelType": "lpg",
+      "powerPs": 146,
+      "listingIds": [
+        "42715999",
+        "42785544",
+        "42725104"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2447097/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · LPG 2.0 2WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Kia Sportage 2022, 1999 cc, lpg; badge(s): lpg 2.0 2wd. All matching cards in the captured search returned 146 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Kia",
+      "model": "Tasman",
+      "year": 2026,
+      "engineCc": 2497,
+      "fuelType": "gasoline",
+      "powerPs": 277,
+      "listingIds": [
+        "42706375",
+        "42789268"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2183076/",
+      "sourceTitle": "EncarRus Korea catalogue — 2026 · 2.5T Gasoline 4WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Kia Tasman 2026, 2497 cc, gasoline; badge(s): 2.5t gasoline 4wd. All matching cards in the captured search returned 277 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "AMG GT",
+      "year": 2021,
+      "engineCc": 2999,
+      "fuelType": "gasoline",
+      "powerPs": 367,
+      "listingIds": [
+        "42777974",
+        "42782232"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2368634/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 4Door 43 4MATIC+",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Mercedes-Benz AMG GT 2021, 2999 cc, gasoline; badge(s): 4door 43 4matic+. All matching cards in the captured search returned 367 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "C-Class",
+      "year": 2023,
+      "engineCc": 1999,
+      "fuelType": "gasoline",
+      "powerPs": 258,
+      "listingIds": [
+        "42793679",
+        "42800267",
+        "42770319"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2152826/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · C300 4MATIC AMG Line",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Mercedes-Benz C-Class 2023, 1999 cc, gasoline; badge(s): c300 4matic amg line. All matching cards in the captured search returned 258 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "GLC",
+      "year": 2023,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 258,
+      "listingIds": [
+        "42738752",
+        "42792517"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2194507/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · GLC 300 4MATIC Avantgarde",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Mercedes-Benz GLC 2023, 1991 cc, gasoline; badge(s): gcl300 4matic coupe. All matching cards in the captured search returned 258 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "GLE",
+      "year": 2023,
+      "engineCc": 1993,
+      "fuelType": "diesel",
+      "powerPs": 272,
+      "listingIds": [
+        "42716403",
+        "42732119",
+        "42769517"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2708619/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · GLE300d 4MATIC",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Mercedes-Benz GLE 2023, 1993 cc, diesel; badge(s): gle300d 4matic. All matching cards in the captured search returned 272 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "GLE",
+      "year": 2022,
+      "engineCc": 1993,
+      "fuelType": "diesel",
+      "powerPs": 272,
+      "listingIds": [
+        "42724298",
+        "42788473"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2379073/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · GLE300d 4MATIC",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Mercedes-Benz GLE 2022, 1993 cc, diesel; badge(s): gle300d 4matic. All matching cards in the captured search returned 272 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Porsche",
+      "model": "Cayenne",
+      "year": 2021,
+      "engineCc": 2995,
+      "fuelType": "gasoline",
+      "powerPs": 340,
+      "listingIds": [
+        "42707855",
+        "42802976"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2765216/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 3.0",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Porsche Cayenne 2021, 2995 cc, gasoline; badge(s): 3.0 coupe / 3.0. All matching cards in the captured search returned 340 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Audi",
+      "model": "A4",
+      "year": 2023,
+      "engineCc": 1968,
+      "fuelType": "diesel",
+      "powerPs": 204,
+      "listingIds": [
+        "42812473"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2307433/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 40 TDI Quattro Premium",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Audi A4 2023, 1968 cc, diesel; badge(s): 40 tdi quattro premium. All matching cards in the captured search returned 204 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Audi",
+      "model": "A6",
+      "year": 2022,
+      "engineCc": 1984,
+      "fuelType": "gasoline",
+      "powerPs": 265,
+      "listingIds": [
+        "42710125"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2312805/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 45 TFSI Premium",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Audi A6 2022, 1984 cc, gasoline; badge(s): 45 tfsi premium. All matching cards in the captured search returned 265 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Audi",
+      "model": "A6",
+      "year": 2026,
+      "engineCc": 1984,
+      "fuelType": "gasoline",
+      "powerPs": 265,
+      "listingIds": [
+        "42778165"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2544148/",
+      "sourceTitle": "EncarRus Korea catalogue — 2026 · 40 TFSI S Line",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Audi A6 2026, 1984 cc, gasoline; badge(s): 40 tfsi advanced. All matching cards in the captured search returned 265 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Audi",
+      "model": "A6",
+      "year": 2023,
+      "engineCc": 1968,
+      "fuelType": "diesel",
+      "powerPs": 204,
+      "listingIds": [
+        "42786386"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2401071/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 40 TDI Premium",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Audi A6 2023, 1968 cc, diesel; badge(s): 40 tdi premium. All matching cards in the captured search returned 204 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Audi",
+      "model": "A6",
+      "year": 2023,
+      "engineCc": 1984,
+      "fuelType": "gasoline",
+      "powerPs": 265,
+      "listingIds": [
+        "42804638"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/1809784/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 45 TFSI Premium",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Audi A6 2023, 1984 cc, gasoline; badge(s): 45 tfsi. All matching cards in the captured search returned 265 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Audi",
+      "model": "A7",
+      "year": 2021,
+      "engineCc": 2995,
+      "fuelType": "gasoline",
+      "powerPs": 340,
+      "listingIds": [
+        "42703809"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2684100/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 55 TFSI Quattro Premium",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Audi A7 2021, 2995 cc, gasoline; badge(s): 55 tfsi quattro premium. All matching cards in the captured search returned 340 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Audi",
+      "model": "A8",
+      "year": 2023,
+      "engineCc": 2995,
+      "fuelType": "gasoline",
+      "powerPs": 340,
+      "listingIds": [
+        "42758875"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2738726/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 55 TFSI Quattro Premium LWB",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Audi A8 2023, 2995 cc, gasoline; badge(s): 55 tfsi quattro premium lwb. All matching cards in the captured search returned 340 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "2 Series",
+      "year": 2024,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 184,
+      "listingIds": [
+        "42781028"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2780350/",
+      "sourceTitle": "EncarRus Korea catalogue — 2024 · 220i Luxury",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW 2 Series 2024, 1998 cc, gasoline; badge(s): 220i m sports. All matching cards in the captured search returned 184 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "2 Series",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 184,
+      "listingIds": [
+        "42799114"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2684164/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 220i M Sports",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): 220i m sports. Selected exact catalogue trim 2022 · 220i M Sports at 184 PS. Run badge is 220i M Sports and exact EncarRus trim is 184 PS; the 306 PS card is M235i xDrive. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "2 Series",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 306,
+      "listingIds": [
+        "42801668"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2776830/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · M235i xDrive",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW 2 Series 2022, 1998 cc, gasoline; badge(s): m235i xdrive. All matching cards in the captured search returned 306 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "5 Series",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 184,
+      "listingIds": [
+        "42800063"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2716181/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 520i Luxury",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW 5 Series 2022, 1998 cc, gasoline; badge(s): 520i luxury. All matching cards in the captured search returned 184 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "7 Series",
+      "year": 2022,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 326,
+      "listingIds": [
+        "42710600"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/1809452/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 740i sDrive Design Pure Excellence",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): 740i sdrive design pure excellence. Selected exact catalogue trim 2022 · 740i sDrive Design Pure Excellence at 326 PS. Run badge exactly names the non-Individual, rear-drive trim; 381 PS is the Individual trim and 340 PS is xDrive. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "7 Series",
+      "year": 2024,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 340,
+      "listingIds": [
+        "42717525"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2338158/",
+      "sourceTitle": "EncarRus Korea catalogue — 2024 · 740i xDrive M Sport",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW 7 Series 2024, 2998 cc, gasoline; badge(s): 740i xdrive m sport. All matching cards in the captured search returned 340 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "7 Series",
+      "year": 2023,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 326,
+      "listingIds": [
+        "42745403"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2568468/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 740i sDrive M Sport",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): 740i sdrive m sport. Selected exact catalogue trim 2023 · 740i sDrive M Sport at 326 PS. Exact run badge matches the non-Individual sDrive M Sport card (326 PS); 381 PS is explicitly M Sport Individual and 340 PS is xDrive. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "7 Series",
+      "year": 2021,
+      "engineCc": 2993,
+      "fuelType": "diesel",
+      "powerPs": 265,
+      "listingIds": [
+        "42790778"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2152113/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 730Ld xDrive Design Pure Excellence",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW 7 Series 2021, 2993 cc, diesel; badge(s): 730d xdrive design pure excellence. All matching cards in the captured search returned 265 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "8-Series",
+      "year": 2021,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 340,
+      "listingIds": [
+        "42820155"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2734820/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 840i xDrive M Sport Gran Coupe",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW 8-Series 2021, 2998 cc, gasoline; badge(s): 840i xdrive m sport gran coupe. All matching cards in the captured search returned 340 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "M4",
+      "year": 2026,
+      "engineCc": 2993,
+      "fuelType": "gasoline",
+      "powerPs": 510,
+      "listingIds": [
+        "42805846"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2379345/",
+      "sourceTitle": "EncarRus Korea catalogue — 2026 · M4 Competition M xDrive",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW M4 2026, 2993 cc, gasoline; badge(s): m4 convertible competition m xdrive. All matching cards in the captured search returned 510 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "X3",
+      "year": 2026,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 184,
+      "listingIds": [
+        "42765755"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2489044/",
+      "sourceTitle": "EncarRus Korea catalogue — 2026 · xDrive 20",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW X3 2026, 1998 cc, gasoline; badge(s): xdrive 20 m sport. All matching cards in the captured search returned 184 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "X3",
+      "year": 2025,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 184,
+      "listingIds": [
+        "42772730"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2725194/",
+      "sourceTitle": "EncarRus Korea catalogue — 2025 · xDrive 20",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW X3 2025, 1998 cc, gasoline; badge(s): xdrive 20. All matching cards in the captured search returned 184 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "X3",
+      "year": 2024,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 184,
+      "listingIds": [
+        "42809893"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/822578/",
+      "sourceTitle": "EncarRus Korea catalogue — 2024 · xDrive 20 M Sport",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW X3 2024, 1998 cc, gasoline; badge(s): xdrive 20i m sport. All matching cards in the captured search returned 184 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2022,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 340,
+      "listingIds": [
+        "42742220"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2275141/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · xDrive 40i xLine",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW X5 2022, 2998 cc, gasoline; badge(s): xdrive 40i m sport. All matching cards in the captured search returned 340 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "X5M",
+      "year": 2021,
+      "engineCc": 4395,
+      "fuelType": "gasoline",
+      "powerPs": 625,
+      "listingIds": [
+        "42736758"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2562077/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 4.4 Competition",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW X5M 2021, 4395 cc, gasoline; badge(s): 4.4 competition. All matching cards in the captured search returned 625 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "BMW",
+      "model": "X6",
+      "year": 2022,
+      "engineCc": 2998,
+      "fuelType": "gasoline",
+      "powerPs": 340,
+      "listingIds": [
+        "42707898"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2550547/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · xDrive40i M Sport",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration BMW X6 2022, 2998 cc, gasoline; badge(s): xdrive40i m sport. All matching cards in the captured search returned 340 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Cadillac",
+      "model": "Escalade",
+      "year": 2022,
+      "engineCc": 6162,
+      "fuelType": "gasoline",
+      "powerPs": 420,
+      "listingIds": [
+        "42731198"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2392684/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 6.2",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Cadillac Escalade 2022, 6162 cc, gasoline; badge(s): 6.2 esv. All matching cards in the captured search returned 420 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Ford",
+      "model": "Explorer",
+      "year": 2022,
+      "engineCc": 2261,
+      "fuelType": "gasoline",
+      "powerPs": 300,
+      "listingIds": [
+        "42706388"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2510310/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 2.3 LimIted 4WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Ford Explorer 2022, 2261 cc, gasoline; badge(s): 2.3 limited 4wd. All matching cards in the captured search returned 300 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Ford",
+      "model": "Mustang",
+      "year": 2022,
+      "engineCc": 2261,
+      "fuelType": "gasoline",
+      "powerPs": 305,
+      "listingIds": [
+        "42708189"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2562142/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · Convertible",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Ford Mustang 2022, 2261 cc, gasoline; badge(s): convertible. All matching cards in the captured search returned 305 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Ford",
+      "model": "Mustang",
+      "year": 2021,
+      "engineCc": 2261,
+      "fuelType": "gasoline",
+      "powerPs": 305,
+      "listingIds": [
+        "42712890"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2302301/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · Convertible",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Ford Mustang 2021, 2261 cc, gasoline; badge(s): convertible. All matching cards in the captured search returned 305 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Ford",
+      "model": "Mustang",
+      "year": 2023,
+      "engineCc": 2261,
+      "fuelType": "gasoline",
+      "powerPs": 305,
+      "listingIds": [
+        "42797199"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/1595036/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · Convertible",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Ford Mustang 2023, 2261 cc, gasoline; badge(s): coupe. All matching cards in the captured search returned 305 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Ford",
+      "model": "Ranger",
+      "year": 2025,
+      "engineCc": 1996,
+      "fuelType": "diesel",
+      "powerPs": 213,
+      "listingIds": [
+        "42783011"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2712851/",
+      "sourceTitle": "EncarRus Korea catalogue — 2025 · 2.0",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Ford Ranger 2025, 1996 cc, diesel; badge(s): 2.0. All matching cards in the captured search returned 213 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "GMC",
+      "model": "Sierra",
+      "year": 2023,
+      "engineCc": 6162,
+      "fuelType": "gasoline",
+      "powerPs": 420,
+      "listingIds": [
+        "42798284"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2348811/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · Denali",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration GMC Sierra 2023, 6162 cc, gasoline; badge(s): denali x. All matching cards in the captured search returned 420 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "GMC",
+      "model": "Sierra",
+      "year": 2025,
+      "engineCc": 6162,
+      "fuelType": "gasoline",
+      "powerPs": 420,
+      "listingIds": [
+        "42815139"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2399840/",
+      "sourceTitle": "EncarRus Korea catalogue — 2025 · Denali-X",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration GMC Sierra 2025, 6162 cc, gasoline; badge(s): denali x. All matching cards in the captured search returned 420 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Honda",
+      "model": "CR-V",
+      "year": 2021,
+      "engineCc": 1498,
+      "fuelType": "gasoline",
+      "powerPs": 190,
+      "listingIds": [
+        "42796427"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/1640592/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 1.5 EX-L 2WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Honda CR-V 2021, 1498 cc, gasoline; badge(s): 1.5 ex l 2wd. All matching cards in the captured search returned 190 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Grandeur",
+      "year": 2023,
+      "engineCc": 3470,
+      "fuelType": "lpg",
+      "powerPs": 240,
+      "listingIds": [
+        "42750144"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2761135/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 3.5 LPG 2WD (Taxi)",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Hyundai Grandeur 2023, 3470 cc, lpg; badge(s): 3.5 lpg 2wd. All matching cards in the captured search returned 240 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Kona",
+      "year": 2025,
+      "engineCc": 1598,
+      "fuelType": "gasoline",
+      "powerPs": 198,
+      "listingIds": [
+        "42750825"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2316852/",
+      "sourceTitle": "EncarRus Korea catalogue — 2025 · Gasoline 1.6 Turbo 2WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Hyundai Kona 2025, 1598 cc, gasoline; badge(s): gasoline 1.6 turbo 2wd. All matching cards in the captured search returned 198 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Kona",
+      "year": 2022,
+      "engineCc": 1999,
+      "fuelType": "gasoline",
+      "powerPs": 280,
+      "listingIds": [
+        "42800395"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2466332/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · Gasoline 2.0 2WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Hyundai Kona 2022, 1999 cc, gasoline; badge(s): gasoline 2.0 2wd. All matching cards in the captured search returned 280 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "year": 2022,
+      "engineCc": 1999,
+      "fuelType": "lpg",
+      "powerPs": 146,
+      "listingIds": [
+        "42728610"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/1585142/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 2.0 LPG",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): 2.0 lpg. Selected exact catalogue trim 2022 · 2.0 LPG at 146 PS. Run badge says 2.0 LPG without rental-car designation; exact standard LPG card is 146 PS. The separate rental-car card is 157 PS. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "year": 2025,
+      "engineCc": 1999,
+      "fuelType": "lpg",
+      "powerPs": 146,
+      "listingIds": [
+        "42759538"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2489459/",
+      "sourceTitle": "EncarRus Korea catalogue — 2025 · 2.0 LPG(Taxi)",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Hyundai Sonata 2025, 1999 cc, lpg; badge(s): 2.0 lpg(taxi). All matching cards in the captured search returned 146 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Veloster",
+      "year": 2021,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 275,
+      "listingIds": [
+        "42817925"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2456696/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 2.0 N",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Hyundai Veloster 2021, 1998 cc, gasoline; badge(s): 2.0 n. All matching cards in the captured search returned 275 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Jeep",
+      "model": "Cherokee",
+      "year": 2022,
+      "engineCc": 3604,
+      "fuelType": "gasoline",
+      "powerPs": 290,
+      "listingIds": [
+        "42735468"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2530267/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · L 3.6 Summit Reserve",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): l 3.6 summit reserve. Selected exact catalogue trim 2022 · L 3.6 Summit Reserve at 290 PS. Exact run badge includes L 3.6 Summit Reserve; the 293 PS card is non-L Overland. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "Jeep",
+      "model": "Compass",
+      "year": 2022,
+      "engineCc": 2360,
+      "fuelType": "gasoline",
+      "powerPs": 180,
+      "listingIds": [
+        "42815310"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2777136/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 2.4 Limitied AWD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Jeep Compass 2022, 2360 cc, gasoline; badge(s): s 2.4 awd. All matching cards in the captured search returned 180 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Jeep",
+      "model": "Renegade",
+      "year": 2021,
+      "engineCc": 2360,
+      "fuelType": "gasoline",
+      "powerPs": 180,
+      "listingIds": [
+        "42715554"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2236861/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 2.4 Limited",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Jeep Renegade 2021, 2360 cc, gasoline; badge(s): 2.4 limited. All matching cards in the captured search returned 180 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Jeep",
+      "model": "Wrangler",
+      "year": 2022,
+      "engineCc": 1995,
+      "fuelType": "gasoline",
+      "powerPs": 270,
+      "listingIds": [
+        "42779073"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2182701/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 2.0 Overland 4Door",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Jeep Wrangler 2022, 1995 cc, gasoline; badge(s): 2.0 rubicon 4door. All matching cards in the captured search returned 270 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "KG_Mobility_Ssangyong",
+      "model": "Rexton",
+      "year": 2021,
+      "engineCc": 2157,
+      "fuelType": "diesel",
+      "powerPs": 202,
+      "listingIds": [
+        "42771564"
+      ],
+      "sourceUrl": "https://m.kg-mobility.com/global/mediacenter/News/1300951_19810.html",
+      "sourceTitle": "KGM official Korea-market Rexton press release",
+      "note": "Preliminary manufacturer-spec match. Encar identity: KG_Mobility_Ssangyong Rexton 2021, 2157 cc, diesel; badge(s): diesel 2.2 4wd. KGM Korea official specification for the facelifted 2.2 diesel Rexton gives 202 PS; EncarRus catalogue alternatives 181/187 conflict with the Korea-market manufacturer figure. Power recorded as 202 PS for preliminary calculation only, not TKS/legal approval."
+    },
+    {
+      "brand": "KG_Mobility_Ssangyong",
+      "model": "Rexton",
+      "year": 2023,
+      "engineCc": 2157,
+      "fuelType": "diesel",
+      "powerPs": 202,
+      "listingIds": [
+        "42808433"
+      ],
+      "sourceUrl": "https://m.kg-mobility.com/showroom/total_price/__icsFiles/afieldfile/2024/02/28/Total_price_2403_1.pdf",
+      "sourceTitle": "KGM official Rexton 2024 specifications and price list",
+      "note": "Preliminary manufacturer-spec match. Encar identity: KG_Mobility_Ssangyong Rexton 2023, 2157 cc, diesel; badge(s): diesel 2.2 4wd. KGM Korea official Rexton 2.2 diesel specification gives 202 PS; EncarRus catalogue alternatives 181/187 conflict with the Korea-market manufacturer figure. Power recorded as 202 PS for preliminary calculation only, not TKS/legal approval."
+    },
+    {
+      "brand": "KG_Mobility_Ssangyong",
+      "model": "Torres",
+      "year": 2022,
+      "engineCc": 1497,
+      "fuelType": "gasoline",
+      "powerPs": 170,
+      "listingIds": [
+        "42750453",
+        "42768666"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2717362/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · Gasoline 1.5 4WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration KG_Mobility_Ssangyong Torres 2022, 1497 cc, gasoline; badge(s): gasoline 1.5 4wd. All matching cards in the captured search returned 170 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Kia",
+      "model": "K5",
+      "year": 2022,
+      "engineCc": 1999,
+      "fuelType": "lpg",
+      "powerPs": 146,
+      "listingIds": [
+        "42801695"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2549633/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 2.0 LPI(Renter car)",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Kia K5 2022, 1999 cc, lpg; badge(s): 2.0 lpi(renter car). All matching cards in the captured search returned 146 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Kia",
+      "model": "K9",
+      "year": 2022,
+      "engineCc": 3778,
+      "fuelType": "gasoline",
+      "powerPs": 315,
+      "listingIds": [
+        "42729395"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2764355/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 3.8 GDI AWD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Kia K9 2022, 3778 cc, gasoline; badge(s): 3.8 gdi awd. All matching cards in the captured search returned 315 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "year": 2025,
+      "engineCc": 1999,
+      "fuelType": "lpg",
+      "powerPs": 146,
+      "listingIds": [
+        "42789160"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2561131/",
+      "sourceTitle": "EncarRus Korea catalogue — 2025 · LPG 2.0 2WD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Kia Sportage 2025, 1999 cc, lpg; badge(s): lpg 2.0 2wd. All matching cards in the captured search returned 146 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Lincoln",
+      "model": "Aviator",
+      "year": 2022,
+      "engineCc": 2956,
+      "fuelType": "gasoline",
+      "powerPs": 400,
+      "listingIds": [
+        "42813249"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/1594548/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 3.0 Black Label AWD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Lincoln Aviator 2022, 2956 cc, gasoline; badge(s): 3.0 black label awd. All matching cards in the captured search returned 400 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Lincoln",
+      "model": "Aviator",
+      "year": 2021,
+      "engineCc": 2956,
+      "fuelType": "gasoline",
+      "powerPs": 400,
+      "listingIds": [
+        "42818024"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2677357/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 3.0 Black Label AWD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Lincoln Aviator 2021, 2956 cc, gasoline; badge(s): 3.0 reserve awd. All matching cards in the captured search returned 400 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "C-Class",
+      "year": 2024,
+      "engineCc": 1999,
+      "fuelType": "gasoline",
+      "powerPs": 258,
+      "listingIds": [
+        "42807461"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2717142/",
+      "sourceTitle": "EncarRus Korea catalogue — 2024 · C300 4MATIC Avantgarde",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Mercedes-Benz C-Class 2024, 1999 cc, gasoline; badge(s): c300 4matic avantgarde. All matching cards in the captured search returned 258 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "GLA",
+      "year": 2025,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 224,
+      "listingIds": [
+        "42792729"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2780201/",
+      "sourceTitle": "EncarRus Korea catalogue — 2025 · GLA250 4MATIC",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Mercedes-Benz GLA 2025, 1991 cc, gasoline; badge(s): gla250 4matic. All matching cards in the captured search returned 224 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "GLC",
+      "year": 2025,
+      "engineCc": 1999,
+      "fuelType": "gasoline",
+      "powerPs": 258,
+      "listingIds": [
+        "42750890"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2717400/",
+      "sourceTitle": "EncarRus Korea catalogue — 2025 · GLC 300 4MATIC Avantgarde",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Mercedes-Benz GLC 2025, 1999 cc, gasoline; badge(s): glc300 4matic amg line. All matching cards in the captured search returned 258 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "GLC",
+      "year": 2023,
+      "engineCc": 1999,
+      "fuelType": "gasoline",
+      "powerPs": 258,
+      "listingIds": [
+        "42814069"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2194507/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · GLC 300 4MATIC Avantgarde",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Mercedes-Benz GLC 2023, 1999 cc, gasoline; badge(s): glc300 4matic amg line. All matching cards in the captured search returned 258 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "S-Class",
+      "year": 2021,
+      "engineCc": 2925,
+      "fuelType": "diesel",
+      "powerPs": 286,
+      "listingIds": [
+        "42755461"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2777256/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · S350 d",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): s350 d. Selected exact catalogue trim 2021 · S350 d at 286 PS. Exact run badge is S350 d; 340 PS belongs to the separate S400 d 4MATIC trim. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "SL-Class",
+      "year": 2026,
+      "engineCc": 1991,
+      "fuelType": "gasoline",
+      "powerPs": 381,
+      "listingIds": [
+        "42735965"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2520131/",
+      "sourceTitle": "EncarRus Korea catalogue — 2026 · AMG SL43",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Mercedes-Benz SL-Class 2026, 1991 cc, gasoline; badge(s): amg sl43. All matching cards in the captured search returned 381 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mini",
+      "model": "Cooper",
+      "year": 2022,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 192,
+      "listingIds": [
+        "42710725"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/1587767/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · Classic",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): classic. Selected exact catalogue trim 2022 · Classic at 192 PS. Exact run badge is Classic and matching EncarRus Classic card is 192 PS; 231 PS is JCW. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mini",
+      "model": "Cooper",
+      "year": 2025,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 218,
+      "listingIds": [
+        "42743873"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2466884/",
+      "sourceTitle": "EncarRus Korea catalogue — 2025 · JCW",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): jcw. Selected exact catalogue trim 2025 · JCW at 218 PS. Exact run badge is JCW and matching EncarRus JCW card is 218 PS. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "Mini",
+      "model": "Countryman",
+      "year": 2026,
+      "engineCc": 1998,
+      "fuelType": "gasoline",
+      "powerPs": 204,
+      "listingIds": [
+        "42820256"
+      ],
+      "sourceUrl": "https://www.mini.co.kr/ko_KR/home/range/mini-countryman/driving-experience.html",
+      "sourceTitle": "MINI Korea official Countryman S ALL4 specifications",
+      "note": "Preliminary manufacturer-spec match. Encar identity: Mini Countryman 2026, 1998 cc, gasoline; badge(s): all4 classic. Run trim ALL4 Classic maps to Korea-market MINI Countryman S ALL4 Classic. MINI Korea 2026 spec lists 150 kW/204 PS; EncarRus displayed 218 PS options are other catalogue variants and do not override exact Korean factory trim. Power recorded as 204 PS for preliminary calculation only, not TKS/legal approval. The official 2026 MINI Korea price list identifies the S ALL4 Classic trim: https://www.mini.co.kr/content/dam/MINI/marketKR/mini_co_kr/pricelist/MINI-All-Models-Price-List_260520.pdf.asset.1779251387981.pdf"
+    },
+    {
+      "brand": "Porsche",
+      "model": "911",
+      "year": 2021,
+      "engineCc": 2981,
+      "fuelType": "gasoline",
+      "powerPs": 385,
+      "listingIds": [
+        "42746996"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2366818/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · Carrera 4 Cabriolet",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): carrera 4 cabriolet. Selected exact catalogue trim 2021 · Carrera 4 Cabriolet at 385 PS. Exact run badge is Carrera 4 Cabriolet; 450 PS cards are Carrera 4S variants. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "Porsche",
+      "model": "Cayenne",
+      "year": 2022,
+      "engineCc": 2995,
+      "fuelType": "gasoline",
+      "powerPs": 340,
+      "listingIds": [
+        "42705908"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2245327/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · 3.0",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Porsche Cayenne 2022, 2995 cc, gasoline; badge(s): 3.0 coupe platinum edition. All matching cards in the captured search returned 340 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Porsche",
+      "model": "Cayenne",
+      "year": 2023,
+      "engineCc": 2995,
+      "fuelType": "gasoline",
+      "powerPs": 340,
+      "listingIds": [
+        "42800973"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2572740/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 3.0 COUPE PLATINUM EDITION",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Porsche Cayenne 2023, 2995 cc, gasoline; badge(s): 3.0 coupe. All matching cards in the captured search returned 340 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Suzuki",
+      "model": "Jimny",
+      "year": 2024,
+      "engineCc": 1462,
+      "fuelType": "gasoline",
+      "powerPs": 102,
+      "listingIds": [
+        "42722653"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/1182146/",
+      "sourceTitle": "EncarRus Korea catalogue — 2024 · 1.5",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Suzuki Jimny 2024, 1462 cc, gasoline; badge(s): 1.5. All matching cards in the captured search returned 102 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Volkswagen",
+      "model": "Passat",
+      "year": 2021,
+      "engineCc": 1968,
+      "fuelType": "diesel",
+      "powerPs": 190,
+      "listingIds": [
+        "42805892"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2008617/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 2.0 TDI 4Motion Prestige",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Volkswagen Passat 2021, 1968 cc, diesel; badge(s): 2.0 tdi prestige. All matching cards in the captured search returned 190 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Volkswagen",
+      "model": "T-Roc",
+      "year": 2021,
+      "engineCc": 1968,
+      "fuelType": "diesel",
+      "powerPs": 150,
+      "listingIds": [
+        "42801093"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2491323/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 2.0 TDI Premium",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Volkswagen T-Roc 2021, 1968 cc, diesel; badge(s): 2.0 tdi prestige. All matching cards in the captured search returned 150 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Volkswagen",
+      "model": "Touareg",
+      "year": 2023,
+      "engineCc": 2967,
+      "fuelType": "diesel",
+      "powerPs": 231,
+      "listingIds": [
+        "42803438"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2683338/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · 3.0 TDI R-Line",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): 3.0 tdi r line. Selected exact catalogue trim 2023 · 3.0 TDI R-Line at 231 PS. Exact run badge is 3.0 TDI R-Line; matching card gives 231 PS while Premium/Prestige cards are 286 PS. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "Volvo",
+      "model": "S90",
+      "year": 2021,
+      "engineCc": 1969,
+      "fuelType": "gasoline",
+      "powerPs": 250,
+      "listingIds": [
+        "42737610"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2693153/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · B5 Inscription",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): b5 inscription. Selected exact catalogue trim 2021 · B5 Inscription at 250 PS. Exact run badge is B5 Inscription; 300 PS belongs to B6 AWD. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "Volvo",
+      "model": "XC40",
+      "year": 2022,
+      "engineCc": 1969,
+      "fuelType": "gasoline",
+      "powerPs": 197,
+      "listingIds": [
+        "42816488"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2018463/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · B4 Inscription",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Volvo XC40 2022, 1969 cc, gasoline; badge(s): b4 inscription. All matching cards in the captured search returned 197 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Volvo",
+      "model": "XC60",
+      "year": 2022,
+      "engineCc": 1969,
+      "fuelType": "gasoline",
+      "powerPs": 250,
+      "listingIds": [
+        "42754088"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/1596796/",
+      "sourceTitle": "EncarRus Korea catalogue — 2022 · B5 Inscription",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Volvo XC60 2022, 1969 cc, gasoline; badge(s): b5 ultimate bright. All matching cards in the captured search returned 250 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    },
+    {
+      "brand": "Volvo",
+      "model": "XC60",
+      "year": 2023,
+      "engineCc": 1969,
+      "fuelType": "gasoline",
+      "powerPs": 250,
+      "listingIds": [
+        "42806008",
+        "42725566"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2543975/",
+      "sourceTitle": "EncarRus Korea catalogue — 2023 · B5 Ultimate Bright",
+      "note": "Preliminary manual resolution of EncarRus review row. Run badge(s): b5 ultimate bright. Selected exact catalogue trim 2023 · B5 Ultimate Bright at 250 PS. Exact run badge is B5 Ultimate Bright; 300 PS belongs to B6 Ultimate Bright. Not TKS/legal confirmation."
+    },
+    {
+      "brand": "Kia",
+      "model": "K9",
+      "year": 2021,
+      "engineCc": 3778,
+      "fuelType": "gasoline",
+      "powerPs": 315,
+      "listingIds": [
+        "42725859"
+      ],
+      "sourceUrl": "https://encarrus.ru/korea/product/2534839/",
+      "sourceTitle": "EncarRus Korea catalogue — 2021 · 3.8 GDI AWD",
+      "note": "Preliminary unique EncarRus catalogue match. Run configuration Kia K9 2021, 3778 cc, gasoline; badge(s): 3.8 gdi awd. All matching cards in the captured search returned 315 PS. Displayed power is a preliminary engine-power reference, not TKS/legal confirmation."
+    }
+  ]
+}

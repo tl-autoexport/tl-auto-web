@@ -1,5 +1,5 @@
 /**
- * Store run-scoped Drom ICE/LPG power candidates as draft-only evidence/specs.
+ * Store run-scoped Drom/EncarRus ICE/LPG power candidates as draft-only evidence/specs.
  * Draft specs are not eligible for the approved power resolver. No cars,
  * calculations, prices, or publication state are written by this importer.
  */
@@ -11,10 +11,11 @@ import { config } from "dotenv";
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
-const manifestPath = process.env.DROM_ICE_MANIFEST ?? "data/power/drom-ice-gasd-lpg-201-preliminary-v1.json";
-const write = process.env.DROM_ICE_PRELIMINARY_WRITE === "true";
+const manifestPath = process.env.ICE_PRELIMINARY_MANIFEST ?? process.env.DROM_ICE_MANIFEST ?? "data/power/drom-ice-gasd-lpg-201-preliminary-v1.json";
+const write = process.env.ICE_PRELIMINARY_WRITE === "true" || process.env.DROM_ICE_PRELIMINARY_WRITE === "true";
 const dbUrl = process.env.SUPABASE_DB_URL;
-const verificationRunId = process.env.DROM_ICE_VERIFICATION_RUN_ID ?? "bd5481a2-04a1-458a-810a-30c3ae130fc5";
+const configuredRunIds = (process.env.ICE_PRELIMINARY_VERIFICATION_RUN_IDS ?? process.env.DROM_ICE_VERIFICATION_RUN_IDS ?? process.env.DROM_ICE_VERIFICATION_RUN_ID ?? "")
+  .split(",").map((value) => value.trim()).filter(Boolean);
 const PS_TO_KW = 0.73549875;
 
 type ManifestRecord = {
@@ -38,8 +39,8 @@ type Manifest = {
   records: ManifestRecord[];
 };
 
-type QueueRow = { source_listing_id: string; candidate_snapshot: Record<string, unknown> };
-type StagingRow = { source_listing_id: string; raw_payload: Record<string, any> };
+type QueueRow = { run_id: string; source_listing_id: string; candidate_snapshot: Record<string, unknown> };
+type StagingRow = { run_id: string; source_listing_id: string; raw_payload: Record<string, any> };
 
 function sha(value: string) {
   return createHash("sha256").update(value).digest("hex");
@@ -49,9 +50,10 @@ function slug(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function specKey(row: ManifestRecord) {
+function specKey(row: ManifestRecord, version: string) {
   const identity = [row.brand, row.model, row.fuelType, row.engineCc, row.year, row.powerPs, row.sourceUrl].join("|");
-  return `drom-ice-${slug(row.brand)}-${slug(row.model)}-${row.fuelType}-${row.engineCc}-${row.year}-${sha(identity).slice(0, 10)}`;
+  const sourcePrefix = version.startsWith("encarrus-") ? "encarrus-ice" : "drom-ice";
+  return `${sourcePrefix}-${slug(row.brand)}-${slug(row.model)}-${row.fuelType}-${row.engineCc}-${row.year}-${sha(identity).slice(0, 10)}`;
 }
 
 function normalizedFuel(snapshotFuel: unknown): string {
@@ -77,11 +79,12 @@ function modelMatches(recordModel: string, snapshotModel: unknown, category: Rec
 
 async function main() {
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as Manifest;
-  if (!manifest.version.startsWith("drom-ice-gasd-lpg-201-preliminary-v") || manifest.status !== "preliminary_only_not_approved_tks_evidence") {
+  if (!/^(drom|encarrus)-ice-gasd-lpg-201-preliminary-v/.test(manifest.version) || manifest.status !== "preliminary_only_not_approved_tks_evidence") {
     throw new Error("Unexpected manifest version/status; refusing import");
   }
   const ids = manifest.records.flatMap((row) => row.listingIds.map(String));
-  if (!manifest.runIds.includes(verificationRunId) || ids.length !== manifest.candidateListingCount || new Set(ids).size !== ids.length) {
+  const verificationRunIds = configuredRunIds.length ? configuredRunIds : manifest.runIds;
+  if (!verificationRunIds.length || verificationRunIds.some((id) => !manifest.runIds.includes(id)) || ids.length !== manifest.candidateListingCount || new Set(ids).size !== ids.length) {
     throw new Error(`Manifest ID/count check failed: ${ids.length}`);
   }
   if (!dbUrl) throw new Error("SUPABASE_DB_URL is required for Encar evidence preflight");
@@ -90,41 +93,54 @@ async function main() {
   await db.connect();
   try {
     const [queue, staging] = await Promise.all([
-      db.query<QueueRow>(`select source_listing_id,candidate_snapshot from public.encar_enrichment_queue where run_id=$1 and source_listing_id=any($2::text[])`, [verificationRunId, ids]),
-      db.query<StagingRow>(`select source_listing_id,raw_payload from public.encar_enrichment_staging where run_id=$1 and source_listing_id=any($2::text[])`, [verificationRunId, ids]),
+      db.query<QueueRow>(`select run_id,source_listing_id,candidate_snapshot from public.encar_enrichment_queue where run_id=any($1::uuid[]) and source_listing_id=any($2::text[])`, [verificationRunIds, ids]),
+      db.query<StagingRow>(`select run_id,source_listing_id,raw_payload from public.encar_enrichment_staging where run_id=any($1::uuid[]) and source_listing_id=any($2::text[])`, [verificationRunIds, ids]),
     ]);
-    const queueById = new Map(queue.rows.map((row) => [String(row.source_listing_id), row]));
-    const stagingById = new Map(staging.rows.map((row) => [String(row.source_listing_id), row]));
-    if (queueById.size !== ids.length || stagingById.size !== ids.length) {
-      throw new Error(`Encar preflight is incomplete: queue=${queueById.size}/${ids.length}, staging=${stagingById.size}/${ids.length}`);
+    const byListingId = <T extends { source_listing_id: string }>(rows: T[]) => {
+      const result = new Map<string, T[]>();
+      for (const row of rows) result.set(String(row.source_listing_id), [...(result.get(String(row.source_listing_id)) ?? []), row]);
+      return result;
+    };
+    const queueById = byListingId(queue.rows);
+    const stagingById = byListingId(staging.rows);
+    const missingQueue = ids.filter((id) => !queueById.has(id));
+    const missingStaging = ids.filter((id) => !stagingById.has(id));
+    if (missingQueue.length || missingStaging.length) {
+      throw new Error(`Encar preflight is incomplete: missing queue=${missingQueue.join(",")}; missing staging=${missingStaging.join(",")}`);
     }
 
     const verified = manifest.records.map((record) => {
       const listingEvidence = record.listingIds.map((id) => {
-        const queued = queueById.get(id)!;
-        const staged = stagingById.get(id)!;
-        const snapshot = queued.candidate_snapshot;
-        const detail = staged.raw_payload?.detail ?? {};
-        const category = detail.category ?? {};
-        const spec = detail.spec ?? {};
-        const actualYear = Math.floor(Number(snapshot.year) / 100);
-        const actualFuel = normalizedFuel(snapshot.fuelType);
-        const actualCc = Number(spec.displacement);
-        if (actualYear !== record.year || actualFuel !== record.fuelType || actualCc !== record.engineCc) {
-          throw new Error(`Encar identity mismatch for ${id}: year=${actualYear}, fuel=${actualFuel}, cc=${actualCc}; expected ${record.year}/${record.fuelType}/${record.engineCc}`);
+        const queueRows = queueById.get(id) ?? [];
+        const stagingRows = stagingById.get(id) ?? [];
+        const valid = verificationRunIds.flatMap((runId) => {
+          const queued = queueRows.find((row) => row.run_id === runId);
+          const staged = stagingRows.find((row) => row.run_id === runId);
+          if (!queued || !staged) return [];
+          const snapshot = queued.candidate_snapshot;
+          const detail = staged.raw_payload?.detail ?? {};
+          const category = detail.category ?? {};
+          const spec = detail.spec ?? {};
+          const actualYear = Math.floor(Number(snapshot.year) / 100);
+          const actualFuel = normalizedFuel(snapshot.fuelType);
+          const actualCc = Number(spec.displacement);
+          const snapshotModel = String(snapshot.model ?? "").toLowerCase();
+          const badge = String(category.gradeEnglishName ?? category.gradeName ?? "").trim();
+          if (actualYear !== record.year || actualFuel !== record.fuelType || actualCc !== record.engineCc || !badge) return [];
+          if (!modelMatches(record.model, snapshot.model, category) && !(record.model === "SM6" && snapshotModel.includes("sm6"))) return [];
+          return [{ listingId: id, yearMonth: snapshot.year, badge, runId }];
+        });
+        if (!valid.length) {
+          throw new Error(`No matching queue/staging pair for ${id} across runs ${verificationRunIds.join(",")}; expected ${record.model}/${record.year}/${record.fuelType}/${record.engineCc}`);
         }
-        const snapshotModel = String(snapshot.model ?? "").toLowerCase();
-        if (!modelMatches(record.model, snapshot.model, category) && !(record.model === "SM6" && snapshotModel.includes("sm6"))) {
-          throw new Error(`Encar model mismatch for ${id}: ${snapshot.model} != ${record.model}`);
-        }
-        const badge = String(category.gradeEnglishName ?? category.gradeName ?? "").trim();
-        if (!badge) throw new Error(`Missing Encar trim/badge for ${id}`);
-        return { listingId: id, yearMonth: snapshot.year, badge };
+        const badgeValues = [...new Set(valid.map((row) => row.badge))];
+        if (badgeValues.length > 1) throw new Error(`Conflicting Encar badges across runs for ${id}: ${badgeValues.join(" / ")}`);
+        return valid[0];
       });
       return { ...record, listingEvidence };
     });
 
-    const expectedSpecs = verified.map((row) => ({ key: specKey(row), row, kw: Number((row.powerPs * PS_TO_KW).toFixed(4)) }));
+    const expectedSpecs = verified.map((row) => ({ key: specKey(row, manifest.version), row, kw: Number((row.powerPs * PS_TO_KW).toFixed(4)) }));
     const existing = await db.query<{ spec_key: string; status: string; calculation_power_kw: string }>(
       `select spec_key,status,calculation_power_kw::text from public.vehicle_power_specs where spec_key=any($1::text[]) and version=1`,
       [expectedSpecs.map((x) => x.key)],
@@ -141,7 +157,7 @@ async function main() {
     const output = {
       readOnly: !write,
       databaseWrites: 0,
-      verificationRunId,
+      verificationRunIds,
       verifiedListings: ids.length,
       verifiedConfigurations: verified.length,
       draftSpecsAlreadyPresent: existing.rows.length,
@@ -173,7 +189,7 @@ async function main() {
         [manifestHash, manifest.version, JSON.stringify({ status: "draft_only", configurations: verified.length, listings: ids.length })],
       );
       const batchId = batch.rows[0]?.id;
-      if (!batchId) throw new Error("Could not create Drom evidence batch");
+      if (!batchId) throw new Error("Could not create preliminary ICE evidence batch");
 
       let inserted = 0;
       for (const [index, item] of pending.entries()) {
@@ -190,16 +206,16 @@ async function main() {
               dvs_power_kw,source_units,reliability,review_status,verification_status,review_note,evidence_note)
            values ($1,$2,'manual',$3,$4,$5,now(),current_date,'M1',$6,$7,$8,$9,$10,$10,'ice',$11,'PS','medium','draft','draft',$12,$12)
            returning id`,
-          [batchId, raw.rows[0]?.id, row.sourceUrl, `Encar listings ${row.listingIds.join(", ")}`, row.sourceTitle ?? "Drom Korean-market catalog", row.brand, row.model,
+          [batchId, raw.rows[0]?.id, row.sourceUrl, `Encar listings ${row.listingIds.join(", ")}`, row.sourceTitle ?? "Korean-market vehicle catalogue", row.brand, row.model,
             row.listingEvidence.map((x) => x.badge).filter((v, i, a) => a.indexOf(v) === i).join(" / "), row.fuelType, row.year, kw,
-            `Preliminary source match only. ${row.sourceTitle ?? "Drom Korean-market catalog"} reports engine output ${row.powerPs} PS (${kw} kW); not an official TKS/OTTS confirmation. Run-scoped IDs: ${row.listingIds.join(", ")}.`],
+            `Preliminary source match only. ${row.sourceTitle ?? "Korean-market vehicle catalogue"} reports engine output ${row.powerPs} PS (${kw} kW); not an official TKS/OTTS confirmation. Run-scoped IDs: ${row.listingIds.join(", ")}.`],
         );
         const spec = await db.query<{ id: string }>(
           `insert into public.vehicle_power_specs
              (spec_key,version,status,vehicle_category,propulsion_type,engine_cc_from,engine_cc_to,dvs_power_kw,
               calculation_power_kw,evidence_id,approval_note,engine_power_hp,power_basis,source_priority)
            values ($1,1,'draft','M1','ice',$2,$2,$3,$3,$4,$5,$6,'combustion_engine',80) returning id`,
-          [key, row.engineCc, kw, evidence.rows[0]?.id, `Draft only; Drom preliminary power. Do not use in automatic/public calculation until reviewed. ${row.sourceUrl}`, row.powerPs],
+          [key, row.engineCc, kw, evidence.rows[0]?.id, `Draft only; preliminary catalogue/manufacturer power. Do not use in automatic/public calculation until reviewed. ${row.sourceUrl}`, row.powerPs],
         );
         const uniqueBadges = row.listingEvidence.map((x) => x.badge).filter((v, i, a) => a.indexOf(v) === i);
         for (const badge of uniqueBadges) {

@@ -1,0 +1,3867 @@
+{
+  "version": "encarrus-ice-gasd-lpg-201-source-audit-v1",
+  "runIds": [
+    "bd5481a2-04a1-458a-810a-30c3ae130fc5",
+    "d50f740a-3cfb-4eea-8e9d-84adba3d0e52"
+  ],
+  "generatedFrom": "User-provided complete compact EncarRus report output (two attached terminal excerpts)",
+  "counts": {
+    "configurations": 89,
+    "uniquePreliminaryCandidateConfigurations": 74,
+    "uniquePreliminaryCandidateListings": 104,
+    "reviewedConfigurations": 15,
+    "reviewedListings": 16,
+    "uniqueListings": 120,
+    "finalPreliminaryRecords": 89,
+    "finalCoveredListings": 120
+  },
+  "reviewResolutions": [
+    {
+      "listingId": "42710600",
+      "powerPs": 326,
+      "trim": "2022 · 740i sDrive Design Pure Excellence",
+      "rationale": "Run badge exactly names the non-Individual, rear-drive trim; 381 PS is the Individual trim and 340 PS is xDrive."
+    },
+    {
+      "listingId": "42710725",
+      "powerPs": 192,
+      "trim": "2022 · Classic",
+      "rationale": "Exact run badge is Classic and matching EncarRus Classic card is 192 PS; 231 PS is JCW."
+    },
+    {
+      "listingId": "42725566",
+      "powerPs": 250,
+      "trim": "2023 · B5 Ultimate Bright",
+      "rationale": "Same run configuration as 42806008: exact B5 Ultimate Bright card gives 250 PS; 300 PS belongs to B6."
+    },
+    {
+      "listingId": "42728610",
+      "powerPs": 146,
+      "trim": "2022 · 2.0 LPG",
+      "rationale": "Run badge says 2.0 LPG without rental-car designation; exact standard LPG card is 146 PS. The separate rental-car card is 157 PS."
+    },
+    {
+      "listingId": "42735468",
+      "powerPs": 290,
+      "trim": "2022 · L 3.6 Summit Reserve",
+      "rationale": "Exact run badge includes L 3.6 Summit Reserve; the 293 PS card is non-L Overland."
+    },
+    {
+      "listingId": "42737610",
+      "powerPs": 250,
+      "trim": "2021 · B5 Inscription",
+      "rationale": "Exact run badge is B5 Inscription; 300 PS belongs to B6 AWD."
+    },
+    {
+      "listingId": "42743873",
+      "powerPs": 218,
+      "trim": "2025 · JCW",
+      "rationale": "Exact run badge is JCW and matching EncarRus JCW card is 218 PS."
+    },
+    {
+      "listingId": "42745403",
+      "powerPs": 326,
+      "trim": "2023 · 740i sDrive M Sport",
+      "rationale": "Exact run badge matches the non-Individual sDrive M Sport card (326 PS); 381 PS is explicitly M Sport Individual and 340 PS is xDrive."
+    },
+    {
+      "listingId": "42746996",
+      "powerPs": 385,
+      "trim": "2021 · Carrera 4 Cabriolet",
+      "rationale": "Exact run badge is Carrera 4 Cabriolet; 450 PS cards are Carrera 4S variants."
+    },
+    {
+      "listingId": "42755461",
+      "powerPs": 286,
+      "trim": "2021 · S350 d",
+      "rationale": "Exact run badge is S350 d; 340 PS belongs to the separate S400 d 4MATIC trim."
+    },
+    {
+      "listingId": "42771564",
+      "powerPs": 202,
+      "official": true,
+      "rationale": "KGM Korea official specification for the facelifted 2.2 diesel Rexton gives 202 PS; EncarRus catalogue alternatives 181/187 conflict with the Korea-market manufacturer figure.",
+      "url": "https://m.kg-mobility.com/global/mediacenter/News/1300951_19810.html",
+      "title": "KGM official Korea-market Rexton press release"
+    },
+    {
+      "listingId": "42799114",
+      "powerPs": 184,
+      "trim": "2022 · 220i M Sports",
+      "rationale": "Run badge is 220i M Sports and exact EncarRus trim is 184 PS; the 306 PS card is M235i xDrive."
+    },
+    {
+      "listingId": "42803438",
+      "powerPs": 231,
+      "trim": "2023 · 3.0 TDI R-Line",
+      "rationale": "Exact run badge is 3.0 TDI R-Line; matching card gives 231 PS while Premium/Prestige cards are 286 PS."
+    },
+    {
+      "listingId": "42806008",
+      "powerPs": 250,
+      "trim": "2023 · B5 Ultimate Bright",
+      "rationale": "Exact run badge is B5 Ultimate Bright; 300 PS belongs to B6 Ultimate Bright."
+    },
+    {
+      "listingId": "42808433",
+      "powerPs": 202,
+      "official": true,
+      "rationale": "KGM Korea official Rexton 2.2 diesel specification gives 202 PS; EncarRus catalogue alternatives 181/187 conflict with the Korea-market manufacturer figure.",
+      "url": "https://m.kg-mobility.com/showroom/total_price/__icsFiles/afieldfile/2024/02/28/Total_price_2403_1.pdf",
+      "title": "KGM official Rexton 2024 specifications and price list"
+    },
+    {
+      "listingId": "42820256",
+      "powerPs": 204,
+      "official": true,
+      "rationale": "Run trim ALL4 Classic maps to Korea-market MINI Countryman S ALL4 Classic. MINI Korea 2026 spec lists 150 kW/204 PS; EncarRus displayed 218 PS options are other catalogue variants and do not override exact Korean factory trim.",
+      "url": "https://www.mini.co.kr/ko_KR/home/range/mini-countryman/driving-experience.html",
+      "title": "MINI Korea official Countryman S ALL4 specifications"
+    }
+  ],
+  "sourceRows": [
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42735257",
+        "42780531",
+        "42800026",
+        "42804803",
+        "42807677",
+        "42816903"
+      ],
+      "car": [
+        "KG_Mobility_Ssangyong",
+        "Torres",
+        2022,
+        1497,
+        "gasoline",
+        "2WD"
+      ],
+      "badges": [
+        "gasoline 1.5 2wd"
+      ],
+      "suggestedPowerHp": 170,
+      "powerCandidatesHp": [
+        170
+      ],
+      "cards": [
+        {
+          "trim": "2022 · Gasoline 1.5 2WD",
+          "year": 2022,
+          "engineCc": 1500,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 170,
+          "productUrl": "https://encarrus.ru/korea/product/2399846/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42726754",
+        "42789484",
+        "42815799"
+      ],
+      "car": [
+        "Hyundai",
+        "Staria",
+        2024,
+        3470,
+        "lpg",
+        null
+      ],
+      "badges": [
+        "l3.5 cargo 5 seater",
+        "l3.5 tourer 11 seater"
+      ],
+      "suggestedPowerHp": 240,
+      "powerCandidatesHp": [
+        240
+      ],
+      "cards": [
+        {
+          "trim": "2024 · L3.5 Lounge 7-Seater",
+          "year": 2024,
+          "engineCc": 3500,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 240,
+          "productUrl": "https://encarrus.ru/korea/product/2761429/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42727600",
+        "42797406",
+        "42810898"
+      ],
+      "car": [
+        "KG_Mobility_Ssangyong",
+        "Tivoli",
+        2022,
+        1497,
+        "gasoline",
+        "2WD"
+      ],
+      "badges": [
+        "gasoline 1.5 2wd",
+        "1.5 a3 2wd"
+      ],
+      "suggestedPowerHp": 163,
+      "powerCandidatesHp": [
+        163
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 1.5 A3 2WD",
+          "year": 2022,
+          "engineCc": 1500,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 163,
+          "productUrl": "https://encarrus.ru/korea/product/2408280/"
+        },
+        {
+          "trim": "2022 · 1.5 A5 2WD",
+          "year": 2022,
+          "engineCc": 1500,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 163,
+          "productUrl": "https://encarrus.ru/korea/product/2522795/"
+        },
+        {
+          "trim": "2022 · 1.5 A7 2WD",
+          "year": 2022,
+          "engineCc": 1500,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 163,
+          "productUrl": "https://encarrus.ru/korea/product/2356952/"
+        },
+        {
+          "trim": "2022 · 1.5 Upbeat 2WD",
+          "year": 2022,
+          "engineCc": 1500,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 163,
+          "productUrl": "https://encarrus.ru/korea/product/2317043/"
+        },
+        {
+          "trim": "2022 · Gasoline 1.5 2WD",
+          "year": 2022,
+          "engineCc": 1500,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 163,
+          "productUrl": "https://encarrus.ru/korea/product/1644248/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42716831",
+        "42745684",
+        "42811705"
+      ],
+      "car": [
+        "Kia",
+        "RAY",
+        2021,
+        998,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "signature",
+        "prestige"
+      ],
+      "suggestedPowerHp": 76,
+      "powerCandidatesHp": [
+        76
+      ],
+      "cards": [
+        {
+          "trim": "2021 · Prestige",
+          "year": 2021,
+          "engineCc": 1000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 76,
+          "productUrl": "https://encarrus.ru/korea/product/2419339/"
+        },
+        {
+          "trim": "2021 · Signature",
+          "year": 2021,
+          "engineCc": 1000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 76,
+          "productUrl": "https://encarrus.ru/korea/product/2772342/"
+        },
+        {
+          "trim": "2021 · Standard",
+          "year": 2021,
+          "engineCc": 1000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 76,
+          "productUrl": "https://encarrus.ru/korea/product/2509977/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42777961",
+        "42796755",
+        "42803623"
+      ],
+      "car": [
+        "Kia",
+        "Tasman",
+        2025,
+        2497,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "2.5t gasoline 4wd"
+      ],
+      "suggestedPowerHp": 277,
+      "powerCandidatesHp": [
+        277
+      ],
+      "cards": [
+        {
+          "trim": "2025 · 2.5T Gasoline 4WD",
+          "year": 2025,
+          "engineCc": 2500,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 277,
+          "productUrl": "https://encarrus.ru/korea/product/2457121/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42703261",
+        "42781077"
+      ],
+      "car": [
+        "Cadillac",
+        "Escalade",
+        2023,
+        6162,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "6.2",
+        "6.2 esv"
+      ],
+      "suggestedPowerHp": 420,
+      "powerCandidatesHp": [
+        420
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 6.2",
+          "year": 2023,
+          "engineCc": 6200,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 420,
+          "productUrl": "https://encarrus.ru/korea/product/2192032/"
+        },
+        {
+          "trim": "2023 · 6.2 ESV",
+          "year": 2023,
+          "engineCc": 6200,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 420,
+          "productUrl": "https://encarrus.ru/korea/product/2466901/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42806101",
+        "42808755"
+      ],
+      "car": [
+        "Genesis",
+        "GV80",
+        2024,
+        2497,
+        "gasoline",
+        "2WD"
+      ],
+      "badges": [
+        "2.5t gasoline 2wd"
+      ],
+      "suggestedPowerHp": 304,
+      "powerCandidatesHp": [
+        304
+      ],
+      "cards": [
+        {
+          "trim": "2024 · 2.5T Gasoline 2WD",
+          "year": 2024,
+          "engineCc": 2500,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 304,
+          "productUrl": "https://encarrus.ru/korea/product/2549910/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42728772",
+        "42798426"
+      ],
+      "car": [
+        "Hyundai",
+        "Elantra",
+        2023,
+        1591,
+        "lpg",
+        null
+      ],
+      "badges": [
+        "1.6 lpi"
+      ],
+      "suggestedPowerHp": 120,
+      "powerCandidatesHp": [
+        120
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 1.6 LPi",
+          "year": 2023,
+          "engineCc": 1600,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 120,
+          "productUrl": "https://encarrus.ru/korea/product/2586821/"
+        },
+        {
+          "trim": "2023 · 1.6 LPi (Rent car)",
+          "year": 2023,
+          "engineCc": 1600,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 120,
+          "productUrl": "https://encarrus.ru/korea/product/2734083/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42728750",
+        "42730141"
+      ],
+      "car": [
+        "Hyundai",
+        "Grandeur",
+        2022,
+        2999,
+        "lpg",
+        null
+      ],
+      "badges": [
+        "3.0 lpi rent car"
+      ],
+      "suggestedPowerHp": 235,
+      "powerCandidatesHp": [
+        235
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 3.0 LPi (Taxi)",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 235,
+          "productUrl": "https://encarrus.ru/korea/product/2586755/"
+        },
+        {
+          "trim": "2022 · 3.0 LPi Rent Car",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 235,
+          "productUrl": "https://encarrus.ru/korea/product/1974174/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42748445",
+        "42758891"
+      ],
+      "car": [
+        "Kia",
+        "K5",
+        2023,
+        1999,
+        "lpg",
+        null
+      ],
+      "badges": [
+        "2.0 lpi(renter car)",
+        "2.0 lpi"
+      ],
+      "suggestedPowerHp": 146,
+      "powerCandidatesHp": [
+        146
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 2.0 LPI(Renter car)",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 146,
+          "productUrl": "https://encarrus.ru/korea/product/735201/"
+        },
+        {
+          "trim": "2023 · 2.0 LPi(Rent)",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 146,
+          "productUrl": "https://encarrus.ru/korea/product/2147335/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42715999",
+        "42785544",
+        "42725104"
+      ],
+      "car": [
+        "Kia",
+        "Sportage",
+        2022,
+        1999,
+        "lpg",
+        "2WD"
+      ],
+      "badges": [
+        "lpg 2.0 2wd"
+      ],
+      "suggestedPowerHp": 146,
+      "powerCandidatesHp": [
+        146
+      ],
+      "cards": [
+        {
+          "trim": "2022 · LPG 2.0 2WD",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 146,
+          "productUrl": "https://encarrus.ru/korea/product/2447097/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42706375",
+        "42789268"
+      ],
+      "car": [
+        "Kia",
+        "Tasman",
+        2026,
+        2497,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "2.5t gasoline 4wd"
+      ],
+      "suggestedPowerHp": 277,
+      "powerCandidatesHp": [
+        277
+      ],
+      "cards": [
+        {
+          "trim": "2026 · 2.5T Gasoline 4WD",
+          "year": 2026,
+          "engineCc": 2500,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 277,
+          "productUrl": "https://encarrus.ru/korea/product/2183076/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42777974",
+        "42782232"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "AMG GT",
+        2021,
+        2999,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "4door 43 4matic+"
+      ],
+      "suggestedPowerHp": 367,
+      "powerCandidatesHp": [
+        367
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 4Door 43 4MATIC+",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 367,
+          "productUrl": "https://encarrus.ru/korea/product/2368634/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42793679",
+        "42800267",
+        "42770319"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "C-Class",
+        2023,
+        1999,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "c300 4matic amg line"
+      ],
+      "suggestedPowerHp": 258,
+      "powerCandidatesHp": [
+        258
+      ],
+      "cards": [
+        {
+          "trim": "2023 · C300 4MATIC AMG Line",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2152826/"
+        },
+        {
+          "trim": "2023 · C300 4MATIC Avantgarde",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2266188/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42738752",
+        "42792517"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "GLC",
+        2023,
+        1991,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "gcl300 4matic coupe"
+      ],
+      "suggestedPowerHp": 258,
+      "powerCandidatesHp": [
+        258
+      ],
+      "cards": [
+        {
+          "trim": "2023 · GLC 300 4MATIC Avantgarde",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2194507/"
+        },
+        {
+          "trim": "2023 · GLC300 4MATIC AMG Line",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2521505/"
+        },
+        {
+          "trim": "2023 · GLC300 4MATIC Coupe",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2738736/"
+        },
+        {
+          "trim": "2023 · GLC300 4MATIC Online Special",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2682708/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42716403",
+        "42732119",
+        "42769517"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "GLE",
+        2023,
+        1993,
+        "diesel",
+        "4WD"
+      ],
+      "badges": [
+        "gle300d 4matic"
+      ],
+      "suggestedPowerHp": 272,
+      "powerCandidatesHp": [
+        272
+      ],
+      "cards": [
+        {
+          "trim": "2023 · GLE300d 4MATIC",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 272,
+          "productUrl": "https://encarrus.ru/korea/product/2708619/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42724298",
+        "42788473"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "GLE",
+        2022,
+        1993,
+        "diesel",
+        "4WD"
+      ],
+      "badges": [
+        "gle300d 4matic"
+      ],
+      "suggestedPowerHp": 272,
+      "powerCandidatesHp": [
+        272
+      ],
+      "cards": [
+        {
+          "trim": "2022 · GLE300d 4MATIC",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 272,
+          "productUrl": "https://encarrus.ru/korea/product/2379073/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42707855",
+        "42802976"
+      ],
+      "car": [
+        "Porsche",
+        "Cayenne",
+        2021,
+        2995,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "3.0 coupe",
+        "3.0"
+      ],
+      "suggestedPowerHp": 340,
+      "powerCandidatesHp": [
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 3.0",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2765216/"
+        },
+        {
+          "trim": "2021 · 3.0 Coupe",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2413788/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42812473"
+      ],
+      "car": [
+        "Audi",
+        "A4",
+        2023,
+        1968,
+        "diesel",
+        "4WD"
+      ],
+      "badges": [
+        "40 tdi quattro premium"
+      ],
+      "suggestedPowerHp": 204,
+      "powerCandidatesHp": [
+        204
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 40 TDI Quattro Premium",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 204,
+          "productUrl": "https://encarrus.ru/korea/product/2307433/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42710125"
+      ],
+      "car": [
+        "Audi",
+        "A6",
+        2022,
+        1984,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "45 tfsi premium"
+      ],
+      "suggestedPowerHp": 265,
+      "powerCandidatesHp": [
+        265
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 45 TFSI Premium",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 265,
+          "productUrl": "https://encarrus.ru/korea/product/2312805/"
+        },
+        {
+          "trim": "2022 · 45 TFSI Quattro Premium",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 265,
+          "productUrl": "https://encarrus.ru/korea/product/2520353/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42778165"
+      ],
+      "car": [
+        "Audi",
+        "A6",
+        2026,
+        1984,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "40 tfsi advanced"
+      ],
+      "suggestedPowerHp": 265,
+      "powerCandidatesHp": [
+        265
+      ],
+      "cards": [
+        {
+          "trim": "2026 · 40 TFSI S Line",
+          "year": 2026,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 265,
+          "productUrl": "https://encarrus.ru/korea/product/2544148/"
+        },
+        {
+          "trim": "2026 · 45 TFSI Quattro S Line",
+          "year": 2026,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 265,
+          "productUrl": "https://encarrus.ru/korea/product/2776870/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42786386"
+      ],
+      "car": [
+        "Audi",
+        "A6",
+        2023,
+        1968,
+        "diesel",
+        null
+      ],
+      "badges": [
+        "40 tdi premium"
+      ],
+      "suggestedPowerHp": 204,
+      "powerCandidatesHp": [
+        204
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 40 TDI Premium",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "2WD",
+          "powerHp": 204,
+          "productUrl": "https://encarrus.ru/korea/product/2401071/"
+        },
+        {
+          "trim": "2023 · 40 TDI Quattro Premium",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 204,
+          "productUrl": "https://encarrus.ru/korea/product/1587247/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42804638"
+      ],
+      "car": [
+        "Audi",
+        "A6",
+        2023,
+        1984,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "45 tfsi"
+      ],
+      "suggestedPowerHp": 265,
+      "powerCandidatesHp": [
+        265
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 45 TFSI Premium",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 265,
+          "productUrl": "https://encarrus.ru/korea/product/1809784/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42703809"
+      ],
+      "car": [
+        "Audi",
+        "A7",
+        2021,
+        2995,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "55 tfsi quattro premium"
+      ],
+      "suggestedPowerHp": 340,
+      "powerCandidatesHp": [
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 55 TFSI Quattro Premium",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2684100/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42758875"
+      ],
+      "car": [
+        "Audi",
+        "A8",
+        2023,
+        2995,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "55 tfsi quattro premium lwb"
+      ],
+      "suggestedPowerHp": 340,
+      "powerCandidatesHp": [
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 55 TFSI Quattro Premium LWB",
+          "year": 2023,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2738726/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42781028"
+      ],
+      "car": [
+        "BMW",
+        "2 Series",
+        2024,
+        1998,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "220i m sports"
+      ],
+      "suggestedPowerHp": 184,
+      "powerCandidatesHp": [
+        184
+      ],
+      "cards": [
+        {
+          "trim": "2024 · 220i Luxury",
+          "year": 2024,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/2780350/"
+        },
+        {
+          "trim": "2024 · 220i M Sports",
+          "year": 2024,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/2018094/"
+        },
+        {
+          "trim": "2024 · 220i Sport",
+          "year": 2024,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/1288416/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42799114"
+      ],
+      "car": [
+        "BMW",
+        "2 Series",
+        2022,
+        1998,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "220i m sports"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        184,
+        306
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 220i M Sports",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/2684164/"
+        },
+        {
+          "trim": "2022 · 220i Sport",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/2356574/"
+        },
+        {
+          "trim": "2022 · M235i xDrive",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 306,
+          "productUrl": "https://encarrus.ru/korea/product/2776830/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42801668"
+      ],
+      "car": [
+        "BMW",
+        "2 Series",
+        2022,
+        1998,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "m235i xdrive"
+      ],
+      "suggestedPowerHp": 306,
+      "powerCandidatesHp": [
+        306
+      ],
+      "cards": [
+        {
+          "trim": "2022 · M235i xDrive",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 306,
+          "productUrl": "https://encarrus.ru/korea/product/2776830/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42800063"
+      ],
+      "car": [
+        "BMW",
+        "5 Series",
+        2022,
+        1998,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "520i luxury"
+      ],
+      "suggestedPowerHp": 184,
+      "powerCandidatesHp": [
+        184
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 520i Luxury",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/2716181/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42710600"
+      ],
+      "car": [
+        "BMW",
+        "7 Series",
+        2022,
+        2998,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "740i sdrive design pure excellence"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        326,
+        381,
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 740Li xDrive Design Pure Excellence",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 326,
+          "productUrl": "https://encarrus.ru/korea/product/2505422/"
+        },
+        {
+          "trim": "2022 · 740i Design Pure Excellence",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 326,
+          "productUrl": "https://encarrus.ru/korea/product/2765035/"
+        },
+        {
+          "trim": "2022 · 740i sDrive Design Pure Excellence",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 326,
+          "productUrl": "https://encarrus.ru/korea/product/1809452/"
+        },
+        {
+          "trim": "2022 · 740i sDrive Design Pure Excellence Individual",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 381,
+          "productUrl": "https://encarrus.ru/korea/product/2316887/"
+        },
+        {
+          "trim": "2022 · 740i sDrive M Sport",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 326,
+          "productUrl": "https://encarrus.ru/korea/product/2457114/"
+        },
+        {
+          "trim": "2022 · 740i sDrive M Sport",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 381,
+          "productUrl": "https://encarrus.ru/korea/product/2307578/"
+        },
+        {
+          "trim": "2022 · 740i xDrive M Sport",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2368460/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42717525"
+      ],
+      "car": [
+        "BMW",
+        "7 Series",
+        2024,
+        2998,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "740i xdrive m sport"
+      ],
+      "suggestedPowerHp": 340,
+      "powerCandidatesHp": [
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2024 · 740i xDrive M Sport",
+          "year": 2024,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2338158/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42745403"
+      ],
+      "car": [
+        "BMW",
+        "7 Series",
+        2023,
+        2998,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "740i sdrive m sport"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        326,
+        340,
+        381
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 740i sDrive Design Pure Excellence",
+          "year": 2023,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 326,
+          "productUrl": "https://encarrus.ru/korea/product/2260795/"
+        },
+        {
+          "trim": "2023 · 740i sDrive Design Pure Excellence Individual",
+          "year": 2023,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 381,
+          "productUrl": "https://encarrus.ru/korea/product/2535544/"
+        },
+        {
+          "trim": "2023 · 740i sDrive M Sport",
+          "year": 2023,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 326,
+          "productUrl": "https://encarrus.ru/korea/product/2568468/"
+        },
+        {
+          "trim": "2023 · 740i sDrive M Sport Individual",
+          "year": 2023,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 381,
+          "productUrl": "https://encarrus.ru/korea/product/761742/"
+        },
+        {
+          "trim": "2023 · 740i xDrive M Sport",
+          "year": 2023,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2235832/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42790778"
+      ],
+      "car": [
+        "BMW",
+        "7 Series",
+        2021,
+        2993,
+        "diesel",
+        "4WD"
+      ],
+      "badges": [
+        "730d xdrive design pure excellence"
+      ],
+      "suggestedPowerHp": 265,
+      "powerCandidatesHp": [
+        265
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 730Ld xDrive Design Pure Excellence",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 265,
+          "productUrl": "https://encarrus.ru/korea/product/2152113/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42820155"
+      ],
+      "car": [
+        "BMW",
+        "8-Series",
+        2021,
+        2998,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "840i xdrive m sport gran coupe"
+      ],
+      "suggestedPowerHp": 340,
+      "powerCandidatesHp": [
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 840i xDrive M Sport Gran Coupe",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2734820/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42805846"
+      ],
+      "car": [
+        "BMW",
+        "M4",
+        2026,
+        2993,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "m4 convertible competition m xdrive"
+      ],
+      "suggestedPowerHp": 510,
+      "powerCandidatesHp": [
+        510
+      ],
+      "cards": [
+        {
+          "trim": "2026 · M4 Competition M xDrive",
+          "year": 2026,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 510,
+          "productUrl": "https://encarrus.ru/korea/product/2379345/"
+        },
+        {
+          "trim": "2026 · M4 Convertible Competition M xDrive",
+          "year": 2026,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 510,
+          "productUrl": "https://encarrus.ru/korea/product/2753514/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42765755"
+      ],
+      "car": [
+        "BMW",
+        "X3",
+        2026,
+        1998,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "xdrive 20 m sport"
+      ],
+      "suggestedPowerHp": 184,
+      "powerCandidatesHp": [
+        184
+      ],
+      "cards": [
+        {
+          "trim": "2026 · xDrive 20",
+          "year": 2026,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/2489044/"
+        },
+        {
+          "trim": "2026 · xDrive 20 M Sport",
+          "year": 2026,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/2577603/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42772730"
+      ],
+      "car": [
+        "BMW",
+        "X3",
+        2025,
+        1998,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "xdrive 20"
+      ],
+      "suggestedPowerHp": 184,
+      "powerCandidatesHp": [
+        184
+      ],
+      "cards": [
+        {
+          "trim": "2025 · xDrive 20",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/2725194/"
+        },
+        {
+          "trim": "2025 · xDrive 20 M Sport",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/2489427/"
+        },
+        {
+          "trim": "2025 · xDrive 20 M Sport Pro",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/2342720/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42809893"
+      ],
+      "car": [
+        "BMW",
+        "X3",
+        2024,
+        1998,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "xdrive 20i m sport"
+      ],
+      "suggestedPowerHp": 184,
+      "powerCandidatesHp": [
+        184
+      ],
+      "cards": [
+        {
+          "trim": "2024 · xDrive 20 M Sport",
+          "year": 2024,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/822578/"
+        },
+        {
+          "trim": "2024 · xDrive 20 M Sport Pro",
+          "year": 2024,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 184,
+          "productUrl": "https://encarrus.ru/korea/product/953350/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42742220"
+      ],
+      "car": [
+        "BMW",
+        "X5",
+        2022,
+        2998,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "xdrive 40i m sport"
+      ],
+      "suggestedPowerHp": 340,
+      "powerCandidatesHp": [
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2022 · xDrive 40i xLine",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2275141/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42736758"
+      ],
+      "car": [
+        "BMW",
+        "X5M",
+        2021,
+        4395,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "4.4 competition"
+      ],
+      "suggestedPowerHp": 625,
+      "powerCandidatesHp": [
+        625
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 4.4 Competition",
+          "year": 2021,
+          "engineCc": 4400,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 625,
+          "productUrl": "https://encarrus.ru/korea/product/2562077/"
+        },
+        {
+          "trim": "2021 · 4.4 Competition First Edition",
+          "year": 2021,
+          "engineCc": 4400,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 625,
+          "productUrl": "https://encarrus.ru/korea/product/2721888/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42707898"
+      ],
+      "car": [
+        "BMW",
+        "X6",
+        2022,
+        2998,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "xdrive40i m sport"
+      ],
+      "suggestedPowerHp": 340,
+      "powerCandidatesHp": [
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2022 · xDrive40i M Sport",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2550547/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42731198"
+      ],
+      "car": [
+        "Cadillac",
+        "Escalade",
+        2022,
+        6162,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "6.2 esv"
+      ],
+      "suggestedPowerHp": 420,
+      "powerCandidatesHp": [
+        420
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 6.2",
+          "year": 2022,
+          "engineCc": 6200,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 420,
+          "productUrl": "https://encarrus.ru/korea/product/2392684/"
+        },
+        {
+          "trim": "2022 · 6.2 ESV",
+          "year": 2022,
+          "engineCc": 6200,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 420,
+          "productUrl": "https://encarrus.ru/korea/product/1710398/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42706388"
+      ],
+      "car": [
+        "Ford",
+        "Explorer",
+        2022,
+        2261,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "2.3 limited 4wd"
+      ],
+      "suggestedPowerHp": 300,
+      "powerCandidatesHp": [
+        300
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 2.3 LimIted 4WD",
+          "year": 2022,
+          "engineCc": 2300,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 300,
+          "productUrl": "https://encarrus.ru/korea/product/2510310/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42708189"
+      ],
+      "car": [
+        "Ford",
+        "Mustang",
+        2022,
+        2261,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "convertible"
+      ],
+      "suggestedPowerHp": 305,
+      "powerCandidatesHp": [
+        305
+      ],
+      "cards": [
+        {
+          "trim": "2022 · Convertible",
+          "year": 2022,
+          "engineCc": 2300,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 305,
+          "productUrl": "https://encarrus.ru/korea/product/2562142/"
+        },
+        {
+          "trim": "2022 · Coupe",
+          "year": 2022,
+          "engineCc": 2300,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 305,
+          "productUrl": "https://encarrus.ru/korea/product/2419373/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42712890"
+      ],
+      "car": [
+        "Ford",
+        "Mustang",
+        2021,
+        2261,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "convertible"
+      ],
+      "suggestedPowerHp": 305,
+      "powerCandidatesHp": [
+        305
+      ],
+      "cards": [
+        {
+          "trim": "2021 · Convertible",
+          "year": 2021,
+          "engineCc": 2300,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 305,
+          "productUrl": "https://encarrus.ru/korea/product/2302301/"
+        },
+        {
+          "trim": "2021 · Coupe",
+          "year": 2021,
+          "engineCc": 2300,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 305,
+          "productUrl": "https://encarrus.ru/korea/product/1595165/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42797199"
+      ],
+      "car": [
+        "Ford",
+        "Mustang",
+        2023,
+        2261,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "coupe"
+      ],
+      "suggestedPowerHp": 305,
+      "powerCandidatesHp": [
+        305
+      ],
+      "cards": [
+        {
+          "trim": "2023 · Convertible",
+          "year": 2023,
+          "engineCc": 2300,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 305,
+          "productUrl": "https://encarrus.ru/korea/product/1595036/"
+        },
+        {
+          "trim": "2023 · Coupe",
+          "year": 2023,
+          "engineCc": 2300,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 305,
+          "productUrl": "https://encarrus.ru/korea/product/2466755/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42783011"
+      ],
+      "car": [
+        "Ford",
+        "Ranger",
+        2025,
+        1996,
+        "diesel",
+        null
+      ],
+      "badges": [
+        "2.0"
+      ],
+      "suggestedPowerHp": 213,
+      "powerCandidatesHp": [
+        213
+      ],
+      "cards": [
+        {
+          "trim": "2025 · 2.0",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 213,
+          "productUrl": "https://encarrus.ru/korea/product/2712851/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42798284"
+      ],
+      "car": [
+        "GMC",
+        "Sierra",
+        2023,
+        6162,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "denali x"
+      ],
+      "suggestedPowerHp": 420,
+      "powerCandidatesHp": [
+        420
+      ],
+      "cards": [
+        {
+          "trim": "2023 · Denali",
+          "year": 2023,
+          "engineCc": 6200,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 420,
+          "productUrl": "https://encarrus.ru/korea/product/2348811/"
+        },
+        {
+          "trim": "2023 · Denali-X",
+          "year": 2023,
+          "engineCc": 6200,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 420,
+          "productUrl": "https://encarrus.ru/korea/product/2717166/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42815139"
+      ],
+      "car": [
+        "GMC",
+        "Sierra",
+        2025,
+        6162,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "denali x"
+      ],
+      "suggestedPowerHp": 420,
+      "powerCandidatesHp": [
+        420
+      ],
+      "cards": [
+        {
+          "trim": "2025 · Denali-X",
+          "year": 2025,
+          "engineCc": 6200,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 420,
+          "productUrl": "https://encarrus.ru/korea/product/2399840/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42796427"
+      ],
+      "car": [
+        "Honda",
+        "CR-V",
+        2021,
+        1498,
+        "gasoline",
+        "2WD"
+      ],
+      "badges": [
+        "1.5 ex l 2wd"
+      ],
+      "suggestedPowerHp": 190,
+      "powerCandidatesHp": [
+        190
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 1.5 EX-L 2WD",
+          "year": 2021,
+          "engineCc": 1500,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 190,
+          "productUrl": "https://encarrus.ru/korea/product/1640592/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42750144"
+      ],
+      "car": [
+        "Hyundai",
+        "Grandeur",
+        2023,
+        3470,
+        "lpg",
+        "2WD"
+      ],
+      "badges": [
+        "3.5 lpg 2wd"
+      ],
+      "suggestedPowerHp": 240,
+      "powerCandidatesHp": [
+        240
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 3.5 LPG 2WD (Taxi)",
+          "year": 2023,
+          "engineCc": 3500,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 240,
+          "productUrl": "https://encarrus.ru/korea/product/2761135/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42750825"
+      ],
+      "car": [
+        "Hyundai",
+        "Kona",
+        2025,
+        1598,
+        "gasoline",
+        "2WD"
+      ],
+      "badges": [
+        "gasoline 1.6 turbo 2wd"
+      ],
+      "suggestedPowerHp": 198,
+      "powerCandidatesHp": [
+        198
+      ],
+      "cards": [
+        {
+          "trim": "2025 · Gasoline 1.6 Turbo 2WD",
+          "year": 2025,
+          "engineCc": 1600,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 198,
+          "productUrl": "https://encarrus.ru/korea/product/2316852/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42800395"
+      ],
+      "car": [
+        "Hyundai",
+        "Kona",
+        2022,
+        1999,
+        "gasoline",
+        "2WD"
+      ],
+      "badges": [
+        "gasoline 2.0 2wd"
+      ],
+      "suggestedPowerHp": 280,
+      "powerCandidatesHp": [
+        280
+      ],
+      "cards": [
+        {
+          "trim": "2022 · Gasoline 2.0 2WD",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 280,
+          "productUrl": "https://encarrus.ru/korea/product/2466332/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42728610"
+      ],
+      "car": [
+        "Hyundai",
+        "Sonata",
+        2022,
+        1999,
+        "lpg",
+        null
+      ],
+      "badges": [
+        "2.0 lpg"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        157,
+        146
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 2.0 LPG",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 146,
+          "productUrl": "https://encarrus.ru/korea/product/1585142/"
+        },
+        {
+          "trim": "2022 · 2.0 LPG(rental car)",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 157,
+          "productUrl": "https://encarrus.ru/korea/product/2678200/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42759538"
+      ],
+      "car": [
+        "Hyundai",
+        "Sonata",
+        2025,
+        1999,
+        "lpg",
+        null
+      ],
+      "badges": [
+        "2.0 lpg(taxi)"
+      ],
+      "suggestedPowerHp": 146,
+      "powerCandidatesHp": [
+        146
+      ],
+      "cards": [
+        {
+          "trim": "2025 · 2.0 LPG(Taxi)",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 146,
+          "productUrl": "https://encarrus.ru/korea/product/2489459/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42817925"
+      ],
+      "car": [
+        "Hyundai",
+        "Veloster",
+        2021,
+        1998,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "2.0 n"
+      ],
+      "suggestedPowerHp": 275,
+      "powerCandidatesHp": [
+        275
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 2.0 N",
+          "year": 2021,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 275,
+          "productUrl": "https://encarrus.ru/korea/product/2456696/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42735468"
+      ],
+      "car": [
+        "Jeep",
+        "Cherokee",
+        2022,
+        3604,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "l 3.6 summit reserve"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        290,
+        293
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 3.6 Overland",
+          "year": 2022,
+          "engineCc": 3600,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 293,
+          "productUrl": "https://encarrus.ru/korea/product/1651851/"
+        },
+        {
+          "trim": "2022 · L 3.6 Overland",
+          "year": 2022,
+          "engineCc": 3600,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 290,
+          "productUrl": "https://encarrus.ru/korea/product/2556618/"
+        },
+        {
+          "trim": "2022 · L 3.6 Summit Reserve",
+          "year": 2022,
+          "engineCc": 3600,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 290,
+          "productUrl": "https://encarrus.ru/korea/product/2530267/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42815310"
+      ],
+      "car": [
+        "Jeep",
+        "Compass",
+        2022,
+        2360,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "s 2.4 awd"
+      ],
+      "suggestedPowerHp": 180,
+      "powerCandidatesHp": [
+        180
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 2.4 Limitied AWD",
+          "year": 2022,
+          "engineCc": 2400,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 180,
+          "productUrl": "https://encarrus.ru/korea/product/2777136/"
+        },
+        {
+          "trim": "2022 · S 2.4 AWD",
+          "year": 2022,
+          "engineCc": 2400,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 180,
+          "productUrl": "https://encarrus.ru/korea/product/2173220/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42715554"
+      ],
+      "car": [
+        "Jeep",
+        "Renegade",
+        2021,
+        2360,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "2.4 limited"
+      ],
+      "suggestedPowerHp": 180,
+      "powerCandidatesHp": [
+        180
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 2.4 Limited",
+          "year": 2021,
+          "engineCc": 2400,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 180,
+          "productUrl": "https://encarrus.ru/korea/product/2236861/"
+        },
+        {
+          "trim": "2021 · 2.4 Longitude",
+          "year": 2021,
+          "engineCc": 2400,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 180,
+          "productUrl": "https://encarrus.ru/korea/product/1595713/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42779073"
+      ],
+      "car": [
+        "Jeep",
+        "Wrangler",
+        2022,
+        1995,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "2.0 rubicon 4door"
+      ],
+      "suggestedPowerHp": 270,
+      "powerCandidatesHp": [
+        270
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 2.0 Overland 4Door",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 270,
+          "productUrl": "https://encarrus.ru/korea/product/2182701/"
+        },
+        {
+          "trim": "2022 · 2.0 Overland Power Top 4Door",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 270,
+          "productUrl": "https://encarrus.ru/korea/product/1595581/"
+        },
+        {
+          "trim": "2022 · 2.0 Rubicon 4Door",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 270,
+          "productUrl": "https://encarrus.ru/korea/product/2308364/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42771564"
+      ],
+      "car": [
+        "KG_Mobility_Ssangyong",
+        "Rexton",
+        2021,
+        2157,
+        "diesel",
+        "4WD"
+      ],
+      "badges": [
+        "diesel 2.2 4wd"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        181,
+        187
+      ],
+      "cards": [
+        {
+          "trim": "2021 · Diesel 2.2 4WD",
+          "year": 2021,
+          "engineCc": 2200,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 181,
+          "productUrl": "https://encarrus.ru/korea/product/2730753/"
+        },
+        {
+          "trim": "2021 · Diesel 2.2 4WD",
+          "year": 2021,
+          "engineCc": 2200,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 187,
+          "productUrl": "https://encarrus.ru/korea/product/1589324/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42808433"
+      ],
+      "car": [
+        "KG_Mobility_Ssangyong",
+        "Rexton",
+        2023,
+        2157,
+        "diesel",
+        "4WD"
+      ],
+      "badges": [
+        "diesel 2.2 4wd"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        187,
+        181
+      ],
+      "cards": [
+        {
+          "trim": "2023 · Diesel 2.2 4WD",
+          "year": 2023,
+          "engineCc": 2200,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 181,
+          "productUrl": "https://encarrus.ru/korea/product/2543900/"
+        },
+        {
+          "trim": "2023 · Diesel 2.2 4WD",
+          "year": 2023,
+          "engineCc": 2200,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 187,
+          "productUrl": "https://encarrus.ru/korea/product/1187448/"
+        },
+        {
+          "trim": "2023 · Disel 2.2 4WD",
+          "year": 2023,
+          "engineCc": 2200,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 187,
+          "productUrl": "https://encarrus.ru/korea/product/1200049/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42750453",
+        "42768666"
+      ],
+      "car": [
+        "KG_Mobility_Ssangyong",
+        "Torres",
+        2022,
+        1497,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "gasoline 1.5 4wd"
+      ],
+      "suggestedPowerHp": 170,
+      "powerCandidatesHp": [
+        170
+      ],
+      "cards": [
+        {
+          "trim": "2022 · Gasoline 1.5 4WD",
+          "year": 2022,
+          "engineCc": 1500,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 170,
+          "productUrl": "https://encarrus.ru/korea/product/2717362/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42801695"
+      ],
+      "car": [
+        "Kia",
+        "K5",
+        2022,
+        1999,
+        "lpg",
+        null
+      ],
+      "badges": [
+        "2.0 lpi(renter car)"
+      ],
+      "suggestedPowerHp": 146,
+      "powerCandidatesHp": [
+        146
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 2.0 LPI(Renter car)",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 146,
+          "productUrl": "https://encarrus.ru/korea/product/2549633/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42729395"
+      ],
+      "car": [
+        "Kia",
+        "K9",
+        2022,
+        3778,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "3.8 gdi awd"
+      ],
+      "suggestedPowerHp": 315,
+      "powerCandidatesHp": [
+        315
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 3.8 GDI AWD",
+          "year": 2022,
+          "engineCc": 3800,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 315,
+          "productUrl": "https://encarrus.ru/korea/product/2764355/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42789160"
+      ],
+      "car": [
+        "Kia",
+        "Sportage",
+        2025,
+        1999,
+        "lpg",
+        "2WD"
+      ],
+      "badges": [
+        "lpg 2.0 2wd"
+      ],
+      "suggestedPowerHp": 146,
+      "powerCandidatesHp": [
+        146
+      ],
+      "cards": [
+        {
+          "trim": "2025 · LPG 2.0 2WD",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "lpg",
+          "driveText": "2WD",
+          "powerHp": 146,
+          "productUrl": "https://encarrus.ru/korea/product/2561131/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42813249"
+      ],
+      "car": [
+        "Lincoln",
+        "Aviator",
+        2022,
+        2956,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "3.0 black label awd"
+      ],
+      "suggestedPowerHp": 400,
+      "powerCandidatesHp": [
+        400
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 3.0 Black Label AWD",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 400,
+          "productUrl": "https://encarrus.ru/korea/product/1594548/"
+        },
+        {
+          "trim": "2022 · 3.0 Reserve AWD",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 400,
+          "productUrl": "https://encarrus.ru/korea/product/2061940/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42818024"
+      ],
+      "car": [
+        "Lincoln",
+        "Aviator",
+        2021,
+        2956,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "3.0 reserve awd"
+      ],
+      "suggestedPowerHp": 400,
+      "powerCandidatesHp": [
+        400
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 3.0 Black Label AWD",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 400,
+          "productUrl": "https://encarrus.ru/korea/product/2677357/"
+        },
+        {
+          "trim": "2021 · 3.0 Reserve AWD",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 400,
+          "productUrl": "https://encarrus.ru/korea/product/1594591/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42807461"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "C-Class",
+        2024,
+        1999,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "c300 4matic avantgarde"
+      ],
+      "suggestedPowerHp": 258,
+      "powerCandidatesHp": [
+        258
+      ],
+      "cards": [
+        {
+          "trim": "2024 · C300 4MATIC Avantgarde",
+          "year": 2024,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2717142/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42792729"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "GLA",
+        2025,
+        1991,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "gla250 4matic"
+      ],
+      "suggestedPowerHp": 224,
+      "powerCandidatesHp": [
+        224
+      ],
+      "cards": [
+        {
+          "trim": "2025 · GLA250 4MATIC",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 224,
+          "productUrl": "https://encarrus.ru/korea/product/2780201/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42750890"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "GLC",
+        2025,
+        1999,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "glc300 4matic amg line"
+      ],
+      "suggestedPowerHp": 258,
+      "powerCandidatesHp": [
+        258
+      ],
+      "cards": [
+        {
+          "trim": "2025 · GLC 300 4MATIC Avantgarde",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2717400/"
+        },
+        {
+          "trim": "2025 · GLC300 4MATIC Avnatgarde Coupe",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2586595/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42814069"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "GLC",
+        2023,
+        1999,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "glc300 4matic amg line"
+      ],
+      "suggestedPowerHp": 258,
+      "powerCandidatesHp": [
+        258
+      ],
+      "cards": [
+        {
+          "trim": "2023 · GLC 300 4MATIC Avantgarde",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2194507/"
+        },
+        {
+          "trim": "2023 · GLC300 4MATIC AMG Line",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2521505/"
+        },
+        {
+          "trim": "2023 · GLC300 4MATIC Coupe",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2738736/"
+        },
+        {
+          "trim": "2023 · GLC300 4MATIC Online Special",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 258,
+          "productUrl": "https://encarrus.ru/korea/product/2682708/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42755461"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "S-Class",
+        2021,
+        2925,
+        "diesel",
+        null
+      ],
+      "badges": [
+        "s350 d"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        286,
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2021 · S350 d",
+          "year": 2021,
+          "engineCc": 2900,
+          "fuelType": "diesel",
+          "driveText": "2WD",
+          "powerHp": 286,
+          "productUrl": "https://encarrus.ru/korea/product/2777256/"
+        },
+        {
+          "trim": "2021 · S400 d 4MATIC",
+          "year": 2021,
+          "engineCc": 2900,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2510167/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42735965"
+      ],
+      "car": [
+        "Mercedes-Benz",
+        "SL-Class",
+        2026,
+        1991,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "amg sl43"
+      ],
+      "suggestedPowerHp": 381,
+      "powerCandidatesHp": [
+        381
+      ],
+      "cards": [
+        {
+          "trim": "2026 · AMG SL43",
+          "year": 2026,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 381,
+          "productUrl": "https://encarrus.ru/korea/product/2520131/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42710725"
+      ],
+      "car": [
+        "Mini",
+        "Cooper",
+        2022,
+        1998,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "classic"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        192,
+        231
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 3Door Resolute Edition",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 192,
+          "productUrl": "https://encarrus.ru/korea/product/2768859/"
+        },
+        {
+          "trim": "2022 · 5Door Classic",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 192,
+          "productUrl": "https://encarrus.ru/korea/product/1588133/"
+        },
+        {
+          "trim": "2022 · 5Door Resolute Edition",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 192,
+          "productUrl": "https://encarrus.ru/korea/product/1588222/"
+        },
+        {
+          "trim": "2022 · Brick Lane Edition",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 192,
+          "productUrl": "https://encarrus.ru/korea/product/2181259/"
+        },
+        {
+          "trim": "2022 · Classic",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 192,
+          "productUrl": "https://encarrus.ru/korea/product/1587767/"
+        },
+        {
+          "trim": "2022 · Classic Launch Pack",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 192,
+          "productUrl": "https://encarrus.ru/korea/product/2555449/"
+        },
+        {
+          "trim": "2022 · JCW",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 231,
+          "productUrl": "https://encarrus.ru/korea/product/2427081/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42743873"
+      ],
+      "car": [
+        "Mini",
+        "Cooper",
+        2025,
+        1998,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "jcw"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        204,
+        163,
+        218,
+        156,
+        192
+      ],
+      "cards": [
+        {
+          "trim": "2025 · 5 Door Favoured",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 204,
+          "productUrl": "https://encarrus.ru/korea/product/1750310/"
+        },
+        {
+          "trim": "2025 · 5Door Breeze Edition",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 156,
+          "productUrl": "https://encarrus.ru/korea/product/2414671/"
+        },
+        {
+          "trim": "2025 · 5Door Essential",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 192,
+          "productUrl": "https://encarrus.ru/korea/product/2567018/"
+        },
+        {
+          "trim": "2025 · Classic",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 192,
+          "productUrl": "https://encarrus.ru/korea/product/2326743/"
+        },
+        {
+          "trim": "2025 · Essential",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 163,
+          "productUrl": "https://encarrus.ru/korea/product/2489231/"
+        },
+        {
+          "trim": "2025 · Favoured",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 163,
+          "productUrl": "https://encarrus.ru/korea/product/2554991/"
+        },
+        {
+          "trim": "2025 · Favoured",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 204,
+          "productUrl": "https://encarrus.ru/korea/product/2472139/"
+        },
+        {
+          "trim": "2025 · JCW",
+          "year": 2025,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 218,
+          "productUrl": "https://encarrus.ru/korea/product/2466884/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42820256"
+      ],
+      "car": [
+        "Mini",
+        "Countryman",
+        2026,
+        1998,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "all4 classic"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        218,
+        306,
+        170
+      ],
+      "cards": [
+        {
+          "trim": "2026 · ALL4 Dealer Tailored Edition",
+          "year": 2026,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 218,
+          "productUrl": "https://encarrus.ru/korea/product/2741923/"
+        },
+        {
+          "trim": "2026 · ALL4 Essential",
+          "year": 2026,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 218,
+          "productUrl": "https://encarrus.ru/korea/product/2450976/"
+        },
+        {
+          "trim": "2026 · ALL4 Favoured",
+          "year": 2026,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 170,
+          "productUrl": "https://encarrus.ru/korea/product/2014917/"
+        },
+        {
+          "trim": "2026 · ALL4 Favoured",
+          "year": 2026,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 218,
+          "productUrl": "https://encarrus.ru/korea/product/2549778/"
+        },
+        {
+          "trim": "2026 · ALL4 JCW",
+          "year": 2026,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 306,
+          "productUrl": "https://encarrus.ru/korea/product/2520191/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42746996"
+      ],
+      "car": [
+        "Porsche",
+        "911",
+        2021,
+        2981,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "carrera 4 cabriolet"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        385,
+        450
+      ],
+      "cards": [
+        {
+          "trim": "2021 · Carrera",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 385,
+          "productUrl": "https://encarrus.ru/korea/product/2772926/"
+        },
+        {
+          "trim": "2021 · Carrera 4 Cabriolet",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 385,
+          "productUrl": "https://encarrus.ru/korea/product/2366818/"
+        },
+        {
+          "trim": "2021 · Carrera 4S",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 450,
+          "productUrl": "https://encarrus.ru/korea/product/2777250/"
+        },
+        {
+          "trim": "2021 · Carrera 4S Cabriolet",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 450,
+          "productUrl": "https://encarrus.ru/korea/product/2332152/"
+        },
+        {
+          "trim": "2021 · Carrera Cabriolet",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 385,
+          "productUrl": "https://encarrus.ru/korea/product/2260088/"
+        },
+        {
+          "trim": "2021 · Carrera S",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 450,
+          "productUrl": "https://encarrus.ru/korea/product/2041145/"
+        },
+        {
+          "trim": "2021 · Carrera S Cabriolet",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 450,
+          "productUrl": "https://encarrus.ru/korea/product/2248750/"
+        },
+        {
+          "trim": "2021 · Targa 4",
+          "year": 2021,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 385,
+          "productUrl": "https://encarrus.ru/korea/product/1596467/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42705908"
+      ],
+      "car": [
+        "Porsche",
+        "Cayenne",
+        2022,
+        2995,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "3.0 coupe platinum edition"
+      ],
+      "suggestedPowerHp": 340,
+      "powerCandidatesHp": [
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2022 · 3.0",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2245327/"
+        },
+        {
+          "trim": "2022 · 3.0 Coupe",
+          "year": 2022,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/1596548/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42800973"
+      ],
+      "car": [
+        "Porsche",
+        "Cayenne",
+        2023,
+        2995,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "3.0 coupe"
+      ],
+      "suggestedPowerHp": 340,
+      "powerCandidatesHp": [
+        340
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 3.0 COUPE PLATINUM EDITION",
+          "year": 2023,
+          "engineCc": 3000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 340,
+          "productUrl": "https://encarrus.ru/korea/product/2572740/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42722653"
+      ],
+      "car": [
+        "Suzuki",
+        "Jimny",
+        2024,
+        1462,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "1.5"
+      ],
+      "suggestedPowerHp": 102,
+      "powerCandidatesHp": [
+        102
+      ],
+      "cards": [
+        {
+          "trim": "2024 · 1.5",
+          "year": 2024,
+          "engineCc": 1500,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 102,
+          "productUrl": "https://encarrus.ru/korea/product/1182146/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42805892"
+      ],
+      "car": [
+        "Volkswagen",
+        "Passat",
+        2021,
+        1968,
+        "diesel",
+        null
+      ],
+      "badges": [
+        "2.0 tdi prestige"
+      ],
+      "suggestedPowerHp": 190,
+      "powerCandidatesHp": [
+        190
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 2.0 TDI 4Motion Prestige",
+          "year": 2021,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 190,
+          "productUrl": "https://encarrus.ru/korea/product/2008617/"
+        },
+        {
+          "trim": "2021 · 2.0 TDI Premium",
+          "year": 2021,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "2WD",
+          "powerHp": 190,
+          "productUrl": "https://encarrus.ru/korea/product/2520940/"
+        },
+        {
+          "trim": "2021 · 2.0 TDI Prestige",
+          "year": 2021,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "2WD",
+          "powerHp": 190,
+          "productUrl": "https://encarrus.ru/korea/product/2400082/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42801093"
+      ],
+      "car": [
+        "Volkswagen",
+        "T-Roc",
+        2021,
+        1968,
+        "diesel",
+        null
+      ],
+      "badges": [
+        "2.0 tdi prestige"
+      ],
+      "suggestedPowerHp": 150,
+      "powerCandidatesHp": [
+        150
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 2.0 TDI Premium",
+          "year": 2021,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "2WD",
+          "powerHp": 150,
+          "productUrl": "https://encarrus.ru/korea/product/2491323/"
+        },
+        {
+          "trim": "2021 · 2.0 TDI Prestige",
+          "year": 2021,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "2WD",
+          "powerHp": 150,
+          "productUrl": "https://encarrus.ru/korea/product/2734841/"
+        },
+        {
+          "trim": "2021 · 2.0 TDI Style",
+          "year": 2021,
+          "engineCc": 2000,
+          "fuelType": "diesel",
+          "driveText": "2WD",
+          "powerHp": 150,
+          "productUrl": "https://encarrus.ru/korea/product/2529568/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42803438"
+      ],
+      "car": [
+        "Volkswagen",
+        "Touareg",
+        2023,
+        2967,
+        "diesel",
+        null
+      ],
+      "badges": [
+        "3.0 tdi r line"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        286,
+        231
+      ],
+      "cards": [
+        {
+          "trim": "2023 · 3.0 TDI Premium",
+          "year": 2023,
+          "engineCc": 3000,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 286,
+          "productUrl": "https://encarrus.ru/korea/product/2467462/"
+        },
+        {
+          "trim": "2023 · 3.0 TDI Prestige",
+          "year": 2023,
+          "engineCc": 3000,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 286,
+          "productUrl": "https://encarrus.ru/korea/product/2344408/"
+        },
+        {
+          "trim": "2023 · 3.0 TDI R-Line",
+          "year": 2023,
+          "engineCc": 3000,
+          "fuelType": "diesel",
+          "driveText": "4WD",
+          "powerHp": 231,
+          "productUrl": "https://encarrus.ru/korea/product/2683338/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42737610"
+      ],
+      "car": [
+        "Volvo",
+        "S90",
+        2021,
+        1969,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "b5 inscription"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        300,
+        250
+      ],
+      "cards": [
+        {
+          "trim": "2021 · B5 Inscription",
+          "year": 2021,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "2WD",
+          "powerHp": 250,
+          "productUrl": "https://encarrus.ru/korea/product/2693153/"
+        },
+        {
+          "trim": "2021 · B6 AWD Inscription",
+          "year": 2021,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 300,
+          "productUrl": "https://encarrus.ru/korea/product/1641092/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42816488"
+      ],
+      "car": [
+        "Volvo",
+        "XC40",
+        2022,
+        1969,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "b4 inscription"
+      ],
+      "suggestedPowerHp": 197,
+      "powerCandidatesHp": [
+        197
+      ],
+      "cards": [
+        {
+          "trim": "2022 · B4 Inscription",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 197,
+          "productUrl": "https://encarrus.ru/korea/product/2018463/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42754088"
+      ],
+      "car": [
+        "Volvo",
+        "XC60",
+        2022,
+        1969,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "b5 ultimate bright"
+      ],
+      "suggestedPowerHp": 250,
+      "powerCandidatesHp": [
+        250
+      ],
+      "cards": [
+        {
+          "trim": "2022 · B5 Inscription",
+          "year": 2022,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 250,
+          "productUrl": "https://encarrus.ru/korea/product/1596796/"
+        }
+      ]
+    },
+    {
+      "classification": "review_match_or_power",
+      "listingIds": [
+        "42806008",
+        "42725566"
+      ],
+      "car": [
+        "Volvo",
+        "XC60",
+        2023,
+        1969,
+        "gasoline",
+        null
+      ],
+      "badges": [
+        "b5 ultimate bright"
+      ],
+      "suggestedPowerHp": null,
+      "powerCandidatesHp": [
+        250,
+        300
+      ],
+      "cards": [
+        {
+          "trim": "2023 · B5 Ultimate Bright",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 250,
+          "productUrl": "https://encarrus.ru/korea/product/2543975/"
+        },
+        {
+          "trim": "2023 · B6 Ultimate Bright",
+          "year": 2023,
+          "engineCc": 2000,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 300,
+          "productUrl": "https://encarrus.ru/korea/product/2683250/"
+        }
+      ]
+    },
+    {
+      "classification": "preliminary_candidate",
+      "listingIds": [
+        "42725859"
+      ],
+      "car": [
+        "Kia",
+        "K9",
+        2021,
+        3778,
+        "gasoline",
+        "4WD"
+      ],
+      "badges": [
+        "3.8 gdi awd"
+      ],
+      "suggestedPowerHp": 315,
+      "powerCandidatesHp": [
+        315
+      ],
+      "cards": [
+        {
+          "trim": "2021 · 3.8 GDI AWD",
+          "year": 2021,
+          "engineCc": 3800,
+          "fuelType": "gasoline",
+          "driveText": "4WD",
+          "powerHp": 315,
+          "productUrl": "https://encarrus.ru/korea/product/2534839/"
+        }
+      ]
+    }
+  ]
+}
