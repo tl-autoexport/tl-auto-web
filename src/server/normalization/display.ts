@@ -1,4 +1,5 @@
 import { normalizeBrand, normalizeDrive, normalizeModel } from "./vehicles";
+import { normalizeCatalogBrand } from "@/lib/catalog-brand";
 
 const KOREAN_RE = /[\u3131-\u318e\uac00-\ud7a3]/;
 
@@ -321,7 +322,7 @@ function displayNameKey(value: string) {
 }
 
 export function translateBrand(value: string | null | undefined) {
-  const normalized = normalizeBrand(value);
+  const normalized = normalizeBrand(normalizeCatalogBrand(value));
   if (!normalized) return "";
   const clean = cleanDisplay(normalized, "");
   return clean ? displayNameCase(clean) : "";

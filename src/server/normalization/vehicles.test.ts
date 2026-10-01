@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { translateDrive } from "./display";
+import { translateBrand, translateDrive } from "./display";
 import {
   driveTypesCompatible,
   normalizeColor,
@@ -15,6 +15,8 @@ assert.equal(normalizeModel("GLE450"), "GLE");
 assert.equal(normalizeModel("GLC 300"), "GLC");
 assert.equal(normalizeModel("CLS-Class"), "CLS");
 assert.equal(normalizeModel("S-Class"), "S-Class");
+assert.equal(translateBrand("Kg__mobility_ssangyong"), "KGM");
+assert.equal(translateBrand("KG_Mobility_Ssangyong"), "KGM");
 
 // Colour: Korean source values must become a Russian palette value instead of
 // being dropped, while genuinely unknown Korean text must never leak to a card.

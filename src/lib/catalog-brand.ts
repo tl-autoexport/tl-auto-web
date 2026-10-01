@@ -1,19 +1,19 @@
 const BRAND_ALIASES: Record<string, { label: string; values: string[] }> = {
   kgm: {
     label: "KGM",
-    values: ["KGM", "KG_Mobility_Ssangyong", "SsangYong", "Ssangyong", "KG Mobility"],
+    values: ["KGM", "KG_Mobility_Ssangyong", "KG__Mobility_Ssangyong", "Kg__mobility_ssangyong", "KG__mobility__ssangyong", "SsangYong", "Ssangyong", "KG Mobility"],
   },
   kgmobilityssangyong: {
     label: "KGM",
-    values: ["KGM", "KG_Mobility_Ssangyong", "SsangYong", "Ssangyong", "KG Mobility"],
+    values: ["KGM", "KG_Mobility_Ssangyong", "KG__Mobility_Ssangyong", "Kg__mobility_ssangyong", "KG__mobility__ssangyong", "SsangYong", "Ssangyong", "KG Mobility"],
   },
   ssangyong: {
     label: "KGM",
-    values: ["KGM", "KG_Mobility_Ssangyong", "SsangYong", "Ssangyong", "KG Mobility"],
+    values: ["KGM", "KG_Mobility_Ssangyong", "KG__Mobility_Ssangyong", "Kg__mobility_ssangyong", "KG__mobility__ssangyong", "SsangYong", "Ssangyong", "KG Mobility"],
   },
   kgmobility: {
     label: "KGM",
-    values: ["KGM", "KG_Mobility_Ssangyong", "SsangYong", "Ssangyong", "KG Mobility"],
+    values: ["KGM", "KG_Mobility_Ssangyong", "KG__Mobility_Ssangyong", "Kg__mobility_ssangyong", "KG__mobility__ssangyong", "SsangYong", "Ssangyong", "KG Mobility"],
   },
   mini: { label: "MINI", values: ["MINI", "Mini"] },
 };
