@@ -374,16 +374,6 @@ function ConditionOverview({
   reports: Array<{ report_type: string; raw_payload?: unknown }>;
 }) {
   const bodyMarks = buildBodyMarks(reports);
-  const inspection = reports.find((report) => report.report_type === "encar_inspection");
-  const findings = getObject(getObject(inspection?.raw_payload)?.inspection)?.outers;
-  const countFindings = (code: string) => Array.isArray(findings)
-    ? findings.filter((finding) => {
-        const statuses = getObject(finding)?.statusTypes;
-        return Array.isArray(statuses) && statuses.some((status) => getObject(status)?.code === code);
-      }).length
-    : null;
-  const exchangeCount = countFindings("X");
-  const weldCount = countFindings("W");
   const insuranceEvents = buildInsuranceEvents(carHistory);
   const ownerCount =
     asNumber(carHistory?.owner_changed_count);
@@ -407,22 +397,6 @@ function ConditionOverview({
       </div>
       <div className="mt-4 grid gap-4 sm:gap-5">
         <BodyConditionMap marks={bodyMarks} insuranceEvents={insuranceEvents} />
-        {Array.isArray(findings) && findings.length > 0 && <div className="grid gap-2 text-sm">{findings.map((value, index) => {
-          const finding = getObject(value);
-          const type = getObject(finding?.type);
-          const statuses = Array.isArray(finding?.statusTypes) ? finding.statusTypes : [];
-          const part = encarBodyPart(String(type?.code ?? "") + " " + String(type?.title ?? ""));
-          const rawLabel = String(type?.title ?? "");
-          const translatedLabel = translateInspectionLabel(rawLabel);
-          const displayLabel = part
-            ? translateBodyPart(part)
-            : translatedLabel ?? (/[가-힣]/.test(rawLabel) ? "Элемент кузова" : rawLabel);
-          const translatedStatuses = statuses.map(status => {
-            const rawStatus = String(getObject(status)?.title ?? "");
-            return translateInspectionStatus(rawStatus) ?? (/[가-힣]/.test(rawStatus) ? "Указано в отчёте" : rawStatus);
-          }).filter(Boolean);
-          return <Spec key={index} label={displayLabel} value={translatedStatuses.join(", ")} />;
-        })}</div>}
         <div className="grid content-start gap-x-6 gap-y-3 text-sm md:grid-cols-2">
           <Spec
             label="Смены владельца"
@@ -458,16 +432,6 @@ function ConditionOverview({
             const date = change?.acquisitionDate ?? change?.registrationDate;
             return typeof date === "string" ? <Spec key={`owner-${index}`} label="Смена владельца" value={date} /> : null;
           })}
-          <Spec
-            label="Замена внешних панелей"
-            value={
-              exchangeCount !== null ? String(exchangeCount) : "Нет данных"
-            }
-          />
-          <Spec
-            label="Ремонт/сварка панелей"
-            value={weldCount !== null ? String(weldCount) : "Нет данных"}
-          />
           {conditionItems.map((item) => (
             <div className="border-t border-[#edf0f5] pt-3" key={item.label}>
               <p className="font-semibold">{item.label}</p>
