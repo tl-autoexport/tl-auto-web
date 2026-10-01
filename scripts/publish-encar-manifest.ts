@@ -4,7 +4,7 @@ import { Client } from "pg";
 import { readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
-import { getCbrCalcRates } from "../src/server/calc/rates";
+import type { CalcRateSnapshot } from "../src/server/calc/rates";
 import { evaluatePublication, powerBasisForFuel, resolveCalculationMonth, storedPowerFinality } from "../src/server/cars/calculation-contract";
 import { resolveAutomaticPowerReference, type AutomaticPowerReferenceRow } from "../src/server/catalog/automatic-power-reference";
 import { normalizeColor, normalizePlate } from "../src/server/normalization/vehicles";
@@ -108,7 +108,7 @@ async function main() {
   ]);
   const plan = JSON.parse(planText) as Plan;
   const preliminary = JSON.parse(preliminaryText) as { runId: string; calculations: Array<{ sourceListingId: string; preliminaryPowerHp: number }> };
-  const report = JSON.parse(reportText) as { runId: string; rateSnapshot: { asOf: string }; summary: { target: number; ready: number; blocked: number }; cars: Array<{ sourceListingId: string; powerClass: "approved" | "preliminary"; ready: boolean }> };
+const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRateSnapshot; summary: { target: number; ready: number; blocked: number }; cars: Array<{ sourceListingId: string; powerClass: "approved" | "preliminary"; ready: boolean }> };
   if (!plan.runId || plan.runId !== preliminary.runId || plan.runId !== report.runId ||
       report.summary.target !== report.summary.ready || report.summary.blocked !== 0 ||
       report.cars.length !== report.summary.target || report.cars.some((car) => !car.ready)) {
@@ -175,8 +175,11 @@ async function main() {
     if (prepared.length !== saved.expected) throw new Error("Manifest cardinality changed");
     const existing = await db.query<{ source_id: string }>(`select source_id from public.cars where primary_source='encar' and source_id=any($1::text[])`, [ids]);
     const existingIds = new Set(existing.rows.map((row) => row.source_id));
-    const rates = await getCbrCalcRates();
-    if (rates.asOf !== report.rateSnapshot.asOf) throw new Error("Exchange-rate date changed since readiness audit; prepare a fresh manifest");
+    const rates = report.rateSnapshot;
+    if (!rates?.asOf || !rates.rates || !rates.customsRates || !rates.rateDetails ||
+        ![rates.rates.krwRub, rates.rates.usdRub, rates.rates.eurRub, rates.rates.kztRub,
+          rates.customsRates.krwRub, rates.customsRates.eurRub].every((value) => Number.isFinite(Number(value))))
+      throw new Error("Readiness report lacks the exact validated rate snapshot; rerun readiness and prepare a new manifest");
     const specIds = [...new Set(prepared.filter((p) => p.class === "approved").map((p) => str(obj(p.plan.power).specId)!))];
     const specs = new Map((await db.query<Spec>(`select id,version,status,calculation_power_kw,power_basis,evidence_id from public.vehicle_power_specs where id=any($1::uuid[])`, [specIds])).rows.map((row) => [row.id, row]));
     const planned: Array<{ item: typeof prepared[number]; car: Obj; calc: ReturnType<typeof calculateRuVladivostok>; photos: ReturnType<typeof gallery>; options: ReturnType<typeof choiceOptions>; inspection: ReturnType<typeof inspectionReport> }> = [];

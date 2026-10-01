@@ -14,6 +14,7 @@ const runId = process.env.TL_AUTO_ENRICHMENT_RUN_ID;
 const dbUrl = process.env.SUPABASE_DB_URL;
 const powerPlanPath = process.env.TL_AUTO_POWER_PLAN ?? "output/tl-auto-new-encar-power-plan.json";
 const preliminaryPath = process.env.TL_AUTO_PRELIMINARY_CALCULATION ?? "output/tl-auto-new-encar-preliminary-calculation-dry-run.json";
+const outputPath = process.env.TL_AUTO_PUBLICATION_READINESS_OUTPUT ?? "output/tl-auto-new-encar-publication-readiness.json";
 if (!runId || !dbUrl) throw new Error("TL_AUTO_ENRICHMENT_RUN_ID and SUPABASE_DB_URL are required");
 
 type Json = Record<string, unknown>;
@@ -197,7 +198,10 @@ async function main() {
       generatedAt: new Date().toISOString(), runId, readOnly: true,
       databaseWrites: 0, encarRequests: 0, publicCatalogChanged: false,
       policy: "Pre-publication readiness only; approved power remains final, automatic references remain preliminary; no cars inserted or published",
-      rateSnapshot: { asOf: rates.asOf, source: rates.source },
+      // Persist exact inputs so the publisher can reproduce these estimates;
+      // the live USDT/KRW quote can change while the CBR date stays constant.
+      rateSnapshot: { asOf: rates.asOf, source: rates.source, rates: rates.rates,
+        customsRates: rates.customsRates, rateDetails: rates.rateDetails },
       summary: {
         target: ids.length, approvedPower: approved.length, preliminaryPower: preliminaryRows.length,
         ready: readyRows.length, blocked: cars.length - readyRows.length,
@@ -212,7 +216,7 @@ async function main() {
       optionalEnrichmentProbeStatuses: Object.fromEntries(enrichment),
       cars,
     };
-    const output = "output/tl-auto-new-encar-publication-readiness.json";
+    const output = outputPath;
     await mkdir("output", { recursive: true });
     await writeFile(output, `${JSON.stringify(report, null, 2)}\n`);
     console.log(JSON.stringify({ ...report, cars: undefined, output }, null, 2));
