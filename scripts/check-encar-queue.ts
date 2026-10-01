@@ -76,19 +76,35 @@ async function main() {
       .split(",")
       .map((value) => value.trim())
       .filter(Boolean);
-    let query = db.from("cars")
-      .select("id,primary_source,source_id,source_url,price_krw,encar_check_attempts")
-      // Check every active public catalog source against Encar. Both sources
-      // use the Encar detail endpoint as the live authority for availability
-      // and current price.
-      .in("primary_source", ["chestny_prigon", "encar"]).eq("is_available", true)
-      .or(`next_encar_check_at.is.null,next_encar_check_at.lte.${new Date().toISOString()}`);
-    if (sourceIds.length) query = query.in("source_id", sourceIds);
-    const { data, error } = await query
-      .order("next_encar_check_at", { ascending: true, nullsFirst: true })
-      .limit(batchSize);
-    if (error) throw error;
-    const cars = (data ?? []) as Car[];
+    const sourceQuota = Math.floor(batchSize / 2);
+    const sourceSelect = "id,primary_source,source_id,source_url,price_krw,encar_check_attempts";
+    const fetchSourceBatch = async (source: "chestny_prigon" | "encar", limit: number) => {
+      if (limit <= 0) return [] as Car[];
+      let query = db.from("cars")
+        .select(sourceSelect)
+        .eq("primary_source", source)
+        .eq("is_available", true)
+        .or(`next_encar_check_at.is.null,next_encar_check_at.lte.${new Date().toISOString()}`);
+      if (sourceIds.length) query = query.in("source_id", sourceIds);
+      const { data, error } = await query
+        .order("next_encar_check_at", { ascending: true, nullsFirst: true })
+        .limit(limit);
+      if (error) throw error;
+      return (data ?? []) as Car[];
+    };
+
+    // Reserve half of every full batch for each public source. If one source
+    // has fewer eligible cars, use the remaining capacity for the other.
+    const [chestnyCars, encarCars] = await Promise.all([
+      fetchSourceBatch("chestny_prigon", sourceQuota),
+      fetchSourceBatch("encar", sourceQuota),
+    ]);
+    const cars = [...chestnyCars, ...encarCars];
+    const remaining = batchSize - cars.length;
+    if (remaining > 0) {
+      const source = chestnyCars.length < sourceQuota ? "chestny_prigon" : "encar";
+      cars.push(...await fetchSourceBatch(source, remaining));
+    }
     const errorSamples: Array<{ sourceId: string; error: string }> = [];
     const priceChangedIds: string[] = [];
     const summary = { dryRun, requested: cars.length, checked: 0, active: 0, unavailable: 0, priceChanged: 0, priceMissing: 0, errors: 0, bySource: { chestny_prigon: 0, encar: 0 } };
