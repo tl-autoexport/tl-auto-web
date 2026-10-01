@@ -83,6 +83,12 @@ type Reference = AutomaticPowerReferenceRow & {
 };
 
 const norm = (value: string | null | undefined) => (value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+function sameExactRuleShape(a: Reference, b: Reference) {
+  return norm(a.brand) === norm(b.brand) && norm(a.model) === norm(b.model) &&
+    norm(a.fuel_type) === norm(b.fuel_type) && a.engine_cc === b.engine_cc &&
+    norm(a.drive_type) === norm(b.drive_type) && norm(a.badge) === norm(b.badge) &&
+    norm(a.badge_detail) === norm(b.badge_detail) && a.year_from === b.year_from && a.year_to === b.year_to;
+}
 const configKey = (r: Omit<Reference, "configuration_key" | "power_hp" | "power_kw" | "source" | "status" | "note">) =>
   [norm(r.brand), norm(r.model), norm(r.fuel_type), r.engine_cc, norm(r.drive_type), norm(r.badge), norm(r.badge_detail),
     `year=${r.year_from}-${r.year_to}`].join("|");
@@ -234,23 +240,57 @@ async function main() {
          from public.vehicle_power_automatic_reference where status <> 'retired'${write ? " for update" : ""}`,
     );
     const live = liveResult.rows;
-    const proposedByKey = new Map(built.references.map((row) => [row.configuration_key, row]));
     const existingByKey = new Map(live.map((row) => [row.configuration_key, row]));
-    const protectedConflicts = built.references.flatMap((row) => {
-      const existing = existingByKey.get(row.configuration_key);
-      if (!existing || existing.status === "automatic" || Number(existing.power_hp) === row.power_hp) return [];
-      return [{ key: row.configuration_key, existingStatus: existing.status,
-        existingPowerPs: existing.power_hp, proposedPowerPs: row.power_hp }];
-    });
+    const effectiveReferences: Reference[] = [];
+    const referencesToWrite: Reference[] = [];
+    const protectedConflicts: Array<Record<string, unknown>> = [];
+    let replacedAutomaticRuleCount = 0;
+    let alreadyConfirmedCount = 0;
+    for (const proposed of built.references) {
+      // Older writers did not always include year bounds in configuration_key.
+      // Match the actual rule columns so an equivalent automatic rule is updated
+      // instead of leaving two equally-specific powers for the resolver.
+      const exactRows = live.filter((row) => sameExactRuleShape(row, proposed));
+      const protectedRows = exactRows.filter((row) => row.status !== "automatic" &&
+        (Number(row.power_hp) !== proposed.power_hp || Number(row.power_kw) !== proposed.power_kw));
+      if (protectedRows.length) {
+        protectedConflicts.push(...protectedRows.map((row) => ({
+          key: row.configuration_key, status: row.status, source: row.source,
+          existingPowerPs: row.power_hp, proposedPowerPs: proposed.power_hp,
+        })));
+        continue;
+      }
+      const automaticRows = exactRows.filter((row) => row.status === "automatic");
+      if (automaticRows.length) {
+        for (const existing of automaticRows) {
+          const replacement = { ...proposed, configuration_key: existing.configuration_key };
+          effectiveReferences.push(replacement);
+          referencesToWrite.push(replacement);
+          replacedAutomaticRuleCount += Number(Number(existing.power_hp) !== proposed.power_hp ||
+            Number(existing.power_kw) !== proposed.power_kw);
+        }
+      } else {
+        const confirmed = exactRows.find((row) => row.status === "confirmed");
+        if (confirmed) {
+          effectiveReferences.push({ ...proposed, configuration_key: confirmed.configuration_key,
+            source: confirmed.source, status: "confirmed", note: confirmed.note });
+          alreadyConfirmedCount += 1;
+        } else {
+          effectiveReferences.push(proposed);
+          referencesToWrite.push(proposed);
+        }
+      }
+    }
     if (protectedConflicts.length) {
       throw new Error(`Conflicting non-automatic references; nothing changed: ${JSON.stringify(protectedConflicts)}`);
     }
 
-    // New evidence replaces only an automatic rule with the exact same key.
-    // All other live rules remain in resolver simulation and can block a write.
+    const replacedKeys = new Set(referencesToWrite.map((row) => row.configuration_key));
+    // Only exact-shape automatic references are replaced; other live rules stay
+    // in the simulation and can still block an unsafe/ambiguous application.
     const simulated = [
-      ...live.filter((row) => !proposedByKey.has(row.configuration_key)),
-      ...built.references,
+      ...live.filter((row) => !replacedKeys.has(row.configuration_key)),
+      ...referencesToWrite,
     ];
     const resolverConflicts: Array<{ listingId: string; badge: string | null; badgeDetail: string | null;
       expected: number; resolved: number | null; key: string | null }> = [];
@@ -273,20 +313,19 @@ async function main() {
       throw new Error(`Resolver precedence conflicts; nothing changed: ${JSON.stringify(resolverConflicts)}`);
     }
 
-    const newCount = built.references.filter((row) => !existingByKey.has(row.configuration_key)).length;
-    const updates = built.references.filter((row) => {
-      const existing = existingByKey.get(row.configuration_key);
-      return existing?.status === "automatic" && Number(existing.power_hp) !== row.power_hp;
-    }).length;
+    const newCount = referencesToWrite.filter((row) => !existingByKey.has(row.configuration_key)).length;
+    const updates = replacedAutomaticRuleCount;
     console.log(JSON.stringify({
       write,
       runIds: manifest.runIds,
       preliminaryListings: built.listingIds.length,
       configurations: manifest.records.length,
-      exactBadgeReferences: built.references.length,
+      exactBadgeReferences: effectiveReferences.length,
+      databaseRowsToWrite: referencesToWrite.length,
       newReferences: newCount,
-      automaticReferencesUpdatedToApprovedPreliminaryValues: updates,
-      alreadyMatchingReferences: built.references.length - newCount - updates,
+      automaticReferencesUpdatedToUserApprovedPreliminaryValues: updates,
+      alreadyConfirmedAtSamePower: alreadyConfirmedCount,
+      alreadyMatchingReferences: effectiveReferences.length - newCount - referencesToWrite.filter((row) => existingByKey.has(row.configuration_key)).length - alreadyConfirmedCount,
       resolverConflicts: resolverConflicts.length,
       effect: "power resolver only; no car rows, calculations, prices, or publication changed",
       next: "Run the existing per-run preliminary calculation/readiness/publication workflow after this import.",
@@ -311,7 +350,7 @@ async function main() {
          power_hp=excluded.power_hp,power_kw=excluded.power_kw,source=excluded.source,
          note=excluded.note,updated_at=now()
        where vehicle_power_automatic_reference.status='automatic'`,
-      [JSON.stringify(built.references)],
+      [JSON.stringify(referencesToWrite)],
     );
 
     const verifyRows = await db.query<Reference>(
@@ -319,17 +358,17 @@ async function main() {
               year_from,year_to,power_hp::double precision as power_hp,power_kw::double precision as power_kw,
               source,status,note
          from public.vehicle_power_automatic_reference where configuration_key=any($1::text[])`,
-      [built.references.map((row) => row.configuration_key)],
+      [effectiveReferences.map((row) => row.configuration_key)],
     );
     const verifiedByKey = new Map(verifyRows.rows.map((row) => [row.configuration_key, row]));
-    const verifyFailures = built.references.filter((expected) => {
+    const verifyFailures = effectiveReferences.filter((expected) => {
       const actual = verifiedByKey.get(expected.configuration_key);
-      return !actual || !["automatic", "confirmed"].includes(actual.status) ||
-        Number(actual.power_hp) !== expected.power_hp;
+      return !actual || actual.status !== expected.status || Number(actual.power_hp) !== expected.power_hp ||
+        Number(actual.power_kw) !== expected.power_kw;
     });
-    if (verifyFailures.length || verifyRows.rowCount !== built.references.length) {
+    if (verifyFailures.length || verifyRows.rowCount !== effectiveReferences.length) {
       throw new Error(`Post-write verification failed: ${JSON.stringify({
-        expected: built.references.length, got: verifyRows.rowCount,
+        expected: effectiveReferences.length, got: verifyRows.rowCount,
         failures: verifyFailures.map((row) => row.configuration_key),
       })}`);
     }
