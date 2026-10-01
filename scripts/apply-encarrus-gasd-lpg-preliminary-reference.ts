@@ -17,6 +17,10 @@ const manifestPath = process.env.ENCARRUS_GASD_LPG_MANIFEST ??
   "data/power/encarrus-ice-gasd-lpg-201-preliminary-v1.json";
 const auditPath = process.env.ENCARRUS_GASD_LPG_AUDIT ??
   "data/power/encarrus-ice-gasd-lpg-201-source-audit-v1.json";
+const planPaths = String(process.env.ENCARRUS_GASD_LPG_PLANS ?? [
+  "output/tl-auto-gasd-bd5481a2-power-plan.json",
+  "output/tl-auto-gasd-d50f740a-power-plan.json",
+].join(",")).split(",").map((path: string) => path.trim()).filter(Boolean);
 const write = process.env.ENCARRUS_GASD_LPG_REFERENCE_WRITE === "true";
 const dbUrl = process.env.SUPABASE_DB_URL;
 const expectedRunIds = new Set([
@@ -59,6 +63,21 @@ type Audit = {
   sourceRows: SourceRow[];
   reviewResolutions: Array<{ listingId: string; powerPs: number; rationale: string; url?: string }>;
 };
+type PlanCandidate = {
+  sourceListingId: string;
+  status: string;
+  configuration: {
+    brand?: string | null;
+    model?: string | null;
+    year?: number | null;
+    engineCc?: number | null;
+    fuelType?: string | null;
+    driveType?: string | null;
+    badge?: string | null;
+    trim?: string | null;
+  };
+};
+type PowerPlan = { runId: string; candidates: PlanCandidate[] };
 type Reference = AutomaticPowerReferenceRow & {
   note: string;
 };
@@ -68,7 +87,7 @@ const configKey = (r: Omit<Reference, "configuration_key" | "power_hp" | "power_
   [norm(r.brand), norm(r.model), norm(r.fuel_type), r.engine_cc, norm(r.drive_type), norm(r.badge), norm(r.badge_detail),
     `year=${r.year_from}-${r.year_to}`].join("|");
 
-function buildReferences(manifest: Manifest, audit: Audit) {
+function buildReferences(manifest: Manifest, audit: Audit, plans: PowerPlan[]) {
   if (manifest.version !== "encarrus-ice-gasd-lpg-201-preliminary-v1" ||
       manifest.status !== "preliminary_only_not_approved_tks_evidence" ||
       manifest.candidateListingCount !== 120 || manifest.records.length !== 89 ||
@@ -86,12 +105,26 @@ function buildReferences(manifest: Manifest, audit: Audit) {
     }
   }
   const reviewById = new Map(audit.reviewResolutions.map((row) => [row.listingId, row]));
+  const planById = new Map<string, PlanCandidate>();
+  for (const plan of plans) {
+    if (!expectedRunIds.has(plan.runId)) throw new Error(`Unexpected run ID in power plan: ${plan.runId}`);
+    for (const candidate of plan.candidates) {
+      const id = String(candidate.sourceListingId);
+      const prior = planById.get(id);
+      if (prior && JSON.stringify(prior.configuration) !== JSON.stringify(candidate.configuration)) {
+        throw new Error(`Power-plan configuration changed between runs for ${id}`);
+      }
+      // Later retry-run entries supersede their cancelled/failed original queue entries.
+      planById.set(id, candidate);
+    }
+  }
   const listingIds = manifest.records.flatMap((row) => row.listingIds.map(String));
   if (listingIds.length !== 120 || new Set(listingIds).size !== 120) {
     throw new Error(`Manifest must cover 120 unique listing IDs, got ${listingIds.length}/${new Set(listingIds).size}`);
   }
 
   const refsByKey = new Map<string, Reference>();
+  const configById = new Map<string, PlanCandidate["configuration"]>();
   for (const record of manifest.records) {
     if (!Number.isInteger(record.year) || !Number.isInteger(record.engineCc) ||
         !Number.isFinite(record.powerPs) || record.powerPs <= 0 || !record.sourceUrl) {
@@ -100,11 +133,20 @@ function buildReferences(manifest: Manifest, audit: Audit) {
     const rows = record.listingIds.map((id) => {
       const row = sourceById.get(String(id));
       if (!row) throw new Error(`Source audit missing listing ${id}`);
+      const planned = planById.get(String(id));
+      if (!planned || planned.status !== "unmatched") {
+        throw new Error(`Power plan missing or no longer unmatched for listing ${id}`);
+      }
+      const config = planned.configuration;
       const [brand, model, year, engineCc, fuelType, driveType] = row.car;
       if (brand !== record.brand || model !== record.model || year !== record.year ||
-          engineCc !== record.engineCc || fuelType !== record.fuelType) {
+          engineCc !== record.engineCc || fuelType !== record.fuelType ||
+          config.brand !== record.brand || config.model !== record.model || config.year !== record.year ||
+          config.engineCc !== record.engineCc || config.fuelType !== record.fuelType ||
+          norm(config.driveType) !== norm(driveType)) {
         throw new Error(`Source-audit configuration mismatch for listing ${id}`);
       }
+      configById.set(String(id), config);
       if (row.classification === "preliminary_candidate") {
         if (row.suggestedPowerHp !== record.powerPs || row.powerCandidatesHp.length !== 1 ||
             row.powerCandidatesHp[0] !== record.powerPs) {
@@ -118,22 +160,22 @@ function buildReferences(manifest: Manifest, audit: Audit) {
       } else {
         throw new Error(`Unexpected source classification for listing ${id}: ${row.classification}`);
       }
-      return { row, driveType };
+      return { row, driveType, config };
     });
 
-    const drives = new Set(rows.map(({ driveType }) => norm(driveType)));
-    if (drives.size !== 1) throw new Error(`Mixed drivetrain within ${record.brand} ${record.model} ${record.year}`);
-    const badges = [...new Set(rows.flatMap(({ row }) => row.badges.map((badge) => badge.trim()).filter(Boolean)))];
-    if (!badges.length) badges.push("");
-    for (const badge of badges) {
+    const configurations = new Map<string, typeof rows[number]["config"]>();
+    for (const { config } of rows) configurations.set(JSON.stringify(config), config);
+    for (const config of configurations.values()) {
+      const badge = config.badge?.trim() || null;
+      const badgeDetail = config.trim?.trim() || null;
       const base = {
         brand: record.brand,
         model: record.model,
         fuel_type: record.fuelType,
         engine_cc: record.engineCc,
-        drive_type: rows[0].driveType,
-        badge: badge || null,
-        badge_detail: null,
+        drive_type: config.driveType ?? null,
+        badge,
+        badge_detail: badgeDetail,
         year_from: record.year,
         year_to: record.year,
       };
@@ -150,6 +192,7 @@ function buildReferences(manifest: Manifest, audit: Audit) {
         `EncarRus evidence: ${record.sourceTitle}; ${record.sourceUrl}.`,
         record.note,
         reviewNotes.length ? `Reviewed decision: ${reviewNotes.join("; ")}` : "",
+        `Exact Encar power-plan badge/trim: ${badge ?? "(empty)"} / ${badgeDetail ?? "(empty)"}.`,
         `Covered Encar listing IDs: ${record.listingIds.join(", ")}.`,
       ].filter(Boolean).join(" ");
       const ref: Reference = {
@@ -169,14 +212,17 @@ function buildReferences(manifest: Manifest, audit: Audit) {
     }
   }
 
-  return { references: [...refsByKey.values()], listingIds, sourceById, reviewById };
+  return { references: [...refsByKey.values()], listingIds, configById };
 }
 
 async function main() {
   if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as Manifest;
   const audit = JSON.parse(await readFile(auditPath, "utf8")) as Audit;
-  const built = buildReferences(manifest, audit);
+  if (!planPaths.length) throw new Error("ENCARRUS_GASD_LPG_PLANS must identify the saved power-plan JSON files");
+  const plans = await Promise.all(planPaths.map(async (path) =>
+    JSON.parse(await readFile(path, "utf8")) as PowerPlan));
+  const built = buildReferences(manifest, audit, plans);
   const db = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await db.connect();
   try {
@@ -206,20 +252,20 @@ async function main() {
       ...live.filter((row) => !proposedByKey.has(row.configuration_key)),
       ...built.references,
     ];
-    const resolverConflicts: Array<{ listingId: string; badge: string | null; expected: number; resolved: number | null; key: string | null }> = [];
+    const resolverConflicts: Array<{ listingId: string; badge: string | null; badgeDetail: string | null;
+      expected: number; resolved: number | null; key: string | null }> = [];
     for (const record of manifest.records) {
       for (const id of record.listingIds) {
-        const source = built.sourceById.get(String(id))!;
-        const [, , year, engineCc, fuelType, driveType] = source.car;
-        for (const badge of source.badges.length ? source.badges : [null]) {
-          const resolved = resolveAutomaticPowerReference({
-            brand: record.brand, model: record.model, fuel_type: fuelType,
-            engine_cc: engineCc, drive_type: driveType, badge, badge_detail: null, year,
-          }, simulated);
-          if (Number(resolved?.power_hp) !== record.powerPs) {
-            resolverConflicts.push({ listingId: String(id), badge, expected: record.powerPs,
-              resolved: resolved?.power_hp ?? null, key: resolved?.configuration_key ?? null });
-          }
+        const config = built.configById.get(String(id))!;
+        const resolved = resolveAutomaticPowerReference({
+          brand: record.brand, model: record.model, fuel_type: record.fuelType,
+          engine_cc: record.engineCc, drive_type: config.driveType ?? null,
+          badge: config.badge ?? null, badge_detail: config.trim ?? null, year: record.year,
+        }, simulated);
+        if (Number(resolved?.power_hp) !== record.powerPs) {
+          resolverConflicts.push({ listingId: String(id), badge: config.badge ?? null,
+            badgeDetail: config.trim ?? null, expected: record.powerPs,
+            resolved: resolved?.power_hp ?? null, key: resolved?.configuration_key ?? null });
         }
       }
     }
