@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 import { fetch, ProxyAgent } from "undici";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
 import { normalizeFuel } from "../src/server/normalization/vehicles";
 
@@ -15,9 +15,11 @@ if (!proxy || !supabaseUrl || !serviceKey) throw new Error("ENCAR_PROXY_URL and 
 
 const target = Math.max(1, Math.min(500, Number(process.env.ENCAR_FRESH_TARGET ?? 500)));
 const pages = Math.max(1, Math.min(400, Number(process.env.ENCAR_FRESH_PAGES ?? 120)));
-const detailConcurrency = Math.max(1, Math.min(4, Number(process.env.ENCAR_FRESH_DETAIL_CONCURRENCY ?? 2)));
+const detailConcurrency = 1;
 const maxListingAgeDays = Math.max(1, Math.min(365, Number(process.env.ENCAR_FRESH_MAX_AGE_DAYS ?? 30)));
 const outputPath = process.env.ENCAR_FRESH_OUTPUT ?? "output/encar-fresh-candidates.json";
+const checkpointPath = process.env.ENCAR_FRESH_CHECKPOINT ?? "output/encar-fresh-checkpoint.json";
+const requestDelayMs = Math.max(0, Math.min(5_000, Number(process.env.ENCAR_FRESH_REQUEST_DELAY_MS ?? 250)));
 const fuels = new Set(["gasoline", "diesel", "lpg"]);
 const agent = new ProxyAgent(proxy);
 const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
@@ -27,12 +29,34 @@ const obj = (value: unknown): Record<string, unknown> => value && typeof value =
 
 type Listing = { Id: number | string; Manufacturer?: string; Model?: string; Year?: number | string; FuelType?: string };
 type Candidate = { source: "encar"; sourceListingId: string; sourceUrl: string; brand: string | null; model: string | null; year: number | null; fuelType: string; firstAdvertisedAt: string; listedAt: string | null };
+type Checkpoint = { version: 1; policy: string; listings: Listing[]; listPage: number; checkedIds: string[]; results: Candidate[]; errors: number };
+
+async function saveCheckpoint(value: Checkpoint) {
+  await mkdir("output", { recursive: true });
+  const temp = `${checkpointPath}.${process.pid}.tmp`;
+  await writeFile(temp, `${JSON.stringify(value)}\n`);
+  await rename(temp, checkpointPath);
+}
+
+async function readCheckpoint(): Promise<Checkpoint | null> {
+  try {
+    const value = JSON.parse(await readFile(checkpointPath, "utf8")) as Checkpoint;
+    if (value.version !== 1 || value.policy !== JSON.stringify({ target, pages, maxListingAgeDays, requestDelayMs }))
+      throw new Error("Existing Encar freshness checkpoint does not match current settings; set ENCAR_FRESH_CHECKPOINT to a new path");
+    return value;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw error;
+  }
+}
 
 async function main() {
-  const candidates = new Map<string, Listing>();
+  const checkpoint = await readCheckpoint();
+  const candidates = new Map<string, Listing>((checkpoint?.listings ?? []).map((row) => [String(row.Id), row]));
   const fuelCounts: Record<string, number> = { gasoline: 0, diesel: 0, lpg: 0, other: 0 };
   const bounds = `(And.Hidden.N._.Year.range(190001..210012)._.Mileage.range(0..999999)._.Price.range(0..100000).)`;
-  for (let page = 0; page < pages; page += 1) {
+  const state: Checkpoint = checkpoint ?? { version: 1, policy: JSON.stringify({ target, pages, maxListingAgeDays, requestDelayMs }), listings: [], listPage: 0, checkedIds: [], results: [], errors: 0 };
+  for (let page = state.listPage; page < pages; page += 1) {
     const q = encodeURIComponent(bounds);
     const sr = encodeURIComponent(`|ModifiedDate|${page * pageSize}|${pageSize}`);
     const response = await fetch(`https://api.encar.com/search/car/list/general?count=true&q=${q}&sr=${sr}`, {
@@ -47,6 +71,9 @@ async function main() {
       if (fuels.has(fuel)) candidates.set(String(row.Id), row);
     }
     console.log(JSON.stringify({ event: "list_progress", page: page + 1, pages, rows: rows.length, uniqueEligible: candidates.size, fuelCounts }));
+    state.listings = [...candidates.values()];
+    state.listPage = page + 1;
+    await saveCheckpoint(state);
     if (rows.length < pageSize) break;
     await delay(250);
   }
@@ -64,38 +91,58 @@ async function main() {
     for (const row of queue.data ?? []) known.add(String(row.source_listing_id));
   }
   const unseen = ids.filter((id) => !known.has(id));
-  const detailResults: Candidate[] = [];
+  const completed = new Set(state.checkedIds);
+  const pending = unseen.filter((id) => !completed.has(id));
+  const detailResults = state.results;
   let cursor = 0;
+  let completedSinceSave = 0;
   async function worker() {
-    while (cursor < unseen.length) {
-      const id = unseen[cursor++];
+    while (cursor < pending.length) {
+      const id = pending[cursor++];
       const listing = candidates.get(id)!;
+      let failed = false;
       try {
         const response = await fetch(`https://api.encar.com/v1/readside/vehicle/${id}`, {
           headers: ENCAR_HEADERS, dispatcher: agent, signal: AbortSignal.timeout(20_000),
         });
-        if (!response.ok) continue;
-        const detail = obj(await response.json());
-        const manage = obj(detail.manage);
-        const advert = obj(detail.advertisement);
-        const firstAdvertisedAt = String(manage.firstAdvertisedDateTime ?? "");
-        const advertised = Date.parse(firstAdvertisedAt);
-        const listingFuel = normalizeFuel(listing.FuelType);
-        const detailFuel = normalizeFuel(obj(detail.spec).fuelName ?? listing.FuelType);
-        if (!firstAdvertisedAt || !Number.isFinite(advertised) || Date.now() - advertised > maxListingAgeDays * 86_400_000) continue;
-        if (!fuels.has(detailFuel ?? "") || detailFuel !== listingFuel) continue;
-        if (manage.dummy === true || advert.salesStatus === "CONTRACT") continue;
-        detailResults.push({
-          source: "encar", sourceListingId: id, sourceUrl: `https://fem.encar.com/cars/detail/${id}`,
-          brand: listing.Manufacturer ?? null, model: listing.Model ?? null,
-          year: Number(String(listing.Year ?? "").slice(0, 4)) || null,
-          fuelType: detailFuel!, firstAdvertisedAt, listedAt: String(manage.registDateTime ?? "") || null,
-        });
-      } catch { /* source/proxy errors are omitted from this read-only discovery report */ }
-      await delay(250);
+        if (!response.ok) failed = true;
+        else {
+          const detail = obj(await response.json());
+          const manage = obj(detail.manage);
+          const advert = obj(detail.advertisement);
+          const firstAdvertisedAt = String(manage.firstAdvertisedDateTime ?? "");
+          const advertised = Date.parse(firstAdvertisedAt);
+          const listingFuel = normalizeFuel(listing.FuelType);
+          const detailFuel = normalizeFuel(obj(detail.spec).fuelName ?? listing.FuelType);
+          if (firstAdvertisedAt && Number.isFinite(advertised) && Date.now() - advertised <= maxListingAgeDays * 86_400_000 &&
+              fuels.has(detailFuel ?? "") && detailFuel === listingFuel && manage.dummy !== true && advert.salesStatus !== "CONTRACT") {
+            detailResults.push({
+              source: "encar", sourceListingId: id, sourceUrl: `https://fem.encar.com/cars/detail/${id}`,
+              brand: listing.Manufacturer ?? null, model: listing.Model ?? null,
+              year: Number(String(listing.Year ?? "").slice(0, 4)) || null,
+              fuelType: detailFuel!, firstAdvertisedAt, listedAt: String(manage.registDateTime ?? "") || null,
+            });
+          }
+        }
+      } catch { failed = true; }
+      finally {
+        if (failed) state.errors += 1;
+        state.checkedIds.push(id);
+        completedSinceSave += 1;
+        if (completedSinceSave >= 10) {
+          state.results = detailResults;
+          await saveCheckpoint(state);
+          completedSinceSave = 0;
+        }
+        if (state.checkedIds.length % 10 === 0 || state.checkedIds.length === unseen.length)
+          console.log(JSON.stringify({ event: "detail_progress", checked: state.checkedIds.length, total: unseen.length, validFresh: detailResults.length, errors: state.errors }));
+        if (requestDelayMs) await delay(requestDelayMs);
+      }
     }
   }
-  await Promise.all(Array.from({ length: detailConcurrency }, worker));
+  await worker();
+  state.results = detailResults;
+  await saveCheckpoint(state);
   detailResults.sort((a, b) => Date.parse(b.firstAdvertisedAt) - Date.parse(a.firstAdvertisedAt));
   const selected = detailResults.slice(0, target);
   const counts = selected.reduce<Record<string, number>>((result, row) => { result[row.fuelType] = (result[row.fuelType] ?? 0) + 1; return result; }, {});
@@ -103,7 +150,7 @@ async function main() {
     generatedAt: new Date().toISOString(), mode: "read_only_discovery", target, selectedCount: selected.length,
     maxListingAgeDays, listSort: "ModifiedDate", sourcePublicationDate: "detail.manage.firstAdvertisedDateTime",
     listPagesRequested: pages, listCandidateIds: ids.length, alreadyInCatalogOrQueue: known.size,
-    unseenChecked: Math.min(cursor, unseen.length), recentActiveCandidateCount: detailResults.length,
+    unseenChecked: state.checkedIds.length, recentActiveCandidateCount: detailResults.length, detailErrors: state.errors,
     selectedFuelCounts: counts, candidates: selected,
     limitation: selected.length < target ? "More list pages may be required; no staging run was created." : null,
   };
