@@ -24,7 +24,7 @@ const fuelFilters: Record<string, string> = {
   diesel: "디젤",
   lpg: "액화석유가스",
 };
-const queryFor = (fuel: string) => encodeURIComponent(`(And.Hidden.N._.FuelType.${fuelFilters[fuel]}._.Year.range(${bounds.minYear}..${bounds.maxYear})._.Mileage.range(${bounds.minMileage}..${bounds.maxMileage})._.Price.range(${bounds.minPrice}..${bounds.maxPrice}).)`);
+const queryFor = (fuel: string) => encodeURIComponent(`(And.Hidden.N.${fuel === "lpg" ? "" : `_.FuelType.${fuelFilters[fuel]}.`}_.Year.range(${bounds.minYear}..${bounds.maxYear})._.Mileage.range(${bounds.minMileage}..${bounds.maxMileage})._.Price.range(${bounds.minPrice}..${bounds.maxPrice}).)`);
 type Listing = { Id: number | string; Manufacturer?: string; Model?: string; Year?: string | number; FuelType?: string; Photos?: Array<{ updatedDate?: string }> };
 
 async function main() {
