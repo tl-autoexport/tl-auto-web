@@ -22,7 +22,7 @@ const bounds = {
 const fuelFilters: Record<string, string> = {
   gasoline: "가솔린",
   diesel: "디젤",
-  lpg: "LPG",
+  lpg: "LPG(일반인 구입)",
 };
 const queryFor = (fuel: string) => encodeURIComponent(`(And.Hidden.N._.FuelType.${fuelFilters[fuel]}._.Year.range(${bounds.minYear}..${bounds.maxYear})._.Mileage.range(${bounds.minMileage}..${bounds.maxMileage})._.Price.range(${bounds.minPrice}..${bounds.maxPrice}).)`);
 type Listing = { Id: number | string; Manufacturer?: string; Model?: string; Year?: string | number; FuelType?: string; Photos?: Array<{ updatedDate?: string }> };
