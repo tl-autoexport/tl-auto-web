@@ -19,33 +19,43 @@ const bounds = {
   minPrice: process.env.ENCAR_MIN_PRICE ?? "0",
   maxPrice: process.env.ENCAR_MAX_PRICE ?? "100000",
 };
-const query = encodeURIComponent(`(And.Hidden.N._.Year.range(${bounds.minYear}..${bounds.maxYear})._.Mileage.range(${bounds.minMileage}..${bounds.maxMileage})._.Price.range(${bounds.minPrice}..${bounds.maxPrice}).)`);
+const fuelFilters: Record<string, string> = {
+  gasoline: "가솔린",
+  diesel: "디젤",
+  lpg: "LPG",
+};
+const queryFor = (fuel: string) => encodeURIComponent(`(And.Hidden.N._.FuelType.${fuelFilters[fuel]}._.Year.range(${bounds.minYear}..${bounds.maxYear})._.Mileage.range(${bounds.minMileage}..${bounds.maxMileage})._.Price.range(${bounds.minPrice}..${bounds.maxPrice}).)`);
 type Listing = { Id: number | string; Manufacturer?: string; Model?: string; Year?: string | number; FuelType?: string; Photos?: Array<{ updatedDate?: string }> };
 
 async function main() {
-  const rows: Listing[] = [];
-  for (let page = 0; page < pageCount; page += 1) {
-    const sort = encodeURIComponent(`|ModifiedDate|${page * pageSize}|${pageSize}`);
-    const url = `https://api.encar.com/search/car/list/general?count=true&q=${query}&sr=${sort}`;
-    const response = await fetch(url, { headers: ENCAR_HEADERS, dispatcher: agent, signal: AbortSignal.timeout(20_000) });
-    if (!response.ok) throw new Error(`Encar list HTTP ${response.status}`);
-    const body = await response.json() as { SearchResults?: Listing[] };
-    const batch = body.SearchResults ?? [];
-    rows.push(...batch);
-    if (batch.length < pageSize) break;
+  const grouped: Record<string, unknown> = {};
+  for (const fuel of ["gasoline", "diesel", "lpg"]) {
+    const rows: Listing[] = [];
+    for (let page = 0; page < pageCount; page += 1) {
+      const sort = encodeURIComponent(`|ModifiedDate|${page * pageSize}|${pageSize}`);
+      const url = `https://api.encar.com/search/car/list/general?count=true&q=${queryFor(fuel)}&sr=${sort}`;
+      const response = await fetch(url, { headers: ENCAR_HEADERS, dispatcher: agent, signal: AbortSignal.timeout(20_000) });
+      if (!response.ok) throw new Error(`Encar ${fuel} list HTTP ${response.status}`);
+      const body = await response.json() as { SearchResults?: Listing[] };
+      const batch = body.SearchResults ?? [];
+      rows.push(...batch);
+      if (batch.length < pageSize) break;
+    }
+    grouped[fuel] = {
+      rowsRead: rows.length,
+      normalizedFuelCounts: rows.reduce<Record<string, number>>((counts, row) => {
+        const type = normalizeFuel(row.FuelType) ?? "unknown";
+        counts[type] = (counts[type] ?? 0) + 1;
+        return counts;
+      }, {}),
+      newestSamples: rows.slice(0, 8).map((row) => ({
+        id: String(row.Id), brand: row.Manufacturer ?? null, model: row.Model ?? null,
+        year: row.Year ?? null, sourceFuel: row.FuelType ?? null,
+        listedPhotoUpdatedAt: row.Photos?.[0]?.updatedDate ?? null,
+      })),
+    };
   }
-  const counts: Record<string, number> = { gasoline: 0, diesel: 0, lpg: 0, other: 0 };
-  for (const row of rows) {
-    const fuel = normalizeFuel(row.FuelType) ?? "other";
-    counts[fuel in counts ? fuel : "other"] += 1;
-  }
-  const grouped = Object.fromEntries(["gasoline", "diesel", "lpg"].map((fuel) => [fuel,
-    rows.filter((row) => normalizeFuel(row.FuelType) === fuel).slice(0, 8).map((row) => ({
-      id: String(row.Id), brand: row.Manufacturer ?? null, model: row.Model ?? null,
-      year: row.Year ?? null, listedPhotoUpdatedAt: row.Photos?.[0]?.updatedDate ?? null,
-    })),
-  ]));
-  console.log(JSON.stringify({ readOnly: true, proxyUsed: true, pagesRead: Math.ceil(rows.length / pageSize), rowsRead: rows.length, fuelCounts: counts, newestSamples: grouped }, null, 2));
+  console.log(JSON.stringify({ readOnly: true, proxyUsed: true, sortCursor: "ModifiedDate", freshnessLimitation: "Publication timestamp requires detail.manage.firstAdvertisedDateTime; this probe only validates per-fuel list filters and samples.", pagesPerFuel: pageCount, perFuel: grouped }, null, 2));
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : error); process.exitCode = 1; })
