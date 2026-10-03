@@ -45,36 +45,36 @@ export default async function Home() {
             <DodoStoryCard
               title="Новая Avanta до 160 л.с."
               href="/catalog?search=Avante&powerMax=160&yearMin=2025&sort=fresh"
-              image="/assets/stories/avante.png"
+              image="/assets/stories/avante.webp"
               position="object-center"
             />
             <DodoStoryCard
               title="Новая линейка гидроциклов Sea-Doo"
-              image="/assets/stories/sea-doo.png"
+              image="/assets/stories/sea-doo.webp"
               position="object-center"
               status="Скоро"
             />
             <DodoStoryCard
               title="Как заказать"
               href="/#delivery"
-              image="/assets/stories/inspection-v2.png"
+              image="/assets/stories/inspection-v2.webp"
               position="object-center"
             />
             <DodoStoryCard
               title="Мы в соцсетях"
               href="/social"
-              image="/assets/stories/social-v2.png"
+              image="/assets/stories/social-v2.webp"
               position="object-center"
             />
             <DodoStoryCard
               title="Стань партнёром"
               href="/#contacts"
-              image="/assets/stories/partner.png"
+              image="/assets/stories/partner.webp"
               position="object-center"
             />
             <DodoStoryCard
               title="Кредитование"
-              image="/assets/stories/financing.png"
+              image="/assets/stories/financing.webp"
               position="object-center"
               status="Скоро"
             />
