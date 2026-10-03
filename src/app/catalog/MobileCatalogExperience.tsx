@@ -261,6 +261,6 @@ function formatRangeValue(value: string, key: string) {
   return value;
 }
 function cleanParams(query: string) { const params = new URLSearchParams(query); ["page", "cursor", "limit"].forEach((key) => params.delete(key)); return params; }
-function generationLabel(code: string, facets: Facets | null) { return facets?.axes.generation?.find((item) => item.value === code)?.label || (code ? code.toUpperCase() : ""); }
+function generationLabel(code: string, facets: Facets | null) { return facets?.axes.generation?.find((item) => item.value === code)?.label || (code.startsWith("ordinal:") ? code.split(":").slice(3).join(":") : code.toUpperCase()); }
 function titleFor(screen: Screen | "brand" | "model" | "generation" | "modification" | "trim") { return ({ brand: "Марка", model: "Модель", generation: "Поколение", modification:"Модификация", trim:"Комплектация", parameters: "Параметры", year: "Год выпуска", price: "Цена", mileage: "Пробег, км", sort: "Сортировка", home: "Фильтры" } as const)[screen]; }
 function pluralCars(count: number) { const tail = count % 100; if (tail > 10 && tail < 15) return "автомобилей"; return count % 10 === 1 ? "автомобиль" : count % 10 >= 2 && count % 10 <= 4 ? "автомобиля" : "автомобилей"; }
