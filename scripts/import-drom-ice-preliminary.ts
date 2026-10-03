@@ -40,7 +40,13 @@ type Manifest = {
 };
 
 type QueueRow = { run_id: string; source_listing_id: string; candidate_snapshot: Record<string, unknown> };
-type StagingRow = { run_id: string; source_listing_id: string; raw_payload: Record<string, any> };
+type StagingRow = { run_id: string; source_listing_id: string; raw_payload: Record<string, unknown> };
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
 
 function sha(value: string) {
   return createHash("sha256").update(value).digest("hex");
@@ -68,7 +74,7 @@ function normalizedModel(value: unknown): string {
   return String(value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
-function modelMatches(recordModel: string, snapshotModel: unknown, category: Record<string, any>): boolean {
+function modelMatches(recordModel: string, snapshotModel: unknown, category: Record<string, unknown>): boolean {
   const expected = recordModel.replace(/\s+(?:w|f|g|u|x)\d+\b.*$/i, "").replace(/\s+n$/i, "").trim();
   const expectedNormalized = normalizedModel(expected);
   const observed = [snapshotModel, category.modelGroupEnglishName, category.modelName]
@@ -118,9 +124,9 @@ async function main() {
           const staged = stagingRows.find((row) => row.run_id === runId);
           if (!queued || !staged) return [];
           const snapshot = queued.candidate_snapshot;
-          const detail = staged.raw_payload?.detail ?? {};
-          const category = detail.category ?? {};
-          const spec = detail.spec ?? {};
+          const detail = asRecord(staged.raw_payload.detail);
+          const category = asRecord(detail.category);
+          const spec = asRecord(detail.spec);
           const actualYear = Math.floor(Number(snapshot.year) / 100);
           const actualFuel = normalizedFuel(snapshot.fuelType);
           const actualCc = Number(spec.displacement);
