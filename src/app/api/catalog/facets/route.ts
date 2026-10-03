@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { createSupabasePublic } from "@/server/supabase/public";
+import { createSupabaseAdmin } from "@/server/supabase/admin";
+import { translateModel } from "@/server/normalization/display";
 import { normalizeCatalogBrand } from "@/lib/catalog-brand";
 
 /**
  * Facet counters for the catalogue cascade.
  *
  * The route only translates URL parameters into the filter keys the database
- * function expects; the counting itself happens in `catalog_facets`, which is
+ * function expects; the counting itself happens in `catalog_display_facets`, which is
  * built from the same predicate as the listing. Keeping the mapping here means
  * the database contract does not have to follow the URL naming.
  *
@@ -20,10 +21,10 @@ export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const filters = buildFilters(params);
 
-  const supabase = createSupabasePublic();
+  const supabase = createSupabaseAdmin();
   const [facets, count] = await Promise.all([
-    supabase.rpc("catalog_facets", { f: filters }),
-    supabase.rpc("catalog_listing_count", { f: filters }),
+    supabase.rpc("catalog_display_facets", { f: filters }),
+    supabase.rpc("catalog_display_listing_count", { f: filters }),
   ]);
   if (facets.error) return NextResponse.json({ error: facets.error.message }, { status: 500 });
   if (count.error) return NextResponse.json({ error: count.error.message }, { status: 500 });
@@ -37,7 +38,7 @@ export async function GET(request: Request) {
       if (existing) existing.cars += row.cars;
       else bucket.push({ value: label, label, cars: row.cars });
     } else {
-      bucket.push({ value: row.value, label: row.label ?? row.value, cars: row.cars });
+      bucket.push({ value: row.value, label: row.axis === "model" ? translateModel(null,row.label ?? row.value) : row.label ?? row.value, cars: row.cars });
     }
     axes[row.axis] = bucket;
   }
@@ -64,6 +65,8 @@ function buildFilters(params: URLSearchParams): Record<string, unknown> {
     brand: normalizeCatalogBrand(params.get("brand")) || undefined,
     model: params.get("model") || undefined,
     generation: params.get("generation") || undefined,
+    modification: params.get("modification") || undefined,
+    trim: params.get("trim") || undefined,
     fuel: params.get("fuel") || undefined,
     drive: params.get("drive") || undefined,
     transmission: params.get("transmission") || undefined,

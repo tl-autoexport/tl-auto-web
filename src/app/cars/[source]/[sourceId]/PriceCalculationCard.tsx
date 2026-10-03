@@ -60,6 +60,8 @@ type PriceCalculationCardProps = {
   source: string;
   sourceId: string;
   title: string;
+  version?: string | null;
+  generation?: string | null;
   year: number | null;
   registrationMonth: number | null;
 };
@@ -182,6 +184,8 @@ function RuPriceCalculationCard({
   source,
   sourceId,
   title,
+  version,
+  generation,
   year,
   registrationMonth,
 }: PriceCalculationCardProps) {
@@ -287,7 +291,13 @@ function RuPriceCalculationCard({
   return (
     <>
       <aside className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <h1 className="mt-0 line-clamp-2 text-2xl font-semibold leading-[1.12] text-[#121722] sm:mt-0 sm:text-3xl">
+          {title}
+        </h1>
+        {version ? <p className="mt-1.5 text-base leading-6 text-[#465368] sm:text-lg">{version}</p> : null}
+        {generation ? <p className="mt-1 text-xs text-[#8591a1] sm:text-sm">{generation}</p> : null}
+
+        <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1">
           <p className="whitespace-nowrap text-[30px] font-semibold leading-none tracking-tight text-[#121722] tabular-nums sm:text-3xl">
             {currency === "USD" ? dollars(displayTotal) : money(displayTotal)}
           </p>
@@ -299,9 +309,6 @@ function RuPriceCalculationCard({
             Цена под ключ до {city.label}
           </span>
         </div>
-        <h1 className="mt-4 line-clamp-2 text-2xl font-semibold leading-[1.12] text-[#121722] sm:mt-5 sm:text-3xl">
-          {title}
-        </h1>
         <p className="mt-1.5 text-[13px] text-[#647084] sm:mt-2 sm:text-sm">
           {formatVehicleYear(year)} · {rub.format(mileageKm ?? 0)} км ·{" "}
           {formatEngineCapacity(engineCc)} · {fuel}
@@ -604,6 +611,8 @@ function KzPriceCalculationCard(props: PriceCalculationCardProps) {
       <aside className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
         <div className="flex items-center gap-2 text-sm font-semibold text-[#956f2c]"><BadgeCheck size={18} />Источник Encar</div>
         <h1 className="mt-3 line-clamp-2 text-2xl font-semibold leading-tight text-[#121722] sm:text-3xl">{props.title}</h1>
+        {props.version ? <p className="mt-1.5 text-base text-[#465368]">{props.version}</p> : null}
+        {props.generation ? <p className="mt-1 text-xs text-[#8591a1]">{props.generation}</p> : null}
         <p className="mt-2 text-sm text-[#647084]">{formatVehicleYear(props.year)} · {rub.format(props.mileageKm ?? 0)} км · {formatEngineCapacity(props.engineCc)}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <span className="rounded-full bg-[#e8f5ee] px-3 py-1 text-xs font-semibold text-[#18784a]">Расчёт для Казахстана</span>
@@ -635,7 +644,7 @@ function KzPriceCalculationCard(props: PriceCalculationCardProps) {
 
 function PendingDestinationCard(props: PriceCalculationCardProps) {
   const { country, city } = useDestination();
-  return <aside className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]"><div className="flex items-center gap-2 text-sm font-semibold text-[#956f2c]"><BadgeCheck size={18} />Источник Encar</div><h1 className="mt-3 text-2xl font-semibold text-[#121722]">{props.title}</h1><div className="mt-4 flex gap-2"><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{country.countryLabel}</span><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{city.label}</span></div><p className="mt-5 text-2xl font-semibold">Расчёт уточняется</p><p className="mt-2 text-sm leading-6 text-[#647084]">Тарифы доставки и оформления для выбранного направления ещё не подтверждены.</p></aside>;
+  return <aside className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]"><div className="flex items-center gap-2 text-sm font-semibold text-[#956f2c]"><BadgeCheck size={18} />Источник Encar</div><h1 className="mt-3 text-2xl font-semibold text-[#121722]">{props.title}</h1>{props.version ? <p className="mt-1.5 text-base text-[#465368]">{props.version}</p> : null}{props.generation ? <p className="mt-1 text-xs text-[#8591a1]">{props.generation}</p> : null}<div className="mt-4 flex gap-2"><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{country.countryLabel}</span><span className="rounded-full bg-[#eef1f6] px-3 py-1 text-xs font-semibold">{city.label}</span></div><p className="mt-5 text-2xl font-semibold">Расчёт уточняется</p><p className="mt-2 text-sm leading-6 text-[#647084]">Тарифы доставки и оформления для выбранного направления ещё не подтверждены.</p></aside>;
 }
 
 function KzRow({ label, value }: { label: string; value: number }) {

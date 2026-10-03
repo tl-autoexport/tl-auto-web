@@ -1,3 +1,4 @@
+import { persistCatalogNamingPg } from "../src/server/catalog/persist-catalog-naming";
 /** Publish only the frozen hybrid/EV allowlist for Encar run 21a687ee. */
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
@@ -316,6 +317,7 @@ async function main() {
           await db.query(`insert into public.source_snapshots(source,source_id,source_url,payload,fetched_at,parser_version,status)
             values ('encar',$1,$2,$3,$4,'encar-electrified-21a687ee-v1','ok')`,
           [item.id, item.stage.source_url, JSON.stringify(item.stage.raw_payload), item.stage.fetched_at]);
+          await persistCatalogNamingPg(db,carId);
           await db.query(`insert into public.car_media(car_id,source,media_type,category,url,thumbnail_url,sort_order,is_primary,legal_mode)
             select $1,'encar','image',p.category,p.url,p.url,p.sort_order,p.is_primary,'external_url'
             from jsonb_to_recordset($2::jsonb) as p(category text,url text,sort_order integer,is_primary boolean)`,

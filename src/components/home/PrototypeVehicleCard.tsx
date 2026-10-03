@@ -19,27 +19,7 @@ const rub = new Intl.NumberFormat("ru-RU");
 const engine = new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const day = 24 * 60 * 60 * 1000;
 
-const BODY_SHAPE_BY_MODEL: Record<string, string> = {
-  K8: "Седан",
-  K5: "Седан",
-  Sonata: "Седан",
-  G80: "Седан",
-  G90: "Седан",
-  Grandeur: "Седан",
-  Avante: "Седан",
-  Elantra: "Седан",
-};
-
 type VehicleCardData = CatalogCar | CatalogCardSummary;
-
-function bodyShapeForCard(car: VehicleCardData) {
-  const storedShape = "vehicle_specs" in car ? car.vehicle_specs?.body_shape : null;
-  if (typeof storedShape === "string" && storedShape.trim()) return storedShape;
-  if (car.body_type === "SUV") return "Кроссовер";
-  if (car.body_type === "Минивэн") return "Минивэн";
-  if (car.body_type === "Спорткар") return "Спорткар";
-  return BODY_SHAPE_BY_MODEL[car.model ?? ""] ?? null;
-}
 
 function daysOnSale(car: CatalogCar) {
   // "Time on sale in Korea" is supportable only by a confirmed source date. Our
@@ -62,13 +42,7 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
   const title = [brand, model].filter(Boolean).join(" ") || "Автомобиль из Кореи";
   const detailsHref = publicCarPath(car.primary_source, car.source_id);
   const message = vehicleClientMessage({ source: car.primary_source, sourceId: car.source_id, title });
-  const seatsValue = car.seats ?? ("vehicle_specs" in car && typeof car.vehicle_specs?.seats === "number" ? car.vehicle_specs.seats : null);
-  const seats = typeof seatsValue === "number" && seatsValue > 0
-    ? `${seatsValue} мест`
-    : null;
   const primaryFacts = [
-    brand,
-    model,
     car.engine_cc ? `${engine.format(car.engine_cc / 1000)} л` : null,
     car.transmission ? translateTransmission(car.transmission) : null,
     car.year ? `${car.year} г.` : null,
@@ -78,8 +52,6 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
     car.fuel_type ? translateFuel(car.fuel_type) : null,
     translateDrive(car.drive_type),
     car.power_hp ? `${car.power_hp} л.с.` : null,
-    bodyShapeForCard(car),
-    seats,
   ].filter((value): value is string => Boolean(value));
   const saleDays = daysOnSale(car);
   const isSupportedRuPrice = country.countryCode === "RU" && ["vladivostok", "ussuriysk"].includes(city.id);
@@ -132,20 +104,20 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
           )}
         </div>
 
-        <h3 className="mt-2 flex flex-wrap items-center gap-1.5 text-lg font-bold leading-tight text-[#101827] transition hover:text-[#956f2c] sm:mt-4 sm:gap-2 sm:text-xl">
-          <span>{primaryFacts.length ? primaryFacts.slice(0, 2).join(" ") : title}</span>
-          {car.year ? <span className="rounded-full border border-[#cfd6e0] px-2 py-0.5 text-xs font-medium text-[#4e5b6d] sm:px-2.5 sm:py-1 sm:text-sm">{car.year}</span> : null}
-        </h3>
+
+        <h3 className="mt-4 text-lg font-semibold leading-tight tracking-tight text-[#101827] sm:mt-5 sm:text-xl">{title}</h3>
+        {car.compact_version || car.generation_label ? <p className="mt-1 text-sm leading-5 text-[#465368] sm:text-[15px]">{[car.compact_version, car.generation_label].filter(Boolean).join(" · ")}</p> : null}
         <div className="mt-1 flex flex-wrap gap-1.5 sm:mt-3">
           {car.accident_count === 0 ? <span className="rounded-full bg-[#e8f5ef] px-2 py-0.5 text-[11px] font-semibold text-[#18794e] sm:px-2.5 sm:py-1 sm:text-xs">Без ДТП</span> : null}
           {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? <span className="rounded-full bg-[#fff2e5] px-2 py-0.5 text-[11px] font-semibold text-[#9a5b1c] sm:px-2.5 sm:py-1 sm:text-xs">Страховые выплаты: {car.insurance_payout_count}</span> : null}
         </div>
         <p className="mt-1 text-xs leading-5 text-[#273246] sm:mt-2 sm:text-sm sm:leading-6">
-          {primaryFacts.slice(2).join(" · ") || "Основные характеристики уточняются"}
+          {primaryFacts.join(" · ")}
         </p>
         <p className="mt-1 text-xs leading-5 text-[#273246] sm:mt-2 sm:text-sm sm:leading-6">
-          {secondaryFacts.join(" · ") || "Комплектация уточняется"}
+          {secondaryFacts.join(" · ")}
         </p>
+
       </div>
 
       <div className="relative z-10 flex items-center gap-2 border-t border-[#e4e9e7] bg-white px-2.5 py-2.5 text-[#207a45] sm:px-4">

@@ -22,7 +22,7 @@ import {
   type CatalogFilters,
   type StagingCatalogType,
 } from "@/server/cars/repository";
-import { translateDrive, translateFuel, translateTransmission, translateTrim } from "@/server/normalization/display";
+import { translateDrive, translateFuel, translateTransmission } from "@/server/normalization/display";
 import { bodyTypeFilterValue, driveTypeFilterValue, transmissionFilterValue } from "@/lib/catalog-filter-values";
 import { LiveCatalogCount } from "./LiveCatalogCount";
 import { getCbrCalcRates } from "@/server/calc/rates";
@@ -31,8 +31,10 @@ import { sourceDisplayName } from "@/lib/source-url";
 import { normalizeCatalogBrand } from "@/lib/catalog-brand";
 import { CatalogSearchBar } from "./CatalogSearchBar";
 import { CatalogInfiniteGrid } from "./CatalogInfiniteGrid";
+import { CatalogFilterDraft } from "./CatalogFilterDraft";
 import { GenerationCascade } from "./GenerationCascade";
 import { MobileCatalogExperience } from "./MobileCatalogExperience";
+import { BrandLogo } from "@/components/catalog/BrandLogo";
 
 export const metadata: Metadata = {
   title: "Каталог автомобилей из Кореи",
@@ -99,6 +101,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     minYear: numberParam(value("yearMin")),
     maxYear: numberParam(value("yearMax")),
     registrationMonth: numberParam(value("month")),
+    modification: value("modification") || undefined,
     trim: value("trim") || undefined,
     bodyType: value("body") || undefined,
     driveType: driveTypeFilterValue(value("drive")) || undefined,
@@ -200,11 +203,12 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                         : "border-transparent text-[#15171b] hover:border-[#d7c49c]"
                     }`}
                     href={selected
-                      ? catalogFilterHref(rawParams, { brand: null, model: null, generation: null, page: null })
-                    : catalogFilterHref(rawParams, { brand, model: null, generation: null, page: null })}
+                      ? catalogFilterHref(rawParams, { brand: null, model: null, generation: null, modification:null,trim:null, page: null })
+                    : catalogFilterHref(rawParams, { brand, model: null, generation: null, modification:null,trim:null, page: null })}
                     prefetch={false}
                     key={brand}
                   >
+                    <BrandLogo brand={brand} size={26} />
                     {brand}
                     <span className="text-[#757b84]">{brandCounts[brand] ?? 0}</span>
                     {selected ? <span aria-hidden="true" className="text-[#a98239]">×</span> : null}
@@ -220,10 +224,10 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       <section id="filters" className="hidden border-b border-[#dce2eb] bg-white md:block">
         <div className="mx-auto max-w-7xl px-3 pb-5 sm:px-5 md:pb-8">
           <div className="rounded-2xl border border-[#dce2eb] bg-[#f7f8fa] p-3 shadow-[0_12px_32px_rgba(16,24,39,0.05)] sm:p-4 md:p-5">
-            <div className="hidden md:block"><GenerationCascade brand={filters.brand} currentQuery={currentQuery} generation={filters.generation} model={filters.model} totalCars={totalCars} /></div>
+            <CatalogFilterDraft key={currentQuery} currentQuery={currentQuery}><div className="hidden md:block"><GenerationCascade brand={filters.brand} currentQuery={currentQuery} generation={filters.generation} model={filters.model} modification={filters.modification} trim={filters.trim} totalCars={totalCars} /></div>
             <div className="mt-4 hidden border-t border-[#dce2eb] pt-4 md:block">
               <CatalogFilterForm {...filterFormProps} />
-            </div>
+            </div></CatalogFilterDraft>
           </div>
         </div>
       </section>
@@ -232,7 +236,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         <div className="sticky top-[68px] z-[60] -mx-3 bg-[#f5f6f8] shadow-[0_5px_14px_rgba(15,31,49,0.1)] sm:-mx-5 md:hidden">
           {popularBrands.length ? <div className="scrollbar-none flex gap-4 overflow-x-auto border-y border-[#dce2eb] bg-white px-3 py-2.5 sm:px-5">{popularBrands.map((brand) => {
             const selected = filters.brand === brand;
-            return <Link aria-current={selected ? "page" : undefined} className={`inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold ${selected ? "text-[#956f2c]" : "text-[#273246]"}`} href={selected ? catalogFilterHref(rawParams, { brand: null, model: null, generation: null, page: null }) : catalogFilterHref(rawParams, { brand, model: null, generation: null, page: null })} key={brand} prefetch={false}>{brand}<span className="text-[#7a8798]">{brandCounts[brand] ?? 0}</span>{selected ? <span aria-hidden="true">×</span> : null}</Link>;
+            return <Link aria-current={selected ? "page" : undefined} className={`inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold ${selected ? "text-[#956f2c]" : "text-[#273246]"}`} href={selected ? catalogFilterHref(rawParams, { brand: null, model: null, generation: null, modification:null,trim:null, page: null }) : catalogFilterHref(rawParams, { brand, model: null, generation: null, modification:null,trim:null, page: null })} key={brand} prefetch={false}><BrandLogo brand={brand} size={20} />{brand}<span className="text-[#7a8798]">{brandCounts[brand] ?? 0}</span>{selected ? <span aria-hidden="true">×</span> : null}</Link>;
           })}</div> : null}
           <MobileCatalogExperience
             currentQuery={currentQuery}
@@ -359,7 +363,6 @@ function CatalogFilterForm({
   totalCars,
   transmissions,
   driveTypes,
-  trims,
   bodies,
   colors,
   under160,
@@ -378,7 +381,7 @@ function CatalogFilterForm({
       <FilterInput inputMode="numeric" label="Пробег до, км" name="mileageMax" placeholder="Например, 80 000" value={value("mileageMax")} />
       <FilterInput inputMode="numeric" label="Пробег от, км" name="mileageMin" placeholder="Например, 10 000" value={value("mileageMin")} />
       <FilterInput inputMode="numeric" label="Мощность до, л.с." name="powerMax" placeholder="Например, 160" value={value("powerMax")} />
-      <FilterSelect label="Комплектация" name="trim" options={trims} placeholder="Любая" translate={(item) => translateTrim(item) ?? item} value={value("trim")} />
+
       <FilterSelect label="Кузов" name="body" options={bodies} placeholder="Любой" translate={translateBody} value={value("body")} />
       <FilterSelect label="Привод" name="drive" options={driveTypes} placeholder="Любой" translate={(item) => translateDrive(item) ?? item} value={value("drive")} />
       <FilterSelect label="Цвет кузова" name="color" options={colors} placeholder="Любой" value={value("color")} />
@@ -390,9 +393,11 @@ function CatalogFilterForm({
 
   return (
     <form action="/catalog" className={mobile ? "min-h-full bg-[#f4f6f9] pb-24" : ""}>
-      {brand ? <input name="brand" type="hidden" value={brand} /> : null}
-      {model ? <input name="model" type="hidden" value={model} /> : null}
-      {generation ? <input name="generation" type="hidden" value={generation} /> : null}
+      {mobile && brand ? <input name="brand" type="hidden" value={brand} /> : null}
+      {mobile && model ? <input name="model" type="hidden" value={model} /> : null}
+      {mobile && generation ? <input name="generation" type="hidden" value={generation} /> : null}
+      {mobile && value("modification") ? <input name="modification" type="hidden" value={value("modification")} /> : null}
+      {mobile && value("trim") ? <input name="trim" type="hidden" value={value("trim")} /> : null}
       {mobile ? <input name="sort" type="hidden" value={sort} /> : null}
       <div className={mobile ? "grid gap-4 p-4" : "grid gap-4"}>
         <div className={mobile ? "grid gap-4" : "grid gap-3 lg:grid-cols-[1fr_1.15fr_0.9fr_0.9fr_auto] lg:items-end"}>
@@ -526,11 +531,12 @@ function buildActiveFilterChips(rawParams: Record<string, string | string[] | un
     chips.push({ key, label, href: catalogFilterHref(rawParams, remove) });
   };
 
-  if (value("brand")) add("brand", value("brand"), { brand: null, model: null, generation: null, page: null });
-  if (value("model")) add("model", value("model"));
+  if (value("brand")) add("brand", value("brand"), { brand: null, model: null, generation: null, modification:null,trim:null, page: null });
+  if (value("model")) add("model", value("model"), { model: null, generation: null, modification: null, trim: null, page: null });
   // The generation is shown in Russian from the approved dictionary; the URL
   // keeps the stable code.
-  if (value("generation")) add("generation", generationLabels[value("generation")] ?? value("generation"));
+  if (value("generation")) add("generation", generationLabels[value("generation")] ?? value("generation"), {generation:null,modification:null,trim:null,page:null});
+  if(value("modification")) add("modification", `Модификация: ${value("modification")}`,{modification:null,trim:null,page:null});
   if (value("drive")) add("drive", `Привод: ${translateDrive(value("drive"))}`);
   if (value("search")) add("search", value("search"));
   if (value("fuel")) add("fuel", translateFuel(value("fuel")));

@@ -22,6 +22,11 @@ export type CatalogCar = {
   created_at: string | null;
   brand: string | null;
   model: string | null;
+  generation_label?: string | null;
+  modification_label?: string | null;
+  version_line?: string | null;
+  compact_version?: string | null;
+  naming_rules_version?: string | null;
   trim: string | null;
   badge: string | null;
   badge_detail: string | null;
@@ -83,7 +88,7 @@ export async function getCatalogPreviewImages(source: string, sourceId: string):
 
   const supabase = createSupabaseServerRead();
   const { data, error } = await supabase
-    .from("cars")
+    .from("catalog_display_cars")
     .select("car_media(url, thumbnail_url, media_type, category, is_primary, sort_order)")
     .eq("primary_source", source)
     .eq("source_id", sourceId)
@@ -118,10 +123,10 @@ export type CatalogPageResult = {
 };
 
 const CATALOG_CAR_SELECT =
-  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_added_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(source, url, thumbnail_url, media_type, category, is_primary, sort_order)";
+  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_added_at, created_at, source_updated_at, brand, model, trim, generation_label, modification_label, version_line, compact_version, naming_rules_version, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(source, url, thumbnail_url, media_type, category, is_primary, sort_order)";
 
 const CATALOG_CARD_SELECT =
-  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_added_at, created_at, source_updated_at, brand, model, trim, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, primary_image_url, primary_thumbnail_url, media_count, seats";
+  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_added_at, created_at, source_updated_at, brand, model, trim, generation_label, modification_label, version_line, compact_version, naming_rules_version, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, primary_image_url, primary_thumbnail_url, media_count, seats";
 
 export type CarDetail = CatalogCar & {
   car_options?: Array<{
@@ -178,6 +183,7 @@ export type CatalogFilters = {
   minPriceRub?: number;
   maxPriceRub?: number;
   registrationMonth?: number;
+  modification?: string;
   trim?: string;
   bodyType?: string;
   driveType?: string;
@@ -309,6 +315,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     minPriceRub,
     maxPriceRub,
     registrationMonth,
+    modification,
     trim,
     bodyType,
     driveType,
@@ -325,13 +332,12 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   } = filters;
   const supabase = createSupabaseServerRead();
   let query = supabase
-    .from("cars")
+    .from("catalog_display_cars")
     .select(CATALOG_CAR_SELECT)
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-    .not("price_rub", "is", null)
-    .not("power_hp", "is", null);
+    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (source) query = query.eq("primary_source", source);
   if (maxPowerHp) query = query.lte("power_hp", maxPowerHp);
@@ -352,6 +358,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   if (minYear) query = query.gte("year", minYear);
   if (maxYear) query = query.lte("year", maxYear);
   if (registrationMonth) query = query.eq("registration_month", registrationMonth);
+  if (modification) query = query.eq("modification_label", modification);
   if (trim) query = query.eq("trim", trim);
   if (bodyType) query = query.in("body_type", bodyTypeValues(bodyType));
   if (driveType) query = query.in("drive_type", driveTypeValues(driveType));
@@ -408,13 +415,12 @@ export async function getCatalogCardPage(
   const sort = filters.sort ?? "fresh";
   const supabase = createSupabaseServerRead();
   let query = supabase
-    .from("cars")
+    .from("catalog_display_cars")
     .select(CATALOG_CARD_SELECT)
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-    .not("price_rub", "is", null)
-    .not("power_hp", "is", null);
+    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (filters.source) query = query.eq("primary_source", filters.source);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
@@ -431,6 +437,7 @@ export async function getCatalogCardPage(
   if (filters.minYear) query = query.gte("year", filters.minYear);
   if (filters.maxYear) query = query.lte("year", filters.maxYear);
   if (filters.registrationMonth) query = query.eq("registration_month", filters.registrationMonth);
+  if (filters.modification) query = query.eq("modification_label", filters.modification);
   if (filters.trim) query = query.eq("trim", filters.trim);
   if (filters.bodyType) query = query.in("body_type", bodyTypeValues(filters.bodyType));
   if (filters.driveType) query = query.in("drive_type", driveTypeValues(filters.driveType));
@@ -536,13 +543,12 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
   if (buildWithoutCatalog) return 0;
   const supabase = createSupabaseServerRead();
   let query = supabase
-    .from("cars")
+    .from("catalog_display_cars")
     .select("id", { count: "exact", head: true })
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-    .not("price_rub", "is", null)
-    .not("power_hp", "is", null);
+    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (filters.source) query = query.eq("primary_source", filters.source);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
@@ -561,6 +567,7 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
   if (filters.minYear) query = query.gte("year", filters.minYear);
   if (filters.maxYear) query = query.lte("year", filters.maxYear);
   if (filters.registrationMonth) query = query.eq("registration_month", filters.registrationMonth);
+  if (filters.modification) query = query.eq("modification_label", filters.modification);
   if (filters.trim) query = query.eq("trim", filters.trim);
   if (filters.bodyType) query = query.in("body_type", bodyTypeValues(filters.bodyType));
   if (filters.driveType) query = query.in("drive_type", driveTypeValues(filters.driveType));
@@ -833,7 +840,7 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
 
 const getCachedHomeCatalogData = unstable_cache(
   fetchHomeCatalogData,
-  ["home-catalog-showcases-v5-exterior-covers", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  ["home-catalog-showcases-v6-canonical-names", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
   { revalidate: 60 },
 );
 
@@ -852,13 +859,12 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
 
   for (let offset = 0; ; offset += pageSize) {
     const { data, error } = await supabase
-      .from("cars")
+      .from("catalog_display_cars")
       .select("brand, model, trim, body_type, fuel_type, transmission, drive_type, color, owners_count")
       .eq("is_available", true)
       .in("primary_source", ["encar", "chestny_prigon"])
       .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-      .not("price_rub", "is", null)
-      .not("power_hp", "is", null)
+      .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
 
@@ -879,14 +885,15 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
 }
 
 const getCachedCatalogFacetCars = unstable_cache(
-  fetchCatalogFacetCars,
-  ["catalog-filter-facets-v3-normalized-brands"],
+  async () => (await fetchCatalogFacetCars()).map(c => [c.brand,c.model,c.trim,c.body_type,c.fuel_type,c.transmission,c.drive_type,c.color,c.owners_count] as const),
+  ["catalog-filter-facets-v5-compact-canonical-names"],
   { revalidate: 3600 },
 );
 
 export async function getCatalogFacetCars(): Promise<CatalogFacetCar[]> {
   if (buildWithoutCatalog) return [];
-  return getCachedCatalogFacetCars();
+  const rows=await getCachedCatalogFacetCars();
+  return rows.map(([brand,model,trim,body_type,fuel_type,transmission,drive_type,color,owners_count])=>({brand,model,trim,body_type,fuel_type,transmission,drive_type,color,owners_count}));
 }
 
 /**
@@ -895,24 +902,21 @@ export async function getCatalogFacetCars(): Promise<CatalogFacetCar[]> {
  */
 async function fetchGenerationLabelMap(): Promise<Record<string, string>> {
   const supabase = createSupabaseServerRead();
-  const { data, error } = await supabase
-    .from("catalog_generation_dictionary")
-    .select("code, label_ru")
-    .eq("status", "approved");
+  const { data, error } = await supabase.rpc("catalog_display_facets", { f: {} });
   if (error) {
     console.error("[cars] Generation label query failed", error);
     return {};
   }
   const labels: Record<string, string> = {};
-  for (const row of (data ?? []) as Array<{ code: string | null; label_ru: string | null }>) {
-    if (row.code && row.label_ru) labels[row.code] = row.label_ru;
+  for (const row of (data ?? []) as Array<{ axis:string; value:string|null; label:string|null }>) {
+    if (row.axis === "generation" && row.value && row.label) labels[row.value] = row.label;
   }
   return labels;
 }
 
 const getCachedGenerationLabelMap = unstable_cache(
   fetchGenerationLabelMap,
-  ["catalog-generation-labels-v1"],
+  ["catalog-generation-labels-v2-canonical-names"],
   { revalidate: 3600 },
 );
 
@@ -927,7 +931,7 @@ export async function getGenerationLabelMap(): Promise<Record<string, string>> {
  */
 async function fetchQuickPresetCounts(): Promise<Record<string, number>> {
   const supabase = createSupabaseServerRead();
-  const { data, error } = await supabase.rpc("catalog_facets", { f: {} });
+  const { data, error } = await supabase.rpc("catalog_display_facets", { f: {} });
   if (error) {
     console.error("[cars] Preset facet query failed", error);
     return {};
@@ -945,7 +949,7 @@ async function fetchQuickPresetCounts(): Promise<Record<string, number>> {
 
 const getCachedQuickPresetCounts = unstable_cache(
   fetchQuickPresetCounts,
-  ["catalog-quick-presets-v1"],
+  ["catalog-quick-presets-v2-canonical-names"],
   { revalidate: 300 },
 );
 
@@ -962,12 +966,12 @@ export async function getSitemapCars(): Promise<SitemapCar[]> {
 
   for (let offset = 0; ; offset += pageSize) {
     const { data, error } = await supabase
-      .from("cars")
+      .from("catalog_display_cars")
       .select("primary_source, source_id, source_updated_at")
       .eq("is_available", true)
       .in("primary_source", ["encar", "chestny_prigon"])
       .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-      .not("price_rub", "is", null).not("power_hp", "is", null)
+      .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
       .order("id", { ascending: true })
       .range(offset, offset + pageSize - 1);
 
@@ -989,13 +993,13 @@ async function fetchCarDetail(source: string, sourceId: string): Promise<CarDeta
 
   const supabase = createSupabaseServerRead();
   const { data, error } = await supabase
-    .from("cars")
+    .from("catalog_display_cars")
     .select(`${CATALOG_CAR_SELECT}, car_options(category, source_code, name_original, name_ru, value_original, value_ru, description_original, description_ru, is_present, sort_order), car_condition_reports(source, report_type, summary, items)`)
     .eq("primary_source", source)
     .eq("source_id", sourceId)
     .eq("is_available", true)
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-    .not("price_rub", "is", null).not("power_hp", "is", null)
+    .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
     .order("sort_order", { foreignTable: "car_media", ascending: true })
     .order("sort_order", { foreignTable: "car_options", ascending: true })
     .maybeSingle();

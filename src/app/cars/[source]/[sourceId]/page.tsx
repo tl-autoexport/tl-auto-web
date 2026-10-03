@@ -26,7 +26,6 @@ import {
   translateDrive,
   translateFuel,
   translateOption,
-  translateTrim,
   translateTransmission,
   translateInspectionLabel,
   translateInspectionStatus,
@@ -194,7 +193,6 @@ export default async function CarDetailPage({
                 />
                 <Spec label="Цвет" value={translateColor(car.color)} />
                 {typeof car.vehicle_specs?.first_registration_date === "string" && <Spec label="Дата регистрации" value={car.vehicle_specs.first_registration_date} />}
-                {translateTrim(car.trim || car.badge_detail || car.badge) ? <Spec label="Комплектация" value={translateTrim(car.trim || car.badge_detail || car.badge)!} /> : null}
                 {typeof car.vehicle_specs?.seats === "number" && car.vehicle_specs.seats > 0 ? (
                   <Spec label="Места" value={`${car.vehicle_specs.seats} мест`} />
                 ) : null}
@@ -219,7 +217,7 @@ export default async function CarDetailPage({
             <div className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]">
               <div className="flex items-center gap-2">
                 <KeyRound className="text-[#a98239]" size={20} />
-                <h2 className="text-xl font-semibold">Комплектация</h2>
+                <h2 className="text-xl font-semibold">Оснащение</h2>
               </div>
               <EncarEquipmentAccordion groups={optionGroups} />
             </div>
@@ -239,6 +237,8 @@ export default async function CarDetailPage({
             source={source}
             sourceId={sourceId}
             title={title}
+            version={car.version_line}
+            generation={car.generation_label}
             year={car.year}
             registrationMonth={car.registration_month}
           />

@@ -1,3 +1,5 @@
+import { persistCatalogNamingPg } from "../src/server/catalog/persist-catalog-naming";
+import { catalogDriveType, normalizeTransmissionType } from "../src/server/normalization/drivetrain";
 /** Publish the explicitly reviewed new-Encar run from saved, enriched source data. */
 import { config } from "dotenv";
 import { Client } from "pg";
@@ -206,7 +208,7 @@ async function main() {
         brand, model, year, registration_year: year, mileage_km: num(spec.mileage), price_krw: priceKrw, price_rub: priceRub,
         engine_cc: engineCc, power_hp: powerHp, power_source: source, power_confidence: powerConfidence, power_finality: powerFinality,
         power_resolution_note: item.class === "approved" ? `Approved TL Auto spec ${approvedSpec?.id}` : "Preliminary automatic reference; exact trim power to be confirmed",
-        fuel_type: fuel, drive_type: str(c.driveType), color: normalizeColor(spec.colorName), body_type: str(spec.bodyName),
+        fuel_type: fuel, transmission: normalizeTransmissionType(spec.transmissionName), drive_type: catalogDriveType(c.driveType), color: normalizeColor(spec.colorName), body_type: str(spec.bodyName),
         grade: str(category.gradeEnglishName), trim: str(category.gradeDetailEnglishName), badge: str(c.badge), badge_detail: str(c.trim),
         vehicle_no_masked: vehicleNo, vin_masked: str(detail.vin), media_count: photos.length,
         vehicle_specs: { source: "encar", seats: num(spec.seatCount), power_confidence: powerConfidence,
@@ -245,6 +247,7 @@ async function main() {
       const carId = insert.rows[0].id;
       await db.query(`insert into public.source_snapshots(source,source_id,source_url,payload,fetched_at,parser_version,status) values ('encar',$1,$2,$3,$4,'encar-staged-full-20260924','ok')`,
         [p.item.id, p.item.row.source_url, JSON.stringify(p.item.row.raw_payload), p.item.row.fetched_at]);
+      await persistCatalogNamingPg(db,carId);
       await db.query(`insert into public.car_media(car_id,source,media_type,category,url,thumbnail_url,sort_order,is_primary,legal_mode)
         select $1,'encar','image',p.category,p.url,p.url,p.sort_order,p.is_primary,'external_url'
         from jsonb_to_recordset($2::jsonb) as p(category text,url text,sort_order integer,is_primary boolean)`,

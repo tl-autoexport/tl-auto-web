@@ -1,3 +1,4 @@
+import { persistCatalogNamingSupabase } from "../catalog/persist-catalog-naming";
 import { catalogDriveType, normalizeTransmissionType } from "@/server/normalization/drivetrain";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -1932,6 +1933,7 @@ export async function importEncar(options: ImportOptions = {}) {
       assertSupabaseResult(
         await supabase.from("source_snapshots").insert(item.snapshot),
       );
+      await persistCatalogNamingSupabase(supabase,carId);
       assertSupabaseResult(
         await supabase
           .from("car_media")

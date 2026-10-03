@@ -19,6 +19,7 @@ export async function GET(request: Request) {
     minYear: numberParam(params.get("yearMin")),
     maxYear: numberParam(params.get("yearMax")),
     registrationMonth: numberParam(params.get("month")),
+    modification: params.get("modification") || undefined,
     trim: params.get("trim") || undefined,
     bodyType: params.get("body") || undefined,
     driveType: params.get("drive") || undefined,

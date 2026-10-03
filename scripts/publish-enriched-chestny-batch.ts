@@ -1,3 +1,4 @@
+import { persistCatalogNamingPg } from "../src/server/catalog/persist-catalog-naming";
 import { Client } from "pg";
 import { config } from "dotenv";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
@@ -355,6 +356,7 @@ async function main() {
             JSON.stringify(metadata),
             specId, item.specVersion, item.calculationPowerKw, item.specPowerBasis,
             `tl_auto_approved_reference:${tier}`, row.generation, powerFinality]);
+          await persistCatalogNamingPg(client,result.rows[0].id);
           carIds.push({ id: result.rows[0].id, item });
         }
 

@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { GenerationCascade } from "@/app/catalog/GenerationCascade";
+import type { IdentitySelection } from "@/app/catalog/CatalogFilterDraft";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import type { FormEvent } from "react";
@@ -15,7 +17,6 @@ import {
   X,
 } from "lucide-react";
 import { useDestination } from "@/components/site/DestinationProvider";
-import { translateBrand, translateModel } from "@/server/normalization/display";
 import { VISIBLE_DESTINATIONS, type CountryCode } from "@/lib/destinations";
 
 type PanelName = "parameters" | "brandModel" | "region" | "transport" | "sort" | null;
@@ -27,7 +28,6 @@ const sortOptions = [
   { value: "mileage_asc", label: "Пробег: меньше" },
 ] as const;
 
-const popularBrands = ["Kia", "Hyundai", "Genesis", "BMW", "Mercedes-Benz", "Toyota", "Audi"];
 const countries = VISIBLE_DESTINATIONS;
 
 type ParameterState = {
@@ -56,12 +56,15 @@ const emptyParameters: ParameterState = {
   drive: "",
 };
 
-export function CatalogQuickNav({ brands = [], models = [], bodies = [], transmissions = [] }: { brands?: string[]; models?: Array<{ brand: string; model: string }>; bodies?: string[]; transmissions?: string[] }) {
+export function CatalogQuickNav({ bodies = [], transmissions = [] }: { brands?: string[]; models?: Array<{ brand: string; model: string }>; bodies?: string[]; transmissions?: string[] }) {
   const [panel, setPanel] = useState<PanelName>(null);
   const [search, setSearch] = useState("");
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
+  const [resetIdentity, setResetIdentity] = useState(0);
+  const [extraIdentity, setExtraIdentity] = useState<IdentitySelection>({});
   const [parameters, setParameters] = useState<ParameterState>(emptyParameters);
+  const [countQuery, setCountQuery] = useState<string|null>(null);
   const [resultCount, setResultCount] = useState<number | null>(null);
   const [countLoading, setCountLoading] = useState(false);
   const { country, city, setDestination } = useDestination();
@@ -77,8 +80,9 @@ export function CatalogQuickNav({ brands = [], models = [], bodies = [], transmi
     const query = new URLSearchParams(parameterQuery);
     if (brand.trim()) query.set("brand", brand.trim());
     if (model.trim()) query.set("model", model.trim());
+    for (const key of ["generation", "modification", "trim"] as const) if (extraIdentity[key]) query.set(key,extraIdentity[key]!);
     return query;
-  }, [brand, model, parameterQuery]);
+  }, [brand, model, extraIdentity, parameterQuery]);
 
   useEffect(() => {
     if (panel !== "parameters" && panel !== "brandModel") return;
@@ -90,6 +94,7 @@ export function CatalogQuickNav({ brands = [], models = [], bodies = [], transmi
         if (response.ok) {
           const payload = await response.json() as { count?: number };
           setResultCount(typeof payload.count === "number" ? payload.count : null);
+          setCountQuery(activeQuery.toString());
         }
       } catch {
         if (!controller.signal.aborted) setResultCount(null);
@@ -126,10 +131,7 @@ export function CatalogQuickNav({ brands = [], models = [], bodies = [], transmi
 
   const submitBrandModel = (event?: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
-    const query = new URLSearchParams();
-    if (brand.trim()) query.set("brand", brand.trim());
-    if (model.trim()) query.set("model", model.trim());
-    window.location.assign(`/catalog${query.toString() ? `?${query.toString()}` : ""}`);
+    window.location.assign(`/catalog${activeQuery.toString() ? `?${activeQuery.toString()}` : ""}`);
   };
 
   const submitParameters = () => {
@@ -137,15 +139,19 @@ export function CatalogQuickNav({ brands = [], models = [], bodies = [], transmi
   };
 
   const resetParameters = () => {
+    setResetIdentity(value => value + 1);
     setBrand("");
     setModel("");
+    setExtraIdentity({});
     setParameters(emptyParameters);
     setResultCount(null);
   };
 
   const resetBrandModel = () => {
+    setResetIdentity(value => value + 1);
     setBrand("");
     setModel("");
+    setExtraIdentity({});
     setResultCount(null);
   };
 
@@ -180,13 +186,13 @@ export function CatalogQuickNav({ brands = [], models = [], bodies = [], transmi
           <div className="flex h-full w-full flex-col overflow-hidden bg-white shadow-[0_18px_45px_rgba(16,24,39,0.18)] sm:h-auto sm:max-h-[calc(100vh-148px)] sm:w-[min(560px,calc(100vw-32px))] sm:rounded-3xl sm:border sm:border-[#dce2eb]">
             <PanelHeader panel={panel} onClose={() => setPanel(null)} onReset={panel === "parameters" ? resetParameters : panel === "brandModel" ? resetBrandModel : undefined} />
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-4 sm:px-5">
+              {panel === "parameters" || panel === "brandModel" ? <GenerationCascade key={resetIdentity} currentQuery={activeQuery.toString()} totalCars={resultCount??0} brand={brand} model={model} generation={extraIdentity.generation} modification={extraIdentity.modification} trim={extraIdentity.trim} onSelection={(next)=>{setBrand(next.brand??"");setModel(next.model??"");setExtraIdentity(next);}} onApply={()=>setPanel("parameters")} /> : null}
               {panel === "parameters" ? <ParametersPanel brand={brand} model={model} bodies={bodies} transmissions={transmissions} onOpenBrandModel={() => setPanel("brandModel")} parameters={parameters} setParameters={setParameters} count={resultCount} loading={countLoading} /> : null}
-              {panel === "brandModel" ? <BrandModelPanel brand={brand} brands={brands} model={model} models={models} setBrand={setBrand} setModel={setModel} /> : null}
               {panel === "region" ? <RegionPanel countryCode={country.countryCode} cityId={city.id} onSelect={selectDestination} /> : null}
               {panel === "transport" ? <TransportPanel /> : null}
               {panel === "sort" ? <SortPanel /> : null}
             </div>
-            {panel === "parameters" || panel === "brandModel" ? <button className="m-4 mt-0 h-12 shrink-0 rounded-xl bg-[#111827] px-4 text-sm font-semibold text-white transition hover:bg-[#263247] disabled:opacity-60" disabled={countLoading || (panel === "brandModel" && !brand)} onClick={panel === "parameters" ? submitParameters : () => submitBrandModel()} type="button">{countLoading ? "Считаем предложения…" : `Показать ${resultCount ?? "все"} объявлений`}</button> : null}
+            {panel === "parameters" || panel === "brandModel" ? <button className="m-4 mt-0 h-12 shrink-0 rounded-xl bg-[#111827] px-4 text-sm font-semibold text-white transition hover:bg-[#263247] disabled:opacity-60" disabled={countLoading || resultCount===null || countQuery!==activeQuery.toString()} onClick={panel === "parameters" ? submitParameters : () => submitBrandModel()} type="button">{countLoading || countQuery!==activeQuery.toString() ? "Считаем предложения…" : `Показать ${resultCount ?? "все"} объявлений`}</button> : null}
           </div>
         </div>, document.body
       ) : null}
@@ -203,22 +209,9 @@ function PanelHeader({ panel, onClose, onReset }: { panel: Exclude<PanelName, nu
   return <div className="flex shrink-0 items-center justify-between border-b border-[#e5e9ef] px-4 py-3 sm:px-5"><button aria-label="Закрыть" className="rounded-full p-1 text-[#263247] hover:bg-[#f0f3f7]" onClick={onClose} type="button"><X size={20} /></button><h2 className="text-base font-semibold text-[#101827]">{titles[panel]}</h2>{onReset ? <button className="inline-flex items-center gap-1 text-sm font-medium text-[#68758a] hover:text-[#111827]" onClick={onReset} type="button"><RotateCcw size={15} /> Сбросить</button> : <span className="w-6" />}</div>;
 }
 
-function ParametersPanel({ brand, model, bodies, transmissions, onOpenBrandModel, parameters, setParameters, count, loading }: { brand: string; model: string; bodies: string[]; transmissions: string[]; onOpenBrandModel: () => void; parameters: ParameterState; setParameters: (value: ParameterState) => void; count: number | null; loading: boolean }) {
+function ParametersPanel({ bodies, transmissions, parameters, setParameters, count, loading }: { brand: string; model: string; bodies: string[]; transmissions: string[]; onOpenBrandModel: () => void; parameters: ParameterState; setParameters: (value: ParameterState) => void; count: number | null; loading: boolean }) {
   const update = (key: keyof ParameterState, value: string) => setParameters({ ...parameters, [key]: value });
-  return <div className="space-y-5"><section className="rounded-2xl border border-[#edf0f4] bg-white p-4"><div className="flex items-center justify-between"><h3 className="text-lg font-semibold">Марка и модель</h3><button className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#956f2c]" onClick={onOpenBrandModel} type="button"><span className="grid size-5 place-items-center rounded-full border border-current text-base leading-none">+</span>{brand ? "Изменить" : "Добавить"}</button></div>{brand ? <div className="mt-3 grid gap-1 text-sm"><div className="flex items-center justify-between border-t border-[#edf0f4] pt-3"><span className="text-[#68758a]">Марка</span><span className="font-semibold text-[#101827]">{brand}</span></div>{model ? <div className="flex items-center justify-between border-t border-[#edf0f4] pt-3"><span className="text-[#68758a]">Модель</span><span className="font-semibold text-[#101827]">{model}</span></div> : null}</div> : <p className="mt-2 text-sm text-[#68758a]">Можно ограничить подбор конкретной маркой и моделью.</p>}</section><WheelRangeInput label="Цена, ₽" min={parameters.priceMin} max={parameters.priceMax} options={numberOptions("price")} onMin={(value) => update("priceMin", value)} onMax={(value) => update("priceMax", value)} /><WheelRangeInput label="Год выпуска" min={parameters.yearMin} max={parameters.yearMax} options={numberOptions("year")} onMin={(value) => update("yearMin", value)} onMax={(value) => update("yearMax", value)} /><WheelField label="Пробег до, км" value={parameters.mileageMax} options={numberOptions("mileage")} onChange={(value) => update("mileageMax", value)} /><WheelField label="Мощность до, л.с." value={parameters.powerMax} options={numberOptions("power")} onChange={(value) => update("powerMax", value)} /><div className="grid gap-3"><SelectField label="Кузов" value={parameters.body} onChange={(value) => update("body", value)} options={[["", "Любой"], ...bodies.map((value) => [value, value])]} /><SelectField label="Привод" value={parameters.drive} onChange={(value) => update("drive", value)} options={[["", "Любой"], ["FWD", "Передний"], ["RWD", "Задний"], ["2WD", "2WD"], ["4WD", "4WD"]]} /><SelectField label="Топливо" value={parameters.fuel} onChange={(value) => update("fuel", value)} options={[["", "Любое"], ["gasoline", "Бензин"], ["diesel", "Дизель"], ["hybrid", "Гибрид"], ["electric", "Электро"], ["lpg", "Газ"]]} /><SelectField label="КПП" value={parameters.transmission} onChange={(value) => update("transmission", value)} options={[["", "Любая"], ...transmissions.map((value) => [value, value === "automatic" ? "АКПП" : value === "manual" ? "Механика" : value === "cvt" ? "Вариатор" : value === "dct" ? "Робот" : value])]} /></div><p className="text-xs text-[#68758a]">{loading ? "Обновляем количество предложений…" : count === null ? "Заполните параметры, чтобы увидеть количество предложений." : `${count.toLocaleString("ru-RU")} предложений`}</p></div>;
-}
-
-function BrandModelPanel({ brand, brands, model, models, setBrand, setModel }: { brand: string; brands: string[]; model: string; models: Array<{ brand: string; model: string }>; setBrand: (value: string) => void; setModel: (value: string) => void }) {
-  const availableBrands = [...new Set([...popularBrands, ...brands])];
-  const availableModels = models.filter((item) => !brand || item.brand === brand).map((item) => item.model).filter((item, index, values) => values.indexOf(item) === index);
-  const [step, setStep] = useState<"brand" | "model">(brand ? "model" : "brand");
-  useEffect(() => {
-    const onPopState = () => setStep("brand");
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, []);
-  if (step === "brand") return <div className="space-y-3"><h3 className="text-sm font-semibold text-[#101827]">Марка</h3><div className="grid max-h-[calc(100vh-210px)] gap-1 overflow-y-auto rounded-xl border border-[#dce2eb] bg-white">{availableBrands.map((item) => <button className={`flex min-h-12 items-center justify-between border-b border-[#edf0f4] px-4 text-left text-base last:border-b-0 ${brand === item ? "bg-[#f5f0e4] font-semibold text-[#5c4317]" : "text-[#263247]"}`} key={item} onClick={() => { setBrand(item); setModel(""); window.history.pushState({ filterStep: "model" }, ""); setStep("model"); }} type="button"><span className="min-w-0 flex-1">{translateBrand(item) || item}</span><ChevronRight aria-hidden="true" className="text-[#a4adba]" size={19} /></button>)}</div></div>;
-  return <div className="space-y-3"><h3 className="text-sm font-semibold text-[#101827]">Модель · {translateBrand(brand) || brand}</h3><div className="grid max-h-[calc(100vh-210px)] gap-1 overflow-y-auto rounded-xl border border-[#dce2eb] bg-white">{availableModels.length ? availableModels.map((item) => <button className={`flex min-h-12 items-center gap-3 border-b border-[#edf0f4] px-4 text-left text-base last:border-b-0 ${model === item ? "bg-[#f5f0e4] font-semibold text-[#5c4317]" : "text-[#263247]"}`} key={item} onClick={() => setModel(model === item ? "" : item)} type="button"><span className="min-w-0 flex-1">{translateModel(brand, item) || item}</span><span aria-hidden="true" className={`grid size-6 place-items-center rounded-md border ${model === item ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}><Check size={16} /></span></button>) : <p className="p-4 text-sm text-[#68758a]">Для этой марки нет доступных моделей.</p>}</div></div>;
+  return <div className="space-y-5"><WheelRangeInput label="Цена, ₽" min={parameters.priceMin} max={parameters.priceMax} options={numberOptions("price")} onMin={(value) => update("priceMin", value)} onMax={(value) => update("priceMax", value)} /><WheelRangeInput label="Год выпуска" min={parameters.yearMin} max={parameters.yearMax} options={numberOptions("year")} onMin={(value) => update("yearMin", value)} onMax={(value) => update("yearMax", value)} /><WheelField label="Пробег до, км" value={parameters.mileageMax} options={numberOptions("mileage")} onChange={(value) => update("mileageMax", value)} /><WheelField label="Мощность до, л.с." value={parameters.powerMax} options={numberOptions("power")} onChange={(value) => update("powerMax", value)} /><div className="grid gap-3"><SelectField label="Кузов" value={parameters.body} onChange={(value) => update("body", value)} options={[["", "Любой"], ...bodies.map((value) => [value, value])]} /><SelectField label="Привод" value={parameters.drive} onChange={(value) => update("drive", value)} options={[["", "Любой"], ["FWD", "Передний"], ["RWD", "Задний"], ["2WD", "2WD"], ["4WD", "4WD"]]} /><SelectField label="Топливо" value={parameters.fuel} onChange={(value) => update("fuel", value)} options={[["", "Любое"], ["gasoline", "Бензин"], ["diesel", "Дизель"], ["hybrid", "Гибрид"], ["electric", "Электро"], ["lpg", "Газ"]]} /><SelectField label="КПП" value={parameters.transmission} onChange={(value) => update("transmission", value)} options={[["", "Любая"], ...transmissions.map((value) => [value, value === "automatic" ? "АКПП" : value === "manual" ? "Механика" : value === "cvt" ? "Вариатор" : value === "dct" ? "Робот" : value])]} /></div><p className="text-xs text-[#68758a]">{loading ? "Обновляем количество предложений…" : count === null ? "Заполните параметры, чтобы увидеть количество предложений." : `${count.toLocaleString("ru-RU")} предложений`}</p></div>;
 }
 
 function RegionPanel({ countryCode, cityId, onSelect }: { countryCode: CountryCode; cityId: string; onSelect: (countryCode: CountryCode, cityId?: string) => void }) {
@@ -232,10 +225,6 @@ function TransportPanel() {
 
 function SortPanel() {
   return <div className="grid gap-1">{sortOptions.map((option) => <Link className="rounded-xl px-3 py-3 text-sm font-medium text-[#263247] hover:bg-[#f0f3f7]" href={`/catalog?sort=${option.value}`} key={option.value}>{option.label}</Link>)}</div>;
-}
-
-function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (value: string) => void; placeholder: string }) {
-  return <label className="block"><span className="mb-1.5 block text-xs font-medium text-[#68758a]">{label}</span><input className="h-11 w-full rounded-xl border border-[#d7dee8] px-3 text-sm text-[#101827] outline-none focus:border-[#956f2c] focus:ring-2 focus:ring-[#c7a55a]/20" onChange={(event) => onChange(event.target.value)} placeholder={placeholder} value={value} /></label>;
 }
 
 function WheelRangeInput({ label, min, max, options, onMin, onMax }: { label: string; min: string; max: string; options: string[]; onMin: (value: string) => void; onMax: (value: string) => void }) {

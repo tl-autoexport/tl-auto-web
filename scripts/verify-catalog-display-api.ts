@@ -1,0 +1,7 @@
+/** Verify local feed/count/facet contracts, no database writes. */
+import assert from 'node:assert/strict';
+import {writeFile} from 'node:fs/promises';
+const origin=process.env.CATALOG_VERIFY_ORIGIN??'http://localhost:3033';
+const cases=[{}, {brand:'BMW',model:'5 Series'}, {brand:'BMW',model:'5 Series',generation:'g30'}, {brand:'Mercedes-Benz',model:'CLS'}, {brand:'Hyundai',model:'Avante'}, {brand:'MINI',model:'Clubman'}, {body:'Кроссовер',drive:'4WD'}, {fuel:'electric'}, {transmission:'automatic'}];
+async function main(){const results=[];for(const filters of cases){const q=new URLSearchParams(filters as Record<string,string>);const [feed,count,facets]=await Promise.all(['feed','count','facets'].map(async path=>{const r=await fetch(`${origin}/api/catalog/${path}?${q}`);assert.equal(r.status,200,`${path} HTTP`);return r.json()}));assert.equal(count.count,facets.total,JSON.stringify(filters));assert.ok(feed.cars.length<=count.count);for(const c of feed.cars){assert.ok(c.version_line);if(filters.model)assert.equal(c.model,filters.model);if(filters.brand)assert.equal(c.brand,filters.brand);if(filters.generation)assert.ok(c.generation_label);}results.push({filters,total:count.count,firstPage:feed.cars.length,nextCursor:Boolean(feed.nextCursor)});}await writeFile('output/catalog-naming/display-api-verification.json',JSON.stringify({readOnly:true,results},null,2));console.log(JSON.stringify(results,null,2));}
+main().catch(e=>{console.error(e.message);process.exitCode=1});

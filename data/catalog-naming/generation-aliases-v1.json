@@ -1,0 +1,392 @@
+{
+  "version": "tl-auto-catalog-naming-v2",
+  "aliases": [
+    {
+      "brand": "Audi",
+      "model": "A3",
+      "source_value": "A3 (8Y)",
+      "code": "8y",
+      "label_ru": "A3 (8Y)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Audi",
+      "model": "A4",
+      "source_value": "A4 (B9)",
+      "code": "b9",
+      "label_ru": "A4 (B9)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Audi",
+      "model": "Q3",
+      "source_value": "Q3 (F3)",
+      "code": "f3",
+      "label_ru": "Q3 (F3)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "BMW",
+      "model": "1 Series",
+      "source_value": "1시리즈 (F20)",
+      "code": "f20",
+      "label_ru": "1 Series (F20)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "BMW",
+      "model": "1 Series",
+      "source_value": "1시리즈 (F40)",
+      "code": "f40",
+      "label_ru": "1 Series (F40)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "BMW",
+      "model": "2 Series",
+      "source_value": "2시리즈 그란쿠페 (F44)",
+      "code": "f44",
+      "label_ru": "2 Series (F44)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "BMW",
+      "model": "X1",
+      "source_value": "X1 (F48)",
+      "code": "f48",
+      "label_ru": "X1 (F48)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "BMW",
+      "model": "X1",
+      "source_value": "X1 (U11)",
+      "code": "u11",
+      "label_ru": "X1 (U11)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "BMW",
+      "model": "X2 (F39)",
+      "source_value": "X2 (U10)",
+      "code": "u10",
+      "label_ru": "X2 (F39) (U10)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "AVANTE",
+      "source_value": "더 뉴 아반떼 (CN7)",
+      "code": "cn7",
+      "label_ru": "AVANTE (CN7)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "AVANTE",
+      "source_value": "더 뉴 아반떼 AD",
+      "code": "ad",
+      "label_ru": "AVANTE (AD)",
+      "provenance": "derived_from_model_allowlist",
+      "status": "approved"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "AVANTE",
+      "source_value": "아반떼 (CN7)",
+      "code": "cn7",
+      "label_ru": "AVANTE (CN7)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Kona",
+      "source_value": "코나 (SX2)",
+      "code": "sx2",
+      "label_ru": "Kona (SX2)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "source_value": "쏘나타 (DN8)",
+      "code": "dn8",
+      "label_ru": "Sonata (DN8)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Sonata",
+      "source_value": "쏘나타 디 엣지(DN8)",
+      "code": "dn8",
+      "label_ru": "Sonata (DN8)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "source_value": "더 뉴 투싼 (NX4)",
+      "code": "nx4",
+      "label_ru": "Tucson (NX4)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "source_value": "투싼 (NX4)",
+      "code": "nx4",
+      "label_ru": "Tucson (NX4)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Veloster",
+      "source_value": "벨로스터 (JS)",
+      "code": "js",
+      "label_ru": "Veloster (JS)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "Carnival",
+      "source_value": "더 뉴 카니발 4세대",
+      "code": "carnival-gen4",
+      "label_ru": "Carnival, 4-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "Carnival",
+      "source_value": "카니발 4세대",
+      "code": "carnival-gen4",
+      "label_ru": "Carnival, 4-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "K3",
+      "source_value": "더 뉴 K3 2세대",
+      "code": "k3-gen2",
+      "label_ru": "K3, 2-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "K5",
+      "source_value": "K5 3세대",
+      "code": "k5-gen3",
+      "label_ru": "K5, 3-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "K5",
+      "source_value": "더 뉴 K5 2세대",
+      "code": "k5-gen2",
+      "label_ru": "K5, 2-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "K5",
+      "source_value": "더 뉴 K5 3세대",
+      "code": "k5-gen3",
+      "label_ru": "K5, 3-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "Morning",
+      "source_value": "더 뉴 모닝 (JA)",
+      "code": "ja",
+      "label_ru": "Morning (JA)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "Morning",
+      "source_value": "모닝 어반 (JA)",
+      "code": "ja",
+      "label_ru": "Morning (JA)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "Morning",
+      "source_value": "올 뉴 모닝 (JA)",
+      "code": "ja",
+      "label_ru": "Morning (JA)",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "Seltos",
+      "source_value": "셀토스 2세대",
+      "code": "seltos-gen2",
+      "label_ru": "Seltos, 2-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sorento",
+      "source_value": "더 뉴 쏘렌토 4세대",
+      "code": "sorento-gen4",
+      "label_ru": "Sorento, 4-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sorento",
+      "source_value": "쏘렌토 4세대",
+      "code": "sorento-gen4",
+      "label_ru": "Sorento, 4-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "source_value": "더 뉴 스포티지 5세대",
+      "code": "sportage-gen5",
+      "label_ru": "Sportage, 5-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "source_value": "스포티지 5세대",
+      "code": "sportage-gen5",
+      "label_ru": "Sportage, 5-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Land Rover",
+      "model": "Discovery Sport",
+      "source_value": "디스커버리 스포츠 2세대",
+      "code": "discovery-sport-gen2",
+      "label_ru": "Discovery Sport, 2-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Land Rover",
+      "model": "Range Rover Evoque",
+      "source_value": "레인지로버 이보크 2세대",
+      "code": "range-rover-evoque-gen2",
+      "label_ru": "Range Rover Evoque, 2-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "A-Class",
+      "source_value": "A-클래스 W176",
+      "code": "w176",
+      "label_ru": "A-Class (W176)",
+      "provenance": "derived_from_model_allowlist",
+      "status": "approved"
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "A-Class",
+      "source_value": "A-클래스 W177",
+      "code": "w177",
+      "label_ru": "A-Class (W177)",
+      "provenance": "derived_from_model_allowlist",
+      "status": "approved"
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "C-Class",
+      "source_value": "C-클래스 W205",
+      "code": "w205",
+      "label_ru": "C-Class (W205)",
+      "provenance": "derived_from_model_allowlist",
+      "status": "approved"
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "model": "C-Class",
+      "source_value": "C-클래스 W206",
+      "code": "w206",
+      "label_ru": "C-Class (W206)",
+      "provenance": "derived_from_model_allowlist",
+      "status": "approved"
+    },
+    {
+      "brand": "MINI",
+      "model": "Cooper",
+      "source_value": "쿠퍼 C 4세대",
+      "code": "cooper-gen4",
+      "label_ru": "Cooper, 4-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "MINI",
+      "model": "Cooper",
+      "source_value": "쿠퍼 S 4세대",
+      "code": "cooper-gen4",
+      "label_ru": "Cooper, 4-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Volkswagen",
+      "model": "Golf",
+      "source_value": "골프 8세대",
+      "code": "golf-gen8",
+      "label_ru": "Golf, 8-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Volkswagen",
+      "model": "Jetta",
+      "source_value": "제타 7세대",
+      "code": "jetta-gen7",
+      "label_ru": "Jetta, 7-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    },
+    {
+      "brand": "Volkswagen",
+      "model": "Tiguan",
+      "source_value": "티구안 2세대",
+      "code": "tiguan-gen2",
+      "label_ru": "Tiguan, 2-е поколение",
+      "provenance": "source_explicit",
+      "status": "approved"
+    }
+  ]
+}

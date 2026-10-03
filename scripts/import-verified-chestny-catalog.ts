@@ -1,3 +1,4 @@
+import { persistCatalogNamingPg } from "../src/server/catalog/persist-catalog-naming";
 import { catalogDriveType, normalizeTransmissionType } from "../src/server/normalization/drivetrain";
 import { Client } from "pg";
 import { config } from "dotenv";
@@ -175,7 +176,12 @@ async function main() {
         // `generation` is updated with coalesce: an empty source value must not
         // erase a generation that was already resolved for the card.
         const updatable = cols.filter((k) => !["primary_source", "source_id", "generation"].includes(k));
-        await c.query(`insert into public.cars(${cols.join(",")}) values ${tuples.join(",")} on conflict(primary_source,source_id) do update set ${updatable.map((k) => `${k}=excluded.${k}`).join(",")},generation=coalesce(excluded.generation,cars.generation),updated_at=now()`, vals);
+        await c.query("begin");
+        try {
+        const saved = await c.query<{id:string}>(`insert into public.cars(${cols.join(",")}) values ${tuples.join(",")} on conflict(primary_source,source_id) do update set ${updatable.map((k) => `${k}=excluded.${k}`).join(",")},generation=coalesce(excluded.generation,cars.generation),updated_at=now() returning id`, vals);
+        for(const car of saved.rows)await persistCatalogNamingPg(c,car.id);
+        await c.query("commit");
+        } catch(error) {await c.query("rollback");throw error;}
       }
     }
 
