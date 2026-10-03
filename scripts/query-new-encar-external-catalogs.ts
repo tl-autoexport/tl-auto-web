@@ -2,7 +2,7 @@
 import { config } from "dotenv";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 
-config({ path: ".env.local", override: true, quiet: true });
+config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
 
 type Group = { brand: string | null; model: string | null; generation: string | null; year: number | null; engineCc: number | null; fuelType: string | null; driveType: string | null; listingIds: string[]; badgeExamples: string[] };
@@ -10,7 +10,10 @@ type SourceCandidate = { engineCc: number; powerHp: number; context: string };
 type SourceResult = { url: string | null; status: "ok" | "unmapped" | "http_error" | "network_error"; candidates: SourceCandidate[]; error?: string };
 
 const inputPath = process.env.TL_AUTO_POWER_PLAN ?? "output/tl-auto-new-encar-power-plan.json";
-const outputPath = process.env.EXTERNAL_CATALOG_OUTPUT ?? "output/tl-auto-new-encar-external-catalogs.json";
+const expectedRunId = process.env.TL_AUTO_ENRICHMENT_RUN_ID?.trim();
+const outputPath = process.env.EXTERNAL_CATALOG_OUTPUT ?? (expectedRunId
+  ? `output/tl-auto-run-${expectedRunId.slice(0, 8)}-external-catalogs.json`
+  : "output/tl-auto-new-encar-external-catalogs.json");
 const delayMs = Math.max(300, Number(process.env.EXTERNAL_CATALOG_DELAY_MS ?? 800));
 const concurrency = Math.max(1, Math.min(4, Number(process.env.EXTERNAL_CATALOG_CONCURRENCY ?? 2)));
 const limit = Math.max(1, Number(process.env.EXTERNAL_CATALOG_LIMIT ?? 1000));
@@ -54,6 +57,8 @@ async function queryGroup(group: Group) {
 }
 async function main() {
   const input = JSON.parse(await readFile(inputPath, "utf8")) as { runId: string; externalSearch?: { worklist?: Group[] } };
+  if (expectedRunId && input.runId !== expectedRunId)
+    throw new Error(`Power plan runId mismatch: expected ${expectedRunId}, got ${input.runId}`);
   const worklist = input.externalSearch?.worklist;
   if (!Array.isArray(worklist)) throw new Error(`No externalSearch.worklist in ${inputPath}`);
   const selected = worklist.slice(0, limit), results: Awaited<ReturnType<typeof queryGroup>>[] = new Array(selected.length);
