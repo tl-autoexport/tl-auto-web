@@ -18,13 +18,16 @@ export type AutomaticPowerReferenceRow = {
 export type AutomaticPowerReferenceInput = Pick<
   AutomaticPowerReferenceRow,
   "brand" | "model" | "fuel_type" | "engine_cc" | "drive_type" | "badge" | "badge_detail"
-> & { year: number | null };
+> & { year: number | null; source_listing_id?: string | null };
 
 function normalize(value: string | null | undefined) {
   return (value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 function sameConfiguration(input: AutomaticPowerReferenceInput, row: AutomaticPowerReferenceRow) {
+  const scope = row.configuration_key.match(/\|listing=([^|]*)$/);
+  if (row.configuration_key.includes("|listing=") &&
+      (!scope || !/^\d+$/.test(scope[1]) || String(input.source_listing_id ?? "") !== scope[1])) return false;
   return (
     normalize(input.brand) === normalize(row.brand) &&
     normalize(input.model) === normalize(row.model) &&
@@ -37,7 +40,7 @@ function sameConfiguration(input: AutomaticPowerReferenceInput, row: AutomaticPo
 }
 
 function matchSpecificity(row: AutomaticPowerReferenceRow) {
-  return Number(Boolean(row.badge)) + Number(Boolean(row.badge_detail));
+  return Number(Boolean(row.badge)) + Number(Boolean(row.badge_detail)) + (row.configuration_key.includes("|listing=") ? 4 : 0);
 }
 
 function coversYear(year: number | null, row: AutomaticPowerReferenceRow) {

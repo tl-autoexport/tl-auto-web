@@ -135,7 +135,7 @@ async function main() {
           drive_type: config.driveType == null ? null : String(config.driveType),
           badge: config.badge == null ? null : String(config.badge),
           badge_detail: config.trim == null ? null : String(config.trim),
-          year,
+          year, source_listing_id: row.source_listing_id,
         };
         const reference = resolveAutomaticPowerReference(input, refs);
         if (!reference || reference.power_hp == null) {

@@ -51,7 +51,7 @@ function automaticInput(c: PlanRow) {
   return {
     brand: str(x.brand) ?? "", model: str(x.model) ?? "", fuel_type: str(x.fuelType) ?? "",
     engine_cc: positive(x.engineCc), drive_type: str(x.driveType), badge: str(x.badge),
-    badge_detail: str(x.trim), year: positive(x.year),
+    badge_detail: str(x.trim), year: positive(x.year), source_listing_id: c.sourceListingId,
   };
 }
 

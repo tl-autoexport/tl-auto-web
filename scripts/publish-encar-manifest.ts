@@ -55,7 +55,7 @@ function automaticInput(c: PlanRow) {
   return {
     brand: str(x.brand) ?? "", model: str(x.model) ?? "", fuel_type: str(x.fuelType) ?? "",
     engine_cc: positive(x.engineCc), drive_type: str(x.driveType), badge: str(x.badge),
-    badge_detail: str(x.trim), year: positive(x.year),
+    badge_detail: str(x.trim), year: positive(x.year), source_listing_id: c.sourceListingId,
   };
 }
 
@@ -104,7 +104,6 @@ function inspectionReport(payload: Obj) {
 }
 
 async function main() {
-  const optionCatalog = await fetchStandardOptionCatalog();
   if (!Number.isInteger(batchSize) || batchSize < 1 || batchSize > 100) throw new Error("Batch size must be between 1 and 100");
   const [planText, preliminaryText, reportText] = await Promise.all([
     readFile(planPath, "utf8"), readFile(preliminaryPath, "utf8"), readFile(readinessPath, "utf8"),
@@ -159,6 +158,12 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
       console.log(JSON.stringify({ prepared: true, runId: manifest.runId, expected: manifest.expected, manifestPath }));
       return;
     }
+    const catalogPath = process.env.TL_AUTO_STANDARD_OPTION_CATALOG?.trim();
+    const optionCatalog: Awaited<ReturnType<typeof fetchStandardOptionCatalog>> = catalogPath
+      ? JSON.parse(await readFile(catalogPath, "utf8"))
+      : await fetchStandardOptionCatalog();
+    if (!Array.isArray(optionCatalog.options) || !optionCatalog.options.length)
+      throw new Error("Standard option catalog is empty or invalid");
     const saved = JSON.parse(await readFile(manifestPath, "utf8")) as Manifest;
     if (JSON.stringify(saved) !== JSON.stringify(manifest)) throw new Error("Manifest or source reports changed after preparation");
     const refs = (await db.query<AutomaticPowerReferenceRow>(`select configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,year_from,year_to,power_hp,power_kw,source,status

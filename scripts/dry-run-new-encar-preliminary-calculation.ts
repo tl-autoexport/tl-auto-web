@@ -33,7 +33,7 @@ const positive = (v: unknown) => {
 async function main() {
   const plan = JSON.parse(await readFile(planPath, "utf8")) as { runId?: string; candidates?: PlanCandidate[] };
   if (plan.runId !== runId) throw new Error(`Power plan runId mismatch: expected ${runId}, got ${plan.runId ?? "missing"}`);
-  const targets = (plan.candidates ?? []).filter((candidate) => candidate.status === "unmatched");
+  const targets = (plan.candidates ?? []).filter((candidate) => ["unmatched", "potential_match_needs_configuration"].includes(candidate.status));
   const ids = [...new Set(targets.map((candidate) => candidate.sourceListingId))];
   if (!ids.length) throw new Error("No unmatched candidates found in the power plan");
 
@@ -64,7 +64,7 @@ async function main() {
         drive_type: config.driveType == null ? null : String(config.driveType),
         badge: config.badge == null ? null : String(config.badge),
         badge_detail: config.trim == null ? null : String(config.trim),
-        year: positive(config.year),
+        year: positive(config.year), source_listing_id: candidate.sourceListingId,
       };
       const reference = resolveAutomaticPowerReference(input, refsResult.rows);
       if (!reference) {

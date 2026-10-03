@@ -93,7 +93,7 @@ async function main() {
     if (plan.runId !== runId) throw new Error(`Power plan runId mismatch (${plan.runId ?? "missing"})`);
     const candidates = plan.candidates ?? [];
     const approved = candidates.filter((candidate) => candidate.status === "approved_match");
-    const unmatched = candidates.filter((candidate) => candidate.status === "unmatched");
+    const unmatched = candidates.filter((candidate) => ["unmatched", "potential_match_needs_configuration"].includes(candidate.status));
     await db.connect();
     connected = true;
     await db.query("begin read only");
@@ -115,7 +115,7 @@ async function main() {
         brand: String(c.brand ?? ""), model: String(c.model ?? ""), fuel_type: String(c.fuelType ?? ""),
         engine_cc: pos(c.engineCc), drive_type: c.driveType == null ? null : String(c.driveType),
         badge: c.badge == null ? null : String(c.badge), badge_detail: c.trim == null ? null : String(c.trim),
-        year: pos(c.year),
+        year: pos(c.year), source_listing_id: candidate.sourceListingId,
       }, refs);
       if (match?.power_hp != null) powerClass.set(candidate.sourceListingId, "preliminary");
     }
