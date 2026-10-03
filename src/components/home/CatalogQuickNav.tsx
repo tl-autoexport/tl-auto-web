@@ -87,23 +87,29 @@ export function CatalogQuickNav({ bodies = [], transmissions = [] }: { brands?: 
   useEffect(() => {
     if (panel !== "parameters" && panel !== "brandModel") return;
     const controller = new AbortController();
+    let active = true;
+    const timeout = window.setTimeout(() => controller.abort(), 12_000);
     const timer = window.setTimeout(async () => {
       setCountLoading(true);
       try {
         const response = await fetch(`/api/catalog/count?${activeQuery.toString()}`, { signal: controller.signal });
-        if (response.ok) {
+        if (!response.ok) throw new Error(`Count returned ${response.status}`);
+        if (active) {
           const payload = await response.json() as { count?: number };
           setResultCount(typeof payload.count === "number" ? payload.count : null);
           setCountQuery(activeQuery.toString());
         }
       } catch {
-        if (!controller.signal.aborted) setResultCount(null);
+        if (active) { setResultCount(null); setCountQuery(activeQuery.toString()); }
       } finally {
-        if (!controller.signal.aborted) setCountLoading(false);
+        window.clearTimeout(timeout);
+        if (active) setCountLoading(false);
       }
     }, 300);
     return () => {
+      active = false;
       window.clearTimeout(timer);
+      window.clearTimeout(timeout);
       controller.abort();
     };
   }, [activeQuery, panel]);
@@ -192,7 +198,7 @@ export function CatalogQuickNav({ bodies = [], transmissions = [] }: { brands?: 
               {panel === "transport" ? <TransportPanel /> : null}
               {panel === "sort" ? <SortPanel /> : null}
             </div>
-            {panel === "parameters" || panel === "brandModel" ? <button className="m-4 mt-0 h-12 shrink-0 rounded-xl bg-[#111827] px-4 text-sm font-semibold text-white transition hover:bg-[#263247] disabled:opacity-60" disabled={countLoading || resultCount===null || countQuery!==activeQuery.toString()} onClick={panel === "parameters" ? submitParameters : () => submitBrandModel()} type="button">{countLoading || countQuery!==activeQuery.toString() ? "Считаем предложения…" : `Показать ${resultCount ?? "все"} объявлений`}</button> : null}
+            {panel === "parameters" || panel === "brandModel" ? <button className="m-4 mt-0 h-12 shrink-0 rounded-xl bg-[#111827] px-4 text-sm font-semibold text-white transition hover:bg-[#263247] disabled:opacity-60" disabled={countLoading || countQuery!==activeQuery.toString()} onClick={panel === "parameters" ? submitParameters : () => submitBrandModel()} type="button">{countLoading || countQuery!==activeQuery.toString() ? "Считаем предложения…" : resultCount === null ? "Показать автомобили" : `Показать ${resultCount} объявлений`}</button> : null}
           </div>
         </div>, document.body
       ) : null}
