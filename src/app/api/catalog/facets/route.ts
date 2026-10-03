@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSupabaseAdmin } from "@/server/supabase/admin";
+import { createSupabasePublic } from "@/server/supabase/public";
 import { translateModel } from "@/server/normalization/display";
 import { normalizeCatalogBrand } from "@/lib/catalog-brand";
 
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const filters = buildFilters(params);
 
-  const supabase = createSupabaseAdmin();
+  const supabase = createSupabasePublic();
   const [facets, count] = await Promise.all([
     supabase.rpc("catalog_display_facets", { f: filters }),
     supabase.rpc("catalog_display_listing_count", { f: filters }),
