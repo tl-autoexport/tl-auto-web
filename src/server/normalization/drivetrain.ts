@@ -12,6 +12,7 @@ export function normalizeTransmissionType(value: unknown): TransmissionType | nu
 export type CatalogDriveType = 'FWD'|'RWD'|'2WD'|'4WD';
 export function catalogDriveType(value: unknown): CatalogDriveType|null {
  const s=String(value??'').trim().toLowerCase();
+ if((s.includes('передний')&&s.includes('задний'))||(s.includes('fwd')&&s.includes('rwd')))return null;
  if(/4wd|awd|4matic|xdrive|quattro|4motion|all.?4|4륜|4х4|4x4|полный|사륜/.test(s))return '4WD';
  if(/\bfwd\b|передний|전륜/.test(s))return 'FWD';
  if(/\brwd\b|задний|후륜/.test(s))return 'RWD';
