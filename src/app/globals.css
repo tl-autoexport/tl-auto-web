@@ -715,3 +715,14 @@ a {
     animation: none;
   }
 }
+
+/* Never present the previous feed as the result of a new mobile selection. */
+.catalog-navigation-loading { display: none; }
+#catalog-results:has([data-catalog-navigation-pending]) [data-catalog-output] { display: none; }
+#catalog-results:has([data-catalog-navigation-pending]) .catalog-navigation-loading {
+  display: block;
+  min-height: 320px;
+  padding: 48px 16px;
+  text-align: center;
+  color: #647084;
+}

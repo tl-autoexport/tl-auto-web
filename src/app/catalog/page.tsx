@@ -122,10 +122,12 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     sort,
   };
 
-  const [totalCars, optionCars, initialPage] = await Promise.all([
+  const [totalCars, optionCars, initialPage, generationLabels, presetCounts] = await Promise.all([
     getCatalogCount(filters),
     getCatalogFacetCars(),
     getCatalogCardPage(filters),
+    getGenerationLabelMap(),
+    getQuickPresetCounts(),
   ]);
   const shownCars = initialPage.cars;
   const brands = unique(optionCars.map((car) => car.brand));
@@ -151,7 +153,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   }, {});
   const currentQuery = catalogQueryString(rawParams);
   const feedQuery = catalogFeedQueryString(rawParams);
-  const [generationLabels, presetCounts] = await Promise.all([getGenerationLabelMap(), getQuickPresetCounts()]);
   const activeChips = buildActiveFilterChips(rawParams, generationLabels);
   const filterFormProps = {
     brand: value("brand"),
@@ -281,9 +282,12 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           <p className="hidden items-center gap-2 text-sm font-medium text-[#3f4b5e] md:inline-flex"><ChevronDown size={16} /> {sortLabels[sort]}</p>
         </div>
 
+        <div className="catalog-navigation-loading" role="status">Подбираем автомобили по выбранным фильтрам…</div>
+        <div data-catalog-output>
         {shownCars.length ? <>
           <CatalogInfiniteGrid initialCars={shownCars} initialCursor={initialPage.nextCursor} key={feedQuery} query={feedQuery} />
         </> : <EmptyState />}
+        </div>
       </section>
     </main>
   );

@@ -854,29 +854,16 @@ export async function getHomeCatalogData(): Promise<HomeCatalogData> {
 
 async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
   const supabase = createSupabaseServerRead();
-  const pageSize = 1000;
-  const facets: CatalogFacetCar[] = [];
-
-  for (let offset = 0; ; offset += pageSize) {
-    const { data, error } = await supabase
-      .from("catalog_display_cars")
-      .select("brand, model, trim, body_type, fuel_type, transmission, drive_type, color, owners_count")
-      .eq("is_available", true)
-      .in("primary_source", ["encar", "chestny_prigon"])
-      .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
-      .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)")
-      .order("id", { ascending: true })
-      .range(offset, offset + pageSize - 1);
-
-    if (error) {
-      console.error("[cars] Catalog facets query failed", error);
-      throw error;
-    }
-
-    const batch = (data ?? []) as CatalogFacetCar[];
-    facets.push(...batch);
-    if (batch.length < pageSize) break;
+  const { data, error } = await supabase.rpc("catalog_display_filter_options");
+  if (error) {
+    console.error("[cars] Catalog filter options query failed", error);
+    throw error;
   }
+  // Retain the existing facet contract and exact brand totals. The database
+  // groups identical options, avoiding paginated round trips on cold starts.
+  const facets = ((data ?? []) as Array<CatalogFacetCar & { cars: number }>).flatMap(({ cars, ...car }) =>
+    Array.from({ length: Number(cars) }, () => car),
+  );
 
   return facets.map((car) => ({
     ...car,
@@ -886,7 +873,7 @@ async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
 
 const getCachedCatalogFacetCars = unstable_cache(
   async () => (await fetchCatalogFacetCars()).map(c => [c.brand,c.model,c.trim,c.body_type,c.fuel_type,c.transmission,c.drive_type,c.color,c.owners_count] as const),
-  ["catalog-filter-facets-v5-compact-canonical-names"],
+  ["catalog-filter-facets-v6-grouped-canonical-names"],
   { revalidate: 3600 },
 );
 

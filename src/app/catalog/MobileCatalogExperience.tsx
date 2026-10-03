@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { ArrowDownUp, ChevronLeft, ChevronRight, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
@@ -23,6 +23,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   totalCars: number;
 }) {
   const router = useRouter();
+  const [navigationPending, startNavigation] = useTransition();
   const [screen, setScreen] = useState<Screen>("home");
   const [draft, setDraft] = useState(() => cleanParams(currentQuery));
   const [facets, setFacets] = useState<Facets | null>(null);
@@ -112,7 +113,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   function apply(nextDraft = draft) {
     const nextQuery = nextDraft.toString();
     const suffix = nextQuery ? `?${nextQuery}` : "";
-    router.replace(`/catalog${suffix}#catalog-results`, { scroll: false });
+    startNavigation(() => router.replace(`/catalog${suffix}#catalog-results`, { scroll: false }));
     setScreen("home");
   }
 
@@ -142,7 +143,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     setFacetsQuery("");
     setCount(totalCars);
     setCountQuery("");
-    router.replace("/catalog#catalog-results", { scroll: false });
+    startNavigation(() => router.replace("/catalog#catalog-results", { scroll: false }));
   }
 
   function choose(axis: "brand" | "model" | "generation" | "modification" | "trim", option: Option) {
@@ -179,7 +180,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     { label: "Пробег", screen: "mileage" as const, active: selected("mileageMax") || selected("mileageMin") },
   ];
 
-  return <div className="md:hidden">
+  return <div className="md:hidden" data-catalog-navigation-pending={navigationPending ? "" : undefined}>
     <div className="scrollbar-none flex gap-2 overflow-x-auto bg-[#f5f6f8] px-3 py-2 sm:px-5">
       <button className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full bg-[#e7e9ed] px-4 text-sm font-semibold" onClick={() => setScreen("parameters")} type="button"><SlidersHorizontal size={16} />Фильтры{activeParameters ? <span className="grid size-5 place-items-center rounded-full bg-[#c7a55a] text-[10px] text-white">{activeParameters}</span> : null}</button>
     {quickRanges.map((item) => <button className={`inline-flex min-h-10 shrink-0 items-center rounded-full px-5 text-sm font-medium ${item.active ? "bg-[#101827] text-white" : "bg-[#e7e9ed] text-[#101827]"}`} key={item.label} onClick={() => openQuickRange(item.screen)} type="button">{item.label}</button>)}
