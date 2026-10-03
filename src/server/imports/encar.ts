@@ -1,3 +1,4 @@
+import { catalogDriveType, normalizeTransmissionType } from "@/server/normalization/drivetrain";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { createSupabaseAdmin } from "@/server/supabase/admin";
@@ -19,7 +20,6 @@ import {
 import {
   translateInspectionLabel,
   translateInspectionStatus,
-  translateTransmission,
 } from "@/server/normalization/display";
 import { encarClient } from "@/server/imports/encar-client";
 import { mapEncarOpenHistory } from "@/server/imports/encar-history";
@@ -1146,10 +1146,10 @@ async function mapCar(
       hybrid_dvs_above_electric_30min:
         hybridPower?.dvsAboveElectric30Min ?? null,
       hybrid_sequential: hybridPower?.sequential ?? null,
-      transmission: translateTransmission(
+      transmission: normalizeTransmissionType(
         detail?.transmission ?? listCar.Transmission,
       ),
-      drive_type: driveType,
+      drive_type: catalogDriveType(driveType),
       body_type: normalizeBodyType(detail?.bodyTypeKr),
       color: detail?.color ?? null,
       seller_region: null,

@@ -1,4 +1,5 @@
-import { normalizeBrand, normalizeDrive, normalizeModel } from "./vehicles";
+import { catalogDriveType, normalizeTransmissionType } from "./drivetrain";
+import { normalizeBrand, normalizeModel } from "./vehicles";
 import { normalizeCatalogBrand } from "@/lib/catalog-brand";
 
 const KOREAN_RE = /[\u3131-\u318e\uac00-\ud7a3]/;
@@ -400,19 +401,13 @@ export function translateFuel(value: string | null | undefined) {
 }
 
 export function translateDrive(value: string | null | undefined) {
-  const drive = normalizeDrive(value);
-  if (drive === "FWD") return "Передний";
-  if (drive === "RWD") return "Задний";
-  if (drive === "2WD" || drive === "4WD") return drive;
-  return null;
+  const type = catalogDriveType(value);
+  return type === "FWD" ? "Передний" : type === "RWD" ? "Задний" : type;
 }
 
 export function translateTransmission(value: string | null | undefined) {
-  const raw = String(value ?? "").trim().toLowerCase();
-  if (!raw) return "-";
-  if (raw.includes("오토") || raw.includes("auto") || raw.includes("a/t")) return "Автомат";
-  if (raw.includes("수동") || raw.includes("manual") || raw.includes("m/t")) return "Механика";
-  return cleanDisplay(value);
+  const type = normalizeTransmissionType(value);
+  return type ? { automatic: "АКПП", dct: "Робот", cvt: "Вариатор", manual: "Механика" }[type] : "-";
 }
 
 export function translateColor(value: string | null | undefined) {

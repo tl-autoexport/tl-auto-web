@@ -1,3 +1,4 @@
+import { catalogDriveType, normalizeTransmissionType } from "../src/server/normalization/drivetrain";
 import { Client } from "pg";
 import { config } from "dotenv";
 import { calculateRuVladivostok } from "../src/server/calc/ru";
@@ -143,8 +144,8 @@ async function main() {
         power_confidence: "high",
         power_resolution_note: `Сопоставлено со справочником TL Auto; calculation_power_kw выведено из подтверждённой мощности ${powerHp} л.с.`,
         fuel_type: fuelType,
-        transmission: r.transmission,
-        drive_type: normalizeDrive([r.drive_type, r.trim, r.generation].filter(Boolean).join(" ")) ?? r.drive_type,
+        transmission: normalizeTransmissionType(r.transmission),
+        drive_type: catalogDriveType(normalizeDrive([r.drive_type, r.trim, r.generation].filter(Boolean).join(" ")) ?? r.drive_type),
         color: normalizeColor(r.exterior_color),
         body_type: r.body_type,
         seller_region: r.location,

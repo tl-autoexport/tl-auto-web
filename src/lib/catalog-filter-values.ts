@@ -11,7 +11,7 @@ export const BODY_TYPES: Record<string, string[]> = {
 };
 
 export const TRANSMISSIONS: Record<string, string[]> = {
-  automatic: ["automatic", "auto", "Автомат", "오토", "오토(A/T)"],
+  automatic: ["automatic", "auto", "Автомат", "АКПП", "오토", "오토(A/T)"],
   manual: ["manual", "Механика", "수동", "수동(M/T)"],
   cvt: ["cvt"],
   dct: ["dct"],
