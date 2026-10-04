@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
-import { catalogCountFilters, createReadCoalescer } from "./catalog-read-coalescer";
+import { catalogCountFilters, catalogDisplayReadView, createReadCoalescer } from "./catalog-read-coalescer";
 
 async function run() {
+  assert.equal(catalogDisplayReadView({ sort: "fresh", maxPowerHp: 160 }), "catalog_display_cars", "unfiltered shelves keep the fast sort-index path");
+  for (const filters of [{ brand: "Volvo" }, { model: "S90" }, { generation: "cn7" }, { modification: "T5" }, { trim: "Inscription" }]) {
+    assert.equal(catalogDisplayReadView(filters), "catalog_display_cascade_cars", "each identity selection uses the indexed projection");
+  }
   assert.deepEqual(
     catalogCountFilters({ sort: "price_desc", brand: "Kia", maxPowerHp: 160, limit: 48, offset: 24, noAccidents: false }),
     catalogCountFilters({ maxPowerHp: 160, brand: "Kia", sort: "fresh" }),

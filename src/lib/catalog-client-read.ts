@@ -12,14 +12,22 @@ export function catalogRead<T>(url: string): Promise<T> {
   if (cached && cached.expires > Date.now()) return Promise.resolve(cached.value as T);
   const existing = pending.get(key);
   if (existing) return existing as Promise<T>;
-  const request = fetch(key, { signal: AbortSignal.timeout(12_000) })
-    .then(async response => {
+  const request = (async () => {
+      // One shared retry for a transient upstream failure, within the same
+      // total time budget. All subscribers still share this request.
+      const signal = AbortSignal.timeout(12_000);
+      let response = await fetch(key, { signal });
+      if ([429, 502, 503, 504].includes(response.status)) {
+        const seconds = Number(response.headers.get("Retry-After"));
+        await new Promise(resolve => setTimeout(resolve, Math.min(1_000, Math.max(250, seconds * 1_000 || 250))));
+        response = await fetch(key, { signal });
+      }
       if (!response.ok) throw new Error(`Catalog read failed: ${response.status}`);
       const value: unknown = await response.json();
       if (ready.size >= 100) ready.delete(ready.keys().next().value!);
       ready.set(key, { expires: Date.now() + 30_000, value });
       return value;
-    }).finally(() => pending.delete(key));
+    })().finally(() => pending.delete(key));
   pending.set(key, request);
   return request as Promise<T>;
 }

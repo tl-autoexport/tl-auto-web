@@ -77,6 +77,7 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
   }, [open, level, optionsQuery, retry]);
 
   useEffect(() => {
+    if (!open) return;
     let active = true;
     const timer = window.setTimeout(() => {
       catalogRead<{ count: number }>(`/api/catalog/count${query}`)
@@ -84,7 +85,7 @@ export function GenerationCascade({ currentQuery, totalCars, brand, model, gener
         .catch(() => { /* The apply action remains usable if an optional count fails. */ });
     }, 150);
     return () => { active = false; window.clearTimeout(timer); };
-  }, [query]);
+  }, [open, query]);
 
   useEffect(() => {
     if (!open || level !== "generation") return;

@@ -28,11 +28,11 @@ const readFacets = unstable_cache(async (serialized: string, requested: string[]
     f: JSON.parse(serialized), requested_axes: requested,
   });
   if (error) {
-    console.error("[cars] Cascade options query failed", { axes: requested, durationMs: Math.round(performance.now() - started), code: error.code, message: error.message });
+    console.error("[cars] Cascade options query failed", { axes: requested, filters: JSON.parse(serialized), durationMs: Math.round(performance.now() - started), code: error.code, message: error.message });
     throw error;
   }
   return (data ?? []) as FacetRow[];
-}, ["catalog-cascade-options-v1"], { revalidate: 60 });
+}, ["catalog-cascade-options-v2-indexed", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"], { revalidate: 60 });
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
@@ -51,7 +51,9 @@ export async function GET(request: Request) {
       params.get("count") === "0" ? Promise.resolve(null) : getCatalogCount(catalogFiltersFromParams(params)),
     ]);
   } catch {
-    return NextResponse.json({ error: "Could not load catalog options" }, { status: 503 });
+    return NextResponse.json({ error: "Could not load catalog options" }, {
+      status: 503, headers: { "Cache-Control": "no-store", "Retry-After": "1" },
+    });
   }
 
   const axes: Record<string, Array<{ value: string; label: string; cars: number }>> = {};

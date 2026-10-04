@@ -5,7 +5,7 @@ import { normalizeColor, normalizeDrive } from "@/server/normalization/vehicles"
 import { bodyTypeValues, driveTypeValues, transmissionValues } from "@/lib/catalog-filter-values";
 import { catalogBrandValues, normalizeCatalogBrand } from "@/lib/catalog-brand";
 import { homeShowcasePhotoUrl } from "@/lib/showcase-photo";
-import { catalogCountFilters, createReadCoalescer } from "./catalog-read-coalescer";
+import { catalogCountFilters, catalogDisplayReadView, createReadCoalescer } from "./catalog-read-coalescer";
 
 const buildWithoutCatalog =
   process.env.TL_AUTO_BUILD_WITHOUT_CATALOG === "true";
@@ -417,7 +417,7 @@ export async function getCatalogCardPage(
   const sort = filters.sort ?? "fresh";
   const supabase = createSupabaseServerRead();
   let query = supabase
-    .from("catalog_display_cars")
+    .from(catalogDisplayReadView(filters))
     .select(CATALOG_CARD_SELECT)
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
@@ -548,7 +548,7 @@ function cursorExpression(column: string, ascending: boolean, cursor: DecodedCat
 async function fetchCatalogCount(filters: CatalogFilters): Promise<number> {
   const supabase = createSupabaseServerRead();
   let query = supabase
-    .from("catalog_display_cars")
+    .from(catalogDisplayReadView(filters))
     // GET with zero result rows keeps the exact total and preserves the JSON
     // error code/message; HEAD used to turn database failures into {message:""}.
     .select("id", { count: "exact" })
