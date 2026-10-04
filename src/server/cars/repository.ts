@@ -5,6 +5,7 @@ import { normalizeColor, normalizeDrive } from "@/server/normalization/vehicles"
 import { bodyTypeValues, driveTypeValues, transmissionValues } from "@/lib/catalog-filter-values";
 import { catalogBrandValues, normalizeCatalogBrand } from "@/lib/catalog-brand";
 import { homeShowcasePhotoUrl } from "@/lib/showcase-photo";
+import { catalogCountFilters, createReadCoalescer } from "./catalog-read-coalescer";
 
 const buildWithoutCatalog =
   process.env.TL_AUTO_BUILD_WITHOUT_CATALOG === "true";
@@ -539,12 +540,14 @@ function cursorExpression(column: string, ascending: boolean, cursor: DecodedCat
   return `${column}.${comparator}.${value},and(${column}.eq.${value},id.gt.${cursor.id})`;
 }
 
-export async function getCatalogCount(filters: CatalogFilters = {}): Promise<number> {
-  if (buildWithoutCatalog) return 0;
+async function fetchCatalogCount(filters: CatalogFilters): Promise<number> {
   const supabase = createSupabaseServerRead();
   let query = supabase
     .from("catalog_display_cars")
-    .select("id", { count: "exact", head: true })
+    // GET with zero result rows keeps the exact total and preserves the JSON
+    // error code/message; HEAD used to turn database failures into {message:""}.
+    .select("id", { count: "exact" })
+    .limit(0)
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
@@ -600,6 +603,18 @@ export async function getCatalogCount(filters: CatalogFilters = {}): Promise<num
     console.warn("[cars] Catalog count query slow", queryContext);
   }
   return count ?? 0;
+}
+
+const coalesceCatalogCount = createReadCoalescer<number>();
+const getCachedCatalogCount = unstable_cache(
+  (filters: CatalogFilters) => coalesceCatalogCount(JSON.stringify(filters), () => fetchCatalogCount(filters)),
+  ["catalog-count-v1-public-electric", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  { revalidate: 30 },
+);
+
+export async function getCatalogCount(filters: CatalogFilters = {}): Promise<number> {
+  if (buildWithoutCatalog) return 0;
+  return getCachedCatalogCount(catalogCountFilters(filters));
 }
 
 /**
@@ -883,66 +898,50 @@ export async function getCatalogFacetCars(): Promise<CatalogFacetCar[]> {
   return rows.map(([brand,model,trim,body_type,fuel_type,transmission,drive_type,color,owners_count])=>({brand,model,trim,body_type,fuel_type,transmission,drive_type,color,owners_count}));
 }
 
-/**
- * Approved generation labels by code, for rendering a selected generation in
- * Russian instead of showing the raw code from the URL.
- */
-async function fetchGenerationLabelMap(): Promise<Record<string, string>> {
+type CatalogFacetSummary = {
+  generationLabels: Record<string, string>;
+  presetCounts: Record<string, number>;
+};
+
+async function fetchCatalogFacetSummary(): Promise<CatalogFacetSummary> {
   const supabase = createSupabaseServerRead();
-  const { data, error } = await supabase.rpc("catalog_display_facets", { f: {} });
+  const { data, error } = await supabase.rpc("catalog_display_summary");
   if (error) {
-    console.error("[cars] Generation label query failed", error);
-    return {};
+    console.error("[cars] Catalog facet summary query failed", error);
+    throw error;
   }
-  const labels: Record<string, string> = {};
-  for (const row of (data ?? []) as Array<{ axis:string; value:string|null; label:string|null }>) {
-    if (row.axis === "generation" && row.value && row.label) labels[row.value] = row.label;
-  }
-  return labels;
+  return data as CatalogFacetSummary;
 }
 
-const getCachedGenerationLabelMap = unstable_cache(
-  fetchGenerationLabelMap,
-  ["catalog-generation-labels-v2-canonical-names"],
-  { revalidate: 3600 },
+const coalesceCatalogFacetSummary = createReadCoalescer<CatalogFacetSummary>();
+const getCachedCatalogFacetSummary = unstable_cache(
+  () => coalesceCatalogFacetSummary("summary", fetchCatalogFacetSummary),
+  ["catalog-facet-summary-v2-compact-canonical-names", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  { revalidate: 300 },
 );
 
 export async function getGenerationLabelMap(): Promise<Record<string, string>> {
   if (buildWithoutCatalog) return {};
-  return getCachedGenerationLabelMap();
+  // Labels are optional presentation data. Keep the existing graceful fallback
+  // outside the cache so a transient RPC failure is never cached as empty data.
+  try {
+    return (await getCachedCatalogFacetSummary()).generationLabels;
+  } catch {
+    return {};
+  }
 }
 
 /**
- * Counters for the customer quick presets, taken from the same facet function
- * the cascade uses, so a preset shows the number of cars it will actually list.
+ * Unfiltered preset counts and generation labels share one bounded aggregate
+ * over the same public selection as the listing and filter cascade.
  */
-async function fetchQuickPresetCounts(): Promise<Record<string, number>> {
-  const supabase = createSupabaseServerRead();
-  const { data, error } = await supabase.rpc("catalog_display_facets", { f: {} });
-  if (error) {
-    console.error("[cars] Preset facet query failed", error);
-    return {};
-  }
-  const rows = (data ?? []) as Array<{ axis: string; value: string; cars: number }>;
-  const pick = (axis: string, value: string) => rows.find((row) => row.axis === axis && row.value === value)?.cars ?? 0;
-  return {
-    under160: pick("power_band", "up_to_160"),
-    electric: pick("fuel", "electric"),
-    fourWheelDrive: pick("drive", "4WD"),
-    noAccident: pick("no_accident", "confirmed"),
-    noInsurance: pick("no_insurance", "confirmed"),
-  };
-}
-
-const getCachedQuickPresetCounts = unstable_cache(
-  fetchQuickPresetCounts,
-  ["catalog-quick-presets-v2-canonical-names"],
-  { revalidate: 300 },
-);
-
 export async function getQuickPresetCounts(): Promise<Record<string, number>> {
   if (buildWithoutCatalog) return {};
-  return getCachedQuickPresetCounts();
+  try {
+    return (await getCachedCatalogFacetSummary()).presetCounts;
+  } catch {
+    return {};
+  }
 }
 
 export async function getSitemapCars(): Promise<SitemapCar[]> {
