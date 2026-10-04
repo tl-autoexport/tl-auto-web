@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { CatalogCardSkeleton, CatalogLoadingVisual } from "@/components/catalog/CatalogLoadingVisual";
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 import { writeSavedCatalogUrl } from "@/lib/catalog-state";
 import type { CatalogCardSummary } from "@/server/cars/repository";
@@ -171,18 +171,11 @@ export function CatalogInfiniteGrid({ initialCars, initialCursor, query }: Props
           </div>
         ))}
         {loading && cursor ? Array.from({ length: 4 }, (_, index) => (
-          <div aria-hidden="true" className="overflow-hidden rounded-[20px] bg-white ring-1 ring-[#dce2eb] motion-safe:animate-pulse sm:rounded-[24px]" key={`loading-${index}`}>
-            <div className="aspect-[2.25/1] bg-[#e8edf3] sm:aspect-[16/10]" />
-            <div className="space-y-3 p-4">
-              <div className="h-6 w-2/3 rounded bg-[#e8edf3]" />
-              <div className="h-4 w-4/5 rounded bg-[#eef1f5]" />
-              <div className="h-4 w-1/2 rounded bg-[#eef1f5]" />
-            </div>
-          </div>
+          <CatalogCardSkeleton key={`loading-${index}`} />
         )) : null}
       </div>
       <div aria-live="polite" className={`mt-7 flex items-center justify-center ${loading ? "min-h-16" : "min-h-12"}`} ref={sentinelRef}>
-        {loading ? <span className="inline-flex items-center gap-2 text-sm text-[#647084]"><LoaderCircle className="animate-spin" size={18} /> Загружаем ещё автомобили</span> : null}
+        {loading ? <CatalogLoadingVisual compact label="Загружаем ещё автомобили" /> : null}
         {error ? <div className="flex flex-col items-center gap-2 text-sm text-[#647084]"><span>Не удалось загрузить автомобили</span><button className="rounded-md border border-[#c7a55a] bg-white px-4 py-2 font-semibold text-[#7b5a22]" onClick={() => void loadMore(true)} type="button">Повторить загрузку</button></div> : null}
         {!cursor && cars.length > 0 ? <span className="text-sm text-[#647084]">Все подходящие автомобили показаны</span> : null}
       </div>

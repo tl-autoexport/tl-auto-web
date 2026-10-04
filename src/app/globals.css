@@ -716,13 +716,33 @@ a {
   }
 }
 
-/* Never present the previous feed as the result of a new mobile selection. */
 .catalog-navigation-loading { display: none; }
-#catalog-results:has([data-catalog-navigation-pending]) [data-catalog-output] { display: none; }
+#catalog-results:has([data-catalog-navigation-pending]) [data-catalog-output] {
+  opacity: .24;
+  pointer-events: none;
+  user-select: none;
+}
 #catalog-results:has([data-catalog-navigation-pending]) .catalog-navigation-loading {
-  display: block;
-  min-height: 320px;
-  padding: 48px 16px;
-  text-align: center;
-  color: #647084;
+  display: grid;
+  place-items: center;
+  padding: 28px 16px;
+}
+
+.catalog-loader { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.catalog-loader__mark { position: relative; display: grid; place-items: center; width: 72px; height: 72px; }
+.catalog-loader__ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+.catalog-loader__arc { transform-origin: 40px 40px; animation: catalog-ring 1.8s linear infinite; }
+.catalog-loader__initials { color: #a67d32; font-family: Georgia, serif; font-size: 27px; letter-spacing: -2px; padding-right: 2px; }
+.catalog-loader__label { color: #667080; font-size: 14px; letter-spacing: .015em; }
+.catalog-loader--compact { flex-direction: row; gap: 10px; }
+.catalog-loader--compact .catalog-loader__mark { width: 32px; height: 32px; }
+.catalog-loader--compact .catalog-loader__initials { font-size: 13px; letter-spacing: -1px; }
+.catalog-skeleton-surface { position: relative; overflow: hidden; background: #f3f2ef; }
+.catalog-skeleton-surface::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,.85) 48%, transparent 72%); transform: translateX(-100%); animation: catalog-shimmer 2.4s ease-in-out infinite; }
+[data-catalog-output] { transition: opacity .2s ease; }
+@keyframes catalog-ring { to { transform: rotate(360deg); } }
+@keyframes catalog-shimmer { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) {
+  .catalog-loader__arc, .catalog-skeleton-surface::after { animation: none; }
+  [data-catalog-output] { transition: none; }
 }

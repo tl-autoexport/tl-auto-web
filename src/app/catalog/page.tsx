@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CatalogLoadingVisual } from "@/components/catalog/CatalogLoadingVisual";
 import Form from "next/form";
 import type { Metadata } from "next";
 import {
@@ -245,7 +246,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         <div className="mb-4 hidden justify-end md:flex">
           <CatalogSortMenu rawParams={rawParams} sort={sort} />
         </div>
-        <div className="catalog-navigation-loading" role="status">Подбираем автомобили по выбранным фильтрам…</div>
+        <div className="catalog-navigation-loading"><CatalogLoadingVisual /></div>
         <div data-catalog-output>
         {shownCars.length ? <>
           <CatalogInfiniteGrid initialCars={shownCars} initialCursor={initialPage.nextCursor} key={feedQuery} query={feedQuery} />
