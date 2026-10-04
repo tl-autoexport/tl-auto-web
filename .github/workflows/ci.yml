@@ -41,4 +41,8 @@ jobs:
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: npm run audit:catalog:publication
       - name: Production build
+        env:
+          # Static generation must not require live catalogue database access.
+          # The deployed server reads the catalogue at request time.
+          TL_AUTO_BUILD_WITHOUT_CATALOG: "true"
         run: npm run build
