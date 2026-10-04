@@ -428,11 +428,11 @@ function CatalogFilterForm({
             <div className="grid gap-4 border-t border-[#e8ecf2] p-4 sm:grid-cols-2 lg:grid-cols-4">{additionalFields}</div>
           </details>
         )}
-        <div className={mobile ? "grid grid-cols-2 gap-2 border-t border-[#dce2eb] pt-4" : "grid gap-2"}>
-          <FilterCheck checked={under160} label="До 160 л.с." name="under160" value="1" />
-          <FilterCheck checked={passable} label="Проходные 3–5 лет" name="passable" value="1" />
-          <FilterCheck checked={clean} label="Без ДТП" name="clean" value="1" />
-          <FilterCheck checked={value("noInsurance") === "1"} label="Без страховых выплат" name="noInsurance" value="1" />
+        <div className={mobile ? "grid grid-cols-2 gap-2 border-t border-[#dce2eb] pt-4" : "flex flex-wrap items-center gap-2 border-t border-[#dce2eb] pt-4"}>
+          <FilterCheck checked={under160} compact={!mobile} label="До 160 л.с." name="under160" value="1" />
+          <FilterCheck checked={passable} compact={!mobile} label="Проходные 3–5 лет" name="passable" value="1" />
+          <FilterCheck checked={clean} compact={!mobile} label="Без ДТП" name="clean" value="1" />
+          <FilterCheck checked={value("noInsurance") === "1"} compact={!mobile} label="Без страховых выплат" name="noInsurance" value="1" />
         </div>
         {!mobile ? (
           <div className="flex flex-wrap items-end justify-between gap-3 border-t border-[#dce2eb] pt-4">
@@ -474,8 +474,12 @@ function RangeField({ label, maxName, maxValue, minName, minValue }: { label: st
   return <fieldset className="grid gap-1.5"><legend className="text-sm text-[#647084]">{label}</legend><div className={`grid grid-cols-2 overflow-hidden rounded-md border ${active ? "border-[#c7a55a] bg-[#fbf7ed]" : "border-[#d7dee8] bg-white"}`}><input aria-label={`${label}: от`} className="h-11 min-w-0 border-r border-[#d7dee8] bg-transparent px-3 text-sm font-medium outline-none placeholder:text-[#a7b0bd]" defaultValue={minValue} inputMode="numeric" name={minName} placeholder="от" /><input aria-label={`${label}: до`} className="h-11 min-w-0 bg-transparent px-3 text-sm font-medium outline-none placeholder:text-[#a7b0bd]" defaultValue={maxValue} inputMode="numeric" name={maxName} placeholder="до" /></div></fieldset>;
 }
 
-function FilterCheck({ checked, label, name, value }: { checked: boolean; label: string; name: string; value: string }) {
-  return <label className={`flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-md border px-2 text-center text-xs font-semibold transition md:min-h-0 md:justify-start md:border-0 md:px-0 md:text-sm ${checked ? "border-[#c7a55a] bg-[#fbf7ed] text-[#7b5a22]" : "border-[#d7dee8] bg-white text-[#3f4b5e]"}`}><input className="size-4 shrink-0 accent-[#c7a55a]" defaultChecked={checked} name={name} type="checkbox" value={value} />{label}</label>;
+function FilterCheck({ checked, compact = false, label, name, value }: { checked: boolean; compact?: boolean; label: string; name: string; value: string }) {
+  const appearance = checked ? "border-[#c7a55a] bg-[#fbf7ed] text-[#7b5a22]" : "border-[#d7dee8] bg-white text-[#3f4b5e]";
+  const layout = compact
+    ? "inline-flex min-h-10 w-fit items-center justify-center gap-2 rounded-full border px-4 text-sm font-semibold transition hover:border-[#c7a55a]"
+    : "flex min-h-11 items-center justify-center gap-2 rounded-md border px-2 text-center text-xs font-semibold transition";
+  return <label className={`${layout} ${appearance}`}><input className="size-4 shrink-0 accent-[#c7a55a]" defaultChecked={checked} name={name} type="checkbox" value={value} />{label}</label>;
 }
 
 function EmptyState() {
