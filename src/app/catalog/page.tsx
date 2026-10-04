@@ -2,6 +2,7 @@ import Link from "next/link";
 import Form from "next/form";
 import type { Metadata } from "next";
 import {
+  ArrowDownUp,
   ArrowRight,
   CarFront,
   Check,
@@ -241,6 +242,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
             totalCars={totalCars}
           />
         </div>
+        <div className="mb-4 hidden justify-end md:flex">
+          <CatalogSortMenu rawParams={rawParams} sort={sort} />
+        </div>
         <div className="catalog-navigation-loading" role="status">Подбираем автомобили по выбранным фильтрам…</div>
         <div data-catalog-output>
         {shownCars.length ? <>
@@ -361,14 +365,13 @@ function CatalogFilterForm({
       {mobile && generation ? <input name="generation" type="hidden" value={generation} /> : null}
       {mobile && value("modification") ? <input name="modification" type="hidden" value={value("modification")} /> : null}
       {mobile && value("trim") ? <input name="trim" type="hidden" value={value("trim")} /> : null}
-      {mobile ? <input name="sort" type="hidden" value={sort} /> : null}
+      <input name="sort" type="hidden" value={sort} />
       <div className={mobile ? "grid gap-4 p-4" : "grid gap-4"}>
         <div className={mobile ? "grid gap-4" : "grid gap-3 lg:grid-cols-[minmax(130px,1fr)_minmax(160px,1.15fr)_minmax(130px,0.9fr)_minmax(120px,0.9fr)_minmax(95px,0.7fr)_auto] lg:items-end"}>
           {mainFields}
           <FilterSelect label="Топливо" name="fuel" options={fuels} placeholder="Любое" translate={translateFuel} value={value("fuel")} />
           <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} />
           <FilterSelect label="Привод" name="drive" options={driveTypes} placeholder="Любой" translate={(item) => translateDrive(item) ?? item} value={value("drive")} />
-          {!mobile ? <LiveCatalogCount initialCount={totalCars} /> : null}
         </div>
         {mobile ? (
           <details className="group border-t border-[#dce2eb] pt-2">
@@ -394,19 +397,9 @@ function CatalogFilterForm({
           <FilterCheck checked={value("noInsurance") === "1"} compact={!mobile} label="Без страховых выплат" name="noInsurance" value="1" />
         </div>
         {!mobile ? (
-          <div className="flex flex-wrap items-end justify-between gap-3 border-t border-[#dce2eb] pt-4">
-            <div className="min-w-64">
-            <label className="grid min-w-64 gap-1.5 text-sm text-[#647084]">
-              <span>Сортировка</span>
-              <span className="relative">
-                <select className="h-11 w-full appearance-none rounded-md border border-[#d7dee8] bg-white px-3 pr-9 text-sm font-medium text-[#273246]" defaultValue={sort} name="sort">
-                  {Object.entries(sortLabels).map(([optionValue, label]) => <option key={optionValue} value={optionValue}>{label}</option>)}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-3 text-[#647084]" size={17} />
-              </span>
-            </label>
-            </div>
-            <Link className="inline-flex min-h-11 items-center gap-1.5 px-2 text-sm font-semibold text-[#647084] hover:text-[#273246]" href="/catalog"><RotateCcw size={16} /> Сбросить все</Link>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#dce2eb] pt-4">
+            <Link className="inline-flex min-h-11 items-center gap-1.5 px-2 text-sm font-semibold text-[#647084] hover:text-[#273246]" href="/catalog"><RotateCcw size={16} /> Сбросить</Link>
+            <LiveCatalogCount initialCount={totalCars} />
           </div>
         ) : null}
       </div>
@@ -416,6 +409,34 @@ function CatalogFilterForm({
         </div>
       ) : null}
     </Form>
+  );
+}
+
+function CatalogSortMenu({ rawParams, sort }: { rawParams: Record<string, string | string[] | undefined>; sort: keyof typeof sortLabels }) {
+  return (
+    <details className="group relative z-20">
+      <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-[#d7dee8] bg-white px-3.5 text-sm font-medium text-[#273246] shadow-sm transition hover:border-[#c7a55a] [&::-webkit-details-marker]:hidden">
+        <ArrowDownUp size={16} className="text-[#647084]" />
+        <span>{sortLabels[sort]}</span>
+        <ChevronDown className="text-[#647084] transition group-open:rotate-180" size={16} />
+      </summary>
+      <div className="absolute right-0 top-full z-[100] mt-2 max-h-80 min-w-64 overflow-y-auto rounded-xl border border-[#e1e6ed] bg-white p-1.5 shadow-[0_12px_32px_rgba(16,24,39,0.16)]">
+        {Object.entries(sortLabels).map(([option, label]) => {
+          const selected = option === sort;
+          return (
+            <Link
+              aria-current={selected ? "page" : undefined}
+              className={`flex min-h-10 items-center gap-2 rounded-lg px-3 text-sm transition ${selected ? "bg-[#fbf7ed] font-semibold text-[#7b5a22]" : "text-[#3f4b5e] hover:bg-[#f4f6f9]"}`}
+              href={catalogFilterHref(rawParams, { sort: option, page: null })}
+              key={option}
+            >
+              <Check aria-hidden="true" className={selected ? "text-[#a98239]" : "invisible"} size={16} />
+              {label}
+            </Link>
+          );
+        })}
+      </div>
+    </details>
   );
 }
 
