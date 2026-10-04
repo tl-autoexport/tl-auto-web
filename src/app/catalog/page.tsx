@@ -16,10 +16,8 @@ import {
   getCatalogCardPage,
   getCatalogCount,
   getCatalogFacetCars,
-  getGenerationLabelMap,
   getPassoStagingCars,
   getPassoStagingCount,
-  getQuickPresetCounts,
   type CatalogFilters,
   type StagingCatalogType,
 } from "@/server/cars/repository";
@@ -28,7 +26,6 @@ import { bodyTypeFilterValue, driveTypeFilterValue, transmissionFilterValue } fr
 import { LiveCatalogCount } from "./LiveCatalogCount";
 import { getCbrCalcRates } from "@/server/calc/rates";
 import { PassoCatalogCard } from "@/components/catalog/PassoCatalogCard";
-import { sourceDisplayName } from "@/lib/source-url";
 import { normalizeCatalogBrand } from "@/lib/catalog-brand";
 import { CatalogSearchBar } from "./CatalogSearchBar";
 import { CatalogInfiniteGrid } from "./CatalogInfiniteGrid";
@@ -123,12 +120,10 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     sort,
   };
 
-  const [totalCars, optionCars, initialPage, generationLabels, presetCounts] = await Promise.all([
+  const [totalCars, optionCars, initialPage] = await Promise.all([
     getCatalogCount(filters),
     getCatalogFacetCars(),
     getCatalogCardPage(filters),
-    getGenerationLabelMap(),
-    getQuickPresetCounts(),
   ]);
   const shownCars = initialPage.cars;
   const brands = unique(optionCars.map((car) => car.brand));
@@ -154,7 +149,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   }, {});
   const currentQuery = catalogQueryString(rawParams);
   const feedQuery = catalogFeedQueryString(rawParams);
-  const activeChips = buildActiveFilterChips(rawParams, generationLabels);
   const filterFormProps = {
     brand: value("brand"),
     generation: value("generation"),
@@ -247,41 +241,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
             totalCars={totalCars}
           />
         </div>
-        <div className="scrollbar-none mb-3 hidden gap-2 overflow-x-auto md:flex">
-          {([
-            { key: "under160", label: "До 160 л.с.", patch: { under160: "1", page: null }, count: presetCounts.under160 },
-            { key: "electric", label: "Электромобили", patch: { fuel: "electric", page: null }, count: presetCounts.electric },
-            { key: "fourWheelDrive", label: "4WD", patch: { drive: "4WD", page: null }, count: presetCounts.fourWheelDrive },
-            { key: "noAccident", label: "Без ДТП", patch: { clean: "1", page: null }, count: presetCounts.noAccident },
-            { key: "noInsurance", label: "Без страховых", patch: { noInsurance: "1", page: null }, count: presetCounts.noInsurance },
-          ] as const).map((preset) => (
-            <Link
-              className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-full border border-[#d7dee8] bg-white px-3 text-xs font-semibold text-[#273246] transition hover:border-[#a98239]"
-              href={catalogFilterHref(rawParams, preset.patch)}
-              key={preset.key}
-              prefetch={false}
-            >
-              {preset.label}
-              <span className="text-[#647084]">{preset.count ?? 0}</span>
-            </Link>
-          ))}
-        </div>
-        {activeChips.length ? (
-          <div className="scrollbar-none mb-4 hidden gap-2 overflow-x-auto md:flex">
-            {activeChips.map((chip) => (
-              <Link className="inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-full bg-[#101827] px-3 text-xs font-semibold text-white" href={chip.href} key={`${chip.key}-${chip.label}`}>
-                {chip.label}
-                <span aria-hidden="true" className="text-white/60">×</span>
-              </Link>
-            ))}
-            <Link className="inline-flex min-h-8 shrink-0 items-center gap-1.5 px-2 text-xs font-semibold text-[#647084]" href="/catalog"><RotateCcw size={14} /> Сбросить все</Link>
-          </div>
-        ) : null}
-        <div className="mb-5 hidden flex-col gap-3 border-b border-[#dce2eb] pb-4 md:flex md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2 text-sm text-[#647084]"><SlidersHorizontal size={17} /><span>{shownCars.length ? `Найдено ${totalCars} автомобилей` : "Ничего не найдено"}</span></div>
-          <p className="hidden items-center gap-2 text-sm font-medium text-[#3f4b5e] md:inline-flex"><ChevronDown size={16} /> {sortLabels[sort]}</p>
-        </div>
-
         <div className="catalog-navigation-loading" role="status">Подбираем автомобили по выбранным фильтрам…</div>
         <div data-catalog-output>
         {shownCars.length ? <>
@@ -404,7 +363,7 @@ function CatalogFilterForm({
       {mobile && value("trim") ? <input name="trim" type="hidden" value={value("trim")} /> : null}
       {mobile ? <input name="sort" type="hidden" value={sort} /> : null}
       <div className={mobile ? "grid gap-4 p-4" : "grid gap-4"}>
-        <div className={mobile ? "grid gap-4" : "grid gap-3 lg:grid-cols-[1fr_1.15fr_0.9fr_0.9fr_auto] lg:items-end"}>
+        <div className={mobile ? "grid gap-4" : "grid gap-3 lg:grid-cols-[minmax(130px,1fr)_minmax(160px,1.15fr)_minmax(130px,0.9fr)_minmax(120px,0.9fr)_minmax(95px,0.7fr)_auto] lg:items-end"}>
           {mainFields}
           <FilterSelect label="Топливо" name="fuel" options={fuels} placeholder="Любое" translate={translateFuel} value={value("fuel")} />
           <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} />
@@ -530,52 +489,6 @@ function catalogFilterHref(
   }
   const query = params.toString();
   return `/catalog${query ? `?${query}` : ""}#catalog-results`;
-}
-
-function buildActiveFilterChips(rawParams: Record<string, string | string[] | undefined>, generationLabels: Record<string, string> = {}) {
-  const value = (name: string) => typeof rawParams[name] === "string" ? rawParams[name] : "";
-  const chips: Array<{ key: string; label: string; href: string }> = [];
-  const add = (key: string, label: string, remove: Record<string, string | null> = { [key]: null, page: null }) => {
-    chips.push({ key, label, href: catalogFilterHref(rawParams, remove) });
-  };
-
-  if (value("brand")) add("brand", value("brand"), { brand: null, model: null, generation: null, modification:null,trim:null, page: null });
-  if (value("model")) add("model", value("model"), { model: null, generation: null, modification: null, trim: null, page: null });
-  // The generation is shown in Russian from the approved dictionary; the URL
-  // keeps the stable code.
-  if (value("generation")) add("generation", generationLabels[value("generation")] ?? value("generation"), {generation:null,modification:null,trim:null,page:null});
-  if(value("modification")) add("modification", `Модификация: ${value("modification")}`,{modification:null,trim:null,page:null});
-  if (value("drive")) add("drive", `Привод: ${translateDrive(value("drive"))}`);
-  if (value("search")) add("search", value("search"));
-  if (value("fuel")) add("fuel", translateFuel(value("fuel")));
-  if (value("transmission")) add("transmission", translateTransmission(value("transmission")));
-  if (value("source")) add("source", sourceDisplayName(value("source")));
-  if (value("number")) add("number", `Лот ${value("number")}`);
-  if (value("yearMin") || value("yearMax")) add("year", `Год ${value("yearMin") || "от"}–${value("yearMax") || "до"}`, { yearMin: null, yearMax: null, page: null });
-  if (value("priceMin") || value("priceMax")) add("price", "Цена задана", { priceMin: null, priceMax: null, page: null });
-  if (value("engineMin") || value("engineMax")) add("engine", "Объём задан", { engineMin: null, engineMax: null, page: null });
-  if (value("mileageMax")) add("mileageMax", `До ${value("mileageMax")} км`);
-  if (value("mileageMin")) add("mileageMin", `От ${value("mileageMin")} км`);
-  if (value("powerMax")) add("powerMax", `До ${value("powerMax")} л.с.`);
-  if (value("trim")) add("trim", `Комплектация: ${value("trim")}`);
-  if (value("body")) add("body", `Кузов: ${translateBody(value("body"))}`);
-  if (value("color")) add("color", `Цвет: ${value("color")}`);
-  if (value("month")) add("month", translateMonth(value("month")));
-  if (value("ownersMin") || value("ownersMax")) add("owners", `Владельцы ${value("ownersMin") || "от"}–${value("ownersMax") || "до"}`, { ownersMin: null, ownersMax: null, page: null });
-  if (value("insuranceMin") || value("insuranceMax")) add("insurance", "Сумма страховых задана", { insuranceMin: null, insuranceMax: null, page: null });
-  if (value("noInsurance")) add("noInsurance", "Без страховых выплат");
-  if (value("under160")) add("under160", "До 160 л.с.");
-  if (value("passable")) add("passable", "Проходные 3–5 лет");
-  if (value("clean")) add("clean", "Без ДТП");
-  if (value("shelf")) add("shelf", shelfLabel(value("shelf")));
-
-  return chips;
-}
-
-function shelfLabel(value: string) {
-  if (value === "under-160") return "До 160 л.с.";
-  if (value === "passable") return "Проходные 3–5 лет";
-  return "Подборка";
 }
 
 function catalogPageHref(rawParams: Record<string, string | string[] | undefined>, page: number) {
