@@ -2,7 +2,7 @@
 import rules from "../../../data/catalog-naming/label-rules-v1.json";
 import {
   canonicalCatalogBrand, canonicalCatalogModel, compactModificationName, generationPresentation,
-  isAbsentName, isOrdinalOnlyName, looksLikeModification, namingKey,
+  generationCatalogLabel, isAbsentName, isOrdinalOnlyName, looksLikeModification, namingKey,
   normalizeVehicleName, splitVersionName, sourceGenerationOrdinal,
 } from "./catalog-naming";
 
@@ -22,6 +22,7 @@ export type Car = {
 export type Node = {
   key: string; car_type: string; level: string; code: string; parent_key: string | null;
   name_kr: string; name_en: string | null; year_from: string | null; year_to: string | null;
+  canonical_brand?: string | null; canonical_model?: string | null;
 };
 export type GenerationAlias = { brand: string; model: string; source_value: string; code: string | null; label_ru: string | null; status: string };
 type LabelResult = { label: string | null; status: string; basis: string; nodeKeys: string[] };
@@ -116,7 +117,9 @@ export function createCatalogNamingResolver(nodes:Node[],aliases:GenerationAlias
     const legacyOne = new Set(legacy.map(a => a.code)).size===1 ? legacy[0] : undefined;
     const genPresentation = generationPresentation(chosenGen?.name_kr ?? genRaw[0] ?? "",chosenGen?.name_en ?? null,model,legacyOne?.code);
     const generation = {
-      ...genMatch,label:genPresentation.display,fullName:genPresentation.fullName,
+      ...genMatch,label:genPresentation.display ?? generationCatalogLabel(
+        genPresentation.fullName, model, chosenGen?.year_from, chosenGen?.year_to,
+      ),fullName:genPresentation.fullName,
       status:genMatch.status === "resolved" ? "resolved" : legacyOne ? "resolved" : genPresentation.display ? "source_descriptor" : genPresentation.fullName ? "source_label" : genRaw.length ? "needs_review" : "missing",
       basis:genMatch.status === "resolved" ? genMatch.basis : legacyOne ? "tl_auto_approved_generation_alias" : "retained_source_name",
       chassisCodes:genPresentation.chassisCodes,ordinal:genPresentation.ordinal,facelift:genPresentation.facelift,sourceValues:genRaw,

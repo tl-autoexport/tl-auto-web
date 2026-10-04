@@ -36,7 +36,7 @@ export function normalizeVehicleName(value: string | null | undefined): string |
     .replace(/\s+/g," ").replace(/\(\s*\)/g,"").trim();
   if (!s || hangul.test(s)) return null;
   const tokens = rules.tokens as Record<string,string>;
-  return s.split(/(\s+|[(),/])/).map(word => {
+  const normalized = s.split(/(\s+|[(),/])/).map(word => {
     if (!word || /^[\s(),/]+$/.test(word)) return word;
     const lower = word.toLowerCase();
     if (tokens[lower]) return tokens[lower];
@@ -50,6 +50,7 @@ export function normalizeVehicleName(value: string | null | undefined): string |
     if (/^(бензин|дизель|гибрид|электро)$/i.test(word)) return lower.charAt(0).toUpperCase()+lower.slice(1);
     return word.charAt(0).toUpperCase()+word.slice(1).toLowerCase();
   }).join("");
+  return normalized.replace(/\bNewrexton\b/gi, "New Rexton").replace(/\bRexton Ii\b/gi, "Rexton II");
 }
 
 export function canonicalCatalogBrand(value: string | null | undefined) {
@@ -76,6 +77,22 @@ export function generationPresentation(raw: string, english: string | null, mode
   const display = chassis.length ? chassis.join(" / ") : ordinal ? `${ordinal}-е поколение` : null;
   return { fullName: fullName ?? (chassis.length ? `${model} (${chassis.join(" / ")})` : ordinal ? `${model}, ${ordinal}-е поколение` : null), display,
     chassisCodes: chassis, ordinal: ordinal ? Number(ordinal) : null, facelift: null };
+}
+
+/** Use the source catalogue's model-variant name when no chassis/ordinal exists. */
+export function generationCatalogLabel(
+  fullName: string | null,
+  model: string,
+  yearFrom?: string | null,
+  yearTo?: string | null,
+) {
+  if (!fullName) return null;
+  const from = yearFrom?.match(/^(\d{4})/)?.[1];
+  const to = yearTo?.match(/^(\d{4})/)?.[1];
+  const sameAsModel = namingKey(fullName) === namingKey(model);
+  if (!from && !to) return sameAsModel ? null : fullName;
+  const range = from && to ? `${from}–${to}` : from ? `с ${from}` : `до ${to}`;
+  return `${fullName} (${range})`;
 }
 
 export function splitVersionName(raw: string | null | undefined, brand: string) {

@@ -9,9 +9,9 @@ async function main(){
  const reviewed=JSON.parse(await readFile('output/catalog-naming/proposals.json','utf8'));
  const resolve=createCatalogNamingResolver(taxonomy.nodes as Node[],aliases.aliases as GenerationAlias[]);
  const result=resolve(audit.rows as Car[]).rows;
- assert.equal(result.length,10294);assert.deepEqual(result,reviewed.rows);
+ assert.equal(result.length,audit.total);assert.deepEqual(result,reviewed.rows);
  assert.equal(result.filter(r=>!r.versionLine).length,0);
  assert.equal(result.filter(r=>r.trim.status==='needs_review'||r.trim.status==='conflict').length,0);
- console.log('Shared import resolver exactly reproduces all 10,294 reviewed naming records');
+ console.log(`Shared import resolver exactly reproduces all ${audit.total.toLocaleString()} reviewed naming records`);
 }
 main().catch(e=>{console.error(e.message);process.exitCode=1});

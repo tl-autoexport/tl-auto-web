@@ -1,12 +1,12 @@
 {
   "version": "tl-auto-catalog-naming-v2",
-  "generatedAt": "2026-10-03T08:32:48.793Z",
-  "auditGeneratedAt": "2026-10-03T07:06:00.334Z",
+  "generatedAt": "2026-10-04T07:28:42.471Z",
+  "auditGeneratedAt": "2026-10-04T07:24:12.372Z",
   "sourceProject": "autoexport-web",
-  "sourceSnapshotAt": "2026-10-03T07:06:00.334Z",
+  "sourceSnapshotAt": "2026-10-04T07:24:12.372Z",
   "inputHashes": {
-    "audit": "1a81ab190a29060ae548d08ff18f0804d828fb04d9bce8b28e7eac814cab887a",
-    "taxonomy": "b21575cd73d66ea5321ecb8d74ec88ab62d2ebbd243220e12cdef07eafb7f3e7",
+    "audit": "b11aa9b109caeaa413643520f1f8449782d519ef2f25f8871e7ca72745ee5bbb",
+    "taxonomy": "142cdfe73d2adc3fec03783ce2cac301742d065224e41bb24a718d145502fd79",
     "generationAliases": "eb296fd67f61280d3efd847c02fbd6e4c25e1513a1a075de21434d0b4208f41c",
     "rules": "4f1e0c59093348e4775c71f3a1892f063c7be97601a5ebfe1124cf9bbeef14ca"
   },
@@ -109404,7 +109404,7 @@
       "name_en": "NewRexton",
       "year_from": "200312",
       "year_to": "200606",
-      "display_name": "Newrexton",
+      "display_name": "New Rexton",
       "canonical_brand": "KGM",
       "canonical_model": "Rexton",
       "source_code_path": [
@@ -109422,7 +109422,7 @@
         }
       ],
       "generation_presentation": {
-        "fullName": "Newrexton",
+        "fullName": "New Rexton",
         "display": null,
         "chassisCodes": [],
         "ordinal": null,
@@ -109440,7 +109440,7 @@
       "name_en": "Rexton II",
       "year_from": "200604",
       "year_to": "200809",
-      "display_name": "Rexton Ii",
+      "display_name": "Rexton II",
       "canonical_brand": "KGM",
       "canonical_model": "Rexton",
       "source_code_path": [
@@ -109458,7 +109458,7 @@
         }
       ],
       "generation_presentation": {
-        "fullName": "Rexton Ii",
+        "fullName": "Rexton II",
         "display": null,
         "chassisCodes": [],
         "ordinal": null,
@@ -119829,12 +119829,7 @@
     {
       "key": "kor:004:003:015",
       "sourceLabel": "NewRexton",
-      "proposedLabel": "Newrexton"
-    },
-    {
-      "key": "kor:004:003:018",
-      "sourceLabel": "Rexton II",
-      "proposedLabel": "Rexton Ii"
+      "proposedLabel": "New Rexton"
     },
     {
       "key": "kor:004:004:021",
