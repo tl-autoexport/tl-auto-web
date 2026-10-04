@@ -870,10 +870,7 @@ export async function getHomeCatalogData(): Promise<HomeCatalogData> {
 async function fetchCatalogFacetCars(): Promise<CatalogFacetCar[]> {
   const supabase = createSupabaseServerRead();
   const { data, error } = await supabase.rpc("catalog_display_filter_options");
-  if (error) {
-    console.error("[cars] Catalog filter options query failed", error);
-    throw error;
-  }
+  if (error) throw error;
   // Retain the existing facet contract and exact brand totals. The database
   // groups identical options, avoiding paginated round trips on cold starts.
   const facets = ((data ?? []) as Array<CatalogFacetCar & { cars: number }>).flatMap(({ cars, ...car }) =>
@@ -894,8 +891,28 @@ const getCachedCatalogFacetCars = unstable_cache(
 
 export async function getCatalogFacetCars(): Promise<CatalogFacetCar[]> {
   if (buildWithoutCatalog) return [];
-  const rows=await getCachedCatalogFacetCars();
-  return rows.map(([brand,model,trim,body_type,fuel_type,transmission,drive_type,color,owners_count])=>({brand,model,trim,body_type,fuel_type,transmission,drive_type,color,owners_count}));
+  try {
+    const rows = await getCachedCatalogFacetCars();
+    return rows.map(([brand, model, trim, body_type, fuel_type, transmission, drive_type, color, owners_count]) => ({
+      brand,
+      model,
+      trim,
+      body_type,
+      fuel_type,
+      transmission,
+      drive_type,
+      color,
+      owners_count,
+    }));
+  } catch (error) {
+    // Facets improve navigation, but they must not take down the actual
+    // catalogue when this comparatively expensive aggregate times out.
+    console.warn("[cars] Catalog filter options unavailable; rendering without facets", {
+      code: error && typeof error === "object" && "code" in error ? error.code : undefined,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return [];
+  }
 }
 
 type CatalogFacetSummary = {
