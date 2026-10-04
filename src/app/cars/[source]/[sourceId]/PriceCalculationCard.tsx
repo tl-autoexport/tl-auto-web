@@ -290,14 +290,8 @@ function RuPriceCalculationCard({
 
   return (
     <>
-      <aside className="rounded bg-white p-4 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
-        <h1 className="mt-0 line-clamp-2 text-2xl font-semibold leading-[1.12] text-[#121722] sm:mt-0 sm:text-3xl">
-          {title}
-        </h1>
-        {version ? <p className="mt-1.5 text-base leading-6 text-[#465368] sm:text-lg">{version}</p> : null}
-        {generation ? <p className="mt-1 text-xs text-[#8591a1] sm:text-sm">{generation}</p> : null}
-
-        <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1">
+      <aside className="rounded bg-white p-3.5 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <p className="whitespace-nowrap text-[30px] font-semibold leading-none tracking-tight text-[#121722] tabular-nums sm:text-3xl">
             {currency === "USD" ? dollars(displayTotal) : money(displayTotal)}
           </p>
@@ -309,12 +303,18 @@ function RuPriceCalculationCard({
             Цена под ключ до {city.label}
           </span>
         </div>
-        <p className="mt-1.5 text-[13px] text-[#647084] sm:mt-2 sm:text-sm">
+        <h1 className="mt-2 line-clamp-2 text-2xl font-semibold leading-[1.12] text-[#121722] sm:mt-3 sm:text-3xl">
+          {title}
+        </h1>
+        {version ? <p className="mt-1 text-base leading-6 text-[#465368] sm:mt-1.5 sm:text-lg">{version}</p> : null}
+        {generation ? <p className="mt-0.5 text-xs text-[#8591a1] sm:mt-1 sm:text-sm">{generation}</p> : null}
+
+        <p className="mt-2 text-[13px] text-[#647084] sm:mt-2 sm:text-sm">
           {formatVehicleYear(year)} · {rub.format(mileageKm ?? 0)} км ·{" "}
           {formatEngineCapacity(engineCc)} · {fuel}
         </p>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="mt-1.5 flex flex-wrap items-center gap-2 sm:mt-0">
           <span className="rounded-full bg-[#fff0a5] px-2.5 py-1 text-[11px] font-semibold text-[#5b4d00] sm:px-3 sm:text-xs">
             Расчёт для РФ
           </span>
@@ -323,7 +323,7 @@ function RuPriceCalculationCard({
           </span>
         </div>
 
-        <div className="mt-3 flex items-center gap-3 text-[13px] text-[#647084] sm:mt-4 sm:text-sm">
+        <div className="mt-2.5 flex items-center gap-3 text-[13px] text-[#647084] sm:mt-4 sm:text-sm">
           <span>Оплата</span>
           <label className="relative inline-flex min-h-10 items-center rounded border border-[#d8dde6] font-medium text-[#121722]">
             <select
@@ -339,7 +339,7 @@ function RuPriceCalculationCard({
           </label>
         </div>
 
-        <section aria-label="Этапы оплат" className="mt-5">
+        <section aria-label="Этапы оплат" className="mt-4 sm:mt-5">
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#647084]">Этапы оплат</h2>
           <div className="overflow-hidden rounded-full bg-[#edf0f5] p-0.5">
             <div className="flex h-7 gap-0.5 overflow-hidden rounded-full">
