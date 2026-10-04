@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { IDENTITY_KEYS, useCatalogFilterDraft } from "./CatalogFilterDraft";
+import { catalogRead } from "@/lib/catalog-client-read";
 export function LiveCatalogCount({ initialCount, mobile = false }: { initialCount: number; mobile?: boolean }) {
  const buttonRef=useRef<HTMLButtonElement>(null);
  const draft=useCatalogFilterDraft();
@@ -24,8 +25,7 @@ export function LiveCatalogCount({ initialCount, mobile = false }: { initialCoun
  useEffect(()=>{
   const controller=new AbortController();
   const timer=setTimeout(async()=>{try{
-   const response=await fetch(`/api/catalog/count?${text}`,{signal:controller.signal});if(!response.ok)throw new Error("count");
-   const payload=await response.json();if(typeof payload.count!=="number")throw new Error("count");
+   const payload=await catalogRead<{count:number}>(`/api/catalog/count?${text}`);if(typeof payload.count!=="number")throw new Error("count");
    if(!controller.signal.aborted){setResolved({query:text,count:payload.count});setFailed(null);}
   }catch{if(!controller.signal.aborted)setFailed(text);}},200);
   return()=>{clearTimeout(timer);controller.abort();};

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Form from "next/form";
 import type { Metadata } from "next";
 import {
   ArrowRight,
@@ -395,7 +396,7 @@ function CatalogFilterForm({
   );
 
   return (
-    <form action="/catalog" className={mobile ? "min-h-full bg-[#f4f6f9] pb-24" : ""}>
+    <Form action="/catalog" prefetch={false} className={mobile ? "min-h-full bg-[#f4f6f9] pb-24" : ""}>
       {mobile && brand ? <input name="brand" type="hidden" value={brand} /> : null}
       {mobile && model ? <input name="model" type="hidden" value={model} /> : null}
       {mobile && generation ? <input name="generation" type="hidden" value={generation} /> : null}
@@ -455,7 +456,7 @@ function CatalogFilterForm({
           <LiveCatalogCount initialCount={totalCars} mobile />
         </div>
       ) : null}
-    </form>
+    </Form>
   );
 }
 

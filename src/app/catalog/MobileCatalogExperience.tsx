@@ -6,9 +6,10 @@ import { createPortal } from "react-dom";
 import { ArrowDownUp, ChevronLeft, ChevronRight, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 import { translateBrand, translateFuel, translateModel, translateTransmission } from "@/server/normalization/display";
 import { BrandLogo } from "@/components/catalog/BrandLogo";
+import { catalogRead, catalogFacetUrl } from "@/lib/catalog-client-read";
 
 type Option = { value: string; label: string; cars?: number };
-type Facets = { total: number; axes: Record<string, Option[]> };
+type Facets = { total?: number; axes: Record<string, Option[]> };
 type SortOption = { value: string; label: string };
 type FieldOptions = { fuels: string[]; transmissions: string[]; bodies: string[]; trims: string[]; colors: string[]; brands: string[]; modelsByBrand: Record<string, string[]> };
 type Screen = "home" | "brand" | "model" | "generation" | "modification" | "trim" | "modification" | "trim" | "parameters" | "year" | "price" | "mileage" | "sort";
@@ -51,7 +52,9 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     }
     return identity.toString();
   }, [draft, query, screen]);
-  const currentFacets = facetsQuery === facetQuery ? facets : null;
+  const identityPicker = ["brand", "model", "generation", "modification", "trim"].includes(screen);
+  const facetUrl = catalogFacetUrl(facetQuery, screen);
+  const currentFacets = facetsQuery === facetUrl ? facets : null;
   const hasCurrentCount = countQuery === query;
   const requestFailed = failedQuery === query;
   const selected = (name: string) => draft.get(name) || "";
@@ -59,39 +62,30 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
 
   useEffect(() => {
     if (screen === "home" && !rangePicker) return;
-    const controller = new AbortController();
     let active = true;
-    let timeout: number | undefined;
     const timer = window.setTimeout(async () => {
       setLoading(true);
       setFailedQuery(null);
-      timeout = window.setTimeout(() => controller.abort(), 12_000);
       try {
-        const facetSuffix = facetQuery ? `?${facetQuery}` : "";
         const countSuffix = query ? `?${query}` : "";
-        const [facetResponse, countResponse] = await Promise.all([
-          fetch(`/api/catalog/facets${facetSuffix}`, { signal: controller.signal }),
-          fetch(`/api/catalog/count${countSuffix}`, { signal: controller.signal }),
+        await Promise.all([
+          identityPicker ? catalogRead<Facets>(facetUrl).then(nextFacets => {
+            if (active) { setFacets(nextFacets); setFacetsQuery(facetUrl); }
+          }) : Promise.resolve(),
+          catalogRead<{ count: number }>(`/api/catalog/count${countSuffix}`).then(nextCount => {
+            if (active && Number.isFinite(nextCount.count)) {
+              setCount(nextCount.count); setCountQuery(query);
+            }
+          }),
         ]);
-        if (!facetResponse.ok || !countResponse.ok) throw new Error("Не удалось обновить фильтры");
-        const [nextFacets, nextCount] = await Promise.all([
-          facetResponse.json() as Promise<Facets>,
-          countResponse.json() as Promise<{ count: number }>,
-        ]);
-        if (!active || !Number.isFinite(nextCount.count)) return;
-        setFacets(nextFacets);
-        setFacetsQuery(facetQuery);
-        setCount(nextCount.count);
-        setCountQuery(query);
       } catch {
         if (active) setFailedQuery(query);
       } finally {
-        window.clearTimeout(timeout);
         if (active) setLoading(false);
       }
-    }, 180);
-    return () => { active = false; controller.abort(); window.clearTimeout(timer); window.clearTimeout(timeout); };
-  }, [facetQuery, query, screen, rangePicker, retry]);
+    }, identityPicker ? 0 : 180);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [facetUrl, identityPicker, query, screen, rangePicker, retry]);
 
   useEffect(() => {
     if (["brand", "model", "generation", "modification", "trim"].includes(screen)) {
@@ -195,7 +189,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
         <button aria-label="Сбросить фильтры" className="px-1 text-right text-xs font-semibold text-[#956f2c]" onClick={reset} type="button">Сбросить</button>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-28">
-        {(["brand", "model", "generation", "modification", "trim"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation" | "modification" | "trim"} brandValue={selected("brand")} facets={currentFacets} find={find} inputRef={inputRef} loading={loading || !currentFacets} onChoose={choose} onFind={setFind} onRetry={() => setRetry((value) => value + 1)} requestFailed={requestFailed} selectedValue={selected(screen)} /> : null}
+        {(["brand", "model", "generation", "modification", "trim"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation" | "modification" | "trim"} brandValue={selected("brand")} facets={currentFacets} find={find} inputRef={inputRef} loading={!currentFacets} onChoose={choose} onFind={setFind} onRetry={() => setRetry((value) => value + 1)} requestFailed={requestFailed} selectedValue={selected(screen)} /> : null}
         {screen === "parameters" ? <Parameters generationLabel={generationLabel(selected("generation"), currentFacets)} onOpenRange={setRangePicker} onSelectLevel={setScreen} options={options} patch={patch} selected={selected} /> : null}
         {screen === "year" || screen === "price" || screen === "mileage" ? <Range title={screen === "year" ? "Год выпуска" : screen === "price" ? "Цена до Владивостока, ₽" : "Пробег, км"} minKey={screen === "year" ? "yearMin" : screen === "price" ? "priceMin" : "mileageMin"} maxKey={screen === "year" ? "yearMax" : screen === "price" ? "priceMax" : "mileageMax"} onOpen={setRangePicker} selected={selected} /> : null}
         {screen === "sort" ? <div className="overflow-hidden rounded-2xl bg-white">{sortOptions.map((option) => <button className={`flex min-h-14 w-full items-center justify-between border-b border-[#edf0f4] px-4 text-left text-sm ${selected("sort") === option.value ? "font-semibold text-[#956f2c]" : "text-[#273246]"}`} key={option.value} onClick={() => changeSort(option.value)} type="button">{option.label}<span>{selected("sort") === option.value ? "✓" : ""}</span></button>)}</div> : null}

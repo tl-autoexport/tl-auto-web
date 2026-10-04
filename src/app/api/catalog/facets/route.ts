@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { createSupabasePublic } from "@/server/supabase/public";
 import { translateModel } from "@/server/normalization/display";
-import { normalizeCatalogBrand } from "@/lib/catalog-brand";
+import { catalogBrandValues, normalizeCatalogBrand } from "@/lib/catalog-brand";
+import { unstable_cache } from "next/cache";
+import { getCatalogCount } from "@/server/cars/repository";
+import { catalogFiltersFromParams } from "@/lib/catalog-filter-params";
+import { createReadCoalescer } from "@/server/cars/catalog-read-coalescer";
 
 /**
  * Facet counters for the catalogue cascade.
@@ -16,21 +20,42 @@ import { normalizeCatalogBrand } from "@/lib/catalog-brand";
  * number.
  */
 type FacetRow = { axis: string; value: string; label: string; cars: number };
+const AXES = ["brand", "model", "generation", "modification", "trim", "fuel", "drive", "transmission", "body", "color", "power_band", "no_accident", "no_insurance"];
+const coalesce = createReadCoalescer<FacetRow[]>();
+const readFacets = unstable_cache(async (serialized: string, requested: string[]) => {
+  const started = performance.now();
+  const { data, error } = await createSupabasePublic().rpc("catalog_display_facet_options", {
+    f: JSON.parse(serialized), requested_axes: requested,
+  });
+  if (error) {
+    console.error("[cars] Cascade options query failed", { axes: requested, durationMs: Math.round(performance.now() - started), code: error.code, message: error.message });
+    throw error;
+  }
+  return (data ?? []) as FacetRow[];
+}, ["catalog-cascade-options-v1"], { revalidate: 60 });
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const filters = buildFilters(params);
 
-  const supabase = createSupabasePublic();
-  const [facets, count] = await Promise.all([
-    supabase.rpc("catalog_display_facets", { f: filters }),
-    supabase.rpc("catalog_display_listing_count", { f: filters }),
-  ]);
-  if (facets.error) return NextResponse.json({ error: facets.error.message }, { status: 500 });
-  if (count.error) return NextResponse.json({ error: count.error.message }, { status: 500 });
+  const requested = [...new Set(params.get("axes")?.split(",") ?? AXES)].sort();
+  if (!requested.length || requested.some(axis => !AXES.includes(axis))) {
+    return NextResponse.json({ error: "Unknown facet axis" }, { status: 400 });
+  }
+  const serialized = JSON.stringify(filters);
+  let rows: FacetRow[];
+  let total: number | null;
+  try {
+    [rows, total] = await Promise.all([
+      coalesce(JSON.stringify([serialized, requested]), () => readFacets(serialized, requested)),
+      params.get("count") === "0" ? Promise.resolve(null) : getCatalogCount(catalogFiltersFromParams(params)),
+    ]);
+  } catch {
+    return NextResponse.json({ error: "Could not load catalog options" }, { status: 503 });
+  }
 
   const axes: Record<string, Array<{ value: string; label: string; cars: number }>> = {};
-  for (const row of (facets.data ?? []) as FacetRow[]) {
+  for (const row of rows) {
     const bucket = axes[row.axis] ?? [];
     if (row.axis === "brand") {
       const label = normalizeCatalogBrand(row.value) ?? row.value;
@@ -47,8 +72,8 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json(
-    { total: count.data ?? 0, axes, filters },
-    { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } },
+    { ...(total !== null ? { total } : {}), axes, filters },
+    { headers: { "Cache-Control": "public, s-maxage=60" } },
   );
 }
 
@@ -63,6 +88,7 @@ function buildFilters(params: URLSearchParams): Record<string, unknown> {
 
   const filters: Record<string, unknown> = {
     brand: normalizeCatalogBrand(params.get("brand")) || undefined,
+    brandValues: params.get("brand") ? catalogBrandValues(params.get("brand")!) : undefined,
     model: params.get("model") || undefined,
     generation: params.get("generation") || undefined,
     modification: params.get("modification") || undefined,

@@ -6,9 +6,10 @@ import { ChevronDown, LoaderCircle, RotateCcw, X } from "lucide-react";
 import { IDENTITY_KEYS, useCatalogFilterDraft, type IdentitySelection } from "./CatalogFilterDraft";
 import { translateBrand, translateModel } from "@/server/normalization/display";
 import { BrandLogo } from "@/components/catalog/BrandLogo";
+import { catalogRead, catalogFacetUrl } from "@/lib/catalog-client-read";
 
 type FacetOption = { value: string; label: string; cars: number };
-type FacetsResponse = { total: number; axes: Record<string, FacetOption[]> };
+type FacetsResponse = { total?: number; axes: Record<string, FacetOption[]> };
 type Level = typeof IDENTITY_KEYS[number];
 type Selection = IdentitySelection;
 
@@ -26,7 +27,7 @@ type Props = {
 
 const LEVEL_LABEL: Record<Level, string> = { brand: "Марка", model: "Модель", generation: "Поколение", modification: "Модификация", trim: "Комплектация" };
 
-export function GenerationCascade({ currentQuery, brand, model, generation, modification, trim, onSelection, onApply }: Props) {
+export function GenerationCascade({ currentQuery, totalCars, brand, model, generation, modification, trim, onSelection, onApply }: Props) {
   const router = useRouter();
   const draft = useCatalogFilterDraft();
   const [open, setOpen] = useState(false);
@@ -38,6 +39,7 @@ export function GenerationCascade({ currentQuery, brand, model, generation, modi
   const [search, setSearch] = useState("");
   const [loaded, setLoaded] = useState<{ query: string; data: FacetsResponse } | null>(null);
   const [loadedGenerations, setLoadedGenerations] = useState<{ query: string; data: FacetsResponse } | null>(null);
+  const [resolvedCount, setResolvedCount] = useState<{ query: string; count: number } | null>(null);
 
   const query = useMemo(() => {
     const params = new URLSearchParams(draft?.parameters ?? currentQuery);
@@ -58,35 +60,39 @@ export function GenerationCascade({ currentQuery, brand, model, generation, modi
     return text ? `?${text}` : "";
   }, [currentQuery, identity.brand, identity.model]);
 
-  const loading = loaded?.query !== query && failedQuery !== query;
-  const data = loaded?.query === query ? loaded.data : null;
+  const optionsQuery = catalogFacetUrl(query, level);
+  const loading = loaded?.query !== optionsQuery && failedQuery !== optionsQuery;
+  const data = loaded?.query === optionsQuery ? loaded.data : null;
   const generationsLoading = open && loadedGenerations?.query !== generationsQuery;
   const generationsData = loadedGenerations?.query === generationsQuery ? loadedGenerations.data : null;
   const generationOptions = generationsData?.axes.generation ?? data?.axes.generation ?? [];
 
   useEffect(() => {
-    const controller = new AbortController();
+    if (!open || level === "generation") return;
     let active = true;
-    const timeout = window.setTimeout(() => controller.abort(), 12_000);
-    fetch(`/api/catalog/facets${query}`, { signal: controller.signal })
-      .then((response) => response.ok ? response.json() : Promise.reject(new Error(String(response.status))))
-      .then((json: FacetsResponse) => { if (active) { setLoaded({ query, data: json }); setFailedQuery((previous) => previous === query ? null : previous); } })
-      .catch(() => { if (active) setFailedQuery(query); })
-      .finally(() => window.clearTimeout(timeout));
-    return () => { active = false; controller.abort(); window.clearTimeout(timeout); };
-  }, [query, retry]);
+    catalogRead<FacetsResponse>(optionsQuery)
+      .then((json) => { if (active) { setLoaded({ query: optionsQuery, data: json }); setFailedQuery((previous) => previous === optionsQuery ? null : previous); } })
+      .catch(() => { if (active) setFailedQuery(optionsQuery); })
+    return () => { active = false; };
+  }, [open, level, optionsQuery, retry]);
+
+  useEffect(() => {
+    let active = true;
+    const timer = window.setTimeout(() => {
+      catalogRead<{ count: number }>(`/api/catalog/count${query}`)
+        .then(result => { if (active) setResolvedCount({ query, count: result.count }); })
+        .catch(() => { /* The apply action remains usable if an optional count fails. */ });
+    }, 150);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [query]);
 
   useEffect(() => {
     if (!open || level !== "generation") return;
-    const controller = new AbortController();
     let active = true;
-    const timeout = window.setTimeout(() => controller.abort(), 12_000);
-    fetch(`/api/catalog/facets${generationsQuery}`, { signal: controller.signal })
-      .then((response) => response.ok ? response.json() : Promise.reject(new Error(String(response.status))))
+    catalogRead<FacetsResponse>(catalogFacetUrl(generationsQuery, "generation"))
       .then((json: FacetsResponse) => { if (active) { setLoadedGenerations({ query: generationsQuery, data: json }); setFailedQuery((previous) => previous === generationsQuery ? null : previous); } })
       .catch(() => { if (active) setFailedQuery(generationsQuery); })
-      .finally(() => window.clearTimeout(timeout));
-    return () => { active = false; controller.abort(); window.clearTimeout(timeout); };
+    return () => { active = false; };
   }, [open, level, generationsQuery, retry]);
 
   const options = (level === "generation" ? generationOptions : data?.axes[level] ?? []).filter((option) => option.label.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
@@ -112,6 +118,13 @@ export function GenerationCascade({ currentQuery, brand, model, generation, modi
     for (const key of IDENTITY_KEYS.slice(index)) delete next[key];
     next[level] = option.value;
     change(next);
+    const nextLevel = IDENTITY_KEYS[index + 1];
+    if (nextLevel) {
+      const params = new URLSearchParams(nextLevel === "generation" ? generationsQuery : query);
+      for (const key of IDENTITY_KEYS) { params.delete(key); if (next[key]) params.set(key, next[key]!); }
+      // Start the next step while the user moves to its control.
+      void catalogRead(catalogFacetUrl(params.toString(), nextLevel)).catch(() => undefined);
+    }
     setOpen(false);
     setSearch("");
   }
@@ -157,7 +170,7 @@ export function GenerationCascade({ currentQuery, brand, model, generation, modi
             </div>
 
             <div className="max-h-[42vh] overflow-y-auto rounded-xl border border-[#e8ecf2] md:grid md:max-h-72 md:grid-cols-2 lg:grid-cols-3">
-              {failedQuery === (level === "generation" ? generationsQuery : query) ? (
+              {failedQuery === (level === "generation" ? generationsQuery : optionsQuery) ? (
                 <div className="p-4 text-sm text-[#647084]">Не удалось загрузить варианты.<button className="ml-2 font-semibold text-[#956f2c]" type="button" onClick={() => { setFailedQuery(null); setRetry((value) => value + 1); }}>Повторить</button></div>
               ) : (level === "generation" ? generationsLoading : loading) ? (
                 <p className="flex items-center gap-2 p-4 text-sm text-[#647084]"><LoaderCircle className="animate-spin" size={17} /> Загружаем варианты</p>
@@ -171,7 +184,7 @@ export function GenerationCascade({ currentQuery, brand, model, generation, modi
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <button className="min-h-11 px-2 text-sm font-semibold text-[#647084]" onClick={clearLevel} type="button">{level === "brand" ? "Все марки" : level === "model" ? "Все модели" : level === "generation" ? "Все поколения" : level === "modification" ? "Все модификации" : "Все комплектации"}</button>
               <button className="inline-flex min-h-11 items-center gap-1.5 px-2 text-sm font-semibold text-[#647084]" onClick={reset} type="button"><RotateCcw size={15} /> Сбросить</button>
-              <button className="ml-auto min-h-12 rounded-xl bg-[#101827] px-5 text-sm font-semibold text-white disabled:cursor-wait disabled:opacity-60 md:min-w-56" disabled={loading} onClick={apply} type="button">{loading ? "Пересчитываем…" : data ? `Показать ${data.total}` : "Показать автомобили"}</button>
+              <button className="ml-auto min-h-12 rounded-xl bg-[#101827] px-5 text-sm font-semibold text-white md:min-w-56" onClick={apply} type="button">{resolvedCount?.query === query ? `Показать ${resolvedCount.count}` : query === currentQuery ? `Показать ${totalCars}` : "Показать автомобили"}</button>
             </div>
           </div>
         </div>
