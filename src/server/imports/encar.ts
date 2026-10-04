@@ -23,6 +23,7 @@ import {
   translateInspectionStatus,
 } from "@/server/normalization/display";
 import { encarClient } from "@/server/imports/encar-client";
+import { normalizeEncarTimestamp } from "@/server/imports/encar-date";
 import { mapEncarOpenHistory } from "@/server/imports/encar-history";
 import { mapChoiceOptions, mapStandardOptions, type EncarOptionCatalog, type EncarOptionRow } from "@/server/imports/encar-options";
 
@@ -920,13 +921,13 @@ async function mapCar(
   hybridPowerOverride?: HybridPowerResolution,
 ) {
   const sourceId = String(listCar.Id);
-  const detail = fastMode ? null : await fetchDetail(sourceId).catch(() => null);
   // List responses may contain only a four-image preview. Always enrich the
-  // photo set during fast imports so new catalog cards do not persist that
-  // truncated preview as their complete gallery.
-  const photoDetail = fastMode
-    ? await fetchDetail(sourceId).catch(() => null)
-    : detail;
+  // detail during fast imports so new catalog cards do not persist that
+  // truncated preview as their complete gallery. Reuse this response for
+  // publication provenance too; previously fast mode fetched it only into
+  // photoDetail while published_at was read from the deliberately-null detail.
+  const detail = await fetchDetail(sourceId).catch(() => null);
+  const photoDetail = detail;
   if (!fastMode) await sleep(120);
   const photos = photoDetail?.photos.length ? photoDetail.photos : buildPhotos(listCar);
   const brand = normalizeBrand(
@@ -1121,7 +1122,7 @@ async function mapCar(
       enrichment_status: "source_only",
       is_available: true,
       sale_status: null,
-      published_at: detail?.firstAdvertisedAt ?? null,
+      published_at: normalizeEncarTimestamp(detail?.firstAdvertisedAt),
       source_updated_at: sourceUpdatedAt,
       last_seen_at: new Date().toISOString(),
       brand,
@@ -1882,6 +1883,28 @@ export async function importEncar(options: ImportOptions = {}) {
   }
 
   const supabase = createSupabaseAdmin();
+  const publicationBySourceId = new Map<string, {
+    published_at: string | null;
+    published_at_source: string | null;
+    catalog_added_at: string | null;
+  }>();
+  const mappedSourceIds = [...new Set(mapped.map((item) => String(item.car.source_id)))];
+  for (let index = 0; index < mappedSourceIds.length; index += 200) {
+    const { data, error } = await supabase
+      .from("cars")
+      .select("source_id,published_at,published_at_source,catalog_added_at")
+      .eq("primary_source", "encar")
+      .in("source_id", mappedSourceIds.slice(index, index + 200));
+    if (error) throw error;
+    for (const row of data ?? []) {
+      if (row.source_id) publicationBySourceId.set(String(row.source_id), {
+        published_at: row.published_at,
+        published_at_source: row.published_at_source,
+        catalog_added_at: row.catalog_added_at,
+      });
+    }
+  }
+
   const { data: run, error: runError } = await supabase
     .from("source_import_runs")
     .insert({
@@ -1922,9 +1945,26 @@ export async function importEncar(options: ImportOptions = {}) {
       writeCursor += 1;
       if (!item) continue;
       try {
+      const sourceId = String(item.car.source_id);
+      const existingPublication = publicationBySourceId.get(sourceId);
+      const hasExistingSourceDate = Boolean(
+        existingPublication?.published_at &&
+        ["source_payload", "source_snapshot"].includes(existingPublication.published_at_source ?? ""),
+      );
+      const importedSourceDate = item.car.published_at;
+      const carToUpsert = {
+        ...item.car,
+        published_at: importedSourceDate ?? (hasExistingSourceDate ? existingPublication?.published_at : null),
+        published_at_source: importedSourceDate
+          ? "source_payload"
+          : hasExistingSourceDate
+            ? existingPublication?.published_at_source
+            : "unknown",
+        catalog_added_at: existingPublication?.catalog_added_at ?? new Date().toISOString(),
+      };
       const { data: savedCar, error: carError } = await supabase
         .from("cars")
-        .upsert(item.car, { onConflict: "primary_source,source_id" })
+        .upsert(carToUpsert, { onConflict: "primary_source,source_id" })
         .select("id")
         .single();
       if (carError) throw carError;
