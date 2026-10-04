@@ -16,6 +16,9 @@ const BRAND_ALIASES: Record<string, { label: string; values: string[] }> = {
     values: ["KGM", "KG_Mobility_Ssangyong", "KG__Mobility_Ssangyong", "Kg__mobility_ssangyong", "KG__mobility__ssangyong", "SsangYong", "Ssangyong", "KG Mobility"],
   },
   mini: { label: "MINI", values: ["MINI", "Mini"] },
+  ds: { label: "DS", values: ["DS", "DS Automobiles", "Citroen-DS", "Citroen-ds", "Citroen DS"] },
+  dsautomobiles: { label: "DS", values: ["DS", "DS Automobiles", "Citroen-DS", "Citroen-ds", "Citroen DS"] },
+  citroends: { label: "DS", values: ["DS", "DS Automobiles", "Citroen-DS", "Citroen-ds", "Citroen DS"] },
 };
 
 function brandKey(value: string) {

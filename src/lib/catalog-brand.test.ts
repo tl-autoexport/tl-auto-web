@@ -9,6 +9,10 @@ assert.equal(normalizeCatalogBrand("SsangYong"), "KGM");
 assert.equal(normalizeCatalogBrand("Mini"), "MINI");
 assert.equal(normalizeCatalogBrand("MINI"), "MINI");
 assert.equal(normalizeCatalogBrand("Land Rover"), "Land Rover");
+assert.equal(normalizeCatalogBrand("Citroen-DS"), "DS");
+assert.equal(normalizeCatalogBrand("Citroen-ds"), "DS");
+assert.equal(normalizeCatalogBrand("DS Automobiles"), "DS");
+assert.equal(normalizeCatalogBrand("Citroen"), "Citroen");
 assert.equal(normalizeCatalogBrand(null), null);
 
 assert.deepEqual(catalogBrandValues("KGM"), [
@@ -23,5 +27,6 @@ assert.deepEqual(catalogBrandValues("KGM"), [
 ]);
 assert.deepEqual(catalogBrandValues("Mini"), ["MINI", "Mini"]);
 assert.deepEqual(catalogBrandValues("Kia"), ["Kia"]);
+assert.deepEqual(catalogBrandValues("DS"), ["DS", "DS Automobiles", "Citroen-DS", "Citroen-ds", "Citroen DS"]);
 
 console.log("catalog brand normalization tests passed");

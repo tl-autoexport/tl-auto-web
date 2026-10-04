@@ -306,7 +306,7 @@ const DISPLAY_NAME_OVERRIDES: Record<string, string> = {
   "xdrive": "xDrive",
 };
 const DISPLAY_UPPERCASE_TOKENS = new Set([
-  "BMW", "KGM", "AMG", "EV", "HEV", "PHEV", "SUV", "GT", "CLS", "GLA", "GLB", "GLC", "GLE", "GLS",
+  "BMW", "KGM", "DS", "AMG", "EV", "HEV", "PHEV", "SUV", "GT", "CLS", "GLA", "GLB", "GLC", "GLE", "GLS",
   "AWD", "FWD", "RWD", "2WD", "4WD", "TDI", "TFSI", "GDI", "LPG", "RS",
 ]);
 

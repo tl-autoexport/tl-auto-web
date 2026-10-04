@@ -68,6 +68,10 @@ const BRAND_MAP: Record<string, string> = {
   미니: "MINI",
   BMW: "BMW",
   ChevroletGMDaewoo: "Chevrolet",
+  "Citroen-DS": "DS",
+  "Citroen-ds": "DS",
+  "Citroen DS": "DS",
+  "DS Automobiles": "DS",
 };
 
 const MODEL_MAP: Record<string, string> = {
