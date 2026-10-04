@@ -19,6 +19,7 @@ export type CatalogCar = {
   source_url: string | null;
   published_at: string | null;
   published_at_source: string | null;
+  catalog_sort_published_at?: string | null;
   catalog_added_at: string | null;
   created_at: string | null;
   brand: string | null;
@@ -124,10 +125,10 @@ export type CatalogPageResult = {
 };
 
 const CATALOG_CAR_SELECT =
-  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_added_at, created_at, source_updated_at, brand, model, trim, generation_label, modification_label, version_line, compact_version, naming_rules_version, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(source, url, thumbnail_url, media_type, category, is_primary, sort_order)";
+  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_sort_published_at, catalog_added_at, created_at, source_updated_at, brand, model, trim, generation_label, modification_label, version_line, compact_version, naming_rules_version, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(source, url, thumbnail_url, media_type, category, is_primary, sort_order)";
 
 const CATALOG_CARD_SELECT =
-  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_added_at, created_at, source_updated_at, brand, model, trim, generation_label, modification_label, version_line, compact_version, naming_rules_version, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, primary_image_url, primary_thumbnail_url, media_count, seats";
+  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_sort_published_at, catalog_added_at, created_at, source_updated_at, brand, model, trim, generation_label, modification_label, version_line, compact_version, naming_rules_version, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, primary_image_url, primary_thumbnail_url, media_count, seats";
 
 export type CarDetail = CatalogCar & {
   car_options?: Array<{
@@ -377,12 +378,12 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   if (passable) query = query.or(passableFilterExpression());
   if (sourceId) query = query.eq("source_id", sourceId);
   const order = {
-    fresh: { column: "source_updated_at", ascending: false },
+    fresh: { column: "catalog_sort_published_at", ascending: false },
     price_asc: { column: "price_rub", ascending: true },
     price_desc: { column: "price_rub", ascending: false },
     mileage_asc: { column: "mileage_km", ascending: true },
     year_desc: { column: "year", ascending: false },
-  }[sort];
+  }[sort] as { column: "catalog_sort_published_at" | "price_rub" | "mileage_km" | "year"; ascending: boolean };
 
   const { data, error } = await query
     .order(order.column, { ascending: order.ascending, nullsFirst: false })
@@ -500,7 +501,7 @@ export async function getCatalogCardPage(
   const lastValue = last ? last[sortConfig.column] : null;
   return {
     cars,
-    nextCursor: hasMore && last && (typeof lastValue === "string" || typeof lastValue === "number")
+    nextCursor: hasMore && last && (typeof lastValue === "string" || typeof lastValue === "number" || (sort === "fresh" && lastValue === null))
       ? encodeCatalogCursor({ id: last.id, value: lastValue })
       : null,
   };
@@ -508,15 +509,15 @@ export async function getCatalogCardPage(
 
 function catalogSortConfig(sort: NonNullable<CatalogFilters["sort"]>) {
   return {
-    fresh: { column: "source_updated_at", ascending: false },
+    fresh: { column: "catalog_sort_published_at", ascending: false },
     price_asc: { column: "price_rub", ascending: true },
     price_desc: { column: "price_rub", ascending: false },
     mileage_asc: { column: "mileage_km", ascending: true },
     year_desc: { column: "year", ascending: false },
-  }[sort] as { column: "source_updated_at" | "price_rub" | "mileage_km" | "year"; ascending: boolean };
+  }[sort] as { column: "catalog_sort_published_at" | "price_rub" | "mileage_km" | "year"; ascending: boolean };
 }
 
-type DecodedCatalogCursor = { id: string; value: string | number };
+type DecodedCatalogCursor = { id: string; value: string | number | null };
 
 function encodeCatalogCursor(cursor: DecodedCatalogCursor) {
   return Buffer.from(JSON.stringify(cursor)).toString("base64url");
@@ -527,7 +528,7 @@ function decodeCatalogCursor(value: string, sort: NonNullable<CatalogFilters["so
     const decoded = JSON.parse(Buffer.from(value, "base64url").toString("utf8")) as Partial<DecodedCatalogCursor>;
     if (typeof decoded.id !== "string" || !/^[0-9a-f-]{36}$/i.test(decoded.id)) return null;
     const numericSort = sort !== "fresh";
-    if ((numericSort && typeof decoded.value !== "number") || (!numericSort && typeof decoded.value !== "string")) return null;
+    if ((numericSort && typeof decoded.value !== "number") || (!numericSort && decoded.value !== null && typeof decoded.value !== "string")) return null;
     return decoded as DecodedCatalogCursor;
   } catch {
     return null;
@@ -535,9 +536,13 @@ function decodeCatalogCursor(value: string, sort: NonNullable<CatalogFilters["so
 }
 
 function cursorExpression(column: string, ascending: boolean, cursor: DecodedCatalogCursor) {
+  if (cursor.value === null) return `and(${column}.is.null,id.gt.${cursor.id})`;
   const comparator = ascending ? "gt" : "lt";
   const value = String(cursor.value).replace(/[(),]/g, "");
-  return `${column}.${comparator}.${value},and(${column}.eq.${value},id.gt.${cursor.id})`;
+  const afterValue = `and(${column}.eq.${value},id.gt.${cursor.id})`;
+  return column === "catalog_sort_published_at"
+    ? `${column}.${comparator}.${value},${afterValue},${column}.is.null`
+    : `${column}.${comparator}.${value},${afterValue}`;
 }
 
 async function fetchCatalogCount(filters: CatalogFilters): Promise<number> {
