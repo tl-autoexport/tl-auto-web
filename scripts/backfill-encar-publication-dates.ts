@@ -204,7 +204,7 @@ async function main() {
       lastProcessedId: cursorId,
       completed,
       stoppedForErrors,
-      nextAfterId: completed || stoppedForErrors ? null : cursorId,
+      nextAfterId: completed ? null : cursorId,
       note: "Only source-payload or source-snapshot dates are written; restart is safe because confirmed rows are skipped.",
     }, null, 2));
   } finally {
