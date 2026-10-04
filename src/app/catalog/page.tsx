@@ -180,25 +180,24 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       <CatalogSearchBar brands={brands} initialValue={value("search")} models={searchableModels} />
 
       <section className="border-b border-[#dce2eb] bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-5 md:py-10">
+        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-5 md:py-6">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end md:gap-5">
             <div>
-              <p className="hidden text-xs font-semibold text-[#956f2c] sm:text-sm md:block">Корея</p>
-              <h1 className="mt-0 text-[25px] font-semibold leading-tight tracking-normal sm:mt-2 sm:text-4xl">Каталог автомобилей</h1>
-              <p className="mt-1.5 max-w-2xl text-[12px] leading-4 text-[#647084] sm:mt-3 sm:text-sm sm:leading-6">Подбор по реальным данным источника с расчётом цены до Владивостока.</p>
+              <h1 className="mt-0 text-[25px] font-semibold leading-tight tracking-normal sm:text-4xl">Каталог автомобилей</h1>
+              <p className="mt-1.5 max-w-2xl text-[12px] leading-4 text-[#647084] sm:mt-2 sm:text-sm sm:leading-6">Подбор по реальным данным источника с расчётом цены до Владивостока.</p>
               <p className="mt-2 text-sm font-semibold text-[#273246] md:hidden">{totalCars.toLocaleString("ru-RU")} автомобилей</p>
             </div>
             <div className="hidden items-center gap-2 self-start rounded-full bg-[#fbf7ed] px-3 py-2 text-xs text-[#7b5a22] md:inline-flex md:gap-3 md:rounded-none md:border-l-2 md:border-[#c7a55a] md:bg-transparent md:pl-4 md:text-sm"><CarFront size={18} className="text-[#c7a55a] md:size-5" /><span><strong className="mr-1 text-base text-[#101827] md:block md:text-xl">{totalCars}</strong><span className="text-[#647084]">автомобилей найдено</span></span></div>
           </div>
 
           {popularBrands.length ? (
-            <div className="scrollbar-none mt-6 hidden items-center gap-5 overflow-x-auto sm:mt-8 md:flex md:flex-wrap md:gap-x-7 md:gap-y-3">
+            <div className="scrollbar-none mt-4 hidden items-center gap-5 overflow-x-auto md:flex md:flex-nowrap md:gap-6">
               {popularBrands.map((brand) => {
                 const selected = filters.brand === brand;
                 return (
                   <Link
                     aria-current={selected ? "page" : undefined}
-                    className={`inline-flex h-10 shrink-0 items-center gap-2 border-b-2 px-0 text-[15px] font-medium transition sm:h-12 sm:gap-2.5 sm:text-lg ${
+                    className={`inline-flex h-10 shrink-0 items-center gap-2 border-b-2 px-0 text-[15px] font-medium transition ${
                       selected
                         ? "border-[#a98239] text-[#15171b]"
                         : "border-transparent text-[#15171b] hover:border-[#d7c49c]"
@@ -216,7 +215,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                   </Link>
                 );
               })}
-              <Link href="#filters" className="inline-flex h-10 shrink-0 items-center gap-2 border-b-2 border-transparent text-[15px] font-medium text-[#7b5a22] transition hover:border-[#d7c49c] sm:h-12 sm:text-lg">Все марки <ChevronRight size={18} /></Link>
+              <Link href="#filters" className="inline-flex h-10 shrink-0 items-center gap-2 border-b-2 border-transparent text-[15px] font-medium text-[#7b5a22] transition hover:border-[#d7c49c]">Все марки <ChevronRight size={18} /></Link>
             </div>
           ) : null}
         </div>
