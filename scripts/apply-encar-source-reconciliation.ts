@@ -256,6 +256,7 @@ async function main() {
       ["42837452", { reason: "existing reference disagrees with source evidence", existingPower: 252, proposedPower: 255 }],
     ]);
     const blockedConfigurations = new Set<string>();
+    const acceptedExisting: Array<{ row: ReconciledRow; reference: Reference }> = [];
     for (const row of built.selected) {
       const id = String(row.sourceListingId);
       const target = built.targetInputs.get(id)!;
@@ -268,6 +269,17 @@ async function main() {
         norm(ref.badge_detail) === norm(c.trim) && Number(ref.year_from) === Number(c.year) &&
         Number(ref.year_to) === Number(c.year) &&
         (!ref.configuration_key.includes("|listing=") || ref.configuration_key.endsWith(`|listing=${id}`)));
+      if (id === "42837452") {
+        const genesis = sameReferences.find((ref) => Number(ref.power_hp) === 252 &&
+          ref.source === "manual_web_research_0358" && ref.status === "automatic" &&
+          ref.note.includes("newsroom.genesis.com"));
+        if (!genesis || target.powerPs !== 255 || norm(c.brand) !== "genesis" || norm(c.model) !== "g70") {
+          throw new Error("Genesis official-source decision guard failed for listing 42837452");
+        }
+        target.powerPs = 252;
+        acceptedExisting.push({ row, reference: genesis });
+        continue;
+      }
       const disagreeing = sameReferences.find((ref) => Number(ref.power_hp) !== target.powerPs ||
         ref.status !== "automatic" && ref.status !== "confirmed");
       if (target.powerPs > 1500 || disagreeing || existing && Number(existing.power_hp) !== target.powerPs) {
@@ -288,6 +300,8 @@ async function main() {
       built.targetInputs.delete(id);
       if (!deferredReasons.has(id)) deferredReasons.set(id, { reason: "same configuration as another deferred conflict" });
     }
+    const acceptedExistingIds = new Set(acceptedExisting.map(({ row }) => String(row.sourceListingId)));
+    built.selected = built.selected.filter((row) => !acceptedExistingIds.has(String(row.sourceListingId)));
     const retainedKeys = new Set(built.selected.map((row) => {
       const c = row.configuration;
       const badge = clean(c.badge), badge_detail = clean(c.trim);
@@ -362,7 +376,11 @@ async function main() {
         ...row,
         ...deferredReasons.get(String(row.sourceListingId)),
       })),
-      remainingListings: plan.candidates.length - plan.candidates.filter((row) => row.status === "approved_match").length - built.selected.length,
+      acceptedExistingOfficialListings: acceptedExisting.map(({ row, reference }) => ({
+        sourceListingId: row.sourceListingId, powerHp: reference.power_hp, source: reference.source,
+        note: "Retained existing official Genesis reference; EncarRus candidate 255 PS declined",
+      })),
+      remainingListings: plan.candidates.length - plan.candidates.filter((row) => row.status === "approved_match").length - built.selected.length - acceptedExisting.length,
       preliminaryListings: built.selected.length,
       exactConfigurations: built.configurationCount,
       referenceRules: built.proposed.length,
@@ -411,6 +429,7 @@ async function main() {
     await db.query("commit");
     await writeFile(auditPath, JSON.stringify({ ...audit, committed: true }, null, 2) + "\n");
     console.log(JSON.stringify({ committed: true, preliminaryListings: built.selected.length,
+      acceptedExistingOfficialListings: acceptedExisting.length, deferredConflictListings: built.excluded.length,
       exactConfigurations: built.configurationCount, referenceRules: built.proposed.length, verifiedListings: built.targetInputs.size,
       preliminaryOnly: true, carsChanged: 0, calculationsChanged: 0, pricesChanged: 0, publications: 0 }, null, 2));
   } catch (error) {
