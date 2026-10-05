@@ -39,7 +39,7 @@ const inputPath = process.env.TL_AUTO_POWER_PLAN ?? "output/tl-auto-new-encar-po
 const outputPath = process.env.DANAWA_POWER_OUTPUT ?? (runIdExpected
   ? `output/tl-auto-run-${runIdExpected}-danawa-power.json`
   : "output/tl-auto-new-encar-danawa-power.json");
-const timeoutMs = Math.max(5000, Number(process.env.DANAWA_TIMEOUT_MS ?? 20000));
+const timeoutMs = Math.max(5000, Number(process.env.DANAWA_TIMEOUT_MS ?? 10000));
 const delayMs = Math.max(250, Number(process.env.DANAWA_DELAY_MS ?? 500));
 const yearWindow = Math.max(0, Math.min(2, Number(process.env.DANAWA_YEAR_WINDOW ?? 1)));
 const ccTolerance = Math.max(0, Number(process.env.DANAWA_ENGINE_CC_TOLERANCE ?? 120));
@@ -241,6 +241,23 @@ async function main() {
   const lineupCache = new Map<string, ParsedLineup>();
   const errors: Array<Record<string, unknown>> = [];
   let requests = 0;
+  let requestAttempts = 0;
+
+  const requestText = async (stage: string, url: string) => {
+    const attempt = ++requestAttempts;
+    const startedAt = Date.now();
+    console.log(JSON.stringify({ event: "request_start", stage, attempt, url }));
+    try {
+      const html = await fetchText(url);
+      requests++;
+      console.log(JSON.stringify({ event: "request_done", stage, attempt, elapsedMs: Date.now() - startedAt, bytes: Buffer.byteLength(html) }));
+      return html;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(JSON.stringify({ event: "request_error", stage, attempt, elapsedMs: Date.now() - startedAt, error: message }));
+      throw error;
+    }
+  };
 
   const searchHits = async (query: string) => {
     const key = query.toLowerCase();
@@ -248,16 +265,23 @@ async function main() {
     if (cached) return cached;
     await sleep(delayMs);
     const url = `https://auto.danawa.com/search/?q=${encodeURIComponent(query)}`;
-    const html = await fetchText(url); requests++;
-    const hits = parseSearchHits(html);
-    searchCache.set(key, hits);
-    return hits;
+    try {
+      const html = await requestText("search", url);
+      const hits = parseSearchHits(html);
+      searchCache.set(key, hits);
+      return hits;
+    } catch (error) {
+      // Remember failed queries too; otherwise every configuration sharing
+      // this model name repeats the same slow or unavailable Danawa request.
+      searchCache.set(key, []);
+      throw error;
+    }
   };
   const modelPage = async (hit: SearchHit) => {
     const cached = modelPageCache.get(hit.modelId);
     if (cached) return cached;
     await sleep(delayMs);
-    const html = await fetchText(`https://auto.danawa.com/auto/?Work=model&Model=${hit.modelId}&Tab=spec`); requests++;
+    const html = await requestText("model_page", `https://auto.danawa.com/auto/?Work=model&Model=${hit.modelId}&Tab=spec`);
     const parsed = parseLineups(html, hit.modelId);
     modelPageCache.set(hit.modelId, parsed);
     return parsed;
@@ -267,7 +291,7 @@ async function main() {
     if (cached) return cached;
     await sleep(delayMs);
     try {
-      const html = await fetchText(lineup.url); requests++;
+      const html = await requestText("lineup_page", lineup.url);
       const parsed = parseLineups(html, lineup.url.match(/Model=(\d+)/)?.[1] ?? "");
       const result = { lineup, modelTitle: parsed.title, variants: parseSpecVariants(html) };
       lineupCache.set(lineup.lineupId, result);
@@ -282,7 +306,12 @@ async function main() {
   };
 
   const modelNames = new Map<string, SearchHit[]>();
-  for (const group of groups) {
+  const uniqueModels = [...new Set(groups.map((group) => `${group.brand}|${group.model}`))];
+  console.log(JSON.stringify({ event: "search_stage_start", configurations: groups.length, distinctModels: uniqueModels.length }));
+  let searchedModels = 0;
+  for (const modelKey of uniqueModels) {
+    const [brandName, modelName] = modelKey.split("|");
+    const group = groups.find((candidate) => `${candidate.brand}|${candidate.model}` === modelKey)!;
     const brand = brandAliases(group);
     const hits = new Map<string, SearchHit>();
     for (const query of modelQueries(group)) {
@@ -295,15 +324,16 @@ async function main() {
         if (/rate\/protection|verification/i.test(error instanceof Error ? error.message : String(error))) throw error;
       }
     }
-    const key = `${group.brand}|${group.model}`;
-    const previous = modelNames.get(key) ?? [];
-    modelNames.set(key, [...new Map([...previous, ...hits.values()].map((hit) => [hit.modelId, hit])).values()]);
+    modelNames.set(modelKey, [...hits.values()]);
+    searchedModels++;
+    console.log(JSON.stringify({ event: "search_model_progress", completed: searchedModels, total: uniqueModels.length, brand: brandName, model: modelName, queries: modelQueries(group).length, hits: hits.size, requests, requestAttempts }));
   }
 
   const allHits = new Map<string, SearchHit>();
   for (const hits of modelNames.values()) for (const hit of hits) allHits.set(hit.modelId, hit);
   const pages = new Map<string, { hit: SearchHit; title: string | null; lineups: Lineup[] }>();
   let modelNo = 0;
+  console.log(JSON.stringify({ event: "model_stage_start", total: allHits.size }));
   for (const hit of allHits.values()) {
     try {
       const page = await modelPage(hit);
@@ -312,11 +342,13 @@ async function main() {
       errors.push({ source: "Danawa model page", modelId: hit.modelId, error: error instanceof Error ? error.message : String(error) });
       if (/rate\/protection|verification/i.test(error instanceof Error ? error.message : String(error))) throw error;
     }
-    if (++modelNo % 10 === 0) console.log(JSON.stringify({ event: "model_progress", completed: modelNo, total: allHits.size, requests }));
+    modelNo++;
+    console.log(JSON.stringify({ event: "model_progress", completed: modelNo, total: allHits.size, requests, requestAttempts }));
   }
 
   const results: Array<Record<string, unknown>> = [];
   let completed = 0;
+  console.log(JSON.stringify({ event: "configuration_stage_start", total: groups.length }));
   for (const group of groups) {
     const hits = modelNames.get(`${group.brand}|${group.model}`) ?? [];
     const matchingPages = hits.flatMap((hit) => {
@@ -364,7 +396,8 @@ async function main() {
       classification,
       listingCount: group.listingIds.length,
     });
-    if (++completed % 10 === 0) console.log(JSON.stringify({ event: "configuration_progress", completed, total: groups.length, requests }));
+    completed++;
+    console.log(JSON.stringify({ event: "configuration_progress", completed, total: groups.length, requests, requestAttempts }));
   }
 
   const classifications = Object.fromEntries([
@@ -376,7 +409,7 @@ async function main() {
     generatedAt: new Date().toISOString(), runId: plan.runId, source: "Danawa public model/year/lineup specification pages",
     readOnly: true, databaseWrites: 0, publicCatalogChanged: false,
     targetConfigurations: groups.length, targetListings: groups.reduce((sum, group) => sum + group.listingIds.length, 0),
-    requests, classifications, classificationListings, yearWindow, engineCcTolerance: ccTolerance,
+    requests, requestAttempts, classifications, classificationListings, yearWindow, engineCcTolerance: ccTolerance,
     errors, output: outputPath, results,
   };
   await mkdir("output", { recursive: true });
