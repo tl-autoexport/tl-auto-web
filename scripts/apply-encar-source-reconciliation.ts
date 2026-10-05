@@ -87,22 +87,13 @@ const configKey = (c: Config) => [c.brand, c.model, c.generation, c.trim, c.badg
 
 function makeReferences(rows: ReconciledRow[], planById: Map<string, Plan["candidates"][number]>) {
   const candidates = rows.filter((row) => eligibleOutcomes.has(row.outcome));
-  const selected = candidates.filter((row) => String(row.sourceListingId) !== "42837452");
+  const selected = candidates;
   const ids = candidates.map((row) => String(row.sourceListingId));
   if (ids.length !== 90 || new Set(ids).size !== 90) {
     throw new Error(`Expected 90 unique preliminary listings from reconciliation, got ${ids.length}/${new Set(ids).size}`);
   }
 
-  const excluded = candidates.filter((row) => String(row.sourceListingId) === "42837452");
-  const conflict = excluded[0];
-  if (excluded.length !== 1 || conflict.powerPs !== 255 ||
-      norm(conflict.configuration.brand) !== "genesis" || norm(conflict.configuration.model) !== "g70" ||
-      conflict.configuration.year !== 2018 || conflict.configuration.engineCc !== 1998 ||
-      norm(conflict.configuration.badge) !== "2.0t awd" || norm(conflict.configuration.trim) !== "supreme" ||
-      norm(conflict.configuration.driveType) !== "4wd" || norm(conflict.configuration.fuelType) !== "gasoline") {
-    throw new Error("Expected the reviewed G70 42837452 conflict; exclusion guard failed");
-  }
-
+  const excluded: ReconciledRow[] = [];
   const grouped = new Map<string, { config: Config; powerPs: number; rows: ReconciledRow[] }>();
   for (const row of selected) {
     const planRow = planById.get(String(row.sourceListingId));
@@ -208,8 +199,8 @@ async function main() {
   }
   const planById = new Map(plan.candidates.map((row) => [String(row.sourceListingId), row]));
   const built = makeReferences(reconciliation.rows, planById);
-  if (built.selected.length !== 89 || built.configurationCount !== 87 || built.proposed.length < 87 || built.proposed.length > 89) {
-    throw new Error(`Expected 89 preliminary listings/87 Encar configurations, got ${built.selected.length}/${built.configurationCount} and ${built.proposed.length} reference rules`);
+  if (built.selected.length !== 90 || built.configurationCount !== 88 || built.proposed.length < 88 || built.proposed.length > 90) {
+    throw new Error(`Expected 90 preliminary listings/88 Encar configurations, got ${built.selected.length}/${built.configurationCount} and ${built.proposed.length} reference rules`);
   }
 
   const db = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
@@ -231,7 +222,7 @@ async function main() {
            from public.vehicle_power_automatic_reference where status <> 'retired'${write ? " for update" : ""}`),
     ]);
     const storedById = new Map(sourceRows.rows.map((row) => [String(row.source_listing_id), row]));
-    if (storedById.size !== 89) throw new Error(`Encar queue/staging evidence incomplete: ${storedById.size}/89 listings`);
+    if (storedById.size !== 90) throw new Error(`Encar queue/staging evidence incomplete: ${storedById.size}/90 listings`);
     for (const id of ids) {
       const stored = storedById.get(id)!;
       if (stored.queue_status !== "succeeded" || stored.staging_status !== "succeeded") {
