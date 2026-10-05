@@ -31,7 +31,7 @@ function daysOnSale(car: CatalogCar) {
   return Math.max(1, elapsed);
 }
 
-export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage = false }: { car: VehicleCardData; enableGallery?: boolean; priorityImage?: boolean }) {
+export function PrototypeVehicleCard({ car, compact = false, enableGallery = false, priorityImage = false }: { car: VehicleCardData; compact?: boolean; enableGallery?: boolean; priorityImage?: boolean }) {
   const { country, city } = useDestination();
   const showcasePhoto = useMemo(() =>
     car.primary_thumbnail_url ?? car.primary_image_url ?? ("car_media" in car ? showcasePhotoUrl(car.car_media) : null),
@@ -79,7 +79,7 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
 
   return (
     <article
-      className="relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_14px_35px_rgba(28,43,61,0.13)] ring-1 ring-[#dce2eb] sm:min-h-[412px] sm:rounded-[24px]"
+      className={`relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_14px_35px_rgba(28,43,61,0.13)] ring-1 ring-[#dce2eb] sm:min-h-[412px] sm:rounded-[24px] ${compact ? "sm:min-h-0" : ""}`}
     >
       <Link aria-label={`Открыть карточку ${title}`} className="absolute inset-0 z-0" href={detailsHref} prefetch={false} />
 
@@ -89,7 +89,7 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
         {showcasePhoto ? <RemoteImage alt={title} className="object-cover" decoding="async" fill loading={priorityImage ? "eager" : "lazy"} priority={priorityImage} sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, calc(100vw - 48px)" src={showcasePhoto} /> : <div className="flex h-full items-center justify-center text-sm text-[#647084]">Фото временно недоступно</div>}
       </div>}
 
-      <div className="pointer-events-none relative z-10 flex-1 p-2.5 sm:p-4">
+      <div className={`pointer-events-none relative z-10 flex-1 ${compact ? "p-2.5 sm:p-3.5" : "p-2.5 sm:p-4"}`}>
         <div>
           {hasExactRuPrice ? (
             <>
@@ -105,28 +105,28 @@ export function PrototypeVehicleCard({ car, enableGallery = false, priorityImage
         </div>
 
 
-        <h3 className="mt-4 text-lg font-semibold leading-tight tracking-tight text-[#101827] sm:mt-5 sm:text-xl">{title}</h3>
-        {car.compact_version || car.generation_label ? <p className="mt-1 text-sm leading-5 text-[#465368] sm:text-[15px]">{[car.compact_version, car.generation_label].filter(Boolean).join(" · ")}</p> : null}
-        <div className="mt-1 flex flex-wrap gap-1.5 sm:mt-3">
+        <h3 className={`${compact ? "mt-2.5 text-base sm:mt-3.5 sm:text-lg" : "mt-4 text-lg sm:mt-5 sm:text-xl"} font-semibold leading-tight tracking-tight text-[#101827]`}>{title}</h3>
+        {car.compact_version || car.generation_label ? <p className={`${compact ? "mt-0.5 text-xs sm:text-sm" : "mt-1 text-sm sm:text-[15px]"} leading-5 text-[#465368]`}>{[car.compact_version, car.generation_label].filter(Boolean).join(" · ")}</p> : null}
+        <div className={`${compact ? "mt-1.5 sm:mt-2" : "mt-1 sm:mt-3"} flex flex-wrap gap-1.5`}>
           {car.accident_count === 0 ? <span className="rounded-full bg-[#e8f5ef] px-2 py-0.5 text-[11px] font-semibold text-[#18794e] sm:px-2.5 sm:py-1 sm:text-xs">Без ДТП</span> : null}
           {car.insurance_payout_count != null && car.insurance_payout_count > 0 ? <span className="rounded-full bg-[#fff2e5] px-2 py-0.5 text-[11px] font-semibold text-[#9a5b1c] sm:px-2.5 sm:py-1 sm:text-xs">Страховые выплаты: {car.insurance_payout_count}</span> : null}
         </div>
-        <p className="mt-1 text-xs leading-5 text-[#273246] sm:mt-2 sm:text-sm sm:leading-6">
+        <p className={`${compact ? "mt-1 text-xs leading-4 sm:mt-1.5 sm:text-sm sm:leading-5" : "mt-1 text-xs leading-5 sm:mt-2 sm:text-sm sm:leading-6"} text-[#273246]`}>
           {primaryFacts.join(" · ")}
         </p>
-        <p className="mt-1 text-xs leading-5 text-[#273246] sm:mt-2 sm:text-sm sm:leading-6">
+        <p className={`${compact ? "mt-0.5 text-xs leading-4 sm:mt-1 sm:text-sm sm:leading-5" : "mt-1 text-xs leading-5 sm:mt-2 sm:text-sm sm:leading-6"} text-[#273246]`}>
           {secondaryFacts.join(" · ")}
         </p>
 
       </div>
 
-      <div className="relative z-10 flex items-center gap-2 border-t border-[#e4e9e7] bg-white px-2.5 py-2.5 text-[#207a45] sm:px-4">
-        <a aria-label={`Получить консультацию по автомобилю ${title}`} className="inline-flex h-10 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-[#207a45] px-4 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(32,122,69,0.24)] transition hover:bg-[#176136] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#207a45] focus-visible:ring-offset-2 sm:h-11 sm:px-5" href={whatsappContactUrl(message)} onClick={(event) => event.stopPropagation()} rel="noreferrer" target="_blank"><MessageCircle size={17} /><span className="truncate">Консультация</span></a>
+      <div className={`relative z-10 flex items-center gap-2 border-t border-[#e4e9e7] bg-white px-2.5 text-[#207a45] sm:px-4 ${compact ? "py-2 sm:py-2" : "py-2.5"}`}>
+        <a aria-label={`Получить консультацию по автомобилю ${title}`} className={`inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-[#207a45] px-4 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(32,122,69,0.24)] transition hover:bg-[#176136] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#207a45] focus-visible:ring-offset-2 ${compact ? "h-9 sm:h-10 sm:px-4" : "h-10 sm:h-11 sm:px-5"}`} href={whatsappContactUrl(message)} onClick={(event) => event.stopPropagation()} rel="noreferrer" target="_blank"><MessageCircle size={17} /><span className="truncate">Консультация</span></a>
         <button aria-label="Поделиться объявлением" className="grid h-10 w-16 shrink-0 place-items-center rounded-xl border border-[#dce5df] bg-white transition hover:border-[#207a45] hover:bg-[#f4faf6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#207a45] focus-visible:ring-offset-2 sm:h-11 sm:w-20" onClick={(event) => { event.stopPropagation(); void share(); }} title="Поделиться объявлением" type="button"><Share2 size={18} /><span className="sr-only">Поделиться объявлением</span></button>
       </div>
 
       {saleDays != null ? (
-        <div className="pointer-events-none relative z-10 px-2.5 py-1.5 text-[11px] text-[#7a8798] sm:px-4 sm:py-3 sm:text-xs">
+        <div className={`pointer-events-none relative z-10 px-2.5 text-[11px] text-[#7a8798] sm:px-4 sm:text-xs ${compact ? "py-1.5 sm:py-2" : "py-1.5 sm:py-3"}`}>
           <span>{`Размещено в Корее ${saleDays} ${pluralDays(saleDays)} назад`}</span>
         </div>
       ) : null}
