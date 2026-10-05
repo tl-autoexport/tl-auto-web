@@ -5,7 +5,7 @@
  */
 import { Client } from "pg";
 import { config } from "dotenv";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import {
   resolveAutomaticPowerReference,
   type AutomaticPowerReferenceRow,
@@ -86,10 +86,21 @@ const sameShape = (a: Reference, b: Reference) =>
 const configKey = (c: Config) => [c.brand, c.model, c.generation, c.trim, c.badge, c.year, c.engineCc, c.fuelType, c.driveType].map(norm).join("|");
 
 function makeReferences(rows: ReconciledRow[], planById: Map<string, Plan["candidates"][number]>) {
-  const selected = rows.filter((row) => eligibleOutcomes.has(row.outcome));
-  const ids = selected.map((row) => String(row.sourceListingId));
+  const candidates = rows.filter((row) => eligibleOutcomes.has(row.outcome));
+  const selected = candidates.filter((row) => String(row.sourceListingId) !== "42837452");
+  const ids = candidates.map((row) => String(row.sourceListingId));
   if (ids.length !== 90 || new Set(ids).size !== 90) {
     throw new Error(`Expected 90 unique preliminary listings from reconciliation, got ${ids.length}/${new Set(ids).size}`);
+  }
+
+  const excluded = candidates.filter((row) => String(row.sourceListingId) === "42837452");
+  const conflict = excluded[0];
+  if (excluded.length !== 1 || conflict.powerPs !== 255 ||
+      norm(conflict.configuration.brand) !== "genesis" || norm(conflict.configuration.model) !== "g70" ||
+      conflict.configuration.year !== 2018 || conflict.configuration.engineCc !== 1998 ||
+      norm(conflict.configuration.badge) !== "2.0t awd" || norm(conflict.configuration.trim) !== "supreme" ||
+      norm(conflict.configuration.driveType) !== "4wd" || norm(conflict.configuration.fuelType) !== "gasoline") {
+    throw new Error("Expected the reviewed G70 42837452 conflict; exclusion guard failed");
   }
 
   const grouped = new Map<string, { config: Config; powerPs: number; rows: ReconciledRow[] }>();
@@ -183,7 +194,7 @@ function makeReferences(rows: ReconciledRow[], planById: Map<string, Plan["candi
       });
     }
   }
-  return { selected, proposed, targetInputs, configurationCount: grouped.size };
+  return { selected, excluded, proposed, targetInputs, configurationCount: grouped.size };
 }
 
 async function main() {
@@ -197,8 +208,8 @@ async function main() {
   }
   const planById = new Map(plan.candidates.map((row) => [String(row.sourceListingId), row]));
   const built = makeReferences(reconciliation.rows, planById);
-  if (built.selected.length !== 90 || built.configurationCount !== 88 || built.proposed.length < 88 || built.proposed.length > 90) {
-    throw new Error(`Expected 90 preliminary listings/88 Encar configurations, got ${built.selected.length}/${built.configurationCount} and ${built.proposed.length} reference rules`);
+  if (built.selected.length !== 89 || built.configurationCount !== 87 || built.proposed.length < 87 || built.proposed.length > 89) {
+    throw new Error(`Expected 89 preliminary listings/87 Encar configurations, got ${built.selected.length}/${built.configurationCount} and ${built.proposed.length} reference rules`);
   }
 
   const db = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
@@ -220,7 +231,7 @@ async function main() {
            from public.vehicle_power_automatic_reference where status <> 'retired'${write ? " for update" : ""}`),
     ]);
     const storedById = new Map(sourceRows.rows.map((row) => [String(row.source_listing_id), row]));
-    if (storedById.size !== 90) throw new Error(`Encar queue/staging evidence incomplete: ${storedById.size}/90 listings`);
+    if (storedById.size !== 89) throw new Error(`Encar queue/staging evidence incomplete: ${storedById.size}/89 listings`);
     for (const id of ids) {
       const stored = storedById.get(id)!;
       if (stored.queue_status !== "succeeded" || stored.staging_status !== "succeeded") {
@@ -295,9 +306,18 @@ async function main() {
     }
     if (unexpectedMatches.length) throw new Error(`Reconciliation would alter ${unexpectedMatches.length} other run listings; nothing written: ${JSON.stringify(unexpectedMatches.slice(0, 20))}`);
 
-    console.log(JSON.stringify({
+    const audit = {
+      generatedAt: new Date().toISOString(),
+      committed: false,
       write,
       runId,
+      sourceCandidateListings: 90,
+      deferredConflictListings: built.excluded.length,
+      deferredConflicts: built.excluded.map((row) => ({
+        ...row,
+        reason: "Existing preliminary reference has 252 PS; new EncarRus candidate has 255 PS; requires source verification",
+      })),
+      remainingListings: 259,
       preliminaryListings: built.selected.length,
       exactConfigurations: built.configurationCount,
       referenceRules: built.proposed.length,
@@ -310,7 +330,10 @@ async function main() {
         bothSourcesAgreeListings: built.selected.filter((row) => row.outcome === "both_agree_preliminary").length,
       },
       effects: { cars: 0, calculations: 0, prices: 0, publication: 0 },
-    }, null, 2));
+    };
+    const auditPath = `output/tl-auto-run-${runId}-source-reconciliation-application.json`;
+    await writeFile(auditPath, JSON.stringify(audit, null, 2) + "\n");
+    console.log(JSON.stringify({ ...audit, auditPath }, null, 2));
 
     if (!write) {
       await db.query("rollback");
@@ -341,6 +364,7 @@ async function main() {
     });
     if (failed.length) throw new Error(`Post-write resolver verification failed: ${JSON.stringify(failed)}`);
     await db.query("commit");
+    await writeFile(auditPath, JSON.stringify({ ...audit, committed: true }, null, 2) + "\n");
     console.log(JSON.stringify({ committed: true, preliminaryListings: built.selected.length,
       exactConfigurations: built.configurationCount, referenceRules: built.proposed.length, verifiedListings: built.targetInputs.size,
       preliminaryOnly: true, carsChanged: 0, calculationsChanged: 0, pricesChanged: 0, publications: 0 }, null, 2));
