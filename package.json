@@ -125,6 +125,7 @@
     "apply:encarrus-ice-preliminary-power": "tsx scripts/apply-encarrus-ice-preliminary-reference.ts",
     "apply:encarrus-gasd-lpg-preliminary-power": "tsx scripts/apply-encarrus-gasd-lpg-preliminary-reference.ts",
     "apply:drom-ice-preliminary-power": "tsx scripts/apply-drom-ice-preliminary-reference.ts",
+    "apply:encar-source-reconciliation": "tsx scripts/apply-encar-source-reconciliation.ts",
     "recalculate:provisional-ev-prices": "tsx scripts/recalculate-provisional-ev-prices.ts",
     "test:automatic-power-reference": "tsx src/server/catalog/automatic-power-reference.test.ts",
     "research:power:ai": "tsx scripts/research-encar-power-with-gemini.ts",
