@@ -217,7 +217,7 @@ export default async function CarDetailPage({
             <div className="rounded bg-white p-5 shadow-sm ring-1 ring-[#d8dde6]">
               <div className="flex items-center gap-2">
                 <KeyRound className="text-[#a98239]" size={20} />
-                <h2 className="text-xl font-semibold">Оснащение</h2>
+                <h2 className="text-xl font-semibold">Комплектация</h2>
               </div>
               <EncarEquipmentAccordion groups={optionGroups} />
             </div>
