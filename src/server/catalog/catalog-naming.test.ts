@@ -12,6 +12,8 @@ assert.equal(canonicalCatalogModel("Canival"),"Carnival");
 assert.equal(canonicalCatalogModel("Santafe"),"Santa Fe");
 assert.equal(canonicalCatalogModel("RAY"),"Ray");
 assert.equal(canonicalCatalogModel("E-Class"),"E-Class");
+assert.equal(canonicalCatalogModel("CLE-Class"),"CLE");
+assert.equal(canonicalCatalogModel("CLE-클래스 C236"),"CLE");
 assert.equal(canonicalCatalogModel("RC"),"RC");
 assert.equal(normalizeVehicleName("3.0 lpi"),"3.0 LPi");
 assert.equal(normalizeVehicleName("t-gdi"),"T-GDi");

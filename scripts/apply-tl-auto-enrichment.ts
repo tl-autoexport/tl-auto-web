@@ -22,6 +22,7 @@ import { createClient } from "@supabase/supabase-js";
 import { Client } from "pg";
 import { translateInspectionLabel, translateInspectionStatus } from "../src/server/normalization/display";
 import { fetchStandardOptionCatalog } from "../src/server/imports/encar";
+import { resolveEncarVehicleId } from "../src/server/imports/encar-identity";
 import { mapEncarOptions, type EncarOptionCatalog } from "../src/server/imports/encar-options";
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
@@ -30,6 +31,9 @@ config({ path: ".env", quiet: true });
 config({ path: ".env.local", quiet: true });
 const runId = process.env.TL_AUTO_ENRICHMENT_RUN_ID ?? "349fe610-17e0-4df8-8053-bcd7d234983d";
 const write = process.env.TL_AUTO_ENRICHMENT_APPLY === "true";
+// Explicit scope avoids collisions when the same Encar ID exists in both sources.
+const primarySource = process.env.TL_AUTO_ENRICHMENT_PRIMARY_SOURCE ?? "chestny_prigon";
+if (!["chestny_prigon", "encar"].includes(primarySource)) throw new Error("Unsupported TL Auto enrichment source");
 const approvedIds = process.env.TL_AUTO_ENRICHMENT_APPROVED_IDS?.split(",").map((value) => value.trim()).filter(Boolean);
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
@@ -99,7 +103,6 @@ function gallery(carId: string, payload: Obj) {
   }) : [];
 }
 
-const PROBE_PAYLOAD_KEY = "detail";
 type CardResult = {
   sourceListingId: string; carId: string; status: "written" | "skipped" | "error";
   skipped: string[]; inserted: { reports: string[]; options: string[]; media: string[] }; error: string | null;
@@ -110,7 +113,7 @@ async function main() {
   const [queue, staging, cars] = await Promise.all([
     pages<Queue>("encar_enrichment_queue", "source_listing_id,status,task,result", (q) => q.eq("run_id", runId)),
     pages<Stage>("encar_enrichment_staging", "source_listing_id,raw_payload", (q) => q.eq("run_id", runId)),
-    pages<Car>("cars", "id,source_id", (q) => q.eq("is_available", true).eq("primary_source", "chestny_prigon")),
+    pages<Car>("cars", "id,source_id", (q) => q.eq("is_available", true).eq("primary_source", primarySource)),
   ]);
   const stageBySource = new Map(staging.map((row) => [row.source_listing_id, row]));
   const carBySource = new Map(cars.map((row) => [row.source_id, row]));
@@ -118,7 +121,7 @@ async function main() {
     && stageBySource.get(q.source_listing_id)?.raw_payload && carBySource.has(q.source_listing_id));
 
   const report = {
-    runId, write, allowlistApplied: Boolean(approvedIds), allowlistedIds: approvedIds?.length ?? null,
+    runId, primarySource, write, allowlistApplied: Boolean(approvedIds), allowlistedIds: approvedIds?.length ?? null,
     matchedCars: work.length,
     plans: { reports: 0, options: 0, galleryImages: 0, skippedEmptyInspection: 0, skippedEmptyOptions: 0, skippedEmptyGallery: 0 },
     results: { written: 0, skipped: 0, errors: 0 },
@@ -149,6 +152,22 @@ async function main() {
   try {
     for (const q of work) {
       const car = carBySource.get(q.source_listing_id)!; const payload = stageBySource.get(q.source_listing_id)!.raw_payload!;
+      // An alias is valid, but detail and reports must describe the same vehicle.
+      try {
+        const vehicleId = resolveEncarVehicleId(q.source_listing_id, payload.detail);
+        const inspectionVehicleId = obj(payload.inspection).vehicleId;
+        if (inspectionVehicleId != null && String(inspectionVehicleId) !== vehicleId) {
+          throw new Error("Encar inspection identity mismatch");
+        }
+      } catch (error) {
+        const rejected: CardResult = { sourceListingId: q.source_listing_id, carId: car.id,
+          status: "error", skipped: ["identity_mismatch"], inserted: { reports: [], options: [], media: [] },
+          error: error instanceof Error ? error.message : String(error) };
+        report.results.errors++;
+        report.details.push(rejected);
+        appendManifest(rejected);
+        continue;
+      }
       const inspection = ready(q, "insurance") ? inspectionReport(car.id, payload) : null;
       const optionRows = (ready(q, "options") || optionsAvailable(payload)) ? options(car.id, payload, optionCatalog) : [];
       const galleryRows = ready(q, "gallery") ? gallery(car.id, payload) : [];
@@ -175,7 +194,7 @@ async function main() {
           // card could have left the catalogue or changed source since selection, and two
           // runs could otherwise both see the block empty (car_options and car_media have
           // no unique constraint to stop duplicates).
-          const locked = await pg.query("select id from public.cars where id = $1 and is_available = true and primary_source = 'chestny_prigon' for update", [car.id]);
+          const locked = await pg.query("select id from public.cars where id = $1 and is_available = true and primary_source = $2 for update", [car.id, primarySource]);
           if (!locked.rowCount) {
             await pg.query("rollback");
             detail.skipped.push("card_not_eligible_under_lock");

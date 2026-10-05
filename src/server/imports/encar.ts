@@ -24,6 +24,7 @@ import {
 } from "@/server/normalization/display";
 import { encarClient } from "@/server/imports/encar-client";
 import { normalizeEncarTimestamp } from "@/server/imports/encar-date";
+import { resolveEncarVehicleId } from "./encar-identity";
 import { mapEncarOpenHistory } from "@/server/imports/encar-history";
 import { mapChoiceOptions, mapStandardOptions, type EncarOptionCatalog, type EncarOptionRow } from "@/server/imports/encar-options";
 
@@ -83,6 +84,7 @@ type EncarListCar = {
 };
 
 type EncarDetail = {
+  vehicleId: string;
   displacement: number | null;
   fuelName: string | null;
   color: string | null;
@@ -600,6 +602,7 @@ export async function fetchDetail(vehicleId: string): Promise<EncarDetail> {
   const spec = data.spec ?? {};
 
   return {
+    vehicleId: resolveEncarVehicleId(vehicleId, data),
     displacement: spec.displacement ?? null,
     fuelName: spec.fuelName ?? null,
     color: normalizeColor(spec.colorName),
@@ -858,7 +861,7 @@ async function fetchEnrichment(
     ? inspectionMedia(inspectionResult.inspection)
     : [];
 
-  if (inspectionResult) {
+  if (inspectionResult && (inspectionResult.inspection.inners?.length || inspectionResult.inspection.outers?.length)) {
     reports.push(
       buildInspectionReport(
         inspectionResult.inspection,
@@ -917,7 +920,6 @@ async function mapCar(
   optionCatalog: EncarOptionCatalog,
   rateSnapshot: CalcRateSnapshot,
   onReject?: (reason: string) => void,
-  fastMode = false,
   hybridPowerOverride?: HybridPowerResolution,
 ) {
   const sourceId = String(listCar.Id);
@@ -927,8 +929,13 @@ async function mapCar(
   // publication provenance too; previously fast mode fetched it only into
   // photoDetail while published_at was read from the deliberately-null detail.
   const detail = await fetchDetail(sourceId).catch(() => null);
+  // Never publish guessed specifications after a failed detail/identity check.
+  if (!detail) {
+    onReject?.(`detail_unavailable:${sourceId}`);
+    return null;
+  }
   const photoDetail = detail;
-  if (!fastMode) await sleep(120);
+  await sleep(120);
   const photos = photoDetail?.photos.length ? photoDetail.photos : buildPhotos(listCar);
   const brand = normalizeBrand(
     detail?.manufacturerEnglish ?? listCar.Manufacturer,
@@ -1009,25 +1016,14 @@ async function mapCar(
   // provides an approved 30-minute-power value for the specific trim.
   const usesStandardTksPayments = isPureElectric;
   const [enrichment, historyResult] = await Promise.all([
-    fastMode
-      ? Promise.resolve({
-          options: [] as EncarOptionRow[],
-          reports: [] as EncarConditionReport[],
-          reportMedia: [],
-        })
-      : fetchEnrichment(
-          sourceId,
+    fetchEnrichment(
+          detail.vehicleId,
           detail,
           optionCatalog,
           Boolean(listCar.Condition?.includes("Inspection")),
         ),
-    fastMode
-      ? Promise.resolve<EncarHistoryResult>({
-          status: "unavailable",
-          reason: "bulk_fast_import",
-        })
-      : detail?.vehicleNo
-        ? fetchEncarHistory(detail.vehicleNo, sourceId)
+    detail.vehicleNo
+        ? fetchEncarHistory(detail.vehicleNo, detail.vehicleId)
         : Promise.resolve<EncarHistoryResult>({
             status: "unavailable",
             reason: "vehicle_number_missing",
@@ -1082,6 +1078,7 @@ async function mapCar(
   const snapshotPayload = {
     list: listCar,
     detail: detail?.raw ?? null,
+    identity: { listingId: sourceId, vehicleId: detail.vehicleId },
     optionsCount: options.length,
     reportTypes: reports.map((report) => report.report_type),
     fetchedAt: new Date().toISOString(),
@@ -1266,7 +1263,6 @@ export async function captureEncarComparisonListing(options: { write?: boolean }
     optionCatalog,
     rateSnapshot,
     (reason) => { rejectReason = reason; },
-    false,
     comparisonHybridSpec,
   );
   if (!item) {
@@ -1705,9 +1701,7 @@ export async function importEncar(options: ImportOptions = {}) {
   }
 
   const rateSnapshot = await getCbrCalcRates();
-  const optionCatalog = fastMode
-    ? { options: [] }
-    : await fetchStandardOptionCatalog();
+  const optionCatalog = await fetchStandardOptionCatalog();
 
   const attemptedSourceIds = new Set<string>();
   const mappedBrandCounts: Record<string, number> = {};
@@ -1736,7 +1730,6 @@ export async function importEncar(options: ImportOptions = {}) {
           quotaRejections.push({ sourceId, brand: candidateBrand, reason });
         }
       },
-      fastMode,
     );
     if (mappedCar) {
       const identity =
@@ -1758,7 +1751,7 @@ export async function importEncar(options: ImportOptions = {}) {
         }
       }
     }
-    if (!fastMode) await sleep(180);
+    await sleep(180);
   };
 
   const electricCandidates = freshCandidates
@@ -1934,10 +1927,8 @@ export async function importEncar(options: ImportOptions = {}) {
   let deactivated = 0;
   const errors: Array<{ sourceId: string; error: unknown }> = [];
 
-  // Fast bulk imports contain only fresh rows, without enrichment/options or
-  // reports.  Keep the full write sequence for normal imports, but allow a
-  // small bounded concurrency for bulk inserts so a 500-item refresh does not
-  // spend several minutes doing independent network round trips in series.
+  // Fast mode only accelerates persistence of fresh rows. It must not omit
+  // source blocks: those are collected by the same mapping path as normal mode.
   let writeCursor = 0;
   const writeWorker = async () => {
     while (writeCursor < mapped.length) {
@@ -1974,14 +1965,12 @@ export async function importEncar(options: ImportOptions = {}) {
         await supabase.from("source_snapshots").insert(item.snapshot),
       );
       await persistCatalogNamingSupabase(supabase,carId);
-      assertSupabaseResult(
-        await supabase
-          .from("car_media")
-          .delete()
-          .eq("car_id", carId)
-          .eq("source", "encar"),
-      );
       if (item.photos.length || item.reportMedia.length) {
+        assertSupabaseResult(
+          await supabase.from("car_media").delete().eq("car_id", carId)
+            .eq("source", "encar")
+            .in("category", [...new Set([...item.photos, ...item.reportMedia].map((media) => media.category))]),
+        );
         assertSupabaseResult(
           await supabase.from("car_media").insert([
             ...item.photos.map((photo, index) => ({
@@ -2006,14 +1995,10 @@ export async function importEncar(options: ImportOptions = {}) {
         );
       }
 
-      assertSupabaseResult(
-        await supabase
-          .from("car_options")
-          .delete()
-          .eq("car_id", carId)
-          .eq("source", "encar"),
-      );
       if (item.options.length) {
+        assertSupabaseResult(
+          await supabase.from("car_options").delete().eq("car_id", carId).eq("source", "encar"),
+        );
         assertSupabaseResult(
           await supabase.from("car_options").insert(
             item.options.map((option) => ({
@@ -2025,14 +2010,11 @@ export async function importEncar(options: ImportOptions = {}) {
         );
       }
 
-      assertSupabaseResult(
-        await supabase
-          .from("car_condition_reports")
-          .delete()
-          .eq("car_id", carId)
-          .eq("source", "encar"),
-      );
       if (item.reports.length) {
+        assertSupabaseResult(
+          await supabase.from("car_condition_reports").delete().eq("car_id", carId)
+            .eq("source", "encar").in("report_type", item.reports.map((report) => report.report_type)),
+        );
         assertSupabaseResult(
           await supabase.from("car_condition_reports").insert(
             item.reports.map((report) => ({
@@ -2212,7 +2194,7 @@ export async function inspectEncarVehicles(vehicleIds: string[]) {
     try {
       const detail = await fetchDetail(vehicleId);
       const enrichment = await fetchEnrichment(
-        vehicleId,
+        detail.vehicleId,
         detail,
         optionCatalog,
         true,
@@ -2267,10 +2249,11 @@ export async function refreshEncarHistories(
       if (!car) return;
 
       try {
-        const historyResult = car.vehicle_no_masked
+        const historyDetail = await fetchDetail(String(car.source_id));
+        const historyResult = historyDetail.vehicleNo
           ? await fetchEncarHistory(
-              String(car.vehicle_no_masked),
-              String(car.source_id),
+              historyDetail.vehicleNo,
+              historyDetail.vehicleId,
             )
           : ({
               status: "unavailable",

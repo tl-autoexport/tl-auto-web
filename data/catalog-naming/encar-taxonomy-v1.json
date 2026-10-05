@@ -17016,9 +17016,9 @@
       "name_en": "CLE-Class",
       "year_from": null,
       "year_to": null,
-      "display_name": "E-Class",
+      "display_name": "CLE",
       "canonical_brand": "Mercedes-Benz",
-      "canonical_model": "E-Class",
+      "canonical_model": "CLE",
       "source_code_path": [
         {
           "level": "manufacturer",
@@ -17044,7 +17044,7 @@
       "year_to": null,
       "display_name": "Cle-class C236",
       "canonical_brand": "Mercedes-Benz",
-      "canonical_model": "E-Class",
+      "canonical_model": "CLE",
       "source_code_path": [
         {
           "level": "manufacturer",
@@ -17082,7 +17082,7 @@
       "year_to": null,
       "display_name": "CLE200 Coupe",
       "canonical_brand": "Mercedes-Benz",
-      "canonical_model": "E-Class",
+      "canonical_model": "CLE",
       "source_code_path": [
         {
           "level": "manufacturer",
@@ -17116,7 +17116,7 @@
       "year_to": null,
       "display_name": "CLE200 Cabriolet",
       "canonical_brand": "Mercedes-Benz",
-      "canonical_model": "E-Class",
+      "canonical_model": "CLE",
       "source_code_path": [
         {
           "level": "manufacturer",
