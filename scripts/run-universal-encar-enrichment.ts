@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { fetch, ProxyAgent } from "undici";
 import { open, readFile, rm } from "node:fs/promises";
 import { ENCAR_HEADERS } from "../src/server/imports/encar-client";
+import { resolveEncarVehicleId } from "../src/server/imports/encar-identity";
 import {
   classifyEncarEvBatteryResponse,
   isEncarElectricFuel,
@@ -200,6 +201,7 @@ async function releaseForRetry(row: Row) {
 
 async function processRow(row: Row) {
   const id = idOf(row);
+  let vehicleId = id;
   const task = row.task ?? {};
   const snapshot = row.candidate_snapshot ?? {};
   let vehicleNo = String(snapshot.vehicleNo ?? snapshot.vehicle_no ?? "").trim();
@@ -212,7 +214,7 @@ async function processRow(row: Row) {
 
   // Detail is the availability gate and a proxy health signal. A temporary
   // source/proxy outage must not become a failed vehicle record.
-  const needsDetail = Boolean(task.gallery || task.contents || task.diagnosis || task.sellingpoint || task.history || task.category);
+  const needsDetail = Object.values(task).some(Boolean) || isEncarElectricFuel(snapshot.fuelType ?? snapshot.fuel_type);
   if (needsDetail) {
     probes.detail = await get(`https://api.encar.com/v1/readside/vehicle/${id}`);
     payload.detail = probes.detail.body ?? null;
@@ -224,6 +226,17 @@ async function processRow(row: Row) {
     // staging as an unavailable source record so discovery is auditable.
     const detail = (probes.detail.body && typeof probes.detail.body === "object"
       ? probes.detail.body : {}) as Record<string, unknown>;
+    if (probes.detail.status === 404 || probes.detail.status === 410) {
+      await complete(row, "unavailable", { encarId: id, blocks: task }, payload,
+        { probes: { detail: { status: probes.detail.status, classification: "report_not_found", error: null } } }, null);
+      return;
+    }
+    vehicleId = resolveEncarVehicleId(id, detail);
+    payload.vehicleId = vehicleId;
+    normalized.vehicleId = vehicleId;
+    vehicleNo ||= findValue(detail, ["vehicleNo", "vehicle_no"]);
+    manufacturerCd ||= findValue(detail, ["manufacturerCd", "manufacturer_cd"]);
+    modelCd ||= findValue(detail, ["modelCd", "model_cd"]);
     const manage = (detail.manage && typeof detail.manage === "object" ? detail.manage : {}) as Record<string, unknown>;
     const advertisement = (detail.advertisement && typeof detail.advertisement === "object" ? detail.advertisement : {}) as Record<string, unknown>;
     const view = (detail.view && typeof detail.view === "object" ? detail.view : {}) as Record<string, unknown>;
@@ -239,26 +252,26 @@ async function processRow(row: Row) {
   }
 
   if (task.insurance) {
-    probes.inspection = await get(`https://api.encar.com/v1/readside/inspection/vehicle/${id}`);
-    probes.summary = await get(`https://api.encar.com/v1/readside/inspection/vehicle/${id}/summary`);
+    probes.inspection = await get(`https://api.encar.com/v1/readside/inspection/vehicle/${vehicleId}`);
+    probes.summary = await get(`https://api.encar.com/v1/readside/inspection/vehicle/${vehicleId}/summary`);
     payload.inspection = probes.inspection.body ?? null;
     payload.inspectionSummary = probes.summary.body ?? null;
     normalized.reportStatus = classify(probes.inspection);
   }
   if (task.options) {
-    probes.options = await get(`https://api.encar.com/v1/readside/vehicles/car/${id}/options/choice`);
+    probes.options = await get(`https://api.encar.com/v1/readside/vehicles/car/${vehicleId}/options/choice`);
     payload.choiceOptions = probes.options.body ?? null;
   }
   if (task.diagnosis) {
-    probes.diagnosis = await get(`https://api.encar.com/v1/readside/diagnosis/vehicle/${id}`);
+    probes.diagnosis = await get(`https://api.encar.com/v1/readside/diagnosis/vehicle/${vehicleId}`);
     payload.diagnosis = probes.diagnosis.body ?? null;
   }
   if (task.sellingpoint) {
-    probes.sellingpoint = await get(`https://api.encar.com/v1/readside/diagnosis/vehicle/${id}/sellingpoint`);
+    probes.sellingpoint = await get(`https://api.encar.com/v1/readside/diagnosis/vehicle/${vehicleId}/sellingpoint`);
     payload.sellingPoint = probes.sellingpoint.body ?? null;
   }
   if (task.contents) {
-    probes.contents = await get(`https://api.encar.com/v1/readside/vehicle/${id}?include=CONTENTS`);
+    probes.contents = await get(`https://api.encar.com/v1/readside/vehicle/${vehicleId}?include=CONTENTS`);
     payload.vehicleContents = probes.contents.body ?? null;
     vehicleNo ||= findValue(probes.contents.body, ["vehicleNo", "vehicle_no"]);
     manufacturerCd ||= findValue(probes.contents.body, ["manufacturerCd", "manufacturer_cd"]);
@@ -273,7 +286,7 @@ async function processRow(row: Row) {
     if (advertisesEvBatteryInfo === false) {
       normalized.evBatteryStatus = "not_advertised";
     } else {
-      probes.evBattery = await get(`https://api.encar.com/v1/readside/vehicle/ev-battery/${id}`);
+      probes.evBattery = await get(`https://api.encar.com/v1/readside/vehicle/ev-battery/${vehicleId}`);
       payload.evBatteryInfo = probes.evBattery.body ?? null;
       normalized.evBatteryStatus = classifyEncarEvBatteryResponse(
         probes.evBattery.status,
@@ -286,7 +299,7 @@ async function processRow(row: Row) {
     payload.vehicleCategory = probes.category.body ?? null;
   }
   if (task.history && vehicleNo) {
-    probes.history = await get(`https://api.encar.com/v1/readside/record/vehicle/${id}/open?vehicleNo=${encodeURIComponent(vehicleNo)}`);
+    probes.history = await get(`https://api.encar.com/v1/readside/record/vehicle/${vehicleId}/open?vehicleNo=${encodeURIComponent(vehicleNo)}`);
     payload.openHistory = probes.history.body ?? null;
   }
 
@@ -300,7 +313,7 @@ async function processRow(row: Row) {
   const terminal = list.some((probe) => [404, 410].includes(probe.status));
   const technical = list.some((probe) => probe.status === 0 || [403, 429, 500, 502, 503, 504].includes(probe.status));
   const status = terminal && !hasReady ? "unavailable" : technical && !hasReady ? "failed" : "succeeded";
-  await complete(row, status, { encarId: id, blocks: task, probes: classes }, payload, { ...normalized, probes: classes }, status === "failed" ? JSON.stringify(classes) : null);
+  await complete(row, status, { encarId: id, vehicleId, blocks: task, probes: classes }, payload, { ...normalized, probes: classes }, status === "failed" ? JSON.stringify(classes) : null);
   log("item_completed", { sourceListingId: row.source_listing_id, status, probes: classes });
 }
 

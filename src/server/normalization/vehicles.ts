@@ -1229,6 +1229,8 @@ export function normalizeBrand(value: unknown) {
 export function normalizeModel(value: unknown) {
   const raw = String(value ?? "").trim();
   const lower = raw.toLowerCase();
+  // CLE-Class contains E-Class; resolve the complete model before aliases.
+  if (/\bcle(?:\s*-?\s*(?:class|\d{3}))?\b/.test(lower)) return "CLE";
   // CLS-Class contains "S-Class" as a substring. Resolve the longer model
   // token first so an Encar CLS is never classified as an S-Class.
   if (/\bcls(?:\s*-?\s*class)?\b/.test(lower)) return "CLS";

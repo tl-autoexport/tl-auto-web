@@ -1,6 +1,14 @@
 import assert from 'node:assert/strict';
 import { mapChoiceOptions, mapStandardOptions } from './encar-options';
 import { mapEncarOpenHistory } from './encar-history';
+import { resolveEncarVehicleId } from './encar-identity';
+assert.equal(resolveEncarVehicleId('42481636', {vehicleId:42470581,queryCarId:42481636}), '42470581');
+assert.equal(resolveEncarVehicleId('42470581', {vehicleId:42470581}), '42470581');
+assert.equal(resolveEncarVehicleId('42481636', {vehicleId:42470581}), '42470581');
+assert.equal(resolveEncarVehicleId('42481636', {spec:{displacement:2999}}), '42481636');
+assert.throws(() => resolveEncarVehicleId('42481636', {vehicleId:42188411,queryCarId:42188411}), /mismatch/);
+assert.throws(() => resolveEncarVehicleId('42481636', {}), /Missing/);
+assert.throws(() => resolveEncarVehicleId('42481636', {vehicleId:'invalid'}), /mismatch/);
 const catalog = { options: [
   { optionCd: '001', optionName: '헤드램프', subOptions: [{optionCd:'075',optionName:'헤드램프(LED)'}] },
   { optionCd: '001', optionName: '브레이크 잠김 방지(ABS)' },
