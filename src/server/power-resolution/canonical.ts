@@ -26,6 +26,7 @@ import type { ApprovedPowerCandidate } from "./resolver";
 const MODEL_ALIASES: Record<string, string> = {
   avante: "Elantra",
   canival: "Carnival",
+  santafe: "Santa Fe",
   tiboli: "Tivoli",
   "1-series": "1 Series",
   "2-series": "2 Series",

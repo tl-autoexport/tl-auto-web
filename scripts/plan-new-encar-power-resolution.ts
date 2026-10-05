@@ -68,6 +68,7 @@ function canonicalEncarBrand(value: unknown) {
   if (!raw) return null;
   const key = raw.toLowerCase().replace(/[\s_()\-]/g, "");
   if (["renaultkoreasamsung", "renaultkorea"].includes(key)) return "Renault Korea";
+  if (["kgmobilityssangyong", "kgmobility"].includes(key)) return "KGM";
   return raw;
 }
 function sourceIdentity(row: CandidateRow) {
