@@ -36,17 +36,17 @@ async function main() {
     (row.group?.listingIds ?? []).map(String).includes(listingId));
   const reconciled = reconciliation.rows.find((row: Result) => String(row.sourceListingId) === listingId);
   if (!target || !reconciled || target.group?.brand !== "Mercedes-Benz" || target.group?.model !== "GLE" ||
-      target.group?.engineCc !== 2998 || target.group?.year !== 2026 || reconciled.powerPs !== 6100 ||
-      !reconciled.danawa?.powers?.includes(6100)) {
-    throw new Error("GLE450 correction guard failed: expected original saved 6100 PS observation");
+      target.group?.engineCc !== 2998 || target.group?.year !== 2026) {
+    throw new Error("GLE450 correction guard failed: saved listing configuration mismatch");
   }
   const matching = (target.sourceCandidates ?? []).filter((candidate: Candidate) =>
     /^GLE450 4MATIC(?: AMG Line)? \(A\/T\)$/i.test(String(candidate.trim ?? "")));
-  if (!matching.length || matching.some((candidate: Candidate) => Number(candidate.powerPs) !== 6100)) {
-    throw new Error("Expected GLE450 Danawa variants with the original misparsed 6100 value");
-  }
-  if (danawa.manualCorrections?.some((item: Result) => item.listingId === listingId)) {
-    throw new Error(`Correction for ${listingId} is already recorded`);
+  const danawaCorrected = Number(target.suggestedPowerPs) === 381 && matching.length > 0 &&
+    matching.every((candidate: Candidate) => Number(candidate.powerPs) === 381 && Number(candidate.rawParsedPowerPs) === 6100);
+  const reconciliationCorrected = Number(reconciled.powerPs) === 381 && reconciled.danawa?.powers?.includes(381);
+  if (!matching.length || !(danawaCorrected || matching.every((candidate: Candidate) => Number(candidate.powerPs) === 6100)) ||
+      !(reconciliationCorrected || reconciled.powerPs === 6100 && reconciled.danawa?.powers?.includes(6100))) {
+    throw new Error("GLE450 correction guard failed: report files contain unexpected partial or changed data");
   }
 
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -54,34 +54,38 @@ async function main() {
   const reconciliationBackup = `${reconciliationPath}.before-rpm-correction-${stamp}`;
   await Promise.all([copyFile(danawaPath, danawaBackup), copyFile(reconciliationPath, reconciliationBackup)]);
 
-  const rejected = (target.sourceCandidates ?? []).filter((candidate: Candidate) => !matching.includes(candidate));
-  target.excludedCandidates = [...(target.excludedCandidates ?? []), ...rejected.map((candidate: Candidate) => ({
-    ...candidate, exclusionReason: "Different GLE trim; not used for the Encar GLE450 configuration",
-  }))];
-  target.sourceCandidates = matching.map((candidate: Candidate) => ({
-    ...candidate, rawParsedPowerPs: 6100, powerPs: 381, powerCorrection: note,
-  }));
-  target.powerCandidatesPs = [381];
-  target.suggestedPowerPs = 381;
-  target.classification = "preliminary_candidate";
-  target.manualCorrection = { listingId, fromPowerPs: 6100, toPowerPs: 381, sourceUrl: correctionUrl, note };
-  danawa.manualCorrections = [...(danawa.manualCorrections ?? []), target.manualCorrection];
-  recompute(danawa);
+  const rejected = danawaCorrected ? [] : (target.sourceCandidates ?? []).filter((candidate: Candidate) => !matching.includes(candidate));
+  if (!danawaCorrected) {
+    target.excludedCandidates = [...(target.excludedCandidates ?? []), ...rejected.map((candidate: Candidate) => ({
+      ...candidate, exclusionReason: "Different GLE trim; not used for the Encar GLE450 configuration",
+    }))];
+    target.sourceCandidates = matching.map((candidate: Candidate) => ({
+      ...candidate, rawParsedPowerPs: 6100, powerPs: 381, powerCorrection: note,
+    }));
+    target.powerCandidatesPs = [381];
+    target.suggestedPowerPs = 381;
+    target.classification = "preliminary_candidate";
+    target.manualCorrection = { listingId, fromPowerPs: 6100, toPowerPs: 381, sourceUrl: correctionUrl, note };
+    danawa.manualCorrections = [...(danawa.manualCorrections ?? []), target.manualCorrection];
+    recompute(danawa);
+  }
 
-  reconciled.powerPs = 381;
-  reconciled.outcome = "danawa_only_preliminary";
-  reconciled.danawa = {
-    ...reconciled.danawa,
-    status: "preliminary_candidate",
-    powers: [381],
-    uniqueCandidate: true,
-    evidence: matching.map((candidate: Candidate) => ({
-      power: 381, rawParsedPower: 6100, trim: candidate.trim, url: candidate.sourceUrl ?? correctionUrl,
-      correction: note,
-    })),
-  };
-  reconciliation.manualCorrections = [...(reconciliation.manualCorrections ?? []),
-    { listingId, fromPowerPs: 6100, toPowerPs: 381, sourceUrl: correctionUrl, note }];
+  if (!reconciliationCorrected) {
+    reconciled.powerPs = 381;
+    reconciled.outcome = "danawa_only_preliminary";
+    reconciled.danawa = {
+      ...reconciled.danawa,
+      status: "preliminary_candidate",
+      powers: [381],
+      uniqueCandidate: true,
+      evidence: matching.map((candidate: Candidate) => ({
+        power: 381, rawParsedPower: 6100, trim: candidate.trim, url: candidate.sourceUrl ?? correctionUrl,
+        correction: note,
+      })),
+    };
+    reconciliation.manualCorrections = [...(reconciliation.manualCorrections ?? []),
+      { listingId, fromPowerPs: 6100, toPowerPs: 381, sourceUrl: correctionUrl, note }];
+  }
 
   await Promise.all([
     writeFile(danawaPath, `${JSON.stringify(danawa, null, 2)}\n`),
