@@ -130,6 +130,7 @@
     "research:power:ai": "tsx scripts/research-encar-power-with-gemini.ts",
     "query:power:external-catalogs": "tsx scripts/query-new-encar-external-catalogs.ts",
     "query:power:encarrus:ice": "tsx scripts/query-encarrus-ice.ts",
+    "query:power:danawa:ice": "tsx scripts/query-new-encar-danawa.ts",
     "import:drom:hybrid-preliminary": "tsx scripts/import-drom-hybrid-preliminary.ts",
     "import:drom:ice-preliminary": "tsx scripts/import-drom-ice-preliminary.ts",
     "import:encarrus:ice-preliminary": "tsx scripts/import-drom-ice-preliminary.ts",
