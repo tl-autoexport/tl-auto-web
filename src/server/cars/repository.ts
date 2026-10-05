@@ -843,8 +843,18 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
     }
   }
 
+  // These two listings were visually reviewed and rejected for homepage
+  // presentation: a side-on camper and a gallery with collage/rear covers.
+  // Keep them in the catalogue, but fill their showcase slots from the next
+  // eligible listings rather than assuming file numbers prove the view angle.
+  const rejectedHomepageCars = new Set([
+    "3ff62b8f-ce4b-40f3-b10a-05536c96f414", // Renault Korea Master, Encar 42839503
+    "7d85beaa-9402-4100-81a5-3a2f561a87ed", // MINI Countryman, Encar 42820256
+  ]);
+
   const presentableCars = (page: CatalogPageResult, limit: number) => page.cars
     .flatMap((car) => {
+      if (rejectedHomepageCars.has(car.id)) return [];
       const url = covers.get(car.id);
       return url ? [{ ...car, primary_image_url: url, primary_thumbnail_url: url }] : [];
     })
@@ -860,7 +870,7 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
 
 const getCachedHomeCatalogData = unstable_cache(
   fetchHomeCatalogData,
-  ["home-catalog-showcases-v7-front-angle-covers", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  ["home-catalog-showcases-v8-reviewed-listings", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
   { revalidate: 60 },
 );
 
