@@ -10,13 +10,48 @@ const listingId = "42835734";
 const correctionUrl = "https://auto.danawa.com/auto/?Work=model&Model=4471&Tab=spec&Lineup=53607";
 const note = "Danawa displays maximum output as 381/5,800~6,100 ps/rpm; 381 is PS and 6,100 is the RPM ceiling. Confirmed from the reviewed Danawa specification screenshot.";
 
-type Candidate = Record<string, any>;
-type Result = Record<string, any>;
+type JsonObject = Record<string, unknown>;
+type Candidate = JsonObject & {
+  trim?: unknown;
+  powerPs?: unknown;
+  rawParsedPowerPs?: unknown;
+  sourceUrl?: unknown;
+};
+type Result = JsonObject & {
+  classification?: unknown;
+  listingCount?: unknown;
+  group?: JsonObject & {
+    listingIds?: unknown[];
+    brand?: unknown;
+    model?: unknown;
+    engineCc?: unknown;
+    year?: unknown;
+  };
+  sourceCandidates?: Candidate[];
+  suggestedPowerPs?: unknown;
+  powerCandidatesPs?: unknown;
+  excludedCandidates?: Candidate[];
+  manualCorrection?: JsonObject;
+  sourceListingId?: unknown;
+  powerPs?: unknown;
+  outcome?: unknown;
+  danawa?: JsonObject & { powers?: unknown[] };
+};
+type Report = JsonObject & {
+  runId?: unknown;
+  readOnly?: unknown;
+  databaseWrites?: unknown;
+  results: Result[];
+  rows: Result[];
+  classifications?: JsonObject;
+  classificationListings?: JsonObject;
+  manualCorrections?: JsonObject[];
+};
 
-async function load(path: string) {
-  return JSON.parse(await readFile(path, "utf8")) as Record<string, any>;
+async function load(path: string): Promise<Report> {
+  return JSON.parse(await readFile(path, "utf8")) as Report;
 }
-function recompute(report: Record<string, any>) {
+function recompute(report: Report) {
   const statuses = ["preliminary_candidate", "review_multiple_powers", "unmapped_model",
     "no_compatible_year_or_lineup", "no_matching_specification"];
   report.classifications = Object.fromEntries(statuses.map((status) =>
