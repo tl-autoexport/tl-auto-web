@@ -267,8 +267,12 @@ async function main() {
         (!ref.configuration_key.includes("|listing=") || ref.configuration_key.endsWith(`|listing=${id}`)));
       const decision = existingReferenceDecisions.get(id);
       if (decision) {
+        const resolvedReference = existing ? live.find((ref) => ref.configuration_key === existing.configuration_key) : undefined;
         const retained = sameReferences.find((ref) => Number(ref.power_hp) === decision.power &&
-          ref.source === decision.source && (ref.status === "automatic" || ref.status === "confirmed"));
+          ref.source === decision.source && (ref.status === "automatic" || ref.status === "confirmed")) ??
+          (resolvedReference && Number(resolvedReference.power_hp) === decision.power &&
+            resolvedReference.source === decision.source && (resolvedReference.status === "automatic" ||
+              resolvedReference.status === "confirmed") ? resolvedReference : undefined);
         if (!retained) throw new Error(`Expected retained reference missing for reviewed listing ${id}`);
         if (id === "42837452" && (!retained.note.includes("newsroom.genesis.com") ||
             target.powerPs !== 255 || norm(c.brand) !== "genesis" || norm(c.model) !== "g70")) {
