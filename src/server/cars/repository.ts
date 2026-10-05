@@ -825,7 +825,7 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
       .in("car_id", carIds)
       .eq("media_type", "image")
       .in("category", ["outer", "outside", "outside_image", "exterior"])
-      .or("url.like.*_001.*,url.like.*_002.*,url.like.*_003.*,url.like.*_004.*")
+      .or("url.like.*_001.*,url.like.*_003.*")
       .limit(1000);
     if (error) {
       console.error("[cars] Homepage exterior covers query failed", error);
@@ -860,7 +860,7 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
 
 const getCachedHomeCatalogData = unstable_cache(
   fetchHomeCatalogData,
-  ["home-catalog-showcases-v6-canonical-names", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  ["home-catalog-showcases-v7-front-angle-covers", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
   { revalidate: 60 },
 );
 

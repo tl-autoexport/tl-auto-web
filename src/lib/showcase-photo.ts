@@ -6,15 +6,18 @@ type ShowcaseMedia = {
   sort_order?: number | null;
 };
 
-/** Strict homepage selection: only known Encar whole-car exterior frames. */
+/** Strict homepage selection: prefer frontal and front three-quarter Encar frames. */
 export function homeShowcasePhotoUrl(media: ShowcaseMedia[] | null | undefined) {
   const exteriorCategories = ["outer", "outside", "outside_image", "exterior"];
-  const preference = [1, 3, 2, 4];
+  // Encar's 003 is a front-facing shot and 001 is the front three-quarter
+  // view. Rear-facing 002/004 frames are intentionally excluded from homepage
+  // showcases, where a clean, presentation-quality cover matters most.
+  const preference = [3, 1];
   const candidates = (media ?? []).flatMap((item) => {
     if (item.media_type !== "image" || !exteriorCategories.includes(item.category?.toLowerCase() ?? "")) return [];
-    // Detail frames (005/006/031/032/033) can also be labelled "outer".
-    // An unknown sequence is not sufficient evidence for a homepage cover.
-    const match = item.url.match(/^https:\/\/ci\.encar\.com\/carpicture[^?#]*_(00[1-4])\.(?:jpg|jpeg|webp)(?:\?.*)?$/i);
+    // An unknown sequence or a detail frame is not enough evidence for a
+    // homepage cover, even if it is labelled "outer" by the source.
+    const match = item.url.match(/^https:\/\/ci\.encar\.com\/carpicture[^?#]*_(001|003)\.(?:jpg|jpeg|webp)(?:\?.*)?$/i);
     if (!match) return [];
     return [{ url: item.url, rank: preference.indexOf(Number(match[1])) }];
   });
