@@ -3,6 +3,7 @@ import {
   normalizeEncarBodyPart,
   translateBrand,
   translateDrive,
+  translateModel,
   translateInspectionStatus,
 } from "./display";
 import {
@@ -23,6 +24,7 @@ assert.equal(normalizeModel("S-Class"), "S-Class");
 assert.equal(normalizeModel("CLE-Class"), "CLE");
 assert.equal(normalizeModel("CLE-클래스 C236"), "CLE");
 assert.equal(normalizeModel("CLE450 4MATIC Cabriolet"), "CLE");
+assert.equal(translateModel("Mercedes-Benz", "CLE"), "CLE");
 assert.equal(normalizeModel("E-Class"), "E-Class");
 assert.equal(translateBrand("Kg__mobility_ssangyong"), "KGM");
 assert.equal(translateBrand("KG_Mobility_Ssangyong"), "KGM");
