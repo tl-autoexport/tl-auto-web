@@ -252,6 +252,51 @@ async function main() {
     }
 
     const live = liveResult.rows;
+    const deferredReasons = new Map<string, Record<string, unknown>>([
+      ["42837452", { reason: "existing reference disagrees with source evidence", existingPower: 252, proposedPower: 255 }],
+    ]);
+    const blockedConfigurations = new Set<string>();
+    for (const row of built.selected) {
+      const id = String(row.sourceListingId);
+      const target = built.targetInputs.get(id)!;
+      const existing = resolveAutomaticPowerReference(target.input, live);
+      const c = row.configuration;
+      const sameReferences = live.filter((ref) =>
+        norm(ref.brand) === norm(c.brand) && norm(ref.model) === norm(c.model) &&
+        norm(ref.fuel_type) === normalizeFuel(c.fuelType) && Number(ref.engine_cc) === Number(c.engineCc) &&
+        norm(ref.drive_type) === norm(c.driveType) && norm(ref.badge) === norm(c.badge) &&
+        norm(ref.badge_detail) === norm(c.trim) && Number(ref.year_from) === Number(c.year) &&
+        Number(ref.year_to) === Number(c.year) &&
+        (!ref.configuration_key.includes("|listing=") || ref.configuration_key.endsWith(`|listing=${id}`)));
+      const disagreeing = sameReferences.find((ref) => Number(ref.power_hp) !== target.powerPs ||
+        ref.status !== "automatic" && ref.status !== "confirmed");
+      if (target.powerPs > 1500 || disagreeing || existing && Number(existing.power_hp) !== target.powerPs) {
+        blockedConfigurations.add(configKey(c));
+        const prior = disagreeing ?? existing;
+        deferredReasons.set(id, {
+          reason: target.powerPs > 1500 ? "implausible ICE power; source parsing requires review" : "existing reference disagrees with source evidence",
+          proposedPower: target.powerPs, existingPower: prior?.power_hp ?? null,
+          existingSource: prior?.source ?? null,
+        });
+      }
+    }
+    const deferred = built.selected.filter((row) => blockedConfigurations.has(configKey(row.configuration)));
+    built.excluded.push(...deferred);
+    built.selected = built.selected.filter((row) => !blockedConfigurations.has(configKey(row.configuration)));
+    for (const row of deferred) {
+      const id = String(row.sourceListingId);
+      built.targetInputs.delete(id);
+      if (!deferredReasons.has(id)) deferredReasons.set(id, { reason: "same configuration as another deferred conflict" });
+    }
+    const retainedKeys = new Set(built.selected.map((row) => {
+      const c = row.configuration;
+      const badge = clean(c.badge), badge_detail = clean(c.trim);
+      return referenceKey({ brand: clean(c.brand), model: clean(c.model), fuel_type: normalizeFuel(c.fuelType),
+        engine_cc: Number(c.engineCc), drive_type: clean(c.driveType), badge, badge_detail,
+        year_from: Number(c.year), year_to: Number(c.year) }, !badge && !badge_detail ? String(row.sourceListingId) : undefined);
+    }));
+    built.proposed = built.proposed.filter((ref) => retainedKeys.has(ref.configuration_key));
+    built.configurationCount = new Set(built.selected.map((row) => configKey(row.configuration))).size;
     const equivalent = new Set<string>();
     const conflicts: Array<Record<string, unknown>> = [];
     for (const proposed of built.proposed) {
@@ -315,9 +360,9 @@ async function main() {
       deferredConflictListings: built.excluded.length,
       deferredConflicts: built.excluded.map((row) => ({
         ...row,
-        reason: "Existing preliminary reference has 252 PS; new EncarRus candidate has 255 PS; requires source verification",
+        ...deferredReasons.get(String(row.sourceListingId)),
       })),
-      remainingListings: 259,
+      remainingListings: plan.candidates.length - plan.candidates.filter((row) => row.status === "approved_match").length - built.selected.length,
       preliminaryListings: built.selected.length,
       exactConfigurations: built.configurationCount,
       referenceRules: built.proposed.length,
