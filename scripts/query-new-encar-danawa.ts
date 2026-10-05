@@ -157,7 +157,12 @@ function parseLineups(html: string, modelId: string): { title: string | null; li
 }
 
 function parsePower(value: string): number | null {
-  const match = value.match(/([\d,]+(?:\.\d+)?)\s*(?:\/\s*[\d,]+)?\s*(?:ps|hp|마력)/i);
+  // Danawa writes engine output and its rpm range as `381/5,800~6,100 ps/rpm`.
+  // The output is the number before `/`; reading the final number before `ps`
+  // would mistake the rev limiter for horsepower.
+  const text = value.trim();
+  const match = text.match(/^([\d,]+(?:\.\d+)?)\s*\/\s*[\d,]+(?:\s*[~～-]\s*[\d,]+)?\s*(?:ps|hp|마력)(?:\s*\/\s*rpm)?$/i) ??
+    text.match(/([\d,]+(?:\.\d+)?)\s*(?:ps|hp|마력)/i);
   if (!match) return null;
   const power = Number(match[1].replace(/,/g, ""));
   return Number.isFinite(power) && power > 0 ? power : null;
