@@ -1,0 +1,264 @@
+import { persistCatalogNamingPg } from "../src/server/catalog/persist-catalog-naming";
+import { catalogDriveType, normalizeTransmissionType } from "../src/server/normalization/drivetrain";
+/** Publish one fully audited Encar staging run, preserving approved/preliminary power status. */
+import { config } from "dotenv";
+import { Client } from "pg";
+import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { calculateRuVladivostok } from "../src/server/calc/ru";
+import { getCbrCalcRates } from "../src/server/calc/rates";
+import { evaluatePublication, powerBasisForFuel, resolveCalculationMonth, storedPowerFinality } from "../src/server/cars/calculation-contract";
+import { resolveAutomaticPowerReference, type AutomaticPowerReferenceRow } from "../src/server/catalog/automatic-power-reference";
+import { normalizeColor, normalizePlate } from "../src/server/normalization/vehicles";
+import { translateInspectionLabel, translateInspectionStatus } from "../src/server/normalization/display";
+import { fetchStandardOptionCatalog } from "../src/server/imports/encar";
+import { mapEncarOptions } from "../src/server/imports/encar-options";
+
+config({ path: ".env.local", override: true, quiet: true });
+config({ path: ".env", quiet: true });
+
+const targetRunId = process.env.TL_AUTO_ENRICHMENT_RUN_ID;
+const powerPlanPath = process.env.TL_AUTO_POWER_PLAN ?? "output/encar-859a-after-research.json";
+const preliminaryPath = process.env.TL_AUTO_PRELIMINARY_CALCULATION ?? "output/encar-859a-preliminary-calculations.json";
+const expectedCandidates = 500;
+if (!targetRunId) throw new Error("TL_AUTO_ENRICHMENT_RUN_ID is required");
+const write = process.env.TL_AUTO_NEW_ENCAR_PUBLISH === "true";
+const probe = process.env.TL_AUTO_NEW_ENCAR_PUBLISH_PROBE === "true";
+const dbUrl = process.env.SUPABASE_DB_URL;
+if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
+
+type Obj = Record<string, unknown>;
+type PlanRow = { sourceListingId: string; status: string; configuration: Obj; power?: Obj };
+type Plan = { runId: string; candidates: PlanRow[] };
+type Stage = { source_listing_id: string; source_url: string | null; queue_status: string; staging_status: string; fetched_at: string | null; raw_payload: Obj | null };
+type Spec = { id: string; version: number; status: string; calculation_power_kw: string; power_basis: string; evidence_id: string };
+
+const obj = (v: unknown): Obj => v && typeof v === "object" && !Array.isArray(v) ? v as Obj : {};
+const str = (v: unknown): string | null => typeof v === "string" && v.trim() ? v.trim() : null;
+const num = (v: unknown): number | null => {
+  const n = typeof v === "number" ? v : Number(String(v ?? "").replace(/,/g, ""));
+  return Number.isFinite(n) ? n : null;
+};
+const positive = (v: unknown): number | null => { const n = num(v); return n != null && n > 0 ? n : null; };
+const imageUrl = (path: string) => path.startsWith("http") ? path : `https://ci.encar.com${path}`;
+const KW_PER_HP = 0.73549875;
+const vehicleNoHash = (value: string) => createHash("sha256")
+  .update(value.toUpperCase().replace(/[^0-9A-Z가-힣]/g, ""))
+  .digest("hex");
+
+function automaticInput(c: PlanRow) {
+  const x = c.configuration;
+  return {
+    brand: str(x.brand) ?? "", model: str(x.model) ?? "", fuel_type: str(x.fuelType) ?? "",
+    engine_cc: positive(x.engineCc), drive_type: str(x.driveType), badge: str(x.badge),
+    badge_detail: str(x.trim), year: positive(x.year), source_listing_id: c.sourceListingId,
+  };
+}
+
+function gallery(payload: Obj) {
+  const photos = obj(payload.detail).photos;
+  if (!Array.isArray(photos)) return [];
+  const unique = new Set<string>();
+  return photos.flatMap((raw) => {
+    const photo = obj(raw);
+    const path = str(photo.path);
+    if (!path) return [];
+    const url = imageUrl(path);
+    if (unique.has(url)) return [];
+    unique.add(url);
+    const type = String(photo.type ?? "").toLowerCase();
+    return [{ url, category: ["outer", "inner", "option", "thumbnail"].includes(type) ? type : "photo" }];
+  }).sort((a, b) => Number(a.category !== "outer") - Number(b.category !== "outer"));
+}
+
+function choiceOptions(payload: Obj, catalog: Awaited<ReturnType<typeof fetchStandardOptionCatalog>>) {
+  const detail = obj(payload.detail);
+  const codes = Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).map(String) : [];
+  const selected = obj(detail.options).choice;
+  return mapEncarOptions(catalog, codes, payload.choiceOptions, Array.isArray(selected) ? selected.map(String) : undefined);
+}
+
+function inspectionReport(payload: Obj) {
+  const inspection = obj(payload.inspection);
+  if (!Object.keys(inspection).length) return null;
+  const summary = obj(payload.inspectionSummary);
+  const master = obj(inspection.master);
+  const detail = obj(master.detail);
+  const formats = Array.isArray(inspection.formats) ? inspection.formats : [];
+  const items = Array.isArray(inspection.inners) ? inspection.inners.map((node) => {
+    const item = obj(node), type = obj(item.type), status = obj(item.statusType);
+    return { code: str(type.code), label_original: str(type.title), label_ru: translateInspectionLabel(str(type.title)),
+      status_code: str(status.code), status_original: str(status.title), status_ru: translateInspectionStatus(str(status.title)),
+      description_original: str(item.description), price: num(item.price), children: Array.isArray(item.children) ? item.children : [] };
+  }) : [];
+  return { summary: { formats, has_structured_report: formats.includes("TABLE"), inspection_date: str(master.registrationDate),
+    supply_number: str(master.supplyNum), accident: master.accdient ?? null, simple_repair: master.simpleRepair ?? null,
+    inspector_name: str(summary.inspName) ?? str(detail.inspName), body_findings_count: Array.isArray(inspection.outers) ? inspection.outers.length : 0,
+    body_findings: Array.isArray(summary.outerSummarys) ? summary.outerSummarys : [] }, items, raw_payload: { inspection, summary } };
+}
+
+async function loadJson(path: string): Promise<Plan> {
+  return JSON.parse(await readFile(path, "utf8")) as Plan;
+}
+
+async function main() {
+  const optionCatalog = await fetchStandardOptionCatalog();
+  const cohort = await loadJson(powerPlanPath);
+  const preliminaryReport = JSON.parse(await readFile(preliminaryPath, "utf8")) as { runId: string; calculations: Array<{ sourceListingId: string }> };
+  if (cohort.runId !== targetRunId || preliminaryReport.runId !== targetRunId || cohort.candidates.length !== expectedCandidates) throw new Error("Power reports do not match the exact 500-car run");
+  const preliminaryIds = new Set(preliminaryReport.calculations.map((row) => row.sourceListingId));
+  const cohortById = new Map(cohort.candidates.map((row) => [row.sourceListingId, row]));
+  const eligible = cohort.candidates.filter((row) => row.status === "approved_match" || preliminaryIds.has(row.sourceListingId));
+  if (eligible.length !== expectedCandidates || new Set(eligible.map((row) => row.sourceListingId)).size !== expectedCandidates) throw new Error(`Expected 500 unique powered cars, found ${eligible.length}`);
+  const powerClassById = new Map(eligible.map((row) => [row.sourceListingId, row.status === "approved_match" ? "approved" as const : "preliminary" as const]));
+  const db = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
+  await db.connect();
+  let committed = false;
+  try {
+    await db.query("begin");
+    await db.query("select pg_advisory_xact_lock(hashtext('tl-auto-new-encar-publication'))");
+    const refs = (await db.query<AutomaticPowerReferenceRow>(`select configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,year_from,year_to,power_hp,power_kw,source,status from public.vehicle_power_automatic_reference where status='automatic'`)).rows;
+    const ids = eligible.map((row) => row.sourceListingId);
+    const stageRows = (await db.query<Stage>(`select q.source_listing_id,q.source_url,q.status queue_status,s.status staging_status,s.fetched_at,s.raw_payload from public.encar_enrichment_queue q join public.encar_enrichment_staging s on s.run_id=q.run_id and s.source_listing_id=q.source_listing_id where q.run_id=$1`, [targetRunId])).rows;
+    if (stageRows.length !== expectedCandidates) throw new Error(`Expected 500 staged rows, found ${stageRows.length}`);
+    const stages = new Map(stageRows.map((row) => [row.source_listing_id, row]));
+    const prepared: Array<{ id: string; row: Stage; plan: PlanRow; class: "approved" | "preliminary"; reference: AutomaticPowerReferenceRow | null }> = [];
+    const exclusions = { dummy: 0, contract: 0, sourcePowerChanged: 0, unavailable: 0 };
+    for (const plan of eligible) {
+      const id = plan.sourceListingId, row = stages.get(id), powerClass = powerClassById.get(id)!;
+      if (!row?.raw_payload) throw new Error(`Missing staged payload: ${id}`);
+      const reference = powerClass === "preliminary" ? resolveAutomaticPowerReference(automaticInput(plan), refs) : null;
+      if (powerClass === "preliminary" && !reference?.power_hp) throw new Error(`Preliminary power no longer resolves: ${id}`);
+      prepared.push({ id, row, plan, class: powerClass, reference });
+    }
+    if (prepared.length !== expectedCandidates) throw new Error(`Cohort drift: ${prepared.length}`);
+    const existing = await db.query<{ source_id: string }>(`select source_id from public.cars where primary_source='encar' and source_id=any($1::text[])`, [ids]);
+    if (existing.rows.length) throw new Error(`Cars already in catalog: ${existing.rows.map((r) => r.source_id).join(",")}`);
+    const rates = await getCbrCalcRates();
+    const specIds = [...new Set(prepared.filter((p) => p.class === "approved").map((p) => str(obj(p.plan.power).specId)!))];
+    const specs = new Map((await db.query<Spec>(`select id,version,status,calculation_power_kw,power_basis,evidence_id from public.vehicle_power_specs where id=any($1::uuid[])`, [specIds])).rows.map((row) => [row.id, row]));
+    const planned: Array<{ item: typeof prepared[number]; car: Obj; calc: ReturnType<typeof calculateRuVladivostok>; photos: ReturnType<typeof gallery>; options: ReturnType<typeof choiceOptions>; inspection: ReturnType<typeof inspectionReport> }> = [];
+    for (const item of prepared) {
+      const { id, row, plan, reference } = item;
+      const payload = obj(row.raw_payload), detail = obj(payload.detail), ad = obj(detail.advertisement), spec = obj(detail.spec), manage = obj(detail.manage), category = obj(detail.category);
+      if (row.queue_status !== "succeeded" || row.staging_status !== "succeeded" || ad.status !== "ADVERTISE") throw new Error(`Source no longer staged as active: ${id}`);
+      const c = plan.configuration;
+      const year = positive(c.year), engineCc = positive(c.engineCc ?? spec.displacement), priceUnits = positive(ad.price);
+      const fuel = str(c.fuelType), brand = str(c.brand), model = str(c.model);
+      const photos = gallery(payload), options = choiceOptions(payload, optionCatalog), inspection = inspectionReport(payload);
+      if (!year || !engineCc || !priceUnits || !fuel || !brand || !model || !row.source_url || !photos.some((p) => p.category === "outer"))
+        throw new Error(`Core source data incomplete: ${id}`);
+      const month = resolveCalculationMonth({ registrationDate: str(manage.registDateTime) });
+      const plannedPower = obj(plan.power);
+      const approvedSpec = item.class === "approved" ? specs.get(str(plannedPower.specId) ?? "") : null;
+      if (item.class === "approved" && (!approvedSpec || approvedSpec.status !== "approved" || Math.abs(Number(approvedSpec.calculation_power_kw) - Number(plannedPower.calculationPowerKw)) > 0.0001))
+        throw new Error(`Approved specification changed: ${id}`);
+      const powerKw = item.class === "approved" ? positive(plannedPower.calculationPowerKw) : positive(reference?.power_kw) ?? (positive(reference?.power_hp) ?? 0) * KW_PER_HP;
+      const powerHp = item.class === "approved" ? Math.round((powerKw ?? 0) / KW_PER_HP) : Math.round(Number(reference?.power_hp));
+      const basis = item.class === "approved" ? str(plannedPower.powerBasis) : powerBasisForFuel(fuel);
+      const evidenceTier = str(plannedPower.evidenceTier);
+      const source = item.class === "approved" ? `tl_auto_approved_reference:${evidenceTier ?? "unknown"}` : str(reference?.source);
+      if (!powerKw || !powerHp || !basis || !source) throw new Error(`Power not resolved: ${id}`);
+      const powerConfidence = item.class === "approved" && ["T1", "T2"].includes(evidenceTier ?? "") ? "high" : "automatic";
+      // A claimed confidence cannot promote weak evidence: anything below T1/T2
+      // stays provisional, which is how three T3 cards were published as final.
+      const powerFinality = storedPowerFinality({ powerConfidence, calculationPowerKw: powerKw,
+        powerResolutionSource: source, calculationPowerSpecId: approvedSpec?.id ?? null, evidenceTier });
+      if (powerFinality == null) throw new Error(`Power finality not resolvable: ${id}`);
+      const priceKrw = Math.round(priceUnits * 10_000);
+      const calc = calculateRuVladivostok({ priceKrw, year, month: month.month, engineCc, fuelType: fuel,
+        ...(item.class === "approved" ? { powerKw } : { powerHp }), destinationCity: "Владивосток",
+        rates: rates.rates, customsRates: rates.customsRates, ratesAsOf: rates.asOf, ratesSource: rates.source, rateDetails: rates.rateDetails });
+      const priceRub = Math.round(calc.totalRub);
+      const verdict = evaluatePublication({ priceRub, hasSnapshot: true, calculationPowerStatus: item.class === "approved" ? "approved" : "matched",
+        calculationPowerKw: powerKw, powerBasis: basis, powerResolutionSource: source, calculationMonth: month.month,
+        fuelType: fuel, hybridDvsPowerHp: null, powerConfidence,
+        calculationPowerSpecId: approvedSpec?.id ?? null, legacyCalculationStatus: null });
+      if (!verdict.ok || verdict.finality !== (powerFinality === "final" ? "final" : "preliminary")) throw new Error(`Publication contract failed: ${id}: ${JSON.stringify(verdict)}`);
+      const sourceDate = str(manage.firstAdvertisedDateTime);
+      const vehicleNo = normalizePlate(detail.vehicleNo) || null;
+      const car: Obj = { primary_source: "encar", source_kind: "encar", source_id: id, source_url: row.source_url,
+        enrichment_status: "source_only", encar_enrichment_status: "applied", is_available: true,
+        published_at: sourceDate, published_at_source: sourceDate ? "source_payload" : "unknown", catalog_added_at: new Date().toISOString(),
+        source_updated_at: str(manage.modifyDateTime), last_seen_at: new Date().toISOString(),
+        brand, model, year, registration_year: year, mileage_km: num(spec.mileage), price_krw: priceKrw, price_rub: priceRub,
+        engine_cc: engineCc, power_hp: powerHp, power_source: source, power_confidence: powerConfidence, power_finality: powerFinality,
+        power_resolution_note: item.class === "approved" ? `Approved TL Auto spec ${approvedSpec?.id}` : "Preliminary automatic reference; exact trim power to be confirmed",
+        fuel_type: fuel, transmission: normalizeTransmissionType(spec.transmissionName), drive_type: catalogDriveType(c.driveType), color: normalizeColor(spec.colorName), body_type: str(spec.bodyName),
+        grade: str(category.gradeEnglishName), trim: str(category.gradeDetailEnglishName), badge: str(c.badge), badge_detail: str(c.trim),
+        vehicle_no_masked: vehicleNo, vin_masked: str(detail.vin), media_count: photos.length,
+        vehicle_specs: { source: "encar", seats: num(spec.seatCount), power_confidence: powerConfidence,
+          encar_options_count: Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).length : 0,
+          encar_standard_option_codes: obj(detail.options).standard ?? [], encar_full_gallery_count: photos.length,
+          enrichment_run_id: targetRunId },
+        calculation_power_status: item.class === "approved" ? "approved" : "matched",
+        calculation_power_spec_id: approvedSpec?.id ?? null, calculation_power_spec_version: approvedSpec?.version ?? null,
+        calculation_power_kw: Number(powerKw.toFixed(4)), power_basis: basis, power_resolution_source: source,
+        calculation_month: month.month, calculation_month_source: month.source };
+      planned.push({ item, car, calc, photos, options, inspection });
+    }
+    const vehicleNumbers = planned.map((p) => str(p.car.vehicle_no_masked)).filter((p): p is string => Boolean(p));
+    const hashes = vehicleNumbers.map(vehicleNoHash);
+    if (new Set(hashes).size !== hashes.length) throw new Error("Duplicate vehicle numbers within publication cohort");
+    const existingHashes = await db.query<{ vehicle_no_hash: string }>(`select distinct vehicle_no_hash from public.cars where vehicle_no_hash=any($1::text[]) and is_available=true`, [hashes]);
+    const duplicateHashes = new Set(existingHashes.rows.map((row) => row.vehicle_no_hash));
+    const toPublish = planned.filter((p) => !duplicateHashes.has(vehicleNoHash(String(p.car.vehicle_no_masked ?? ""))));
+    if (planned.length !== expectedCandidates || toPublish.length + duplicateHashes.size !== expectedCandidates)
+      throw new Error(`Existing-catalog overlap changed: candidates=${planned.length}, new=${toPublish.length}, overlapping plates=${duplicateHashes.size}`);
+    const report = { dryRun: !write, runIds: [targetRunId], selected: toPublish.length,
+      alreadyInCatalogByPlate: duplicateHashes.size,
+      approved: toPublish.filter((p) => p.item.class === "approved").length,
+      preliminary: toPublish.filter((p) => p.item.class === "preliminary").length,
+      excluded: exclusions, photos: toPublish.reduce((n, p) => n + p.photos.length, 0),
+      choiceOptions: toPublish.reduce((n, p) => n + p.options.length, 0),
+      inspectionReports: toPublish.filter((p) => p.inspection).length,
+      priceRubSum: toPublish.reduce((n, p) => n + Number(p.car.price_rub), 0) };
+    if (!write) { console.log(JSON.stringify(report, null, 2)); await db.query("rollback"); return; }
+    const toInsert = probe ? toPublish.slice(0, 1) : toPublish;
+    for (let index = 0; index < toInsert.length; index++) {
+      const p = toInsert[index];
+      const columns = Object.keys(p.car);
+      const values = Object.values(p.car).map((value) => value && typeof value === "object" && !Array.isArray(value) ? JSON.stringify(value) : value);
+      const insert = await db.query<{ id: string }>(`insert into public.cars(${columns.join(",")}) values (${columns.map((_, i) => `$${i + 1}`).join(",")}) returning id`, values);
+      const carId = insert.rows[0].id;
+      await db.query(`insert into public.source_snapshots(source,source_id,source_url,payload,fetched_at,parser_version,status) values ('encar',$1,$2,$3,$4,'encar-staged-full-20260924','ok')`,
+        [p.item.id, p.item.row.source_url, JSON.stringify(p.item.row.raw_payload), p.item.row.fetched_at]);
+      await persistCatalogNamingPg(db,carId);
+      await db.query(`insert into public.car_media(car_id,source,media_type,category,url,thumbnail_url,sort_order,is_primary,legal_mode)
+        select $1,'encar','image',p.category,p.url,p.url,p.sort_order,p.is_primary,'external_url'
+        from jsonb_to_recordset($2::jsonb) as p(category text,url text,sort_order integer,is_primary boolean)`,
+        [carId, JSON.stringify(p.photos.map((photo, i) => ({ ...photo, sort_order: i, is_primary: i === 0 })))]);
+      if (p.options.length) await db.query(`insert into public.car_options(car_id,source,category,source_code,name_original,name_ru,value_original,value_ru,price_krw,description_original,description_ru,is_present,sort_order)
+        select $1,'encar',o.category,o.source_code,o.name_original,o.name_ru,o.value_original,o.value_ru,o.price_krw,o.description_original,o.description_ru,true,o.sort_order
+        from jsonb_to_recordset($2::jsonb) as o(category text,source_code text,name_original text,name_ru text,value_original text,value_ru text,price_krw bigint,description_original text,description_ru text,sort_order integer)`,
+        [carId, JSON.stringify(p.options.map((option, i) => ({ ...option, sort_order: 1000 + i })))]);
+      if (p.inspection) await db.query(`insert into public.car_condition_reports(car_id,source,report_type,summary,items,raw_payload) values ($1,'encar','encar_inspection',$2,$3,$4)`,
+        [carId, JSON.stringify(p.inspection.summary), JSON.stringify(p.inspection.items), JSON.stringify(p.inspection.raw_payload)]);
+      await db.query(`insert into public.calc_snapshots(car_id,country_code,destination_city,importer_type,calc_version,inputs,rates,result,car_price_rub,duty_rub,fees_rub,util_rub,freight_rub,broker_rub,total_rub)
+        values ($1,'RU','Владивосток','individual',$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+        [carId, p.calc.calcVersion, JSON.stringify(p.car), JSON.stringify({ ...p.calc.rates, details: p.calc.rateDetails }), JSON.stringify(p.calc),
+          Math.round(p.calc.carPriceRub), Math.round(p.calc.dutyRub), Math.round(p.calc.feesRub), Math.round(p.calc.utilRub),
+          Math.round(p.calc.freightRub), Math.round(p.calc.brokerRub), Math.round(p.calc.totalRub)]);
+      if ((index + 1) % 25 === 0) console.log(JSON.stringify({ event: "transaction_prepared", cars: index + 1, total: toInsert.length }));
+    }
+    if (probe) {
+      await db.query("rollback");
+      console.log(JSON.stringify({ probe: true, insertedInTransaction: toInsert.length, committed: false }));
+      return;
+    }
+    const verify = await db.query<{ cars: string; snapshots: string; media: string }>(`select
+      (select count(*) from public.cars where primary_source='encar' and source_id=any($1::text[]) and is_available=true)::text cars,
+      (select count(distinct s.car_id) from public.calc_snapshots s join public.cars c on c.id=s.car_id where c.primary_source='encar' and c.source_id=any($1::text[]))::text snapshots,
+      (select count(distinct m.car_id) from public.car_media m join public.cars c on c.id=m.car_id where c.primary_source='encar' and c.source_id=any($1::text[]))::text media`, [ids]);
+    const v = verify.rows[0];
+    if (Number(v.cars) !== toInsert.length || Number(v.snapshots) !== toInsert.length || Number(v.media) !== toInsert.length) throw new Error(`Pre-commit verification failed: ${JSON.stringify(v)}`);
+    await db.query("commit");
+    committed = true;
+    console.log(JSON.stringify({ ...report, committed, verified: v }, null, 2));
+  } catch (error) {
+    if (!committed) await db.query("rollback").catch(() => undefined);
+    throw error;
+  } finally { await db.end(); }
+}
+
+main().catch((error) => { console.error(error instanceof Error ? error.stack ?? error.message : error); process.exit(1); });
