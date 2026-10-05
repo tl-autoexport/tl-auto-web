@@ -234,6 +234,7 @@ export default async function CarDetailPage({
             powerConfidence={car.power_confidence}
             powerFinality={car.power_finality}
             priceKrw={car.price_krw}
+            priceRub={car.price_rub}
             source={source}
             sourceId={sourceId}
             title={title}

@@ -57,6 +57,8 @@ type PriceCalculationCardProps = {
   /** Stored finality; when present it decides the preliminary notice. */
   powerFinality?: "final" | "provisional" | null;
   priceKrw: number | null;
+  /** The canonical published catalog price; snapshot totals must agree with it. */
+  priceRub: number | null;
   source: string;
   sourceId: string;
   title: string;
@@ -181,6 +183,7 @@ function RuPriceCalculationCard({
   powerConfidence,
   powerFinality,
   priceKrw,
+  priceRub,
   source,
   sourceId,
   title,
@@ -201,10 +204,12 @@ function RuPriceCalculationCard({
     calc: CalculationSnapshot;
     sourceCalculatedAt: string | null;
   }>();
-  const activeCalc =
-    refreshedCalc?.sourceCalculatedAt === (calc?.calculated_at ?? null)
-      ? refreshedCalc.calc
-      : calc;
+  const storedCalcMatchesPublishedPrice = priceRub == null ||
+    (calc?.total_rub != null && Math.abs(Number(calc.total_rub) - priceRub) <= 1);
+  const activeCalc = refreshedCalc?.sourceCalculatedAt === (calc?.calculated_at ?? null)
+    ? refreshedCalc.calc
+    : storedCalcMatchesPublishedPrice ? calc : undefined;
+  const canRefreshCalculation = storedCalcMatchesPublishedPrice || priceRub == null;
   const [isRefreshing, setRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const delivery = city.id === "moscow" ? 220_000 : 0;
@@ -223,7 +228,7 @@ function RuPriceCalculationCard({
   const customs = duty + excise + vat + number(activeCalc?.fees_rub) + number(activeCalc?.util_rub);
   // Do not display a stored total that was built from a different set of
   // fields. The card total is always the exact sum of its visible rows.
-  const total = car + korea + russia + customs;
+  const total = activeCalc ? car + korea + russia + customs : priceRub ?? 0;
   const displayTotal = currency === "USD" && dealerUsdRub > 0 ? total / dealerUsdRub : total;
   const calculatedAt = activeCalc?.calculated_at
     ? new Intl.DateTimeFormat("ru-RU", {
@@ -313,6 +318,11 @@ function RuPriceCalculationCard({
           {formatVehicleYear(year)} · {rub.format(mileageKm ?? 0)} км ·{" "}
           {formatEngineCapacity(engineCc)} · {fuel}
         </p>
+        {!storedCalcMatchesPublishedPrice ? (
+          <p className="mt-2 rounded-lg border border-[#ead8ac] bg-[#fffaf0] px-3 py-2 text-xs leading-5 text-[#6b5325]">
+            Показана актуальная цена из каталога. Детализация расчёта обновляется.
+          </p>
+        ) : null}
 
         <div className="mt-1.5 flex flex-wrap items-center gap-2 sm:mt-0">
           <span className="rounded-full bg-[#fff0a5] px-2.5 py-1 text-[11px] font-semibold text-[#5b4d00] sm:px-3 sm:text-xs">
@@ -398,13 +408,14 @@ function RuPriceCalculationCard({
 
         <div className="mt-4 grid gap-2.5 sm:mt-5 sm:gap-3">
           <button
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded bg-[#956f2c] px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#c91824] sm:px-5 sm:py-3"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded bg-[#956f2c] px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#c91824] disabled:cursor-not-allowed disabled:bg-[#aab2bf] sm:px-5 sm:py-3"
+            disabled={!canRefreshCalculation}
             onClick={() => setModalOpen(true)}
             type="button"
           >
             <Calculator size={17} />
             <span className="sm:hidden">Расчёт</span>
-            <span className="hidden sm:inline">Показать расчёт цены</span>
+            <span className="hidden sm:inline">{canRefreshCalculation ? "Показать расчёт цены" : "Детализация обновляется"}</span>
           </button>
         </div>
         <div className="mt-2 hidden grid-cols-2 gap-2 sm:mt-3 sm:grid">
