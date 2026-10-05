@@ -243,9 +243,14 @@ async function main() {
     }
 
     const live = liveResult.rows;
-    const deferredReasons = new Map<string, Record<string, unknown>>([
-      ["42837452", { reason: "existing reference disagrees with source evidence", existingPower: 252, proposedPower: 255 }],
+    const existingReferenceDecisions = new Map<string, { power: number; source: string; note: string }>([
+      ["42837452", { power: 252, source: "manual_web_research_0358", note: "Official Genesis source retained; EncarRus 255 PS candidate declined" }],
+      ["42444571", { power: 381, source: "carpoint_one", note: "Existing CarPoint reference retained; Danawa 6250 PS candidate rejected as invalid" }],
+      ["42824478", { power: 308, source: "carpoint_one", note: "Existing CarPoint reference retained over conflicting EncarRus candidate" }],
+      ["42782354", { power: 75, source: "engine_fallback", note: "Existing engine fallback reference retained over conflicting EncarRus candidate" }],
+      ["42089782", { power: 202, source: "carpoint_one", note: "Existing CarPoint reference retained over conflicting Danawa candidate" }],
     ]);
+    const deferredReasons = new Map<string, Record<string, unknown>>();
     const blockedConfigurations = new Set<string>();
     const acceptedExisting: Array<{ row: ReconciledRow; reference: Reference }> = [];
     for (const row of built.selected) {
@@ -260,15 +265,21 @@ async function main() {
         norm(ref.badge_detail) === norm(c.trim) && Number(ref.year_from) === Number(c.year) &&
         Number(ref.year_to) === Number(c.year) &&
         (!ref.configuration_key.includes("|listing=") || ref.configuration_key.endsWith(`|listing=${id}`)));
-      if (id === "42837452") {
-        const genesis = sameReferences.find((ref) => Number(ref.power_hp) === 252 &&
-          ref.source === "manual_web_research_0358" && ref.status === "automatic" &&
-          ref.note.includes("newsroom.genesis.com"));
-        if (!genesis || target.powerPs !== 255 || norm(c.brand) !== "genesis" || norm(c.model) !== "g70") {
+      const decision = existingReferenceDecisions.get(id);
+      if (decision) {
+        const retained = sameReferences.find((ref) => Number(ref.power_hp) === decision.power &&
+          ref.source === decision.source && (ref.status === "automatic" || ref.status === "confirmed"));
+        if (!retained) throw new Error(`Expected retained reference missing for reviewed listing ${id}`);
+        if (id === "42837452" && (!retained.note.includes("newsroom.genesis.com") ||
+            target.powerPs !== 255 || norm(c.brand) !== "genesis" || norm(c.model) !== "g70")) {
           throw new Error("Genesis official-source decision guard failed for listing 42837452");
         }
-        target.powerPs = 252;
-        acceptedExisting.push({ row, reference: genesis });
+        if (id === "42444571" && target.powerPs !== 6250 || id === "42824478" && target.powerPs !== 312 ||
+            id === "42782354" && target.powerPs !== 76 || id === "42089782" && target.powerPs !== 194) {
+          throw new Error(`Expected source conflict changed for reviewed listing ${id}`);
+        }
+        target.powerPs = decision.power;
+        acceptedExisting.push({ row, reference: retained });
         continue;
       }
       const disagreeing = sameReferences.find((ref) => Number(ref.power_hp) !== target.powerPs ||
@@ -367,9 +378,9 @@ async function main() {
         ...row,
         ...deferredReasons.get(String(row.sourceListingId)),
       })),
-      acceptedExistingOfficialListings: acceptedExisting.map(({ row, reference }) => ({
+      acceptedExistingReferenceListings: acceptedExisting.map(({ row, reference }) => ({
         sourceListingId: row.sourceListingId, powerHp: reference.power_hp, source: reference.source,
-        note: "Retained existing official Genesis reference; EncarRus candidate 255 PS declined",
+        note: existingReferenceDecisions.get(String(row.sourceListingId))?.note,
       })),
       remainingListings: plan.candidates.length - plan.candidates.filter((row) => row.status === "approved_match").length - built.selected.length - acceptedExisting.length,
       preliminaryListings: built.selected.length,
@@ -420,7 +431,7 @@ async function main() {
     await db.query("commit");
     await writeFile(auditPath, JSON.stringify({ ...audit, committed: true }, null, 2) + "\n");
     console.log(JSON.stringify({ committed: true, preliminaryListings: built.selected.length,
-      acceptedExistingOfficialListings: acceptedExisting.length, deferredConflictListings: built.excluded.length,
+      acceptedExistingReferenceListings: acceptedExisting.length, deferredConflictListings: built.excluded.length,
       exactConfigurations: built.configurationCount, referenceRules: built.proposed.length, verifiedListings: built.targetInputs.size,
       preliminaryOnly: true, carsChanged: 0, calculationsChanged: 0, pricesChanged: 0, publications: 0 }, null, 2));
   } catch (error) {
