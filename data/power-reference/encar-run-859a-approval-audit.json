@@ -1,0 +1,1849 @@
+{
+  "runId": "859a2544-7c79-4014-bee1-f1920d619215",
+  "scope": "All 258 recovered research candidates; source verification and proposed status only",
+  "summary": {
+    "total": 258,
+    "eligibleForApproval": 30,
+    "retainPreliminary": 228,
+    "databaseWrites": 0
+  },
+  "policy": "Manufacturer publication must state chosen power and match model generation, engine, fuel and material version qualifiers; unavailable documents or model-year ambiguity remain preliminary. Source links alone never imply approval.",
+  "decisions": [
+    {
+      "sourceListingId": "25819864",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "38491809",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41159512",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41376408",
+      "powerPs": 140,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://news.cision.com/hyundai-motor-company/r/hyundai-unveils-all-new-avante-in-korea,c504766",
+      "matchingBasis": "Korean Avante MD 1.6 GDI; M16/GDI badge and 2011–2014 model period match. Later 2015 rows without generation are not promoted.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "28992542",
+      "powerPs": 270,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2010-grandeur-hg",
+      "matchingBasis": "HG300 petrol GDI, Korean HG generation, 2999 cc (3000 is nominal rounding), 270 PS. Neither LPi nor later IG.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "38577184",
+      "powerPs": 381,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "40134943",
+      "powerPs": 235,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "40562721",
+      "powerPs": 275,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.media.stellantis.com/uk-en/maserati/press/new-ghibli-maseratis-first-saloon-in-the-premium-e-segment-features-two-twin-turbo-v6-petrol-engines-a-brand-new-efficient-diesel-engine-and-undiminished-luxury",
+      "matchingBasis": "Ghibli original generation 2987 cc V6 diesel, rated 202 kW/275 hp in manufacturer release; listed 3.0 diesel variant matches. Retain manufacturer nominal metric output 275 PS.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "40978087",
+      "powerPs": 260,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "40978684",
+      "powerPs": 149,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41015204",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41032963",
+      "powerPs": 281,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41039407",
+      "powerPs": 262,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41039871",
+      "powerPs": 170,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41052455",
+      "powerPs": 367,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41069088",
+      "powerPs": 128,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41072323",
+      "powerPs": 315,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41312948",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41355983",
+      "powerPs": 435,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41379325",
+      "powerPs": 256,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41407525",
+      "powerPs": 252,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41407773",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41426393",
+      "powerPs": 190,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.press.bmwgroup.com/deutschland/article/detail/T0280559DE/neue-einstiegsmotorisierung-fuer-den-bmw-6er-gran-turismo",
+      "matchingBasis": "G32 620d 2019 RWD, 2.0 diesel 1995 cc; 2018 manufacturer introduction explicitly specifies 140 kW/190 PS. Does not approve xDrive from this RWD release.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41443230",
+      "powerPs": 194,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41463070",
+      "powerPs": 166,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41473495",
+      "powerPs": 156,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://blog.gm-korea.co.kr/4070?category=431279",
+      "matchingBasis": "GM Korea 2014 Malibu diesel release: 1956 cc, 156 PS, automatic. Listed 2014/2015 diesel versions match.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41638204",
+      "powerPs": 75,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41708634",
+      "powerPs": 190,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41715280",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "Chat assigned Sportage R a Danawa URL also used for Spark; source link requires correction.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41718835",
+      "powerPs": 306,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41720872",
+      "powerPs": 612,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41723867",
+      "powerPs": 201,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://news.cision.com/hyundai-motor-company/r/hyundai-launches-all-new-grandeur-in-korea,g537067",
+      "matchingBasis": "HG240 2359 cc petrol, early 2011/2012 Korean generation; distinguishes later 190 PS HG240.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41731022",
+      "powerPs": 201,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://news.cision.com/hyundai-motor-company/r/hyundai-launches-all-new-grandeur-in-korea,g537067",
+      "matchingBasis": "HG240 2359 cc petrol, early 2011/2012 Korean generation; distinguishes later 190 PS HG240.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41724139",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41726597",
+      "powerPs": 300,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41729520",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41731130",
+      "powerPs": 175,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai.com/kr/ko/vehicles/grand-starex/20my/specifications.html",
+      "matchingBasis": "Grand Starex 2497 cc diesel van/wagon with automatic transmission explicitly supplied by the user in source payload checks. Specification distinguishes 140 PS manual and 175 PS automatic; same engine configuration as 2016–2019 records.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41741347",
+      "powerPs": 197,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41747903",
+      "powerPs": 144,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41749445",
+      "powerPs": 250,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41750390",
+      "powerPs": 204,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41751402",
+      "powerPs": 186,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RUM/catalog/catalog_all-new-sorento.pdf",
+      "matchingBasis": "Korean UM All New Sorento, 1995 cc R2.0 E-VGT diesel 2WD, 186 PS; official January 2015 catalogue. Rows explicitly identify All New Sorento generation, before facelift, including late-2014 first sales.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41752725",
+      "powerPs": 186,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RUM/catalog/catalog_all-new-sorento.pdf",
+      "matchingBasis": "Korean UM All New Sorento, 1995 cc R2.0 E-VGT diesel 2WD, 186 PS; official January 2015 catalogue. Rows explicitly identify All New Sorento generation, before facelift, including late-2014 first sales.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41756385",
+      "powerPs": 381,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41757808",
+      "powerPs": 340,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41767214",
+      "powerPs": 510,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41768228",
+      "powerPs": 150,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41769098",
+      "powerPs": 162,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41773133",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "41792765",
+      "powerPs": 258,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42058830",
+      "powerPs": 187,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42064597",
+      "powerPs": 175,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai.com/kr/ko/vehicles/grand-starex/20my/specifications.html",
+      "matchingBasis": "Grand Starex 2497 cc diesel van/wagon with automatic transmission explicitly supplied by the user in source payload checks. Specification distinguishes 140 PS manual and 175 PS automatic; same engine configuration as 2016–2019 records.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42071415",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42076659",
+      "powerPs": 281,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42081675",
+      "powerPs": 334,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42082247",
+      "powerPs": 243,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42088558",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42092103",
+      "powerPs": 282,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42092529",
+      "powerPs": 175,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai.com/kr/ko/vehicles/grand-starex/20my/specifications.html",
+      "matchingBasis": "Grand Starex 2497 cc diesel van/wagon with automatic transmission explicitly supplied by the user in source payload checks. Specification distinguishes 140 PS manual and 175 PS automatic; same engine configuration as 2016–2019 records.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42095503",
+      "powerPs": 100,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42095517",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42108224",
+      "powerPs": 76,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42471178",
+      "powerPs": 76,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42109258",
+      "powerPs": 190,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42110573",
+      "powerPs": 140,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://news.cision.com/hyundai-motor-company/r/hyundai-unveils-all-new-avante-in-korea,c504766",
+      "matchingBasis": "Korean Avante MD 1.6 GDI; M16/GDI badge and 2011–2014 model period match. Later 2015 rows without generation are not promoted.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42115197",
+      "powerPs": 252,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42170621",
+      "powerPs": 172,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42383815",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42408893",
+      "powerPs": 300,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42417266",
+      "powerPs": 168,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42418956",
+      "powerPs": 168,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42421071",
+      "powerPs": 163,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42421255",
+      "powerPs": 141,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42422310",
+      "powerPs": 385,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42426399",
+      "powerPs": 315,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42429078",
+      "powerPs": 165,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42433729",
+      "powerPs": 163,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42435007",
+      "powerPs": 194,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42435631",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42437811",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42439745",
+      "powerPs": 75,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42440484",
+      "powerPs": 126,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42441303",
+      "powerPs": 381,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42441739",
+      "powerPs": 123,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42444446",
+      "powerPs": 290,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42445707",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42446086",
+      "powerPs": 485,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42450568",
+      "powerPs": 372,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42451720",
+      "powerPs": 303,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42453781",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42454614",
+      "powerPs": 245,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42456016",
+      "powerPs": 175,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42456361",
+      "powerPs": 425,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42464332",
+      "powerPs": 190,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42466930",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42467080",
+      "powerPs": 178,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42467582",
+      "powerPs": 315,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42467892",
+      "powerPs": 110,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42473493",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42473550",
+      "powerPs": 168,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42475046",
+      "powerPs": 200,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42476408",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42481691",
+      "powerPs": 115,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42486951",
+      "powerPs": 286,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42598957",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42599369",
+      "powerPs": 126,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42719083",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42719188",
+      "powerPs": 156,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://blog.gm-korea.co.kr/4070?category=431279",
+      "matchingBasis": "GM Korea 2014 Malibu diesel release: 1956 cc, 156 PS, automatic. Listed 2014/2015 diesel versions match.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42728396",
+      "powerPs": 178,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42743263",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42757468",
+      "powerPs": 178,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42772769",
+      "powerPs": 145,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42776504",
+      "powerPs": 186,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42777601",
+      "powerPs": 82,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42782013",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42782159",
+      "powerPs": 240,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42782390",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42783521",
+      "powerPs": 300,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42785344",
+      "powerPs": 290,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42786117",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42786404",
+      "powerPs": 181,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42787657",
+      "powerPs": 178,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42787953",
+      "powerPs": 350,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42789337",
+      "powerPs": 177,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42789341",
+      "powerPs": 130,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42791323",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42791539",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42791545",
+      "powerPs": 360,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42793016",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42793340",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42793470",
+      "powerPs": 510,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42794126",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42794344",
+      "powerPs": 610,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42794802",
+      "powerPs": 175,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42794874",
+      "powerPs": 280,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai-n.com/ko/models/n/elantra-n",
+      "matchingBasis": "CN7 Avante N 1998 cc 2.0 turbo, 280 PS normal engine output. NGS temporary 290 PS is explicitly excluded.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42795326",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42795517",
+      "powerPs": 231,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42795523",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42795553",
+      "powerPs": 281,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42796017",
+      "powerPs": 190,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42796152",
+      "powerPs": 126,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42796257",
+      "powerPs": 235,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42796268",
+      "powerPs": 76,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42796453",
+      "powerPs": 170,
+      "decision": "retain_preliminary",
+      "reason": "Chat selected Korean Torres 170 PS but cited global KGM 163 PS; Korean evidence still required.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42796942",
+      "powerPs": 168,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42796987",
+      "powerPs": 190,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42797510",
+      "powerPs": 163,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42798049",
+      "powerPs": 175,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42798119",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42798565",
+      "powerPs": 367,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42798956",
+      "powerPs": 350,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42799012",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42799251",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42799404",
+      "powerPs": 245,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.press.bmwgroup.com/korea/article/detail/T0124076KO/bmw-%EC%BD%94%EB%A6%AC%EC%95%84-%EC%8B%A0%ED%98%95%EC%97%94%EC%A7%84%EC%9D%B4-%EC%9E%A5%EC%B0%A9%EB%90%9C-2012%EB%85%84%ED%98%95-528i-%EC%B6%9C%EC%8B%9C",
+      "matchingBasis": "BMW Korea 2012 F10 528i and 528i xDrive: 1997 cc four-cylinder, 245 manufacturer nominal PS; 2012/2013 listings match motor and drivetrain.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42799534",
+      "powerPs": 132,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42799540",
+      "powerPs": 136,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42799695",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42799709",
+      "powerPs": 180,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42799810",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42799823",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42799842",
+      "powerPs": 210,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42800579",
+      "powerPs": 151,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42802089",
+      "powerPs": 469,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42803332",
+      "powerPs": 252,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42804786",
+      "powerPs": 172,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42804831",
+      "powerPs": 258,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42805023",
+      "powerPs": 340,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42805480",
+      "powerPs": 198,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42805682",
+      "powerPs": 245,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42805747",
+      "powerPs": 132,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42805850",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42806123",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42806133",
+      "powerPs": 270,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai.com/kr/ko/brand/brandstory/heritage/2010-grandeur-hg",
+      "matchingBasis": "HG300 petrol GDI, Korean HG generation, 2999 cc (3000 is nominal rounding), 270 PS. Neither LPi nor later IG.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42806277",
+      "powerPs": 168,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42806750",
+      "powerPs": 282,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42807649",
+      "powerPs": 126,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42807692",
+      "powerPs": 70,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42808171",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42808326",
+      "powerPs": 123,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_k3gt.pdf",
+      "matchingBasis": "Facelift second-generation K3 2024, 1598 cc naturally aspirated petrol 1.6; July 2023 Korean catalogue table specifies 123 PS, separate from 1591 cc GT 204 PS.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42808654",
+      "powerPs": 281,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.kia.com/kr/vehicles/tasman/specification",
+      "matchingBasis": "Tasman 2025 2497 cc gasoline 2.5 turbo 4WD; Korean official specification 281 PS.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42809516",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42810293",
+      "powerPs": 41,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42810411",
+      "powerPs": 90,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42810450",
+      "powerPs": 135,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42811783",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42812141",
+      "powerPs": 75,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42812675",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42813034",
+      "powerPs": 260,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42813176",
+      "powerPs": 151,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42813240",
+      "powerPs": 235,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42813282",
+      "powerPs": 286,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42813583",
+      "powerPs": 90,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42813758",
+      "powerPs": 146,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42813926",
+      "powerPs": 175,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai.com/kr/ko/vehicles/grand-starex/20my/specifications.html",
+      "matchingBasis": "Grand Starex 2497 cc diesel van/wagon with automatic transmission explicitly supplied by the user in source payload checks. Specification distinguishes 140 PS manual and 175 PS automatic; same engine configuration as 2016–2019 records.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42813973",
+      "powerPs": 235,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42814094",
+      "powerPs": 300,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/grandeur-catalog-eng.pdf",
+      "matchingBasis": "GN7 2023, 3470 cc gasoline 3.5 2WD; official Korean GN7 table gives 300 PS. Not LPG 240 PS or 2.5 198 PS.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42814321",
+      "powerPs": 132,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42814416",
+      "powerPs": 177,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42814469",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42814550",
+      "powerPs": 282,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42814724",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42814916",
+      "powerPs": 140,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://news.cision.com/hyundai-motor-company/r/hyundai-unveils-all-new-avante-in-korea,c504766",
+      "matchingBasis": "Korean Avante MD 1.6 GDI; M16/GDI badge and 2011–2014 model period match. Later 2015 rows without generation are not promoted.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42815175",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42815803",
+      "powerPs": 159,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/html/pdf/en-cn-catalog/en-catalog/grand-starex-catalog-eng.pdf",
+      "matchingBasis": "Grand Starex 2359 cc LPi van; official Korean catalogue explicitly lists LPi van and wagon at 159 PS; no diesel/gearbox ambiguity.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42815824",
+      "powerPs": 146,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42815932",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42816437",
+      "powerPs": 300,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/grandeur-catalog-eng.pdf",
+      "matchingBasis": "GN7 2023, 3470 cc gasoline 3.5 2WD; official Korean GN7 table gives 300 PS. Not LPG 240 PS or 2.5 198 PS.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42816765",
+      "powerPs": 186,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42816782",
+      "powerPs": 334,
+      "decision": "retain_preliminary",
+      "reason": "LPG conversion inferred; exact listing conversion not independently confirmed; retains 334 PS candidate.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42817032",
+      "powerPs": 140,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://news.cision.com/hyundai-motor-company/r/hyundai-unveils-all-new-avante-in-korea,c504766",
+      "matchingBasis": "Korean Avante MD 1.6 GDI; M16/GDI badge and 2011–2014 model period match. Later 2015 rows without generation are not promoted.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42817066",
+      "powerPs": 168,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42817484",
+      "powerPs": 175,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42817974",
+      "powerPs": 180,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42819940",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42821018",
+      "powerPs": 140,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42821804",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42822243",
+      "powerPs": 146,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42822494",
+      "powerPs": 300,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/grandeur-catalog-eng.pdf",
+      "matchingBasis": "GN7 2023, 3470 cc gasoline 3.5 2WD; official Korean GN7 table gives 300 PS. Not LPG 240 PS or 2.5 198 PS.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42822530",
+      "powerPs": 151,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42822701",
+      "powerPs": 252,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42823578",
+      "powerPs": 208,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42823607",
+      "powerPs": 123,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_k3gt.pdf",
+      "matchingBasis": "Facelift second-generation K3 2024, 1598 cc naturally aspirated petrol 1.6; July 2023 Korean catalogue table specifies 123 PS, separate from 1591 cc GT 204 PS.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42823616",
+      "powerPs": 245,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42824072",
+      "powerPs": 235,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42824279",
+      "powerPs": 190,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42824341",
+      "powerPs": 707,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42825350",
+      "powerPs": 240,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42825907",
+      "powerPs": 136,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42826676",
+      "powerPs": 78,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42827441",
+      "powerPs": 155,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42827898",
+      "powerPs": 123,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42830139",
+      "powerPs": 70,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42830703",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42830821",
+      "powerPs": 186,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42830847",
+      "powerPs": 186,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42831329",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42831435",
+      "powerPs": 186,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RUM/catalog/catalog_all-new-sorento.pdf",
+      "matchingBasis": "Korean UM All New Sorento, 1995 cc R2.0 E-VGT diesel 2WD, 186 PS; official January 2015 catalogue. Rows explicitly identify All New Sorento generation, before facelift, including late-2014 first sales.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42831814",
+      "powerPs": 190,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42832405",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42832748",
+      "powerPs": 135,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42832788",
+      "powerPs": 184,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42833583",
+      "powerPs": 334,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42833822",
+      "powerPs": 252,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42833908",
+      "powerPs": 284,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42834040",
+      "powerPs": 144,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42834638",
+      "powerPs": 260,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42835247",
+      "powerPs": 218,
+      "decision": "retain_preliminary",
+      "reason": "Chat explicitly requested checking A7 40 TDI designation versus 2967 cc; 218 PS remains provisional.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42836063",
+      "powerPs": 400,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42837410",
+      "powerPs": 245,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.press.bmwgroup.com/korea/article/detail/T0124076KO/bmw-%EC%BD%94%EB%A6%AC%EC%95%84-%EC%8B%A0%ED%98%95%EC%97%94%EC%A7%84%EC%9D%B4-%EC%9E%A5%EC%B0%A9%EB%90%9C-2012%EB%85%84%ED%98%95-528i-%EC%B6%9C%EC%8B%9C",
+      "matchingBasis": "BMW Korea 2012 F10 528i and 528i xDrive: 1997 cc four-cylinder, 245 manufacturer nominal PS; 2012/2013 listings match motor and drivetrain.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42838437",
+      "powerPs": 202,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42838858",
+      "powerPs": 135,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42838879",
+      "powerPs": 190,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42839043",
+      "powerPs": 240,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42839503",
+      "powerPs": 150,
+      "decision": "retain_preliminary",
+      "reason": "User accepted 150 PS best-fit camper estimate; official van rating does not establish exact camper base version.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42839616",
+      "powerPs": 187,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42839626",
+      "powerPs": 175,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42839680",
+      "powerPs": 186,
+      "decision": "eligible_for_approval",
+      "officialSourceUrl": "https://www.kia.com/content/dam/kwcms/kr/ko/files/RUM/catalog/catalog_all-new-sorento.pdf",
+      "matchingBasis": "Korean UM All New Sorento, 1995 cc R2.0 E-VGT diesel 2WD, 186 PS; official January 2015 catalogue. Rows explicitly identify All New Sorento generation, before facelift, including late-2014 first sales.",
+      "databaseWritten": false
+    },
+    {
+      "sourceListingId": "42840004",
+      "powerPs": 186,
+      "decision": "retain_preliminary",
+      "reason": "No independently verified manufacturer specification tied to this exact generation/year/engine in the recovered evidence.",
+      "databaseWritten": false
+    }
+  ]
+}

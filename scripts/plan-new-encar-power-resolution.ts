@@ -126,7 +126,7 @@ function inputFor(row: CandidateRow) {
     snapshot.year ?? detail.year ?? detail.modelYear ?? contents.year ??
     category.formYear ?? category.yearMonth,
   );
-  const engineCc = canonicalEngineCc(spec.displacement ?? detail.displacement ?? snapshot.engineCc);
+  const engineCc = canonicalEngineCc(obj(row.normalized).powerResearchEngineCc ?? spec.displacement ?? detail.displacement ?? snapshot.engineCc);
   const badge = category.gradeEnglishName ?? snapshot.badge ?? snapshot.badgeDetail;
   const rawModelName = text(category.modelName);
   const rawEnglishGeneration = text(category.gradeDetailEnglishName);
