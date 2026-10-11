@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useContext, useState, type ReactNode } from "react";
-export const IDENTITY_KEYS = ["brand", "model", "generation", "modification", "trim"] as const;
+import { CASCADE_LEVELS } from "@/lib/catalog-cascade";
+export const IDENTITY_KEYS = CASCADE_LEVELS;
 export type IdentitySelection = Partial<Record<typeof IDENTITY_KEYS[number], string>>;
 const Context = createContext<{ identity: IdentitySelection; setIdentity: (value: IdentitySelection) => void; parameters: string; setParameters: (value: string) => void } | null>(null);
 export function CatalogFilterDraft({ currentQuery, children }: { currentQuery: string; children: ReactNode }) {

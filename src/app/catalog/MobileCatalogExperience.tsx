@@ -3,9 +3,12 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import { ArrowDownUp, ChevronLeft, ChevronRight, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
+import { ArrowDownUp, ChevronLeft, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 import { translateBrand, translateFuel, translateModel, translateTransmission } from "@/server/normalization/display";
-import { BrandLogo } from "@/components/catalog/BrandLogo";
+import { CascadeOption } from "@/components/catalog/CascadeOption";
+import { cascadeChange, cascadeFacetQuery, CASCADE_LEVELS, type CascadeLevel } from "@/lib/catalog-cascade";
+import { GenerationCascade } from "./GenerationCascade";
+import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
 import { catalogRead, catalogFacetUrl } from "@/lib/catalog-client-read";
 
 type Option = { value: string; label: string; cars?: number };
@@ -37,6 +40,8 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   const [find, setFind] = useState("");
   const [rangePicker, setRangePicker] = useState<RangePickerState | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogAccessibility({ dialogRef, open: screen !== "home", onClose: () => setScreen("home") });
 
   const query = useMemo(() => draft.toString(), [draft]);
   // Generation choices describe the selected vehicle, not the intersection of
@@ -53,7 +58,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     return identity.toString();
   }, [draft, query, screen]);
   const identityPicker = ["brand", "model", "generation", "modification", "trim"].includes(screen);
-  const facetUrl = catalogFacetUrl(facetQuery, screen);
+  const facetUrl = catalogFacetUrl(identityPicker ? cascadeFacetQuery(facetQuery, screen as CascadeLevel) : facetQuery, screen);
   const currentFacets = facetsQuery === facetUrl ? facets : null;
   const hasCurrentCount = countQuery === query;
   const requestFailed = failedQuery === query;
@@ -119,7 +124,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
       if (screen === "generation") ["generation","modification","trim"].forEach(key=>next.delete(key));
       if (screen === "modification") ["modification","trim"].forEach(key=>next.delete(key));
       if (screen === "trim") next.delete("trim");
-      if (screen === "parameters") ["brand", "model", "generation", ...PARAM_KEYS].forEach((key) => next.delete(key));
+      if (screen === "parameters") [...CASCADE_LEVELS, ...PARAM_KEYS].forEach((key) => next.delete(key));
       if (["year", "price", "mileage"].includes(screen)) PARAM_KEYS.forEach((key) => next.delete(key));
       if (screen === "sort") next.delete("sort");
       return next;
@@ -141,11 +146,8 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   }
 
   function choose(axis: "brand" | "model" | "generation" | "modification" | "trim", option: Option) {
-    if (axis === "brand") { patch({ brand: option.value, model: null, generation: null, modification:null,trim:null }); setScreen("model"); }
-    if (axis === "model") { patch({ model: option.value, generation: null, modification:null,trim:null }); setScreen("generation"); }
-    if (axis === "generation") { patch({ generation: option.value, modification:null,trim:null }); setScreen("modification"); }
-    if(axis === "modification"){patch({modification:option.value,trim:null});setScreen("trim");}
-    if(axis === "trim")patch({trim:option.value});
+    patch(cascadeChange(axis, option.value));
+    setScreen("parameters");
   }
 
   function changeSort(value: string) {
@@ -182,15 +184,15 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     </div>
     {hasAppliedFilters ? <div className="scrollbar-none flex items-center gap-1.5 overflow-x-auto bg-[#f5f6f8] px-3 pb-2 sm:px-5">{chips.map((chip) => <span className="shrink-0 rounded-full bg-[#101827] px-2.5 py-1 text-[11px] font-semibold text-white" key={chip}>{chip}</span>)}<button className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#657287]" onClick={resetAll} type="button"><RotateCcw size={14} />Сбросить всё</button></div> : null}
 
-    {screen !== "home" && typeof document !== "undefined" ? createPortal(<div aria-modal="true" className="fixed inset-x-0 top-0 z-[130] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#f4f6f9] pt-[env(safe-area-inset-top)]" role="dialog">
+    {screen !== "home" && typeof document !== "undefined" ? createPortal(<div ref={dialogRef} aria-label={titleFor(screen)} aria-modal="true" className="fixed inset-x-0 top-0 z-[130] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#f4f6f9] pt-[env(safe-area-inset-top)]" role="dialog">
       <header className="grid min-h-16 grid-cols-[44px_minmax(0,1fr)_76px] items-center border-b border-[#dce2eb] bg-white px-4">
         <button aria-label="Назад" className="grid size-11 place-items-center" onClick={() => setScreen(screen === "parameters" || screen === "year" || screen === "price" || screen === "mileage" || screen === "sort" ? "home" : screen === "brand" ? "home" : screen === "model" ? "brand" : screen === "generation" ? "model" : screen === "modification" ? "generation" : "modification")} type="button"><ChevronLeft size={25} /></button>
         <h2 className="truncate text-center text-lg font-semibold">{titleFor(screen)}</h2>
         <button aria-label="Сбросить фильтры" className="px-1 text-right text-xs font-semibold text-[#956f2c]" onClick={reset} type="button">Сбросить</button>
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-28">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
         {(["brand", "model", "generation", "modification", "trim"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation" | "modification" | "trim"} brandValue={selected("brand")} facets={currentFacets} find={find} inputRef={inputRef} loading={!currentFacets} onChoose={choose} onFind={setFind} onRetry={() => setRetry((value) => value + 1)} requestFailed={requestFailed} selectedValue={selected(screen)} /> : null}
-        {screen === "parameters" ? <Parameters generationLabel={generationLabel(selected("generation"), currentFacets)} onOpenRange={setRangePicker} onSelectLevel={setScreen} options={options} patch={patch} selected={selected} /> : null}
+        {screen === "parameters" ? <Parameters currentQuery={query} generationLabel={generationLabel(selected("generation"), currentFacets)} onOpenRange={setRangePicker} onSelectLevel={setScreen} options={options} patch={patch} selected={selected} /> : null}
         {screen === "year" || screen === "price" || screen === "mileage" ? <Range title={screen === "year" ? "Год выпуска" : screen === "price" ? "Цена до Владивостока, ₽" : "Пробег, км"} minKey={screen === "year" ? "yearMin" : screen === "price" ? "priceMin" : "mileageMin"} maxKey={screen === "year" ? "yearMax" : screen === "price" ? "priceMax" : "mileageMax"} onOpen={setRangePicker} selected={selected} /> : null}
         {screen === "sort" ? <div className="overflow-hidden rounded-2xl bg-white">{sortOptions.map((option) => <button className={`flex min-h-14 w-full items-center justify-between border-b border-[#edf0f4] px-4 text-left text-sm ${selected("sort") === option.value ? "font-semibold text-[#956f2c]" : "text-[#273246]"}`} key={option.value} onClick={() => changeSort(option.value)} type="button">{option.label}<span>{selected("sort") === option.value ? "✓" : ""}</span></button>)}</div> : null}
       </div>
@@ -202,11 +204,12 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
 
 function Picker({ axis, brandValue, facets, find, inputRef, loading, onChoose, onFind, onRetry, requestFailed, selectedValue }: { axis: "brand" | "model" | "generation" | "modification" | "trim"; brandValue: string; facets: Facets | null; find: string; inputRef: React.RefObject<HTMLInputElement | null>; loading: boolean; onChoose: (axis: "brand" | "model" | "generation" | "modification" | "trim", item: Option) => void; onFind: (text: string) => void; onRetry: () => void; requestFailed: boolean; selectedValue: string }) {
   const items = (facets?.axes[axis] ?? []).filter((item) => item.label.toLowerCase().includes(find.toLowerCase()));
-  return <><label className="relative mb-4 block"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7a8798]" size={20} /><input className="h-13 w-full rounded-xl bg-white pl-11 pr-4 text-base outline-none ring-1 ring-[#e0e5ec] focus:ring-[#a98239]" onChange={(event) => onFind(event.target.value)} placeholder={`Поиск: ${titleFor(axis).toLowerCase()}`} ref={inputRef} value={find} /></label><div className="overflow-hidden rounded-2xl bg-white">{requestFailed ? <div className="p-5 text-sm text-[#647084]">Не удалось загрузить варианты. <button className="font-semibold text-[#956f2c]" onClick={onRetry} type="button">Повторить</button></div> : loading ? <p className="p-5 text-sm text-[#647084]">Загружаем варианты…</p> : items.length ? items.map((item) => { const isSelected = selectedValue === item.value; const label = axis === "brand" ? translateBrand(item.label) : axis === "model" ? translateModel(brandValue, item.label) : item.label; return <button className={`flex min-h-14 w-full items-center gap-3 border-b border-[#edf0f4] px-4 text-left ${isSelected ? "bg-[#fbf7ed]" : ""}`} key={item.value} onClick={() => { onFind(""); onChoose(axis, item); }} type="button"><BrandLogo brand={axis === "brand" ? item.value : ""} size={32} /><span className="min-w-0 flex-1 truncate text-[15px] font-medium">{label || item.label}</span>{item.cars !== undefined ? <span className="text-xs text-[#7a8798]">{item.cars}</span> : null}{axis === "brand" ? <ChevronRight aria-hidden="true" className="text-[#a4adba]" size={18} /> : <span aria-hidden="true" className={`grid size-6 place-items-center rounded-md border ${isSelected ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span>}</button>; }) : <p className="p-5 text-sm text-[#647084]">{axis === "generation" ? "Для этой марки и модели пока нет подтверждённых данных о поколениях." : "Нет вариантов для текущего отбора."}</p>}</div></>;
+  return <><label className="relative mb-4 block"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7a8798]" size={20} /><input className="h-13 w-full rounded-xl bg-white pl-11 pr-4 text-base outline-none ring-1 ring-[#e0e5ec] focus:ring-[#a98239]" onChange={(event) => onFind(event.target.value)} placeholder={`Поиск: ${titleFor(axis).toLowerCase()}`} ref={inputRef} value={find} /></label><div className="overflow-hidden rounded-2xl bg-white">{requestFailed ? <div className="p-5 text-sm text-[#647084]">Не удалось загрузить варианты. <button className="font-semibold text-[#956f2c]" onClick={onRetry} type="button">Повторить</button></div> : loading ? <p className="p-5 text-sm text-[#647084]">Загружаем варианты…</p> : items.length ? items.map((item) => { const isSelected = selectedValue === item.value; const label = axis === "brand" ? translateBrand(item.label) : axis === "model" ? translateModel(brandValue, item.label) : item.label; return <CascadeOption key={item.value} label={label || item.label} brand={axis === "brand" ? item.value : undefined} generation={axis === "generation"} selected={isSelected} cars={item.cars} onClick={() => { onFind(""); onChoose(axis, item); }} />; }) : <p className="p-5 text-sm text-[#647084]">{axis === "generation" ? "Для этой марки и модели пока нет подтверждённых данных о поколениях." : "Нет вариантов для текущего отбора."}</p>}</div></>;
 }
 
-function Parameters({ generationLabel, onOpenRange, onSelectLevel, options, patch, selected }: { generationLabel: string; onOpenRange: (state: RangePickerState) => void; onSelectLevel: (screen: Screen) => void; options: FieldOptions; patch: (values: Record<string, string | null>) => void; selected: (name: string) => string }) {
-  const row = (value: string, placeholder: string, screen: Screen) => <button className={`flex min-h-[3.5rem] w-full items-center justify-between rounded-xl border px-3.5 text-left text-[15px] font-medium transition ${value ? "border-[#c7a55a] bg-[#fffcf5] text-[#273246]" : "border-[#dbe2eb] bg-[#fbfcfe] text-[#39465a]"}`} onClick={() => onSelectLevel(screen)} type="button"><span className="min-w-0 truncate">{value || placeholder}</span><span className="ml-3 grid size-7 shrink-0 place-items-center rounded-full bg-[#eef1f5]"><ChevronRight className="text-[#7c899b]" size={17} /></span></button>;
+function Parameters({ currentQuery, onOpenRange, options, patch, selected }: { currentQuery: string; generationLabel: string; onOpenRange: (state: RangePickerState) => void; onSelectLevel: (screen: Screen) => void; options: FieldOptions; patch: (values: Record<string, string | null>) => void; selected: (name: string) => string }) {
+  const [picking, setPicking] = useState(false);
+
   const presets: Array<{ label: string; active: boolean; values: Record<string, string | null> }> = [
     { label: "До 160 л.с.", active: selected("under160") === "1", values: { under160: selected("under160") === "1" ? null : "1", powerMax: null } },
     { label: "Кроссоверы 4WD", active: selected("body") === "Кроссовер" && selected("drive") === "4WD", values: selected("body") === "Кроссовер" && selected("drive") === "4WD" ? { body: null, drive: null } : { body: "Кроссовер", drive: "4WD" } },
@@ -215,7 +218,7 @@ function Parameters({ generationLabel, onOpenRange, onSelectLevel, options, patc
     { label: "Без ДТП", active: selected("clean") === "1", values: { clean: selected("clean") === "1" ? null : "1" } },
     { label: "Без страховых", active: selected("noInsurance") === "1", values: { noInsurance: selected("noInsurance") === "1" ? null : "1" } },
   ];
-  return <div className="grid gap-4"><section className="rounded-2xl bg-white p-4"><h3 className="text-base font-semibold">Популярные настройки</h3><div className="mt-3 grid grid-cols-3 gap-2">{presets.map((preset) => <button aria-pressed={preset.active} className={`min-h-10 rounded-full px-1.5 text-[11px] font-semibold leading-tight tracking-[-0.01em] transition ${preset.active ? "bg-[#101827] text-white shadow-[0_6px_14px_rgba(16,24,39,0.16)]" : "bg-[#f1f3f6] text-[#273246]"}`} key={preset.label} onClick={() => patch(preset.values)} type="button">{preset.label}</button>)}</div></section><section className="rounded-2xl bg-white p-4"><h3 className="text-lg font-semibold">Марка и модель</h3><div className="mt-3 grid gap-2">{row(translateBrand(selected("brand")), "Выбрать марку", "brand")}{row(translateModel(selected("brand"), selected("model")), "Выбрать модель", "model")}{row(generationLabel, "Выбрать поколение", "generation")}{selected("generation") ? row(selected("modification"),"Модификация — любая","modification") : null}{selected("modification") ? row(selected("trim"),"Комплектация — любая","trim") : null}</div></section><section className="rounded-2xl bg-white p-4"><h3 className="text-lg font-semibold">Основные параметры</h3><div className="mt-4 grid gap-4"><Select label="Топливо" name="fuel" values={options.fuels} patch={patch} selected={selected} translate={translateFuel} /><Select label="Трансмиссия" name="transmission" values={options.transmissions} patch={patch} selected={selected} translate={translateTransmission} /><Select label="Кузов" name="body" values={options.bodies} patch={patch} selected={selected} /><Range title="Пробег, км" minKey="mileageMin" maxKey="mileageMax" onOpen={onOpenRange} selected={selected} /><Range title="Объём двигателя, см³" minKey="engineMin" maxKey="engineMax" onOpen={onOpenRange} selected={selected} /><Range title="Мощность, л.с." minKey="powerMax" maxKey="powerMax" onOpen={onOpenRange} selected={selected} single /></div></section></div>;
+  return <div className="grid gap-4">{!picking ? <section className="rounded-2xl bg-white p-4"><h3 className="text-base font-semibold">Популярные настройки</h3><div className="mt-3 grid grid-cols-3 gap-2">{presets.map((preset) => <button aria-pressed={preset.active} className={`min-h-10 rounded-full px-1.5 text-[11px] font-semibold leading-tight tracking-[-0.01em] transition ${preset.active ? "bg-[#101827] text-white shadow-[0_6px_14px_rgba(16,24,39,0.16)]" : "bg-[#f1f3f6] text-[#273246]"}`} key={preset.label} onClick={() => patch(preset.values)} type="button">{preset.label}</button>)}</div></section> : null}<section className={picking ? "" : "rounded-2xl border border-[#dce2eb] bg-white p-4"}><GenerationCascade onPickerOpenChange={setPicking} currentQuery={currentQuery} totalCars={0} brand={selected("brand")} model={selected("model")} generation={selected("generation")} modification={selected("modification")} trim={selected("trim")} onSelection={next => patch(Object.fromEntries(CASCADE_LEVELS.map(key => [key, next[key] || null])))} /></section>{!picking ? <section className="rounded-2xl bg-white p-4"><h3 className="text-lg font-semibold">Основные параметры</h3><div className="mt-4 grid gap-4"><Select label="Топливо" name="fuel" values={options.fuels} patch={patch} selected={selected} translate={translateFuel} /><Select label="Трансмиссия" name="transmission" values={options.transmissions} patch={patch} selected={selected} translate={translateTransmission} /><Select label="Кузов" name="body" values={options.bodies} patch={patch} selected={selected} /><Range title="Пробег, км" minKey="mileageMin" maxKey="mileageMax" onOpen={onOpenRange} selected={selected} /><Range title="Объём двигателя, см³" minKey="engineMin" maxKey="engineMax" onOpen={onOpenRange} selected={selected} /><Range title="Мощность, л.с." minKey="powerMax" maxKey="powerMax" onOpen={onOpenRange} selected={selected} single /></div></section> : null}</div>;
 }
 
 function Select({ label, name, values, patch, selected, translate }: { label: string; name: string; values: string[]; patch: (values: Record<string, string | null>) => void; selected: (name: string) => string; translate?: (value: string) => string }) { return <label className="grid gap-1.5 text-sm text-[#647084]">{label}<select className="h-12 rounded-xl border border-[#d7dee8] bg-white px-3 text-[15px] text-[#273246]" onChange={(event) => patch({ [name]: event.target.value || null })} value={selected(name)}><option value="">Любой</option>{values.map((value) => <option key={value} value={value}>{translate ? translate(value) : value}</option>)}</select></label>; }

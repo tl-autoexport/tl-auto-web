@@ -6,6 +6,7 @@ import { unstable_cache } from "next/cache";
 import { getCatalogCount } from "@/server/cars/repository";
 import { catalogFiltersFromParams } from "@/lib/catalog-filter-params";
 import { createReadCoalescer } from "@/server/cars/catalog-read-coalescer";
+import { generationFacetLabel } from "@/server/catalog/generation-facet-label";
 
 /**
  * Facet counters for the catalogue cascade.
@@ -65,7 +66,8 @@ export async function GET(request: Request) {
       if (existing) existing.cars += row.cars;
       else bucket.push({ value: label, label, cars: row.cars });
     } else {
-      bucket.push({ value: row.value, label: row.axis === "model" ? translateModel(null,row.label ?? row.value) : row.label ?? row.value, cars: row.cars });
+      const label = row.axis === "generation" ? generationFacetLabel(row.value, row.label ?? row.value, params.get("brand"), params.get("model")) : row.axis === "model" ? translateModel(null,row.label ?? row.value) : row.label ?? row.value;
+      bucket.push({ value: row.value, label, cars: row.cars });
     }
     axes[row.axis] = bucket;
   }

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { GenerationCascade } from "@/app/catalog/GenerationCascade";
 import type { IdentitySelection } from "@/app/catalog/CatalogFilterDraft";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useDialogAccessibility } from "@/components/site/useDialogAccessibility";
 import { createPortal } from "react-dom";
 import type { FormEvent } from "react";
 import {
@@ -58,6 +59,9 @@ const emptyParameters: ParameterState = {
 
 export function CatalogQuickNav({ bodies = [], transmissions = [] }: { brands?: string[]; models?: Array<{ brand: string; model: string }>; bodies?: string[]; transmissions?: string[] }) {
   const [panel, setPanel] = useState<PanelName>(null);
+  const [cascadePicking, setCascadePicking] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogAccessibility({ dialogRef, open: Boolean(panel), onClose: () => setPanel(null) });
   const [search, setSearch] = useState("");
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -114,20 +118,6 @@ export function CatalogQuickNav({ bodies = [], transmissions = [] }: { brands?: 
     };
   }, [activeQuery, panel]);
 
-  useEffect(() => {
-    if (!panel) return;
-    const previousOverflow = document.body.style.overflow;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setPanel(null);
-    };
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", closeOnEscape);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [panel]);
-
   const submitSearch = (event: FormEvent<HTMLFormElement>, nextSearch = search) => {
     event.preventDefault();
     const value = nextSearch.trim();
@@ -140,9 +130,7 @@ export function CatalogQuickNav({ bodies = [], transmissions = [] }: { brands?: 
     window.location.assign(`/catalog${activeQuery.toString() ? `?${activeQuery.toString()}` : ""}`);
   };
 
-  const submitParameters = () => {
-    window.location.assign(`/catalog${activeQuery.toString() ? `?${activeQuery.toString()}` : ""}`);
-  };
+  const submitParameters = () => submitBrandModel();
 
   const resetParameters = () => {
     setResetIdentity(value => value + 1);
@@ -189,16 +177,16 @@ export function CatalogQuickNav({ bodies = [], transmissions = [] }: { brands?: 
 
       {panel && typeof document !== "undefined" ? createPortal(
         <div className="fixed inset-0 z-[130] bg-[#101827]/25 p-0 sm:flex sm:items-start sm:justify-center sm:p-4 sm:pt-[132px]">
-          <div className="flex h-full w-full flex-col overflow-hidden bg-white shadow-[0_18px_45px_rgba(16,24,39,0.18)] sm:h-auto sm:max-h-[calc(100vh-148px)] sm:w-[min(560px,calc(100vw-32px))] sm:rounded-3xl sm:border sm:border-[#dce2eb]">
+          <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={panel === "brandModel" ? "Марка и модель" : "Параметры"} className="flex h-[100dvh] w-full flex-col overflow-hidden bg-[#f4f6f9] pt-[env(safe-area-inset-top)] shadow-[0_18px_45px_rgba(16,24,39,0.18)] sm:h-auto sm:max-h-[calc(100dvh-148px)] sm:w-[min(560px,calc(100vw-32px))] sm:rounded-3xl sm:border sm:border-[#dce2eb]">
             <PanelHeader panel={panel} onClose={() => setPanel(null)} onReset={panel === "parameters" ? resetParameters : panel === "brandModel" ? resetBrandModel : undefined} />
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-4 sm:px-5">
-              {panel === "parameters" || panel === "brandModel" ? <GenerationCascade key={resetIdentity} currentQuery={activeQuery.toString()} totalCars={resultCount??0} brand={brand} model={model} generation={extraIdentity.generation} modification={extraIdentity.modification} trim={extraIdentity.trim} onSelection={(next)=>{setBrand(next.brand??"");setModel(next.model??"");setExtraIdentity(next);}} onApply={()=>setPanel("parameters")} /> : null}
-              {panel === "parameters" ? <ParametersPanel brand={brand} model={model} bodies={bodies} transmissions={transmissions} onOpenBrandModel={() => setPanel("brandModel")} parameters={parameters} setParameters={setParameters} count={resultCount} loading={countLoading} /> : null}
+              {panel === "parameters" || panel === "brandModel" ? <GenerationCascade onPickerOpenChange={setCascadePicking} key={resetIdentity} currentQuery={activeQuery.toString()} totalCars={resultCount??0} brand={brand} model={model} generation={extraIdentity.generation} modification={extraIdentity.modification} trim={extraIdentity.trim} onSelection={(next)=>{setBrand(next.brand??"");setModel(next.model??"");setExtraIdentity(next);}} /> : null}
+              {panel === "parameters" && !cascadePicking ? <ParametersPanel brand={brand} model={model} bodies={bodies} transmissions={transmissions} onOpenBrandModel={() => setPanel("brandModel")} parameters={parameters} setParameters={setParameters} count={resultCount} loading={countLoading} /> : null}
               {panel === "region" ? <RegionPanel countryCode={country.countryCode} cityId={city.id} onSelect={selectDestination} /> : null}
               {panel === "transport" ? <TransportPanel /> : null}
               {panel === "sort" ? <SortPanel /> : null}
             </div>
-            {panel === "parameters" || panel === "brandModel" ? <button className="m-4 mt-0 h-12 shrink-0 rounded-xl bg-[#111827] px-4 text-sm font-semibold text-white transition hover:bg-[#263247] disabled:opacity-60" disabled={countLoading || countQuery!==activeQuery.toString()} onClick={panel === "parameters" ? submitParameters : () => submitBrandModel()} type="button">{countLoading || countQuery!==activeQuery.toString() ? "Считаем предложения…" : resultCount === null ? "Показать автомобили" : `Показать ${resultCount} объявлений`}</button> : null}
+            {panel === "parameters" || panel === "brandModel" ? <button className="m-4 mt-0 mb-[max(1rem,env(safe-area-inset-bottom))] min-h-14 shrink-0 rounded-2xl bg-[#111827] px-4 text-sm font-semibold text-white transition hover:bg-[#263247] disabled:opacity-60" disabled={countLoading || countQuery!==activeQuery.toString()} onClick={panel === "parameters" ? submitParameters : () => submitBrandModel()} type="button">{countLoading || countQuery!==activeQuery.toString() ? "Считаем предложения…" : resultCount === null ? "Показать автомобили" : `Показать ${resultCount} объявлений`}</button> : null}
           </div>
         </div>, document.body
       ) : null}
