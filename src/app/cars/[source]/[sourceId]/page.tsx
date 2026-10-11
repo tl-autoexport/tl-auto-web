@@ -38,6 +38,7 @@ import { PriceCalculationCard } from "./PriceCalculationCard";
 import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
 import { publicCarPath } from "@/lib/car-url";
 import { PowerKeyFact } from "./PowerKeyFact";
+import { officialSourceUrl } from "@/lib/source-url";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const getCachedCarDetail = cache(getCarDetail);
@@ -237,6 +238,7 @@ export default async function CarDetailPage({
             priceRub={car.price_rub}
             source={source}
             sourceId={sourceId}
+            sourceUrl={officialSourceUrl(car.source_url, car.primary_source)}
             title={title}
             version={car.version_line}
             generation={car.generation_label}

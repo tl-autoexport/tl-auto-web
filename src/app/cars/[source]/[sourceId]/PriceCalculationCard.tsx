@@ -9,6 +9,7 @@ import {
   BadgeCheck,
   Calculator,
   ChevronDown,
+  ExternalLink,
   MessageCircle,
   Phone,
   RefreshCw,
@@ -61,6 +62,7 @@ type PriceCalculationCardProps = {
   priceRub: number | null;
   source: string;
   sourceId: string;
+  sourceUrl: string | null;
   title: string;
   version?: string | null;
   generation?: string | null;
@@ -186,6 +188,7 @@ function RuPriceCalculationCard({
   priceRub,
   source,
   sourceId,
+  sourceUrl,
   title,
   version,
   generation,
@@ -296,6 +299,18 @@ function RuPriceCalculationCard({
   return (
     <>
       <aside className="rounded bg-white p-3.5 shadow-sm ring-1 ring-[#d8dde6] sm:p-5">
+        {sourceUrl ? (
+          <div className="mb-3 flex items-center justify-between gap-3 text-xs font-semibold text-[#e51d2a] sm:text-sm">
+            <div className="flex min-w-0 items-center gap-2">
+              <BadgeCheck className="size-4 shrink-0 sm:size-[18px]" />
+              <span className="truncate">Источник Encar</span>
+            </div>
+            <a className="inline-flex min-h-9 shrink-0 items-center gap-1 rounded-full border border-[#f0bcc1] px-2.5 text-[11px] font-semibold text-[#c61927] transition hover:bg-[#fff1f2] sm:text-xs" href={sourceUrl} rel="noopener noreferrer" target="_blank">
+              Оригинал
+              <ExternalLink size={13} />
+            </a>
+          </div>
+        ) : null}
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <p className="whitespace-nowrap text-[30px] font-semibold leading-none tracking-tight text-[#121722] tabular-nums sm:text-3xl">
             {currency === "USD" ? dollars(displayTotal) : money(displayTotal)}
