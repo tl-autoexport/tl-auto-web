@@ -35,7 +35,9 @@ async function main() {
   if (plan.runId !== runId) throw new Error(`Power plan runId mismatch: expected ${runId}, got ${plan.runId ?? "missing"}`);
   const targets = (plan.candidates ?? []).filter((candidate) => ["unmatched", "potential_match_needs_configuration"].includes(candidate.status));
   const ids = [...new Set(targets.map((candidate) => candidate.sourceListingId))];
-  if (!ids.length) throw new Error("No unmatched candidates found in the power plan");
+  if (!plan.candidates?.length || (ids.length === 0 && plan.candidates.some((candidate) => candidate.status !== "approved_match"))) {
+    throw new Error("Power plan has no preliminary candidates and is not fully approved");
+  }
 
   const db = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await db.connect();

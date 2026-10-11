@@ -92,7 +92,7 @@ async function main() {
        on conflict (source_kind, source_sha256) do update
          set metadata = excluded.metadata
        returning id`,
-      ["https://www.genesis.com/kr/ko/", sourceSha256, manifest.version, JSON.stringify(summary)],
+      [specifications[0]?.source.uri ?? "https://www.hyundai.com/kr/ko/", sourceSha256, manifest.version, JSON.stringify(summary)],
     );
     const batchId = batchResult.rows[0]?.id;
     if (!batchId) throw new Error("Source batch was not created");

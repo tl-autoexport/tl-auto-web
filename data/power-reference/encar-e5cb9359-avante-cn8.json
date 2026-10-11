@@ -1,0 +1,50 @@
+{
+  "version": "hyundai-avante-cn8-2026-gasoline-2.0-149ps-v1",
+  "specifications": [
+    {
+      "specKey": "hyundai-elantra-cn8-2026-gasoline-1999-149ps",
+      "brand": "Hyundai",
+      "model": "Elantra",
+      "fuelType": "gasoline",
+      "propulsionType": "ice",
+      "engineCc": 1999,
+      "years": [
+        2026,
+        2026
+      ],
+      "power": {
+        "value": 149,
+        "unit": "PS",
+        "kw": 109.5893138
+      },
+      "powerBasis": "combustion_engine",
+      "source": {
+        "title": "Hyundai official Avante CN8 gasoline 2.0 specification",
+        "uri": "https://www.hyundai.com/kr/ko/e/vehicles/the-all-new-avante/intro",
+        "supportingUri": "https://www.drom.ru/catalog/hyundai/avante/563484/",
+        "retrievedAt": "2026-10-11",
+        "note": "Official Hyundai page states Smartstream gasoline 2.0 output 149 PS. Cross-checked against Drom listing for 2026 Hyundai Avante CN8 2.0 IVT 2WD Modern, 1999 cc, 149 hp. Apply only to ordinary CN8 2.0 Modern and Inspiration trims; exclude Avante N turbo 2.0 280 PS."
+      },
+      "matches": [
+        {
+          "generation": "CN8",
+          "trim": "modern",
+          "badge": "2.0",
+          "yearFrom": 2026,
+          "yearTo": 2026,
+          "engineCcFrom": 1999,
+          "engineCcTo": 1999
+        },
+        {
+          "generation": "CN8",
+          "trim": "inspiration",
+          "badge": "2.0",
+          "yearFrom": 2026,
+          "yearTo": 2026,
+          "engineCcFrom": 1999,
+          "engineCcTo": 1999
+        }
+      ]
+    }
+  ]
+}
