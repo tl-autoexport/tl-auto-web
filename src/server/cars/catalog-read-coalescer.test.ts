@@ -1,7 +1,29 @@
 import assert from "node:assert/strict";
-import { catalogCountFilters, catalogDisplayReadView, createReadCoalescer } from "./catalog-read-coalescer";
+import { catalogCountFilters, catalogDisplayReadView, countCatalogIdPages, createReadCoalescer, readCatalogPage } from "./catalog-read-coalescer";
 
 async function run() {
+  const matchingPage = { cars: [{ id: "matching-car" }], nextCursor: "next-matching-car" };
+  const timeout = { code: "57014", message: "statement timeout" };
+  const warnings: unknown[] = [];
+  assert.deepEqual(await readCatalogPage(Promise.reject(timeout), Promise.resolve(matchingPage), error => warnings.push(error)),
+    { totalCars: null, initialPage: matchingPage }, "a count timeout preserves matching cards and pagination without a false total");
+  assert.deepEqual(warnings, [timeout]);
+  assert.deepEqual(await readCatalogPage(Promise.resolve(42), Promise.resolve(matchingPage), () => undefined),
+    { totalCars: 42, initialPage: matchingPage });
+  await assert.rejects(readCatalogPage(Promise.resolve(42), Promise.reject(new Error("listing unavailable")), () => undefined), /listing unavailable/);
+  for (const size of [0, 261, 500, 1001]) {
+    const ids = Array.from({ length: size }, (_, index) => String(index).padStart(6, "0"));
+    const seen: string[] = [];
+    const total = await countCatalogIdPages(async (afterId, limit) => {
+      const page = ids.filter((id) => afterId === null || id > afterId).slice(0, limit);
+      seen.push(...page);
+      return page;
+    });
+    assert.equal(total, size, "fallback counts every ID, including exact page boundaries");
+    assert.deepEqual(seen, ids, "fallback neither skips nor duplicates rows");
+  }
+  await assert.rejects(countCatalogIdPages(async () => { throw new Error("database unavailable"); }), /database unavailable/);
+  await assert.rejects(countCatalogIdPages(async () => Array(500).fill("same-id")), /did not advance/);
   assert.equal(catalogDisplayReadView({ sort: "fresh", maxPowerHp: 160 }), "catalog_display_cars", "unfiltered shelves keep the fast sort-index path");
   for (const filters of [{ brand: "Volvo" }, { model: "S90" }, { generation: "cn7" }, { modification: "T5" }, { trim: "Inscription" }]) {
     assert.equal(catalogDisplayReadView(filters), "catalog_display_cascade_cars", "each identity selection uses the indexed projection");

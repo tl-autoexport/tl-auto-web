@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { IDENTITY_KEYS, useCatalogFilterDraft } from "./CatalogFilterDraft";
 import { catalogRead } from "@/lib/catalog-client-read";
-export function LiveCatalogCount({ initialCount, mobile = false }: { initialCount: number; mobile?: boolean }) {
+export function LiveCatalogCount({ initialCount, mobile = false }: { initialCount: number | null; mobile?: boolean }) {
  const buttonRef=useRef<HTMLButtonElement>(null);
  const draft=useCatalogFilterDraft();
  const [formQuery,setFormQuery]=useState<string|null>(null);
@@ -33,6 +33,6 @@ export function LiveCatalogCount({ initialCount, mobile = false }: { initialCoun
  const loading=resolved?.query!==text;
  return <>
  {identity ? IDENTITY_KEYS.map(key=><input key={key} name={key} type="hidden" value={identity[key]??""} />) : null}
- <button ref={buttonRef} disabled={loading||failed===text} className={mobile?"flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#c7a55a] text-sm font-semibold text-[#15130f] disabled:opacity-60":"inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[#c7a55a] px-6 text-sm font-semibold text-[#15130f] disabled:opacity-60"} type="submit"><Search size={17}/>{failed===text?"Не удалось пересчитать":loading?"Пересчитываем…":`Показать ${resolved?.count??initialCount}${mobile?" автомобилей":""}`}</button>
+ <button ref={buttonRef} className={mobile?"flex h-12 w-full items-center justify-center gap-2 rounded-md bg-[#c7a55a] text-sm font-semibold text-[#15130f]":"inline-flex h-11 items-center justify-center gap-2 rounded-md bg-[#c7a55a] px-6 text-sm font-semibold text-[#15130f]"} type="submit"><Search size={17}/>{failed===text||loading||initialCount===null&&resolved===null?"Показать автомобили":`Показать ${resolved?.count??initialCount}${mobile?" автомобилей":""}`}</button>
  </>;
 }

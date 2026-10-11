@@ -35,6 +35,7 @@ import { CatalogFilterDraft } from "./CatalogFilterDraft";
 import { GenerationCascade } from "./GenerationCascade";
 import { MobileCatalogExperience } from "./MobileCatalogExperience";
 import { BrandLogo } from "@/components/catalog/BrandLogo";
+import { readCatalogPage } from "@/server/cars/catalog-read-coalescer";
 
 export const metadata: Metadata = {
   title: "Каталог автомобилей из Кореи",
@@ -122,10 +123,11 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     sort,
   };
 
-  const [totalCars, optionCars, initialPage] = await Promise.all([
-    getCatalogCount(filters),
+  const [{ totalCars, initialPage }, optionCars] = await Promise.all([
+    readCatalogPage(getCatalogCount(filters), getCatalogCardPage(filters), (error: unknown) => {
+      console.warn("[catalog] Count unavailable; rendering matching cards", error);
+    }),
     getCatalogFacetCars(),
-    getCatalogCardPage(filters),
   ]);
   const shownCars = initialPage.cars;
   const brands = unique(optionCars.map((car) => car.brand));
@@ -182,9 +184,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
             <div>
               <h1 className="mt-0 text-[25px] font-semibold leading-tight tracking-normal sm:text-4xl">Каталог автомобилей</h1>
               <p className="mt-1.5 max-w-2xl text-[12px] leading-4 text-[#647084] sm:mt-2 sm:text-sm sm:leading-6">Подбор по реальным данным источника с расчётом цены до Владивостока.</p>
-              <p className="mt-2 text-sm font-semibold text-[#273246] md:hidden">{totalCars.toLocaleString("ru-RU")} автомобилей</p>
+              <p className="mt-2 text-sm font-semibold text-[#273246] md:hidden">{totalCars === null ? "Автомобили по выбранным параметрам" : `${totalCars.toLocaleString("ru-RU")} автомобилей`}</p>
             </div>
-            <div className="hidden items-center gap-2 self-start rounded-full bg-[#fbf7ed] px-3 py-2 text-xs text-[#7b5a22] md:inline-flex md:gap-3 md:rounded-none md:border-l-2 md:border-[#c7a55a] md:bg-transparent md:pl-4 md:text-sm"><CarFront size={18} className="text-[#c7a55a] md:size-5" /><span><strong className="mr-1 text-base text-[#101827] md:block md:text-xl">{totalCars}</strong><span className="text-[#647084]">автомобилей найдено</span></span></div>
+            <div className="hidden items-center gap-2 self-start rounded-full bg-[#fbf7ed] px-3 py-2 text-xs text-[#7b5a22] md:inline-flex md:gap-3 md:rounded-none md:border-l-2 md:border-[#c7a55a] md:bg-transparent md:pl-4 md:text-sm"><CarFront size={18} className="text-[#c7a55a] md:size-5" /><span><strong className="mr-1 text-base text-[#101827] md:block md:text-xl">{totalCars}</strong><span className="text-[#647084]">{totalCars === null ? "Автомобили по выбранным параметрам" : "автомобилей найдено"}</span></span></div>
           </div>
 
           {popularBrands.length ? (
@@ -314,7 +316,7 @@ type CatalogFilterFormProps = {
   passable: boolean;
   clean: boolean;
   sort: keyof typeof sortLabels;
-  totalCars: number;
+  totalCars: number | null;
   value: (name: string) => string;
   mobile?: boolean;
 };

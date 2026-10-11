@@ -24,7 +24,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   currentQuery: string;
   options: FieldOptions;
   sortOptions: SortOption[];
-  totalCars: number;
+  totalCars: number | null;
 }) {
   const router = useRouter();
   const [navigationPending, startNavigation] = useTransition();
@@ -60,7 +60,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
   const identityPicker = ["brand", "model", "generation", "modification", "trim"].includes(screen);
   const facetUrl = catalogFacetUrl(identityPicker ? cascadeFacetQuery(facetQuery, screen as CascadeLevel) : facetQuery, screen);
   const currentFacets = facetsQuery === facetUrl ? facets : null;
-  const hasCurrentCount = countQuery === query;
+  const hasCurrentCount = countQuery === query && count !== null;
   const requestFailed = failedQuery === query;
   const selected = (name: string) => draft.get(name) || "";
   const activeParameters = PARAM_KEYS.filter((key) => draft.has(key)).length;
@@ -196,7 +196,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
         {screen === "year" || screen === "price" || screen === "mileage" ? <Range title={screen === "year" ? "Год выпуска" : screen === "price" ? "Цена до Владивостока, ₽" : "Пробег, км"} minKey={screen === "year" ? "yearMin" : screen === "price" ? "priceMin" : "mileageMin"} maxKey={screen === "year" ? "yearMax" : screen === "price" ? "priceMax" : "mileageMax"} onOpen={setRangePicker} selected={selected} /> : null}
         {screen === "sort" ? <div className="overflow-hidden rounded-2xl bg-white">{sortOptions.map((option) => <button className={`flex min-h-14 w-full items-center justify-between border-b border-[#edf0f4] px-4 text-left text-sm ${selected("sort") === option.value ? "font-semibold text-[#956f2c]" : "text-[#273246]"}`} key={option.value} onClick={() => changeSort(option.value)} type="button">{option.label}<span>{selected("sort") === option.value ? "✓" : ""}</span></button>)}</div> : null}
       </div>
-      {screen !== "sort" ? <div className="shrink-0 border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount || requestFailed} onClick={() => apply()} type="button">{requestFailed ? "Не удалось пересчитать" : loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button>{requestFailed ? <button className="mt-2 w-full text-sm text-[#956f2c]" onClick={() => setRetry((value) => value + 1)} type="button">Повторить запрос</button> : null}</div> : null}
+      {screen !== "sort" ? <div className="shrink-0 border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" onClick={() => apply()} type="button">{requestFailed || loading || !hasCurrentCount ? "Показать автомобили" : `Показать ${count} ${pluralCars(count)}`}</button>{requestFailed ? <button className="mt-2 w-full text-sm text-[#956f2c]" onClick={() => setRetry((value) => value + 1)} type="button">Повторить запрос</button> : null}</div> : null}
     </div>, document.body) : null}
     {rangePicker && typeof document !== "undefined" ? createPortal(<RangePicker count={count} hasCurrentCount={hasCurrentCount} loading={loading} onApply={applyRange} onClose={() => setRangePicker(null)} patch={patch} selected={selected} state={rangePicker} />, document.body) : null}
   </div>;
@@ -227,7 +227,7 @@ function Range({ title, minKey, maxKey, onOpen, selected, single = false }: { ti
   return <fieldset><legend className="mb-1.5 text-sm text-[#647084]">{title}</legend><button aria-label={`Выбрать: ${title}`} className="grid w-full grid-cols-2 overflow-hidden rounded-xl border border-[#d7dee8] bg-white text-left" onClick={() => onOpen({ title, minKey, maxKey, single })} type="button"><span className="min-w-0 border-r border-[#d7dee8] px-3 py-3 text-[15px] text-[#273246]">{displayValue(selected(minKey), single ? "До" : "От")}</span><span className="min-w-0 px-3 py-3 text-[15px] text-[#273246]">{single ? "л.с." : displayValue(selected(maxKey), "До")}</span></button></fieldset>;
 }
 
-function RangePicker({ count, hasCurrentCount, loading, onApply, onClose, patch, selected, state }: { count: number; hasCurrentCount: boolean; loading: boolean; onApply: () => void; onClose: () => void; patch: (values: Record<string, string | null>) => void; selected: (name: string) => string; state: RangePickerState }) {
+function RangePicker({ count, hasCurrentCount, loading, onApply, onClose, patch, selected, state }: { count: number | null; hasCurrentCount: boolean; loading: boolean; onApply: () => void; onClose: () => void; patch: (values: Record<string, string | null>) => void; selected: (name: string) => string; state: RangePickerState }) {
   const values = rangeValues(state.minKey);
   const minValue = selected(state.minKey);
   const maxValue = selected(state.maxKey);
@@ -237,7 +237,7 @@ function RangePicker({ count, hasCurrentCount, loading, onApply, onClose, patch,
     patch({ [key]: value || null });
   };
   const column = (key: string, heading: string, value: string) => <div className="min-w-0"><p className="mb-2 text-sm text-[#7a8798]">{heading}</p><div className="h-44 snap-y overflow-y-auto rounded-2xl bg-[#f2f4f7] p-1">{["", ...values].map((option) => <button className={`block min-h-10 w-full snap-center rounded-xl px-3 text-left text-[15px] ${value === option ? "bg-white font-semibold text-[#101827]" : "text-[#647084]"}`} key={option || "empty"} onClick={() => selectValue(key, option)} type="button">{option ? formatRangeValue(option, state.minKey) : "Не выбрано"}</button>)}</div></div>;
-  return <div aria-modal="true" className="fixed inset-0 z-[150] flex items-end bg-[#101827]/45" onClick={onClose} role="dialog"><section className="w-full rounded-t-[28px] bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" onClick={(event) => event.stopPropagation()}><div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-[#d5dae2]" /><header className="mb-5 flex items-center gap-3"><h3 className="min-w-0 flex-1 text-xl font-semibold">{state.title}</h3><div className="flex shrink-0 items-center gap-4"><button className="text-sm font-semibold text-[#956f2c]" onClick={() => patch({ [state.minKey]: null, [state.maxKey]: null })} type="button">Сбросить</button><button aria-label="Закрыть" className="grid size-9 place-items-center text-3xl font-light leading-none" onClick={onClose} type="button">×</button></div></header><div className={state.single ? "grid" : "grid grid-cols-2 gap-3"}>{state.single ? column(state.minKey, "До", minValue) : <>{column(state.minKey, "От", minValue)}{column(state.maxKey, "До", maxValue)}</>}</div><button className="mt-5 min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" disabled={loading || !hasCurrentCount} onClick={onApply} type="button">{loading || !hasCurrentCount ? "Пересчитываем…" : `Показать ${count} ${pluralCars(count)}`}</button></section></div>;
+  return <div aria-modal="true" className="fixed inset-0 z-[150] flex items-end bg-[#101827]/45" onClick={onClose} role="dialog"><section className="w-full rounded-t-[28px] bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]" onClick={(event) => event.stopPropagation()}><div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-[#d5dae2]" /><header className="mb-5 flex items-center gap-3"><h3 className="min-w-0 flex-1 text-xl font-semibold">{state.title}</h3><div className="flex shrink-0 items-center gap-4"><button className="text-sm font-semibold text-[#956f2c]" onClick={() => patch({ [state.minKey]: null, [state.maxKey]: null })} type="button">Сбросить</button><button aria-label="Закрыть" className="grid size-9 place-items-center text-3xl font-light leading-none" onClick={onClose} type="button">×</button></div></header><div className={state.single ? "grid" : "grid grid-cols-2 gap-3"}>{state.single ? column(state.minKey, "До", minValue) : <>{column(state.minKey, "От", minValue)}{column(state.maxKey, "До", maxValue)}</>}</div><button className="mt-5 min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" onClick={onApply} type="button">{loading || !hasCurrentCount ? "Показать автомобили" : `Показать ${count} ${pluralCars(count)}`}</button></section></div>;
 }
 
 function rangeValues(key: string) {
@@ -260,4 +260,4 @@ function formatRangeValue(value: string, key: string) {
 function cleanParams(query: string) { const params = new URLSearchParams(query); ["page", "cursor", "limit"].forEach((key) => params.delete(key)); return params; }
 function generationLabel(code: string, facets: Facets | null) { return facets?.axes.generation?.find((item) => item.value === code)?.label || (code.startsWith("ordinal:") ? code.split(":").slice(3).join(":") : code.toUpperCase()); }
 function titleFor(screen: Screen | "brand" | "model" | "generation" | "modification" | "trim") { return ({ brand: "Марка", model: "Модель", generation: "Поколение", modification:"Модификация", trim:"Комплектация", parameters: "Параметры", year: "Год выпуска", price: "Цена", mileage: "Пробег, км", sort: "Сортировка", home: "Фильтры" } as const)[screen]; }
-function pluralCars(count: number) { const tail = count % 100; if (tail > 10 && tail < 15) return "автомобилей"; return count % 10 === 1 ? "автомобиль" : count % 10 >= 2 && count % 10 <= 4 ? "автомобиля" : "автомобилей"; }
+function pluralCars(count: number | null) { if (count === null) return "автомобилей"; const tail = count % 100; if (tail > 10 && tail < 15) return "автомобилей"; return count % 10 === 1 ? "автомобиль" : count % 10 >= 2 && count % 10 <= 4 ? "автомобиля" : "автомобилей"; }

@@ -5,7 +5,7 @@ import { normalizeColor, normalizeDrive } from "@/server/normalization/vehicles"
 import { bodyTypeValues, driveTypeValues, transmissionValues } from "@/lib/catalog-filter-values";
 import { catalogBrandValues, normalizeCatalogBrand } from "@/lib/catalog-brand";
 import { homeShowcasePhotoUrl } from "@/lib/showcase-photo";
-import { catalogCountFilters, catalogDisplayReadView, createReadCoalescer } from "./catalog-read-coalescer";
+import { catalogCountFilters, catalogDisplayReadView, countCatalogIdPages, createReadCoalescer } from "./catalog-read-coalescer";
 
 const buildWithoutCatalog =
   process.env.TL_AUTO_BUILD_WITHOUT_CATALOG === "true";
@@ -545,14 +545,13 @@ function cursorExpression(column: string, ascending: boolean, cursor: DecodedCat
     : `${column}.${comparator}.${value},${afterValue}`;
 }
 
-async function fetchCatalogCount(filters: CatalogFilters): Promise<number> {
+function catalogCountQuery(filters: CatalogFilters, exact: boolean) {
   const supabase = createSupabaseServerRead();
   let query = supabase
     .from(catalogDisplayReadView(filters))
     // GET with zero result rows keeps the exact total and preserves the JSON
     // error code/message; HEAD used to turn database failures into {message:""}.
-    .select("id", { count: "exact" })
-    .limit(0)
+    .select("id", exact ? { count: "exact" } : {})
     .eq("is_available", true)
     .in("primary_source", ["encar", "chestny_prigon"])
     .in("fuel_type", ["gasoline", "diesel", "hybrid", "electric", "lpg"])
@@ -593,8 +592,12 @@ async function fetchCatalogCount(filters: CatalogFilters): Promise<number> {
   if (filters.passable) query = query.or(passableFilterExpression());
   if (filters.sourceId) query = query.eq("source_id", filters.sourceId);
 
+  return query;
+}
+
+async function fetchCatalogCount(filters: CatalogFilters): Promise<number> {
   const startedAt = Date.now();
-  const { count, error } = await query;
+  const { count, error } = await catalogCountQuery(filters, true).limit(0);
   const durationMs = Date.now() - startedAt;
   const queryContext = { ...catalogQueryContext(filters), durationMs };
   if (error) {
@@ -602,7 +605,17 @@ async function fetchCatalogCount(filters: CatalogFilters): Promise<number> {
       ...queryContext,
       error: { code: error.code, message: error.message, details: error.details, hint: error.hint },
     });
-    throw error;
+    if (error.code !== "57014") throw error;
+    // Exact COUNT scans the complete selection in one statement. Bounded ID
+    // reads use the identical predicates without that aggregate. Never invent
+    // a total or use the size of the first card page as the catalogue count.
+    return countCatalogIdPages(async (afterId, limit) => {
+      let pageQuery = catalogCountQuery(filters, false).order("id").limit(limit).abortSignal(AbortSignal.timeout(8_000));
+      if (afterId) pageQuery = pageQuery.gt("id", afterId);
+      const { data, error: pageError } = await pageQuery;
+      if (pageError) throw pageError;
+      return (data ?? []).map((row) => row.id as string);
+    });
   }
   if (durationMs >= CATALOG_QUERY_SLOW_MS) {
     console.warn("[cars] Catalog count query slow", queryContext);

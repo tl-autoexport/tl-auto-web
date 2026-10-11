@@ -15,7 +15,7 @@ type Selection = IdentitySelection;
 
 type Props = {
   currentQuery: string;
-  totalCars: number;
+  totalCars: number | null;
   brand?: string | null;
   model?: string | null;
   generation?: string | null;
