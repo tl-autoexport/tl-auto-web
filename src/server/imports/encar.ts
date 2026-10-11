@@ -1,4 +1,5 @@
 import { persistCatalogNamingSupabase } from "../catalog/persist-catalog-naming";
+import { showcasePhotoScore } from "@/lib/showcase-photo";
 import { catalogDriveType, normalizeTransmissionType } from "@/server/normalization/drivetrain";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -435,7 +436,7 @@ function normalizeEncarPhotos(
         : `https://ci.encar.com${photo.path}`,
       category: normalizeEncarPhotoCategory(photo.type),
     }))
-    .sort((left, right) => encarPhotoRank(left) - encarPhotoRank(right));
+    .sort((left, right) => showcasePhotoScore(right) - showcasePhotoScore(left) || encarPhotoRank(left) - encarPhotoRank(right));
 
   const seen = new Set<string>();
   return normalized.filter((photo) => {

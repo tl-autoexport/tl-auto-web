@@ -4,7 +4,7 @@ import { createSupabasePublic } from "@/server/supabase/public";
 import { normalizeColor, normalizeDrive } from "@/server/normalization/vehicles";
 import { bodyTypeValues, driveTypeValues, transmissionValues } from "@/lib/catalog-filter-values";
 import { catalogBrandValues, normalizeCatalogBrand } from "@/lib/catalog-brand";
-import { homeShowcasePhotoUrl } from "@/lib/showcase-photo";
+import { homeShowcasePhotoUrl, showcasePhotoScore } from "@/lib/showcase-photo";
 import { catalogCountFilters, catalogDisplayReadView, countCatalogIdPages, createReadCoalescer } from "./catalog-read-coalescer";
 
 const buildWithoutCatalog =
@@ -112,11 +112,7 @@ export async function getCatalogPreviewImages(source: string, sourceId: string):
 }
 
 function previewPhotoScore(media: { url: string; category: string | null }) {
-  const category = media.category?.toLowerCase() ?? "";
-  if (["inner", "inside", "inside_image", "interior", "option", "condition", "scratch", "inspection_record", "underbody", "thermal", "thermal_reference", "exterior_360_thumbnail"].some((blocked) => category === blocked || category.startsWith(`${blocked}_`))) return 0;
-  const fileCode = Number(media.url.match(/_(\d{3})(?:\.[a-z]+)(?:\?|$)/i)?.[1] ?? Number.NaN);
-  if (["outside", "outside_image", "exterior", "outer"].includes(category)) return 400 + (fileCode === 1 ? 140 : fileCode === 3 ? 130 : fileCode === 5 ? 90 : fileCode === 2 ? 25 : 0);
-  return 100;
+  return showcasePhotoScore(media);
 }
 
 export type CatalogPageResult = {
@@ -1134,8 +1130,8 @@ export function getShowcasePhoto(car: CatalogCar) {
     .filter((item) => item.score > 0)
     .sort(
       (left, right) =>
-        Number(right.media.is_primary) - Number(left.media.is_primary) ||
         right.score - left.score ||
+        Number(right.media.is_primary) - Number(left.media.is_primary) ||
         left.media.sort_order - right.media.sort_order,
     );
 
@@ -1144,47 +1140,6 @@ export function getShowcasePhoto(car: CatalogCar) {
 
 export function hasShowcasePhoto(car: CatalogCar) {
   return Boolean(getShowcasePhoto(car));
-}
-
-function showcasePhotoScore(media: NonNullable<CatalogCar["car_media"]>[number]) {
-  const category = media.category?.toLowerCase() ?? "";
-  if (
-    [
-      "inner",
-      "inside",
-      "inside_image",
-      "interior",
-      "option",
-      "condition",
-      "scratch",
-      "inspection_record",
-      "underbody",
-      "thermal",
-      "thermal_reference",
-      "exterior_360_thumbnail",
-    ].some((blocked) => category === blocked || category.startsWith(`${blocked}_`))
-  ) {
-    return 0;
-  }
-
-  const fileCode = Number(media.url.match(/_(\d{3})(?:\.[a-z]+)(?:\?|$)/i)?.[1] ?? NaN);
-  const primaryBonus = media.is_primary ? 1000 : 0;
-  if (["outside", "outside_image", "exterior", "outer"].includes(category)) {
-    const exteriorAngleBonus =
-      fileCode === 2 ? 55 :
-      fileCode === 3 ? 50 :
-      fileCode === 4 ? 35 :
-      fileCode === 1 ? 18 :
-      Number.isFinite(fileCode) && fileCode <= 8 ? 20 - fileCode : 0;
-    return 300 + exteriorAngleBonus + primaryBonus;
-  }
-  if (category === "thumbnail") return 280 + (fileCode === 1 ? 30 : 0) + primaryBonus;
-  if (category === "photo" && fileCode === 1) return 260 + primaryBonus;
-  if (category === "photo" && Number.isFinite(fileCode) && fileCode >= 2 && fileCode <= 8) {
-    return 220 - fileCode + primaryBonus;
-  }
-
-  return 0;
 }
 
 function passableFilterExpression(now = new Date()) {

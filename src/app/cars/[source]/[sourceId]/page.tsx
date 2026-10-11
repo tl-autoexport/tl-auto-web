@@ -39,6 +39,7 @@ import { formatEngineCapacity, formatVehicleYear } from "@/lib/vehicle-format";
 import { publicCarPath } from "@/lib/car-url";
 import { PowerKeyFact } from "./PowerKeyFact";
 import { officialSourceUrl } from "@/lib/source-url";
+import { showcasePhotoScore } from "@/lib/showcase-photo";
 
 const rub = new Intl.NumberFormat("ru-RU");
 const getCachedCarDetail = cache(getCarDetail);
@@ -135,7 +136,7 @@ export default async function CarDetailPage({
   // `chestny_prigon`, из-за чего в карточке оставалось только пять фото.
   const displayGalleryMedia = Array.from(
     new Map(galleryMedia.map((media) => [media.url, media])).values(),
-  );
+  ).sort((a, b) => showcasePhotoScore(b) - showcasePhotoScore(a) || a.sort_order - b.sort_order);
 
   return (
     <main className="min-h-screen bg-[#f4f5f7] text-[#121722]">

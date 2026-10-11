@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { homeShowcasePhotoUrl } from "./showcase-photo";
+import { homeShowcasePhotoUrl, showcasePhotoUrl } from "./showcase-photo";
 
 const front = "https://ci.encar.com/carpicture02/pic4282/42820256_003.jpg";
 const frontThreeQuarter = "https://ci.encar.com/carpicture02/pic4282/42820256_001.jpg";
@@ -45,3 +45,14 @@ assert.equal(
 );
 
 console.log("Homepage showcase photo selection tests passed.");
+
+const g90 = "https://ci.encar.com/carpicture04/pic4164/41647619";
+assert.equal(showcasePhotoUrl([
+  { url: `${g90}_005.jpg`, media_type: "image", category: "outer", is_primary: true, sort_order: 0 },
+  { url: `${g90}_003.jpg`, media_type: "image", category: "outer", sort_order: 1 },
+  { url: `${g90}_001.jpg`, media_type: "image", category: "outer", sort_order: 2 },
+]), `${g90}_001.jpg`, "G90 cover must show the car, not the legacy primary wheel frame");
+assert.equal(showcasePhotoUrl([
+  { url: `${g90}_005.jpg`, media_type: "image", category: "outer", is_primary: true },
+  { url: `${g90}_003.jpg?impolicy=heightRate&rh=768`, media_type: "image", category: "outer" },
+]), `${g90}_003.jpg?impolicy=heightRate&rh=768`, "frontal fallback must outrank detail frames");

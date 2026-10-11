@@ -18,6 +18,7 @@
  * Dry-run by default; TL_AUTO_ENRICHMENT_APPLY=true enables the write.
  */
 import { config } from "dotenv";
+import { showcasePhotoScore } from "../src/lib/showcase-photo";
 import { createClient } from "@supabase/supabase-js";
 import { Client } from "pg";
 import { translateInspectionLabel, translateInspectionStatus } from "../src/server/normalization/display";
@@ -100,7 +101,8 @@ function gallery(carId: string, payload: Obj) {
     const photo = obj(raw); const path = text(photo.path); if (!path) return [];
     const type = text(photo.type)?.toLowerCase(); const category = ["outer", "inner", "option", "thumbnail"].includes(type ?? "") ? type : "photo";
     return [{ car_id: carId, source: "encar", media_type: "image", category, url: photoUrl(path), thumbnail_url: photoUrl(path), sort_order: index, is_primary: index === 0, legal_mode: "external_url" }];
-  }) : [];
+  }).sort((a, b) => showcasePhotoScore(b) - showcasePhotoScore(a) || a.sort_order - b.sort_order)
+    .map((photo, index) => ({ ...photo, sort_order: index, is_primary: index === 0 })) : [];
 }
 
 type CardResult = {

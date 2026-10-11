@@ -34,6 +34,7 @@ const NON_SHOWCASE_CATEGORIES = [
   "condition",
   "scratch",
   "inspection_record",
+  "encar_inspection_document",
   "underbody",
   "thermal",
   "thermal_reference",
@@ -54,11 +55,20 @@ export function showcasePhotoUrl(media: ShowcaseMedia[] | null | undefined) {
   return ranked[0]?.item.url ?? images[0]?.url ?? null;
 }
 
-function showcasePhotoScore(media: ShowcaseMedia) {
+export function showcasePhotoScore(media: ShowcaseMedia) {
   const category = media.category?.toLowerCase() ?? "";
   if (NON_SHOWCASE_CATEGORIES.some((blocked) => category === blocked || category.startsWith(`${blocked}_`))) return 0;
 
   const fileCode = Number(media.url.match(/_(\d{3})(?:\.[a-z]+)(?:\?|$)/i)?.[1] ?? NaN);
+  // Standard Encar 001 is the full-car cover, even when legacy metadata
+  // incorrectly marks a detail frame as primary or mislabels the category.
+  if (/^https:\/\/ci\.encar\.com\/carpicture/i.test(media.url)) {
+    if (fileCode === 1) return 1000;
+    if (fileCode === 3) return 900;
+    if (fileCode === 2) return 800;
+    if (fileCode === 4) return 700;
+    return 100;
+  }
   // The feed's primary flag often points to a rear angle. Do not let it
   // influence showcase selection; the exterior-frame sequence is reliable.
   const primaryBonus = 0;
