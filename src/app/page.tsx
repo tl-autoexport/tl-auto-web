@@ -44,7 +44,7 @@ export default async function Home() {
           <StoryCarousel>
             <DodoStoryCard
               title="Новая Avanta до 160 л.с."
-              href="/catalog?search=Avante&powerMax=160&yearMin=2025&sort=fresh"
+              href="/catalog?brand=Hyundai&model=Avante&generation=cn8&sort=fresh"
               image="/assets/stories/avante.webp"
               position="object-center"
             />
