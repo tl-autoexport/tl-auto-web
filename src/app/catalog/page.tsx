@@ -121,6 +121,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     minInsurancePayoutKrw: numberParam(value("insuranceMin")),
     maxInsurancePayoutKrw: numberParam(value("insuranceMax")),
     passable,
+    crossovers4wd: value("crossovers4wd") === "1",
+    electricOnly: value("electricOnly") === "1",
+    lpgOnly: value("lpgOnly") === "1",
     sourceId: value("number") || undefined,
     sort,
   };
@@ -340,7 +343,7 @@ function CatalogFilterForm({
   under160,
   value,
 }: CatalogFilterFormProps) {
-  return <Form action="/catalog" prefetch={false}><input name="sort" type="hidden" value={sort} /><CatalogParameterFields values={Object.fromEntries(["priceMin", "priceMax", "mileageMin", "mileageMax", "yearMin", "yearMax", "engineMin", "engineMax", "powerMin", "powerMax", "body", "transmission", "fuel", "drive", "under160", "passable", "clean", "noInsurance"].map(name => [name, value(name)]))} bodies={bodies} transmissions={transmissions} fuels={fuels} /><div className="mt-4 flex items-center justify-between"><Link href="/catalog" className="text-sm text-[#647084]">Сбросить</Link><LiveCatalogCount initialCount={totalCars} /></div></Form>;
+  return <Form action="/catalog" prefetch={false}><input name="sort" type="hidden" value={sort} /><CatalogParameterFields values={Object.fromEntries(["priceMin", "priceMax", "mileageMin", "mileageMax", "yearMin", "yearMax", "engineMin", "engineMax", "powerMin", "powerMax", "body", "transmission", "fuel", "drive", "under160", "passable", "clean", "noInsurance", "crossovers4wd", "electricOnly", "lpgOnly"].map(name => [name, value(name)]))} bodies={bodies} transmissions={transmissions} fuels={fuels} /><div className="mt-4 flex items-center justify-between"><Link href="/catalog" className="text-sm text-[#647084]">Сбросить</Link><LiveCatalogCount initialCount={totalCars} /></div></Form>;
 }
 
 function CatalogSortMenu({ rawParams, sort }: { rawParams: Record<string, string | string[] | undefined>; sort: keyof typeof sortLabels }) {

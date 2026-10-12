@@ -194,6 +194,9 @@ export type CatalogFilters = {
   minInsurancePayoutKrw?: number;
   maxInsurancePayoutKrw?: number;
   passable?: boolean;
+  crossovers4wd?: boolean;
+  electricOnly?: boolean;
+  lpgOnly?: boolean;
   sourceId?: string;
   sort?: "fresh" | "price_asc" | "price_desc" | "mileage_asc" | "year_desc";
 };
@@ -226,6 +229,9 @@ function catalogQueryContext(filters: CatalogFilters) {
     noInsurance: filters.noInsurance,
     insurancePayoutRange: filters.minInsurancePayoutKrw !== undefined || filters.maxInsurancePayoutKrw !== undefined,
     passable: filters.passable,
+    crossovers4wd: filters.crossovers4wd,
+    electricOnly: filters.electricOnly,
+    lpgOnly: filters.lpgOnly,
     sourceId: filters.sourceId,
   })
     .filter(([, value]) => Boolean(value))
@@ -328,6 +334,9 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     minInsurancePayoutKrw,
     maxInsurancePayoutKrw,
     passable,
+    crossovers4wd,
+    electricOnly,
+    lpgOnly,
     sourceId,
     sort = "fresh",
   } = filters;
@@ -354,6 +363,8 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
       : query.eq("model", model);
   }
   if (fuelType) query = query.eq("fuel_type", fuelType);
+  if (electricOnly) query = query.eq("fuel_type", "electric");
+  if (lpgOnly) query = query.eq("fuel_type", "lpg");
   if (transmission) query = query.in("transmission", transmissionValues(transmission));
   if (minEngineCc) query = query.gte("engine_cc", minEngineCc);
   if (maxEngineCc) query = query.lte("engine_cc", maxEngineCc);
@@ -364,6 +375,10 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
   if (trim) query = query.eq("trim", trim);
   if (bodyType) query = query.in("body_type", bodyTypeValues(bodyType));
   if (driveType) query = query.in("drive_type", driveTypeValues(driveType));
+  if (crossovers4wd) {
+    query = query.in("body_type", bodyTypeValues("Кроссовер"));
+    query = query.in("drive_type", driveTypeValues("4WD"));
+  }
   if (color) query = query.eq("color", color);
   if (minOwners) query = query.gte("owners_count", minOwners);
   if (maxOwners) query = query.lte("owners_count", maxOwners);
@@ -434,6 +449,8 @@ export async function getCatalogCardPage(
     ? query.or(catalogSearchExpression(filters.model))
     : query.eq("model", filters.model);
   if (filters.fuelType) query = query.eq("fuel_type", filters.fuelType);
+  if (filters.electricOnly) query = query.eq("fuel_type", "electric");
+  if (filters.lpgOnly) query = query.eq("fuel_type", "lpg");
   if (filters.transmission) query = query.in("transmission", transmissionValues(filters.transmission));
   if (filters.minEngineCc) query = query.gte("engine_cc", filters.minEngineCc);
   if (filters.maxEngineCc) query = query.lte("engine_cc", filters.maxEngineCc);
@@ -444,6 +461,10 @@ export async function getCatalogCardPage(
   if (filters.trim) query = query.eq("trim", filters.trim);
   if (filters.bodyType) query = query.in("body_type", bodyTypeValues(filters.bodyType));
   if (filters.driveType) query = query.in("drive_type", driveTypeValues(filters.driveType));
+  if (filters.crossovers4wd) {
+    query = query.in("body_type", bodyTypeValues("Кроссовер"));
+    query = query.in("drive_type", driveTypeValues("4WD"));
+  }
   if (filters.color) query = query.eq("color", filters.color);
   if (filters.minOwners) query = query.gte("owners_count", filters.minOwners);
   if (filters.maxOwners) query = query.lte("owners_count", filters.maxOwners);
@@ -570,6 +591,8 @@ function catalogCountQuery(filters: CatalogFilters, exact: boolean) {
       : query.eq("model", filters.model);
   }
   if (filters.fuelType) query = query.eq("fuel_type", filters.fuelType);
+  if (filters.electricOnly) query = query.eq("fuel_type", "electric");
+  if (filters.lpgOnly) query = query.eq("fuel_type", "lpg");
   if (filters.transmission) query = query.in("transmission", transmissionValues(filters.transmission));
   if (filters.minEngineCc) query = query.gte("engine_cc", filters.minEngineCc);
   if (filters.maxEngineCc) query = query.lte("engine_cc", filters.maxEngineCc);
@@ -580,6 +603,10 @@ function catalogCountQuery(filters: CatalogFilters, exact: boolean) {
   if (filters.trim) query = query.eq("trim", filters.trim);
   if (filters.bodyType) query = query.in("body_type", bodyTypeValues(filters.bodyType));
   if (filters.driveType) query = query.in("drive_type", driveTypeValues(filters.driveType));
+  if (filters.crossovers4wd) {
+    query = query.in("body_type", bodyTypeValues("Кроссовер"));
+    query = query.in("drive_type", driveTypeValues("4WD"));
+  }
   if (filters.color) query = query.eq("color", filters.color);
   if (filters.minOwners) query = query.gte("owners_count", filters.minOwners);
   if (filters.maxOwners) query = query.lte("owners_count", filters.maxOwners);

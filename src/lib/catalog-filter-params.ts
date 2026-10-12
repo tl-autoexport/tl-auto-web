@@ -34,6 +34,9 @@ export function catalogFiltersFromParams(params: URLSearchParams): CatalogFilter
     minInsurancePayoutKrw: numberParam(params.get("insuranceMin")),
     maxInsurancePayoutKrw: numberParam(params.get("insuranceMax")),
     passable: params.get("passable") === "1",
+    crossovers4wd: params.get("crossovers4wd") === "1",
+    electricOnly: params.get("electricOnly") === "1",
+    lpgOnly: params.get("lpgOnly") === "1",
     sourceId: params.get("number") || undefined,
   };
 
