@@ -14,9 +14,7 @@ export const TKS_CUSTOMS_FEE_BANDS: readonly TksCustomsFeeBand[] = [
   { maxRub: 4_200_000, feeRub: 18_465 },
   { maxRub: 5_500_000, feeRub: 21_344 },
   { maxRub: 10_000_000, feeRub: 49_240 },
-  // The next TKS threshold is not yet captured in our HAR set. Keep the
-  // last verified value explicit until that control is recorded.
-  { maxRub: Number.POSITIVE_INFINITY, feeRub: 49_240 },
+  { maxRub: Number.POSITIVE_INFINITY, feeRub: 73_860 },
 ];
 
 export type TksDutyVolumeBand = {
@@ -54,7 +52,7 @@ export const TKS_NEW_PRICE_BANDS: readonly TksNewPriceBand[] = [
 ];
 
 export function tksCustomsFeeRub(customsValueRub: number) {
-  return TKS_CUSTOMS_FEE_BANDS.find((band) => customsValueRub <= band.maxRub)?.feeRub ?? 49_240;
+  return TKS_CUSTOMS_FEE_BANDS.find((band) => customsValueRub <= band.maxRub)?.feeRub ?? 73_860;
 }
 
 export function tksDutyVolumeRate(ageGroup: Exclude<TksAgeGroup, "under_3">, engineCc: number) {

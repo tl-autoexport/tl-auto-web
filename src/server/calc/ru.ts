@@ -8,7 +8,7 @@ import {
   tksStpExciseRub,
 } from "./tks-rules";
 
-export const CALC_VERSION = "ru-individual-autoexport-tks-client-total-2026.03";
+export const CALC_VERSION = "ru-individual-autoexport-tks-client-total-2026.04";
 
 const DEFAULT_RATES: CalcRates = { krwRub: 0.04718, eurRub: 87.403, usdRub: 70.95, kztRub: 0.14 };
 // TL Auto uses a 30-day planning window for the estimated customs clearance
@@ -43,19 +43,17 @@ function getIndividualDutyRub({
 }: { priceRub: number; engineCc: number; ageYearsAtClearance: number; eurRub: number }) {
   const priceEur = priceRub / eurRub;
   let eurPerCc: number;
-  let percent: number;
+  let percent = 0;
   if (ageYearsAtClearance < 3) {
     const band = tksNewPriceRate(priceEur);
     [eurPerCc, percent] = [band.eurPerCc, band.percent];
   } else if (ageYearsAtClearance <= 5) {
     eurPerCc = tksDutyVolumeRate("from_3_to_5", engineCc);
-    percent = 0.154;
   } else {
     eurPerCc = tksDutyVolumeRate("over_7", engineCc);
-    percent = 0.2;
   }
   const dutyByVolume = engineCc * eurPerCc * eurRub;
-  const dutyByValue = priceEur * percent * eurRub;
+  const dutyByValue = ageYearsAtClearance < 3 ? priceEur * percent * eurRub : 0;
   return {
     dutyRub: roundRub(Math.max(dutyByVolume, dutyByValue)),
     eurPerCc,

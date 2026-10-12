@@ -55,10 +55,9 @@ function expectedDuty(control: Control, customsValueRub: number, eurRub: number)
     return Math.max(control.engine_cc * band.eurPerCc * eurRub, priceEur * band.percent * eurRub);
   }
   const eurPerCc = tksDutyVolumeRate(age === "from_3_to_5" ? age : age === "from_5_to_7" ? age : "over_7", control.engine_cc);
-  // TKS's private-import table uses the volume minimum for 3–5 and 20% value
-  // minimum for vehicles older than five years.
-  const percent = age === "from_3_to_5" ? 0.154 : 0.2;
-  return Math.max(control.engine_cc * eurPerCc * eurRub, priceEur * percent * eurRub);
+  // Under the individual-import ETS regime, vehicles older than three years
+  // use the specific euro/cm³ rate without an additional value-based minimum.
+  return control.engine_cc * eurPerCc * eurRub;
 }
 
 async function main() {

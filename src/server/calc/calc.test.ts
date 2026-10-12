@@ -297,6 +297,19 @@ assert.equal(feeBoundary(4_200_000), 18_465);
 assert.equal(feeBoundary(4_200_001), 21_344);
 assert.equal(feeBoundary(5_500_000), 21_344);
 assert.equal(feeBoundary(5_500_001), 49_240);
-assert.equal(feeBoundary(10_000_001), 49_240);
+assert.equal(feeBoundary(10_000_000), 49_240);
+assert.equal(feeBoundary(10_000_001), 73_860);
+
+const rollsRoyceGhost = calculateRuVladivostok({
+  priceKrw: 410_000_000, year: 2022, month: 6, engineCc: 6749, powerKw: 442,
+  fuelType: "gasoline", calculationDate: "2026-10-11T10:18:42.671Z",
+  rates: { krwRub: 0.06584712304250559, usdRub: 88.300992, eurRub: 98.77348, kztRub: 0.18912299999999999 },
+  customsRates: { krwRub: 0.0633996, eurRub: 94.9745 },
+});
+assert.equal(rollsRoyceGhost.customs.mode, "volume");
+assert.equal(rollsRoyceGhost.dutyRub, 2_307_538.44, "3–5-year passenger vehicle uses only the specific euro/cc rate");
+assert.equal(rollsRoyceGhost.feesRub, 73_860, "2026 customs fee above 10 million rubles");
+assert.equal(rollsRoyceGhost.utilRub, 6_885_600);
+assert.equal(rollsRoyceGhost.totalRub, 36_542_597.44);
 
 console.log("calc benchmark passed", { fixture: "AutoExport individual regime", totalRub: genesisG70.totalRub });
