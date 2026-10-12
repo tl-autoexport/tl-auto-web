@@ -159,10 +159,14 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
     apply(next);
   }
   function openQuickRange(screen: "price" | "year" | "mileage") {
+    if (screen === "price") {
+      setScreen("price");
+      return;
+    }
     setRangePicker({
-      title: screen === "price" ? "Цена, ₽" : screen === "year" ? "Год выпуска" : "Пробег, км",
-      minKey: screen === "price" ? "priceMin" : screen === "year" ? "yearMin" : "mileageMin",
-      maxKey: screen === "price" ? "priceMax" : screen === "year" ? "yearMax" : "mileageMax",
+      title: screen === "year" ? "Год выпуска" : "Пробег, км",
+      minKey: screen === "year" ? "yearMin" : "mileageMin",
+      maxKey: screen === "year" ? "yearMax" : "mileageMax",
     });
   }
   function applyRange() {
@@ -194,7 +198,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
         {(["brand", "model", "generation", "modification", "trim"] as Screen[]).includes(screen) ? <Picker axis={screen as "brand" | "model" | "generation" | "modification" | "trim"} brandValue={selected("brand")} facets={currentFacets} find={find} inputRef={inputRef} loading={!currentFacets} onChoose={choose} onFind={setFind} onRetry={() => setRetry((value) => value + 1)} requestFailed={requestFailed} selectedValue={selected(screen)} /> : null}
         {screen === "parameters" ? <Parameters currentQuery={query} generationLabel={generationLabel(selected("generation"), currentFacets)} onOpenRange={setRangePicker} onSelectLevel={setScreen} options={options} patch={patch} selected={selected} /> : null}
-        {screen === "year" || screen === "price" || screen === "mileage" ? <Range title={screen === "year" ? "Год выпуска" : screen === "price" ? "Цена до Владивостока, ₽" : "Пробег, км"} minKey={screen === "year" ? "yearMin" : screen === "price" ? "priceMin" : "mileageMin"} maxKey={screen === "year" ? "yearMax" : screen === "price" ? "priceMax" : "mileageMax"} onOpen={setRangePicker} selected={selected} /> : null}
+        {screen === "year" || screen === "price" || screen === "mileage" ? <Range patch={patch} title={screen === "year" ? "Год выпуска" : screen === "price" ? "Цена до Владивостока, ₽" : "Пробег, км"} minKey={screen === "year" ? "yearMin" : screen === "price" ? "priceMin" : "mileageMin"} maxKey={screen === "year" ? "yearMax" : screen === "price" ? "priceMax" : "mileageMax"} onOpen={setRangePicker} selected={selected} /> : null}
         {screen === "sort" ? <div className="overflow-hidden rounded-2xl bg-white">{sortOptions.map((option) => <button className={`flex min-h-14 w-full items-center justify-between border-b border-[#edf0f4] px-4 text-left text-sm ${selected("sort") === option.value ? "font-semibold text-[#956f2c]" : "text-[#273246]"}`} key={option.value} onClick={() => changeSort(option.value)} type="button">{option.label}<span>{selected("sort") === option.value ? "✓" : ""}</span></button>)}</div> : null}
       </div>
       {screen !== "sort" ? <div className="shrink-0 border-t border-[#dce2eb] bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"><button className="min-h-14 w-full rounded-2xl bg-[#101827] px-4 text-base font-semibold text-white disabled:opacity-60" onClick={() => apply()} type="button">{requestFailed || loading || !hasCurrentCount ? "Показать автомобили" : `Показать ${count} ${pluralCars(count)}`}</button>{requestFailed ? <button className="mt-2 w-full text-sm text-[#956f2c]" onClick={() => setRetry((value) => value + 1)} type="button">Повторить запрос</button> : null}</div> : null}
@@ -205,7 +209,7 @@ export function MobileCatalogExperience({ currentQuery, options, sortOptions, to
 
 function Picker({ axis, brandValue, facets, find, inputRef, loading, onChoose, onFind, onRetry, requestFailed, selectedValue }: { axis: "brand" | "model" | "generation" | "modification" | "trim"; brandValue: string; facets: Facets | null; find: string; inputRef: React.RefObject<HTMLInputElement | null>; loading: boolean; onChoose: (axis: "brand" | "model" | "generation" | "modification" | "trim", item: Option) => void; onFind: (text: string) => void; onRetry: () => void; requestFailed: boolean; selectedValue: string }) {
   const items = (facets?.axes[axis] ?? []).filter((item) => item.label.toLowerCase().includes(find.toLowerCase()));
-  return <><label className="relative mb-4 block"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7a8798]" size={20} /><input className="h-13 w-full rounded-xl bg-white pl-11 pr-4 text-base outline-none ring-1 ring-[#e0e5ec] focus:ring-[#a98239]" onChange={(event) => onFind(event.target.value)} placeholder={`Поиск: ${titleFor(axis).toLowerCase()}`} ref={inputRef} value={find} /></label><div className="overflow-hidden rounded-2xl bg-white">{requestFailed ? <div className="p-5 text-sm text-[#647084]">Не удалось загрузить варианты. <button className="font-semibold text-[#956f2c]" onClick={onRetry} type="button">Повторить</button></div> : loading ? <p className="p-5 text-sm text-[#647084]">Загружаем варианты…</p> : items.length ? items.map((item) => { const isSelected = selectedValue === item.value; const label = axis === "brand" ? translateBrand(item.label) : axis === "model" ? translateModel(brandValue, item.label) : item.label; return <CascadeOption key={item.value} label={label || item.label} brand={axis === "brand" ? item.value : undefined} generation={axis === "generation"} selected={isSelected} cars={item.cars} onClick={() => { onFind(""); onChoose(axis, item); }} />; }) : <p className="p-5 text-sm text-[#647084]">{axis === "generation" ? "Для этой марки и модели пока нет подтверждённых данных о поколениях." : "Нет вариантов для текущего отбора."}</p>}</div></>;
+  return <><label className="relative mb-4 block"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7a8798]" size={20} /><input className="h-13 w-full rounded-xl bg-white pl-11 pr-4 text-base outline-none ring-1 ring-[#e0e5ec] focus:ring-[#647084]" onChange={(event) => onFind(event.target.value)} placeholder={`Поиск: ${titleFor(axis).toLowerCase()}`} ref={inputRef} value={find} /></label><div className="overflow-hidden rounded-2xl bg-white">{requestFailed ? <div className="p-5 text-sm text-[#647084]">Не удалось загрузить варианты. <button className="font-semibold text-[#956f2c]" onClick={onRetry} type="button">Повторить</button></div> : loading ? <p className="p-5 text-sm text-[#647084]">Загружаем варианты…</p> : items.length ? items.map((item) => { const isSelected = selectedValue === item.value; const label = axis === "brand" ? translateBrand(item.label) : axis === "model" ? translateModel(brandValue, item.label) : item.label; return <CascadeOption key={item.value} label={label || item.label} brand={axis === "brand" ? item.value : undefined} generation={axis === "generation"} selected={isSelected} cars={item.cars} onClick={() => { onFind(""); onChoose(axis, item); }} />; }) : <p className="p-5 text-sm text-[#647084]">{axis === "generation" ? "Для этой марки и модели пока нет подтверждённых данных о поколениях." : "Нет вариантов для текущего отбора."}</p>}</div></>;
 }
 
 function Parameters({ currentQuery, onOpenRange, options, patch, selected }: { currentQuery: string; generationLabel: string; onOpenRange: (state: RangePickerState) => void; onSelectLevel: (screen: Screen) => void; options: FieldOptions; patch: (values: Record<string, string | null>) => void; selected: (name: string) => string }) {
@@ -214,8 +218,9 @@ function Parameters({ currentQuery, onOpenRange, options, patch, selected }: { c
   return <div className="grid gap-4"><section className={picking ? "" : "rounded-2xl border border-[#dce2eb] bg-white p-4"}><GenerationCascade onPickerOpenChange={setPicking} currentQuery={currentQuery} totalCars={0} brand={selected("brand")} model={selected("model")} generation={selected("generation")} modification={selected("modification")} trim={selected("trim")} onSelection={next => patch(Object.fromEntries(CASCADE_LEVELS.map(key => [key, next[key] || null])))} /></section>{!picking ? <CatalogParameterFields values={Object.fromEntries(PARAM_KEYS.map(name => [name, selected(name)]))} bodies={options.bodies} transmissions={options.transmissions} fuels={options.fuels} onChange={(name, value) => patch({ [name]: value || null })} /> : null}</div>;
 }
 
-function Range({ title, minKey, maxKey, onOpen, selected, single = false }: { title: string; minKey: string; maxKey: string; onOpen: (state: RangePickerState) => void; selected: (name: string) => string; single?: boolean }) {
+function Range({ title, minKey, maxKey, onOpen, selected, patch, single = false }: { patch: (values: Record<string, string | null>) => void; title: string; minKey: string; maxKey: string; onOpen: (state: RangePickerState) => void; selected: (name: string) => string; single?: boolean }) {
   const displayValue = (value: string, fallback: string) => value ? formatRangeValue(value, minKey) : fallback;
+  if (minKey === "priceMin") return <fieldset><legend className="mb-2 text-sm text-[#647084]">{title}</legend><div className="grid grid-cols-2 gap-2">{[minKey, maxKey].map((key, index) => <input key={key} aria-label={`${title}: ${index ? "до" : "от"}`} className="h-12 min-w-0 rounded-xl border border-[#d7dee8] bg-white px-3 outline-none focus:border-[#647084]" inputMode="numeric" placeholder={index ? "До" : "От"} value={selected(key)} onChange={event => patch({ [key]: event.target.value || null })} />)}</div></fieldset>;
   return <fieldset><legend className="mb-1.5 text-sm text-[#647084]">{title}</legend><button aria-label={`Выбрать: ${title}`} className="grid w-full grid-cols-2 overflow-hidden rounded-xl border border-[#d7dee8] bg-white text-left" onClick={() => onOpen({ title, minKey, maxKey, single })} type="button"><span className="min-w-0 border-r border-[#d7dee8] px-3 py-3 text-[15px] text-[#273246]">{displayValue(selected(minKey), single ? "До" : "От")}</span><span className="min-w-0 px-3 py-3 text-[15px] text-[#273246]">{single ? "л.с." : displayValue(selected(maxKey), "До")}</span></button></fieldset>;
 }
 
@@ -233,11 +238,10 @@ function RangePicker({ count, hasCurrentCount, loading, onApply, onClose, patch,
 }
 
 function rangeValues(key: string) {
-  if (key === "yearMin") return Array.from({ length: 37 }, (_, index) => String(new Date().getFullYear() - index));
-  if (key === "priceMin") return Array.from({ length: 80 }, (_, index) => String((index + 1) * 250_000));
-  if (key === "mileageMin") return Array.from({ length: 31 }, (_, index) => String(index * 10_000));
-  if (key === "engineMin") return Array.from({ length: 66 }, (_, index) => String(500 + index * 100));
-  if (key === "powerMax") return [...new Set(["160", ...Array.from({ length: 19 }, (_, index) => String(50 + index * 25))])].sort((left, right) => Number(left) - Number(right));
+  if (key === "yearMin") return Array.from({ length: new Date().getFullYear() - 1979 }, (_, index) => String(new Date().getFullYear() - index));
+  if (key === "mileageMin") return Array.from({ length: 1001 }, (_, index) => String(index * 1000));
+  if (key === "engineMin") return Array.from({ length: 100 }, (_, index) => String((index + 1) * 100));
+  if (key === "powerMax") return Array.from({ length: 201 }, (_, index) => String(index * 10));
   return [];
 }
 

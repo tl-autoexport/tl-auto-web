@@ -188,7 +188,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
               <p className="mt-1.5 max-w-2xl text-[12px] leading-4 text-[#647084] sm:mt-2 sm:text-sm sm:leading-6">Подбор по реальным данным источника с расчётом цены до Владивостока.</p>
               <p className="mt-2 text-sm font-semibold text-[#273246] md:hidden">{totalCars === null ? "Автомобили по выбранным параметрам" : `${totalCars.toLocaleString("ru-RU")} автомобилей`}</p>
             </div>
-            <div className="hidden items-center gap-2 self-start rounded-full bg-[#fbf7ed] px-3 py-2 text-xs text-[#7b5a22] md:inline-flex md:gap-3 md:rounded-none md:border-l-2 md:border-[#c7a55a] md:bg-transparent md:pl-4 md:text-sm"><CarFront size={18} className="text-[#c7a55a] md:size-5" /><span><strong className="mr-1 text-base text-[#101827] md:block md:text-xl">{totalCars}</strong><span className="text-[#647084]">{totalCars === null ? "Автомобили по выбранным параметрам" : "автомобилей найдено"}</span></span></div>
+            <div className="hidden items-center gap-2 self-start rounded-full bg-[#fbf7ed] px-3 py-2 text-xs text-[#7b5a22] md:inline-flex md:gap-3 md:rounded-none md:border-l-2 md:border-[#d7dee8] md:bg-transparent md:pl-4 md:text-sm"><CarFront size={18} className="text-[#c7a55a] md:size-5" /><span><strong className="mr-1 text-base text-[#101827] md:block md:text-xl">{totalCars}</strong><span className="text-[#647084]">{totalCars === null ? "Автомобили по выбранным параметрам" : "автомобилей найдено"}</span></span></div>
           </div>
 
           {popularBrands.length ? (
@@ -200,7 +200,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                     aria-current={selected ? "page" : undefined}
                     className={`inline-flex h-10 shrink-0 items-center gap-2 border-b-2 px-0 text-[15px] font-medium transition ${
                       selected
-                        ? "border-[#a98239] text-[#15171b]"
+                        ? "border-[#647084] text-[#15171b]"
                         : "border-transparent text-[#15171b] hover:border-[#d7c49c]"
                     }`}
                     href={selected
@@ -346,7 +346,7 @@ function CatalogFilterForm({
 function CatalogSortMenu({ rawParams, sort }: { rawParams: Record<string, string | string[] | undefined>; sort: keyof typeof sortLabels }) {
   return (
     <details className="group relative z-20">
-      <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-[#d7dee8] bg-white px-3.5 text-sm font-medium text-[#273246] shadow-sm transition hover:border-[#c7a55a] [&::-webkit-details-marker]:hidden">
+      <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-[#d7dee8] bg-white px-3.5 text-sm font-medium text-[#273246] shadow-sm transition hover:border-[#d7dee8] [&::-webkit-details-marker]:hidden">
         <ArrowDownUp size={16} className="text-[#647084]" />
         <span>{sortLabels[sort]}</span>
         <ChevronDown className="text-[#647084] transition group-open:rotate-180" size={16} />
@@ -373,22 +373,22 @@ function CatalogSortMenu({ rawParams, sort }: { rawParams: Record<string, string
 
 function FilterSelect({ label, name, options, placeholder, translate, value }: { label: string; name: string; options: string[]; placeholder: string; translate?: (item: string) => string; value: string }) {
   const active = Boolean(value);
-  return <label className="grid gap-1.5 text-sm text-[#647084]"><span>{label}</span><span className="relative"><select className={`h-11 w-full appearance-none rounded-md border px-3 pr-9 text-sm font-medium outline-none transition ${active ? "border-[#c7a55a] bg-[#fbf7ed] text-[#7b5a22]" : "border-[#d7dee8] bg-white text-[#273246]"} focus:border-[#101827]`} defaultValue={value} name={name}><option value="">{placeholder}</option>{options.map((item) => <option key={item} value={item}>{translate ? translate(item) : item}</option>)}</select>{active ? <Check className="pointer-events-none absolute right-8 top-3 text-[#c7a55a]" size={17} /> : null}<ChevronDown className="pointer-events-none absolute right-3 top-3 text-[#647084]" size={17} /></span></label>;
+  return <label className="grid gap-1.5 text-sm text-[#647084]"><span>{label}</span><span className="relative"><select className={`h-11 w-full appearance-none rounded-md border px-3 pr-9 text-sm font-medium outline-none transition ${active ? "border-[#d7dee8] bg-[#fbf7ed] text-[#7b5a22]" : "border-[#d7dee8] bg-white text-[#273246]"} focus:border-[#101827]`} defaultValue={value} name={name}><option value="">{placeholder}</option>{options.map((item) => <option key={item} value={item}>{translate ? translate(item) : item}</option>)}</select>{active ? <Check className="pointer-events-none absolute right-8 top-3 text-[#c7a55a]" size={17} /> : null}<ChevronDown className="pointer-events-none absolute right-3 top-3 text-[#647084]" size={17} /></span></label>;
 }
 
 function FilterInput({ inputMode = "text", label, name, placeholder, value }: { inputMode?: "numeric" | "text"; label: string; name: string; placeholder: string; value: string }) {
-  return <label className="grid gap-1.5 text-sm text-[#647084]"><span>{label}</span><input className={`h-11 w-full rounded-md border px-3 text-sm font-medium text-[#273246] outline-none placeholder:text-[#a7b0bd] ${value ? "border-[#c7a55a] bg-[#fbf7ed]" : "border-[#d7dee8] bg-white"} focus:border-[#101827]`} defaultValue={value} inputMode={inputMode} name={name} placeholder={placeholder} /></label>;
+  return <label className="grid gap-1.5 text-sm text-[#647084]"><span>{label}</span><input className={`h-11 w-full rounded-md border px-3 text-sm font-medium text-[#273246] outline-none placeholder:text-[#a7b0bd] ${value ? "border-[#d7dee8] bg-[#fbf7ed]" : "border-[#d7dee8] bg-white"} focus:border-[#101827]`} defaultValue={value} inputMode={inputMode} name={name} placeholder={placeholder} /></label>;
 }
 
 function RangeField({ label, maxName, maxValue, minName, minValue }: { label: string; maxName: string; maxValue: string; minName: string; minValue: string }) {
   const active = Boolean(minValue || maxValue);
-  return <fieldset className="grid gap-1.5"><legend className="text-sm text-[#647084]">{label}</legend><div className={`grid grid-cols-2 overflow-hidden rounded-md border ${active ? "border-[#c7a55a] bg-[#fbf7ed]" : "border-[#d7dee8] bg-white"}`}><input aria-label={`${label}: от`} className="h-11 min-w-0 border-r border-[#d7dee8] bg-transparent px-3 text-sm font-medium outline-none placeholder:text-[#a7b0bd]" defaultValue={minValue} inputMode="numeric" name={minName} placeholder="от" /><input aria-label={`${label}: до`} className="h-11 min-w-0 bg-transparent px-3 text-sm font-medium outline-none placeholder:text-[#a7b0bd]" defaultValue={maxValue} inputMode="numeric" name={maxName} placeholder="до" /></div></fieldset>;
+  return <fieldset className="grid gap-1.5"><legend className="text-sm text-[#647084]">{label}</legend><div className={`grid grid-cols-2 overflow-hidden rounded-md border ${active ? "border-[#d7dee8] bg-[#fbf7ed]" : "border-[#d7dee8] bg-white"}`}><input aria-label={`${label}: от`} className="h-11 min-w-0 border-r border-[#d7dee8] bg-transparent px-3 text-sm font-medium outline-none placeholder:text-[#a7b0bd]" defaultValue={minValue} inputMode="numeric" name={minName} placeholder="от" /><input aria-label={`${label}: до`} className="h-11 min-w-0 bg-transparent px-3 text-sm font-medium outline-none placeholder:text-[#a7b0bd]" defaultValue={maxValue} inputMode="numeric" name={maxName} placeholder="до" /></div></fieldset>;
 }
 
 function FilterCheck({ checked, compact = false, label, name, value }: { checked: boolean; compact?: boolean; label: string; name: string; value: string }) {
-  const appearance = checked ? "border-[#c7a55a] bg-[#fbf7ed] text-[#7b5a22]" : "border-[#d7dee8] bg-white text-[#3f4b5e]";
+  const appearance = checked ? "border-[#d7dee8] bg-[#fbf7ed] text-[#7b5a22]" : "border-[#d7dee8] bg-white text-[#3f4b5e]";
   const layout = compact
-    ? "inline-flex min-h-10 w-fit items-center justify-center gap-2 rounded-full border px-4 text-sm font-semibold transition hover:border-[#c7a55a]"
+    ? "inline-flex min-h-10 w-fit items-center justify-center gap-2 rounded-full border px-4 text-sm font-semibold transition hover:border-[#d7dee8]"
     : "flex min-h-11 items-center justify-center gap-2 rounded-md border px-2 text-center text-xs font-semibold transition";
   return <label className={`${layout} ${appearance}`}><input className="size-4 shrink-0 accent-[#c7a55a]" defaultChecked={checked} name={name} type="checkbox" value={value} />{label}</label>;
 }
@@ -403,14 +403,14 @@ function Pagination({ currentPage, rawParams, totalPages }: { currentPage: numbe
     <PaginationLink disabled={currentPage === 1} href={catalogPageHref(rawParams, currentPage - 1)} label="Назад"><ChevronLeft size={17} /></PaginationLink>
     {pages.map((page, index) => page === null
       ? <span key={`ellipsis-${index}`} className="px-2 text-[#7a8798]">…</span>
-      : <Link key={page} aria-current={page === currentPage ? "page" : undefined} className={`inline-flex size-10 items-center justify-center rounded-md border text-sm font-semibold transition ${page === currentPage ? "border-[#c7a55a] bg-[#c7a55a] text-[#15130f]" : "border-[#d7dee8] bg-white text-[#273246] hover:border-[#c7a55a] hover:text-[#956f2c]"}`} href={catalogPageHref(rawParams, page)} scroll>{page}</Link>)}
+      : <Link key={page} aria-current={page === currentPage ? "page" : undefined} className={`inline-flex size-10 items-center justify-center rounded-md border text-sm font-semibold transition ${page === currentPage ? "border-[#d7dee8] bg-[#c7a55a] text-[#15130f]" : "border-[#d7dee8] bg-white text-[#273246] hover:border-[#d7dee8] hover:text-[#956f2c]"}`} href={catalogPageHref(rawParams, page)} scroll>{page}</Link>)}
     <PaginationLink disabled={currentPage === totalPages} href={catalogPageHref(rawParams, currentPage + 1)} label="Вперёд"><ChevronRight size={17} /></PaginationLink>
   </nav>;
 }
 
 function PaginationLink({ children, disabled, href, label }: { children: React.ReactNode; disabled: boolean; href: string; label: string }) {
   if (disabled) return <span aria-disabled="true" className="inline-flex h-10 items-center gap-1 rounded-md border border-[#e3e7ed] bg-[#f0f2f5] px-3 text-sm font-semibold text-[#a0a9b6]">{children}<span className="hidden sm:inline">{label}</span></span>;
-  return <Link aria-label={label} className="inline-flex h-10 items-center gap-1 rounded-md border border-[#d7dee8] bg-white px-3 text-sm font-semibold text-[#273246] transition hover:border-[#c7a55a] hover:text-[#c7a55a]" href={href} scroll>{children}<span className="hidden sm:inline">{label}</span></Link>;
+  return <Link aria-label={label} className="inline-flex h-10 items-center gap-1 rounded-md border border-[#d7dee8] bg-white px-3 text-sm font-semibold text-[#273246] transition hover:border-[#d7dee8] hover:text-[#c7a55a]" href={href} scroll>{children}<span className="hidden sm:inline">{label}</span></Link>;
 }
 
 function catalogQueryString(rawParams: Record<string, string | string[] | undefined>) {

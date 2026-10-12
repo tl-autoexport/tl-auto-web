@@ -49,6 +49,7 @@ const ENCAR_BODY_TYPE_MAP: Record<string, string> = {
   SUV: "SUV",
   RV: "Минивэн",
   승합차: "Минивэн",
+  경승합차: "Минивэн",
   화물차: "Коммерческий автомобиль",
 };
 

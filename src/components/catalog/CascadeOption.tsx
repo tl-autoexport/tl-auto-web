@@ -9,6 +9,6 @@ export function CascadeOption({ label, brand, generation, selected, cars, onClic
     {brand ? <BrandLogo brand={brand} size={28} /> : null}
     <span className="min-w-0 flex-1 break-words font-medium leading-5 text-[#273246]">{name}{period ? <span className="mt-1 block text-xs font-normal text-[#647084]">{period}</span> : null}</span>
     {cars !== undefined ? <span className="shrink-0 text-xs tabular-nums text-[#7a8798]">{cars}</span> : null}
-    <span aria-hidden="true" className={`grid size-5 shrink-0 place-items-center rounded border text-xs ${selected ? "border-[#a98239] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span>
+    <span aria-hidden="true" className={`grid size-5 shrink-0 place-items-center rounded border text-xs ${selected ? "border-[#647084] bg-[#a98239] text-white" : "border-[#b9c1cb] text-transparent"}`}>✓</span>
   </button>;
 }

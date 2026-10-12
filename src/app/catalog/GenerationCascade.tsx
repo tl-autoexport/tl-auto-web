@@ -134,7 +134,7 @@ export function GenerationCascade({ currentQuery, brand, model, generation, modi
           const disabled = index > 0 && !identity[parent];
           const shownValue = item === "generation" ? generationLabel : item === "brand" ? translateBrand(identity.brand) : item === "model" ? translateModel(identity.brand, identity.model) : identity[item];
           return (
-            <button className={`grid min-h-[68px] grid-cols-[1fr_auto] items-center rounded-xl border px-4 text-left transition ${level === item && open ? "border-[#a98239] bg-[#fffaf0] shadow-[0_0_0_2px_rgba(169,130,57,0.12)]" : shownValue ? "border-[#c7a55a] bg-white" : "border-[#d7dee8] bg-white"} ${disabled ? "cursor-not-allowed opacity-50" : "hover:border-[#a98239]"}`} disabled={disabled} key={item} onClick={() => show(item)} type="button">
+            <button className={`grid min-h-[68px] grid-cols-[1fr_auto] items-center rounded-xl border px-4 text-left transition ${level === item && open ? "border-[#647084] bg-[#f4f6f9] " : shownValue ? "border-[#d7dee8] bg-white" : "border-[#d7dee8] bg-white"} ${disabled ? "cursor-not-allowed opacity-50" : "hover:border-[#647084]"}`} disabled={disabled} key={item} onClick={() => show(item)} type="button">
               <span className="min-w-0">
                 <span className="block text-xs text-[#7a8798]">{LEVEL_LABEL[item]}</span>
                 <span className="mt-1 block break-words py-1 text-sm font-semibold leading-5 text-[#273246]">{shownValue || `Все ${item === "brand" ? "марки" : item === "model" ? "модели" : item === "generation" ? "поколения" : item === "modification" ? "модификации" : "комплектации"}`}</span>
