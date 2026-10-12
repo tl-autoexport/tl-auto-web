@@ -1,4 +1,5 @@
 export type TksAgeGroup = "under_3" | "from_3_to_5" | "from_5_to_7" | "over_7";
+export type TksUtilTariffYear = 2026 | 2027;
 
 export type TksCustomsFeeBand = {
   maxRub: number;
@@ -186,17 +187,26 @@ function volumeGroup(engineCc: number): keyof typeof TKS_UTIL_NEW {
   return "over_3500";
 }
 
-export function tksUtilCoefficient(powerHp: number, engineCc: number, ageGroup: "under_3" | "older", sequentialHybrid = false) {
-  const table = sequentialHybrid ? TKS_UTIL_SEQUENTIAL : (ageGroup === "under_3" ? TKS_UTIL_NEW : TKS_UTIL_OLDER)[volumeGroup(engineCc)];
-  return table.find((band) => powerHp <= band.maxHp)?.coefficient ?? table.at(-1)!.coefficient;
+function coefficientForTariffYear(coefficient: number, tariffYear: TksUtilTariffYear) {
+  // The personal-use rates in the government schedule remain fixed at 0.17/0.26;
+  // commercial coefficients increase by 10% in 2027 and are published to 2 decimals.
+  if (tariffYear === 2026 || coefficient === 0.17 || coefficient === 0.26) return coefficient;
+  return Math.round((coefficient * 1.1 + Number.EPSILON) * 100) / 100;
 }
 
-export function tksUtilCoefficientKw(powerKw: number, engineCc: number, ageGroup: "under_3" | "older", sequentialHybrid = false) {
+export function tksUtilCoefficient(powerHp: number, engineCc: number, ageGroup: "under_3" | "older", sequentialHybrid = false, tariffYear: TksUtilTariffYear = 2026) {
+  const table = sequentialHybrid ? TKS_UTIL_SEQUENTIAL : (ageGroup === "under_3" ? TKS_UTIL_NEW : TKS_UTIL_OLDER)[volumeGroup(engineCc)];
+  const coefficient = table.find((band) => powerHp <= band.maxHp)?.coefficient ?? table.at(-1)!.coefficient;
+  return coefficientForTariffYear(coefficient, tariffYear);
+}
+
+export function tksUtilCoefficientKw(powerKw: number, engineCc: number, ageGroup: "under_3" | "older", sequentialHybrid = false, tariffYear: TksUtilTariffYear = 2026) {
   const source = sequentialHybrid
     ? TKS_UTIL_KW_2026.electric[ageGroup]
     : TKS_UTIL_KW_2026.ice[engineCc <= 1000 ? "up_to_1000" : engineCc <= 2000 ? "up_to_2000" : volumeGroup(engineCc)][ageGroup];
   const table = source;
-  return table.find((band) => powerKw <= band.maxKw)?.coefficient ?? table.at(-1)!.coefficient;
+  const coefficient = table.find((band) => powerKw <= band.maxKw)?.coefficient ?? table.at(-1)!.coefficient;
+  return coefficientForTariffYear(coefficient, tariffYear);
 }
 
 export function tksUtilCoefficientKwForPropulsion(
@@ -204,12 +214,14 @@ export function tksUtilCoefficientKwForPropulsion(
   engineCc: number,
   ageGroup: "under_3" | "older",
   propulsion: "ice" | "electric" | "hybrid_parallel" | "hybrid_sequential",
+  tariffYear: TksUtilTariffYear = 2026,
 ) {
   if (propulsion === "electric" || propulsion === "hybrid_sequential") {
     const table = TKS_UTIL_KW_2026.electric[ageGroup];
-    return table.find((band) => powerKw <= band.maxKw)?.coefficient ?? table.at(-1)!.coefficient;
+    const coefficient = table.find((band) => powerKw <= band.maxKw)?.coefficient ?? table.at(-1)!.coefficient;
+    return coefficientForTariffYear(coefficient, tariffYear);
   }
-  return tksUtilCoefficientKw(powerKw, engineCc, ageGroup, false);
+  return tksUtilCoefficientKw(powerKw, engineCc, ageGroup, false, tariffYear);
 }
 
 /**

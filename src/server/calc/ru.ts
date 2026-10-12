@@ -8,7 +8,7 @@ import {
   tksStpExciseRub,
 } from "./tks-rules";
 
-export const CALC_VERSION = "ru-individual-autoexport-tks-client-total-2026.04";
+export const CALC_VERSION = "ru-individual-autoexport-tks-client-total-2026.05";
 
 const DEFAULT_RATES: CalcRates = { krwRub: 0.04718, eurRub: 87.403, usdRub: 70.95, kztRub: 0.14 };
 // TL Auto uses a 30-day planning window for the estimated customs clearance
@@ -90,6 +90,7 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
   const calculationDate = input.calculationDate ? new Date(input.calculationDate) : new Date();
   if (Number.isNaN(calculationDate.getTime())) throw new Error("Invalid calculation date");
   const clearanceDate = getClearanceDate(calculationDate, input.clearanceDays);
+  const utilTariffYear = (clearanceDate.getUTCFullYear() >= 2027 ? 2027 : 2026) as 2026 | 2027;
   const currentCarAgeYears = getCarAgeYears(input.year, input.month || 6, calculationDate);
   const carAgeYears = getCarAgeYears(input.year, input.month || 6, clearanceDate);
   const carPriceRub = Math.round(input.priceKrw * rates.krwRub);
@@ -112,8 +113,8 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
   const serviceFeeRub = SERVICE_FEE_RUB;
   const feesRub = tksCustomsFeeRub(customsValueRub);
   const utilCoefficient = powerKw != null
-    ? tksUtilCoefficientKwForPropulsion(powerKw, input.engineCc ?? 0, carAgeYears < 3 ? "under_3" : "older", propulsion)
-    : tksUtilCoefficient(powerHp!, input.engineCc ?? 0, carAgeYears < 3 ? "under_3" : "older", input.hybridSequential === true);
+    ? tksUtilCoefficientKwForPropulsion(powerKw, input.engineCc ?? 0, carAgeYears < 3 ? "under_3" : "older", propulsion, utilTariffYear)
+    : tksUtilCoefficient(powerHp!, input.engineCc ?? 0, carAgeYears < 3 ? "under_3" : "older", input.hybridSequential === true, utilTariffYear);
   const utilRub = Math.round(UTIL_BASE_RUB * utilCoefficient);
   const exciseRub = usesStp ? roundRub(tksStpExciseRub(powerKw!)) : 0;
   const vatRub = usesStp ? roundRub((customsValueRub + customs.dutyRub + exciseRub) * 0.22) : 0;
@@ -129,7 +130,7 @@ export function calculateRuVladivostok(input: CalcInput): CalcResult {
     rateDetails: input.rateDetails ?? null,
     koreaExpensesRub,
     customs: { eurPerCc: customs.eurPerCc, percentRate: customs.percentRate, mode: customs.mode, excisePerHp: usesStp ? tksStpExciseRub(powerKw!) / (powerKw! * KW_TO_HP) : 0, vatRate: usesStp ? 0.22 : 0 },
-    util: { baseRub: UTIL_BASE_RUB, coefficient: utilCoefficient },
+    util: { baseRub: UTIL_BASE_RUB, coefficient: utilCoefficient, tariffYear: utilTariffYear },
     estimatedClearanceDate: clearanceDate.toISOString(), carAgeYears: Number(carAgeYears.toFixed(3)), currentCarAgeYears: Number(currentCarAgeYears.toFixed(3)),
     disclaimer: "Расчёт предварительный: итог зависит от курса, даты оформления, состояния авто и фактических расходов.",
   };

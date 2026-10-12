@@ -90,6 +90,7 @@ export interface CalcResult {
   util: {
     baseRub: number;
     coefficient: number;
+    tariffYear: 2026 | 2027;
   };
   estimatedClearanceDate: string;
   carAgeYears: number;

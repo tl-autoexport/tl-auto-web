@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { calculateRuVladivostok } from "./ru";
-import { tksStpExciseRub } from "./tks-rules";
+import { tksCustomsFeeRub, tksDutyVolumeRate, tksNewPriceRate, tksStpExciseRub, tksUtilCoefficientKwForPropulsion } from "./tks-rules";
 
 const genesisG70 = calculateRuVladivostok({
   priceKrw: 26_690_000, year: 2021, month: 10, engineCc: 1998, powerHp: 252,
@@ -288,6 +288,19 @@ const feeBoundary = (carPriceRub: number) => calculateRuVladivostok({
   priceKrw: carPriceRub, year: 2022, month: 1, engineCc: 1000, powerHp: 100,
   calculationDate: "2026-07-26T00:00:00.000Z", rates: { krwRub: 1, usdRub: 1, eurRub: 1, kztRub: 1 },
 }).feesRub;
+for (const [threshold, belowFee, atFee, aboveFee] of [
+  [200_000, 1_231, 1_231, 2_462],
+  [450_000, 2_462, 2_462, 4_924],
+  [1_200_000, 4_924, 4_924, 13_541],
+  [2_700_000, 13_541, 13_541, 18_465],
+  [4_200_000, 18_465, 18_465, 21_344],
+  [5_500_000, 21_344, 21_344, 49_240],
+  [10_000_000, 49_240, 49_240, 73_860],
+] as const) {
+  assert.equal(tksCustomsFeeRub(threshold - 0.01), belowFee, `customs fee below ${threshold}`);
+  assert.equal(tksCustomsFeeRub(threshold), atFee, `customs fee at ${threshold}`);
+  assert.equal(tksCustomsFeeRub(threshold + 0.01), aboveFee, `customs fee above ${threshold}`);
+}
 assert.equal(feeBoundary(450_000), 2_462);
 assert.equal(feeBoundary(450_001), 4_924);
 assert.equal(feeBoundary(1_200_001), 13_541);
@@ -300,6 +313,39 @@ assert.equal(feeBoundary(5_500_001), 49_240);
 assert.equal(feeBoundary(10_000_000), 49_240);
 assert.equal(feeBoundary(10_000_001), 73_860);
 
+for (const ageDays of [1_094, 1_095, 1_096, 1_097, 1_825, 1_826, 1_827] as const) {
+  const ageCase = calculateRuVladivostok({
+    priceKrw: 20_000_000, year: 2020, month: 1, engineCc: 6_749, powerHp: 200,
+    fuelType: "gasoline", calculationDate: new Date(Date.UTC(2020, 0, 15) + ageDays * 86_400_000).toISOString(),
+    clearanceDays: 0, rates: { krwRub: 0.06, usdRub: 90, eurRub: 100, kztRub: 0.15 },
+  });
+  const expectedRate = ageDays < 1_096 ? 3.5 : ageDays <= 1_826 ? 3.6 : 5.7;
+  assert.equal(ageCase.customs.eurPerCc, expectedRate, `age tariff at ${ageDays} days from manufacture`);
+}
+
+for (const [cc, expected35, expected57] of [
+  [1_000, 1.5, 3], [1_001, 1.7, 3.2],
+  [1_500, 1.7, 3.2], [1_501, 2.5, 3.5],
+  [1_800, 2.5, 3.5], [1_801, 2.7, 4.8],
+  [2_300, 2.7, 4.8], [2_301, 3, 5],
+  [3_000, 3, 5], [3_001, 3.6, 5.7],
+] as const) {
+  assert.equal(tksDutyVolumeRate("from_3_to_5", cc), expected35, `3–5 year cc boundary at ${cc} cm³`);
+  assert.equal(tksDutyVolumeRate("from_5_to_7", cc), expected57, `5–7 year cc boundary at ${cc} cm³`);
+}
+
+for (const [threshold, ccRate, percent] of [
+  [8_500, 2.5, 0.54], [16_700, 3.5, 0.48], [42_300, 5.5, 0.48],
+  [84_500, 7.5, 0.48], [169_000, 15, 0.48],
+] as const) {
+  assert.deepEqual(tksNewPriceRate(threshold), { maxEur: threshold, eurPerCc: ccRate, percent });
+}
+assert.equal(tksNewPriceRate(8_500.01).eurPerCc, 3.5);
+assert.equal(tksNewPriceRate(16_700.01).eurPerCc, 5.5);
+assert.equal(tksNewPriceRate(42_300.01).eurPerCc, 7.5);
+assert.equal(tksNewPriceRate(84_500.01).eurPerCc, 15);
+assert.equal(tksNewPriceRate(169_000.01).eurPerCc, 20);
+
 const rollsRoyceGhost = calculateRuVladivostok({
   priceKrw: 410_000_000, year: 2022, month: 6, engineCc: 6749, powerKw: 442,
   fuelType: "gasoline", calculationDate: "2026-10-11T10:18:42.671Z",
@@ -311,5 +357,35 @@ assert.equal(rollsRoyceGhost.dutyRub, 2_307_538.44, "3–5-year passenger vehicl
 assert.equal(rollsRoyceGhost.feesRub, 73_860, "2026 customs fee above 10 million rubles");
 assert.equal(rollsRoyceGhost.utilRub, 6_885_600);
 assert.equal(rollsRoyceGhost.totalRub, 36_542_597.44);
+
+const projectedTariffInput = {
+  priceKrw: 30_000_000, year: 2024, month: 1, engineCc: 1_500, powerKw: 140,
+  fuelType: "gasoline" as const,
+  rates: { krwRub: 0.06, usdRub: 90, eurRub: 100, kztRub: 0.15 },
+};
+const lastClearanceDay2026 = calculateRuVladivostok({
+  ...projectedTariffInput, calculationDate: "2026-12-01T00:00:00.000Z",
+});
+const firstClearanceDay2027 = calculateRuVladivostok({
+  ...projectedTariffInput, calculationDate: "2026-12-02T00:00:00.000Z",
+});
+assert.equal(lastClearanceDay2026.estimatedClearanceDate, "2026-12-31T00:00:00.000Z");
+assert.equal(lastClearanceDay2026.util.tariffYear, 2026);
+assert.equal(lastClearanceDay2026.util.coefficient, 47.64);
+assert.equal(firstClearanceDay2027.estimatedClearanceDate, "2027-01-01T00:00:00.000Z");
+assert.equal(firstClearanceDay2027.util.tariffYear, 2027);
+assert.equal(firstClearanceDay2027.util.coefficient, 52.4);
+assert.equal(firstClearanceDay2027.utilRub, 1_048_000);
+
+const explicitlyCurrentYear = calculateRuVladivostok({
+  ...projectedTariffInput, calculationDate: "2026-12-02T00:00:00.000Z", clearanceDays: 0,
+});
+assert.equal(explicitlyCurrentYear.util.tariffYear, 2026);
+assert.equal(explicitlyCurrentYear.util.coefficient, 47.64);
+
+assert.equal(tksUtilCoefficientKwForPropulsion(73.55, 0, "under_3", "electric", 2026), 49.56);
+assert.equal(tksUtilCoefficientKwForPropulsion(73.55, 0, "under_3", "electric", 2027), 54.52);
+assert.equal(tksUtilCoefficientKwForPropulsion(100, 1_500, "under_3", "ice", 2026), 0.17);
+assert.equal(tksUtilCoefficientKwForPropulsion(100, 1_500, "under_3", "ice", 2027), 0.17);
 
 console.log("calc benchmark passed", { fixture: "AutoExport individual regime", totalRub: genesisG70.totalRub });
