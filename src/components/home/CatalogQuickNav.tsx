@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CatalogParameterFields } from "@/components/catalog/CatalogParameterFields";
 import { GenerationCascade } from "@/app/catalog/GenerationCascade";
 import type { IdentitySelection } from "@/app/catalog/CatalogFilterDraft";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -37,6 +38,10 @@ type ParameterState = {
   yearMin: string;
   yearMax: string;
   mileageMax: string;
+  mileageMin: string;
+  engineMin: string;
+  engineMax: string;
+  powerMin: string;
   powerMax: string;
   body: string;
   fuel: string;
@@ -50,6 +55,10 @@ const emptyParameters: ParameterState = {
   yearMin: "",
   yearMax: "",
   mileageMax: "",
+  mileageMin: "",
+  engineMin: "",
+  engineMax: "",
+  powerMin: "",
   powerMax: "",
   body: "",
   fuel: "",
@@ -181,7 +190,7 @@ export function CatalogQuickNav({ bodies = [], transmissions = [] }: { brands?: 
             <PanelHeader panel={panel} onClose={() => setPanel(null)} onReset={panel === "parameters" ? resetParameters : panel === "brandModel" ? resetBrandModel : undefined} />
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-4 sm:px-5">
               {panel === "parameters" || panel === "brandModel" ? <GenerationCascade onPickerOpenChange={setCascadePicking} key={resetIdentity} currentQuery={activeQuery.toString()} totalCars={resultCount??0} brand={brand} model={model} generation={extraIdentity.generation} modification={extraIdentity.modification} trim={extraIdentity.trim} onSelection={(next)=>{setBrand(next.brand??"");setModel(next.model??"");setExtraIdentity(next);}} /> : null}
-              {panel === "parameters" && !cascadePicking ? <ParametersPanel brand={brand} model={model} bodies={bodies} transmissions={transmissions} onOpenBrandModel={() => setPanel("brandModel")} parameters={parameters} setParameters={setParameters} count={resultCount} loading={countLoading} /> : null}
+              {panel === "parameters" && !cascadePicking ? <CatalogParameterFields values={parameters} bodies={bodies} transmissions={transmissions} onChange={(name, value) => setParameters(previous => ({ ...previous, [name]: value }))} /> : null}
               {panel === "region" ? <RegionPanel countryCode={country.countryCode} cityId={city.id} onSelect={selectDestination} /> : null}
               {panel === "transport" ? <TransportPanel /> : null}
               {panel === "sort" ? <SortPanel /> : null}
@@ -203,11 +212,6 @@ function PanelHeader({ panel, onClose, onReset }: { panel: Exclude<PanelName, nu
   return <div className="flex shrink-0 items-center justify-between border-b border-[#e5e9ef] px-4 py-3 sm:px-5"><button aria-label="Закрыть" className="rounded-full p-1 text-[#263247] hover:bg-[#f0f3f7]" onClick={onClose} type="button"><X size={20} /></button><h2 className="text-base font-semibold text-[#101827]">{titles[panel]}</h2>{onReset ? <button className="inline-flex items-center gap-1 text-sm font-medium text-[#68758a] hover:text-[#111827]" onClick={onReset} type="button"><RotateCcw size={15} /> Сбросить</button> : <span className="w-6" />}</div>;
 }
 
-function ParametersPanel({ bodies, transmissions, parameters, setParameters, count, loading }: { brand: string; model: string; bodies: string[]; transmissions: string[]; onOpenBrandModel: () => void; parameters: ParameterState; setParameters: (value: ParameterState) => void; count: number | null; loading: boolean }) {
-  const update = (key: keyof ParameterState, value: string) => setParameters({ ...parameters, [key]: value });
-  return <div className="space-y-5"><WheelRangeInput label="Цена, ₽" min={parameters.priceMin} max={parameters.priceMax} options={numberOptions("price")} onMin={(value) => update("priceMin", value)} onMax={(value) => update("priceMax", value)} /><WheelRangeInput label="Год выпуска" min={parameters.yearMin} max={parameters.yearMax} options={numberOptions("year")} onMin={(value) => update("yearMin", value)} onMax={(value) => update("yearMax", value)} /><WheelField label="Пробег до, км" value={parameters.mileageMax} options={numberOptions("mileage")} onChange={(value) => update("mileageMax", value)} /><WheelField label="Мощность до, л.с." value={parameters.powerMax} options={numberOptions("power")} onChange={(value) => update("powerMax", value)} /><div className="grid gap-3"><SelectField label="Кузов" value={parameters.body} onChange={(value) => update("body", value)} options={[["", "Любой"], ...bodies.map((value) => [value, value])]} /><SelectField label="Привод" value={parameters.drive} onChange={(value) => update("drive", value)} options={[["", "Любой"], ["FWD", "Передний"], ["RWD", "Задний"], ["2WD", "2WD"], ["4WD", "4WD"]]} /><SelectField label="Топливо" value={parameters.fuel} onChange={(value) => update("fuel", value)} options={[["", "Любое"], ["gasoline", "Бензин"], ["diesel", "Дизель"], ["hybrid", "Гибрид"], ["electric", "Электро"], ["lpg", "Газ"]]} /><SelectField label="КПП" value={parameters.transmission} onChange={(value) => update("transmission", value)} options={[["", "Любая"], ...transmissions.map((value) => [value, value === "automatic" ? "АКПП" : value === "manual" ? "Механика" : value === "cvt" ? "Вариатор" : value === "dct" ? "Робот" : value])]} /></div><p className="text-xs text-[#68758a]">{loading ? "Обновляем количество предложений…" : count === null ? "Заполните параметры, чтобы увидеть количество предложений." : `${count.toLocaleString("ru-RU")} предложений`}</p></div>;
-}
-
 function RegionPanel({ countryCode, cityId, onSelect }: { countryCode: CountryCode; cityId: string; onSelect: (countryCode: CountryCode, cityId?: string) => void }) {
   const activeCountry = countries.find((item) => item.countryCode === countryCode) ?? countries[0];
   return <div className="space-y-3"><p className="text-sm text-[#68758a]">Страна и город выбираются вручную. Геолокация не используется.</p>{countries.map((item) => <div key={item.countryCode}><button className={`flex w-full items-center justify-between rounded-xl border px-3 py-3 text-left text-sm font-semibold ${item.countryCode === countryCode ? "border-[#111827] bg-[#111827] text-white" : "border-[#dce2eb] text-[#263247]"}`} onClick={() => onSelect(item.countryCode)} type="button">{item.countryLabel}<ChevronRight size={17} /></button>{item.countryCode === activeCountry.countryCode ? <div className="mt-1 grid grid-cols-2 gap-1 pl-2">{activeCountry.cities.map((itemCity) => <button className={`flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm ${itemCity.id === cityId ? "bg-[#f5f0e4] font-semibold text-[#5c4317]" : "text-[#68758a] hover:bg-[#f0f3f7]"}`} key={itemCity.id} onClick={() => onSelect(countryCode, itemCity.id)} type="button">{itemCity.label}{itemCity.id === cityId ? <Check size={15} /> : null}</button>)}</div> : null}</div>)}</div>;
@@ -221,25 +225,3 @@ function SortPanel() {
   return <div className="grid gap-1">{sortOptions.map((option) => <Link className="rounded-xl px-3 py-3 text-sm font-medium text-[#263247] hover:bg-[#f0f3f7]" href={`/catalog?sort=${option.value}`} key={option.value}>{option.label}</Link>)}</div>;
 }
 
-function WheelRangeInput({ label, min, max, options, onMin, onMax }: { label: string; min: string; max: string; options: string[]; onMin: (value: string) => void; onMax: (value: string) => void }) {
-  return <div><span className="mb-1.5 block text-xs font-medium text-[#68758a]">{label}</span><div className="grid grid-cols-2 gap-2"><WheelSelect value={min} options={options} placeholder="От" onChange={onMin} /><WheelSelect value={max} options={options} placeholder="До" onChange={onMax} /></div></div>;
-}
-
-function WheelField({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (value: string) => void }) {
-  return <div><span className="mb-1.5 block text-xs font-medium text-[#68758a]">{label}</span><WheelSelect value={value} options={options} placeholder="Не выбрано" onChange={onChange} /></div>;
-}
-
-function WheelSelect({ value, options, placeholder, onChange }: { value: string; options: string[]; placeholder: string; onChange: (value: string) => void }) {
-  return <select className="h-12 w-full appearance-none rounded-xl border border-[#d7dee8] bg-white px-3 text-[15px] text-[#273246]" onChange={(event) => onChange(event.target.value)} value={value}><option value="">{placeholder}</option>{options.map((option) => <option key={option} value={option}>{option}</option>)}</select>;
-}
-
-function numberOptions(kind: "price" | "year" | "mileage" | "power") {
-  if (kind === "price") return Array.from({ length: 80 }, (_, index) => String((index + 1) * 250_000));
-  if (kind === "year") return Array.from({ length: 37 }, (_, index) => String(new Date().getFullYear() - index));
-  if (kind === "mileage") return Array.from({ length: 31 }, (_, index) => String(index * 10_000));
-  return [...new Set(["160", ...Array.from({ length: 19 }, (_, index) => String(50 + index * 25))])].sort((a, b) => Number(a) - Number(b));
-}
-
-function SelectField({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: string[][] }) {
-  return <label className="block"><span className="mb-1.5 block text-xs font-medium text-[#68758a]">{label}</span><select className="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3 text-sm text-[#101827] outline-none focus:border-[#956f2c]" onChange={(event) => onChange(event.target.value)} value={value}>{options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}</select></label>;
-}

@@ -27,6 +27,7 @@ export function catalogFiltersFromParams(params: URLSearchParams): CatalogFilter
     maxMileageKm: numberParam(params.get("mileageMax")),
     minPriceRub: numberParam(params.get("priceMin")),
     maxPriceRub: numberParam(params.get("priceMax")),
+    minPowerHp: numberParam(params.get("powerMin")),
     maxPowerHp: under160 ? 160 : numberParam(params.get("powerMax")),
     noAccidents: params.get("clean") === "1",
     noInsurance: params.get("noInsurance") === "1",

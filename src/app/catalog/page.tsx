@@ -1,3 +1,4 @@
+import { CatalogParameterFields } from "@/components/catalog/CatalogParameterFields";
 import Link from "next/link";
 import { CatalogLoadingVisual } from "@/components/catalog/CatalogLoadingVisual";
 import Form from "next/form";
@@ -113,6 +114,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     maxMileageKm: numberParam(value("mileageMax")),
     minPriceRub: numberParam(value("priceMin")),
     maxPriceRub: numberParam(value("priceMax")),
+    minPowerHp: numberParam(value("powerMin")),
     maxPowerHp: under160 ? 160 : numberParam(value("powerMax")),
     noAccidents: value("clean") === "1",
     noInsurance: value("noInsurance") === "1",
@@ -338,81 +340,7 @@ function CatalogFilterForm({
   under160,
   value,
 }: CatalogFilterFormProps) {
-  const mainFields = (
-    <>
-      <RangeField label="Год выпуска" maxName="yearMax" maxValue={value("yearMax")} minName="yearMin" minValue={value("yearMin")} />
-      <RangeField label="Цена до Владивостока, ₽" maxName="priceMax" maxValue={value("priceMax")} minName="priceMin" minValue={value("priceMin")} />
-    </>
-  );
-
-  const additionalFields = (
-    <>
-      <RangeField label="Объём двигателя, см³" maxName="engineMax" maxValue={value("engineMax")} minName="engineMin" minValue={value("engineMin")} />
-      <FilterInput inputMode="numeric" label="Пробег до, км" name="mileageMax" placeholder="Например, 80 000" value={value("mileageMax")} />
-      <FilterInput inputMode="numeric" label="Пробег от, км" name="mileageMin" placeholder="Например, 10 000" value={value("mileageMin")} />
-      <FilterInput inputMode="numeric" label="Мощность до, л.с." name="powerMax" placeholder="Например, 160" value={value("powerMax")} />
-
-      <FilterSelect label="Кузов" name="body" options={bodies} placeholder="Любой" translate={translateBody} value={value("body")} />
-      <FilterSelect label="Привод" name="drive" options={driveTypes} placeholder="Любой" translate={(item) => translateDrive(item) ?? item} value={value("drive")} />
-      <FilterSelect label="Цвет кузова" name="color" options={colors} placeholder="Любой" value={value("color")} />
-      <FilterSelect label="Месяц выпуска" name="month" options={Array.from({ length: 12 }, (_, index) => String(index + 1))} placeholder="Любой" translate={translateMonth} value={value("month")} />
-      <RangeField label="Количество владельцев" maxName="ownersMax" maxValue={value("ownersMax")} minName="ownersMin" minValue={value("ownersMin")} />
-      <RangeField label="Страховые выплаты, ₩" maxName="insuranceMax" maxValue={value("insuranceMax")} minName="insuranceMin" minValue={value("insuranceMin")} />
-    </>
-  );
-
-  return (
-    <Form action="/catalog" prefetch={false} className={mobile ? "min-h-full bg-[#f4f6f9] pb-24" : ""}>
-      {mobile && brand ? <input name="brand" type="hidden" value={brand} /> : null}
-      {mobile && model ? <input name="model" type="hidden" value={model} /> : null}
-      {mobile && generation ? <input name="generation" type="hidden" value={generation} /> : null}
-      {mobile && value("modification") ? <input name="modification" type="hidden" value={value("modification")} /> : null}
-      {mobile && value("trim") ? <input name="trim" type="hidden" value={value("trim")} /> : null}
-      <input name="sort" type="hidden" value={sort} />
-      <div className={mobile ? "grid gap-4 p-4" : "grid gap-4"}>
-        <div className={mobile ? "grid gap-4" : "grid gap-3 lg:grid-cols-[minmax(130px,1fr)_minmax(160px,1.15fr)_minmax(130px,0.9fr)_minmax(120px,0.9fr)_minmax(95px,0.7fr)_auto] lg:items-end"}>
-          {mainFields}
-          <FilterSelect label="Топливо" name="fuel" options={fuels} placeholder="Любое" translate={translateFuel} value={value("fuel")} />
-          <FilterSelect label="КПП" name="transmission" options={transmissions} placeholder="Любая" translate={translateTransmission} value={value("transmission")} />
-          <FilterSelect label="Привод" name="drive" options={driveTypes} placeholder="Любой" translate={(item) => translateDrive(item) ?? item} value={value("drive")} />
-        </div>
-        {mobile ? (
-          <details className="group border-t border-[#dce2eb] pt-2">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-sm font-semibold text-[#273246] [&::-webkit-details-marker]:hidden">
-              Дополнительные параметры
-              <ChevronDown className="transition group-open:rotate-180" size={18} />
-            </summary>
-            <div className="grid gap-4 pb-2 pt-3">{additionalFields}</div>
-          </details>
-        ) : (
-          <details className="group rounded-xl border border-[#dce2eb] bg-white">
-            <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 text-sm font-semibold text-[#273246] [&::-webkit-details-marker]:hidden">
-              <span className="inline-flex items-center gap-2"><SlidersHorizontal size={17} /> Дополнительные параметры</span>
-              <ChevronDown className="transition group-open:rotate-180" size={18} />
-            </summary>
-            <div className="grid gap-4 border-t border-[#e8ecf2] p-4 sm:grid-cols-2 lg:grid-cols-4">{additionalFields}</div>
-          </details>
-        )}
-        <div className={mobile ? "grid grid-cols-2 gap-2 border-t border-[#dce2eb] pt-4" : "flex flex-wrap items-center gap-2 border-t border-[#dce2eb] pt-4"}>
-          <FilterCheck checked={under160} compact={!mobile} label="До 160 л.с." name="under160" value="1" />
-          <FilterCheck checked={passable} compact={!mobile} label="Проходные 3–5 лет" name="passable" value="1" />
-          <FilterCheck checked={clean} compact={!mobile} label="Без ДТП" name="clean" value="1" />
-          <FilterCheck checked={value("noInsurance") === "1"} compact={!mobile} label="Без страховых выплат" name="noInsurance" value="1" />
-        </div>
-        {!mobile ? (
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#dce2eb] pt-4">
-            <Link className="inline-flex min-h-11 items-center gap-1.5 px-2 text-sm font-semibold text-[#647084] hover:text-[#273246]" href="/catalog"><RotateCcw size={16} /> Сбросить</Link>
-            <LiveCatalogCount initialCount={totalCars} />
-          </div>
-        ) : null}
-      </div>
-      {mobile ? (
-        <div className="fixed inset-x-0 bottom-0 z-10 border-t border-[#dce2eb] bg-white p-3 pb-[max(12px,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(16,24,39,0.08)]">
-          <LiveCatalogCount initialCount={totalCars} mobile />
-        </div>
-      ) : null}
-    </Form>
-  );
+  return <Form action="/catalog" prefetch={false}><input name="sort" type="hidden" value={sort} /><CatalogParameterFields values={Object.fromEntries(["priceMin", "priceMax", "mileageMin", "mileageMax", "yearMin", "yearMax", "engineMin", "engineMax", "powerMin", "powerMax", "body", "transmission", "fuel", "drive", "under160", "passable", "clean", "noInsurance"].map(name => [name, value(name)]))} bodies={bodies} transmissions={transmissions} fuels={fuels} /><div className="mt-4 flex items-center justify-between"><Link href="/catalog" className="text-sm text-[#647084]">Сбросить</Link><LiveCatalogCount initialCount={totalCars} /></div></Form>;
 }
 
 function CatalogSortMenu({ rawParams, sort }: { rawParams: Record<string, string | string[] | undefined>; sort: keyof typeof sortLabels }) {

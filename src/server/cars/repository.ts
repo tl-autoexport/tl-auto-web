@@ -163,6 +163,7 @@ export type CatalogFilters = {
   limit?: number;
   offset?: number;
   source?: "encar";
+  minPowerHp?: number;
   maxPowerHp?: number;
   /** Free-text make/model search from the quick search control. */
   search?: string;
@@ -203,6 +204,7 @@ const CATALOG_QUERY_SLOW_MS = 1_500;
 function catalogQueryContext(filters: CatalogFilters) {
   const activeFilters = Object.entries({
     source: filters.source,
+    minPowerHp: filters.minPowerHp,
     maxPowerHp: filters.maxPowerHp,
     search: filters.search,
     brand: filters.brand,
@@ -297,6 +299,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     limit = 24,
     offset = 0,
     source,
+    minPowerHp,
     maxPowerHp,
     search,
     brand,
@@ -338,6 +341,7 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (source) query = query.eq("primary_source", source);
+  if (minPowerHp) query = query.gte("power_hp", minPowerHp);
   if (maxPowerHp) query = query.lte("power_hp", maxPowerHp);
   if (search) query = query.or(catalogSearchExpression(search));
   if (brand) query = query.in("brand", catalogBrandValues(brand));
@@ -421,6 +425,7 @@ export async function getCatalogCardPage(
     .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (filters.source) query = query.eq("primary_source", filters.source);
+  if (filters.minPowerHp) query = query.gte("power_hp", filters.minPowerHp);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
   if (filters.search) query = query.or(catalogSearchExpression(filters.search));
   if (filters.brand) query = query.in("brand", catalogBrandValues(filters.brand));
@@ -554,6 +559,7 @@ function catalogCountQuery(filters: CatalogFilters, exact: boolean) {
     .or("fuel_type.eq.electric,and(price_rub.not.is.null,power_hp.not.is.null)");
 
   if (filters.source) query = query.eq("primary_source", filters.source);
+  if (filters.minPowerHp) query = query.gte("power_hp", filters.minPowerHp);
   if (filters.maxPowerHp) query = query.lte("power_hp", filters.maxPowerHp);
   if (filters.search) query = query.or(catalogSearchExpression(filters.search));
   if (filters.brand) query = query.in("brand", catalogBrandValues(filters.brand));
