@@ -50,7 +50,7 @@ export function CatalogParameterFields({ values, onChange, bodies, transmissions
       {showAllOptions ? <div className="mt-2 grid gap-2">{[...new Set(CATALOG_OPTIONS.map(option => option.group))].map(group => {
         const groupedOptions = CATALOG_OPTIONS.filter(option => option.group === group && !CATALOG_OPTIONS.slice(0, 8).some(primary => primary.id === option.id));
         if (!groupedOptions.length) return null;
-        return <details className="group rounded-xl border border-[#e1e5eb] bg-white" key={group}><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-3 text-sm font-medium text-[#273246] [&::-webkit-details-marker]:hidden">{group}<ChevronDown className="transition group-open:rotate-180" size={16} /></summary><div className="grid gap-1 border-t border-[#edf0f4] p-2 sm:grid-cols-2">{groupedOptions.map(option => <label className={`flex min-h-10 cursor-pointer items-center gap-2 rounded-lg px-2 text-sm ${selectedOptions.has(option.id) ? "bg-[#f4f6f9] text-[#182133]" : "text-[#273246]"}`} key={option.id}><input checked={selectedOptions.has(option.id)} className="size-4 accent-[#273246]" onChange={event => updateSelection("options", toggleValue(selection("options"), option.id), event)} type="checkbox" /><span>{option.label}</span></label>)}</div></details>;
+        return <details className="group/option rounded-xl border border-[#e1e5eb] bg-white" key={group}><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-3 text-sm font-medium text-[#273246] [&::-webkit-details-marker]:hidden">{group}<ChevronDown className="transition group-open/option:rotate-180" size={16} /></summary><div className="grid gap-1 border-t border-[#edf0f4] p-2 sm:grid-cols-2">{groupedOptions.map(option => <label className={`flex min-h-10 cursor-pointer items-center gap-2 rounded-lg px-2 text-sm ${selectedOptions.has(option.id) ? "bg-[#f4f6f9] text-[#182133]" : "text-[#273246]"}`} key={option.id}><input checked={selectedOptions.has(option.id)} className="size-4 accent-[#273246]" onChange={event => updateSelection("options", toggleValue(selection("options"), option.id), event)} type="checkbox" /><span>{option.label}</span></label>)}</div></details>;
       })}</div> : null}
       <input name="options" type="hidden" value={selection("options")} />
       <p className="mt-1 text-xs text-[#7a8798]">Если выбрано несколько опций, автомобиль должен иметь каждую из них.</p>
@@ -80,8 +80,8 @@ export function CatalogParameterFields({ values, onChange, bodies, transmissions
         {select("Кузов", "body", [...new Set(bodies.map(value => bodyTypeFilterValue(value) ?? value))])}{select("Коробка", "transmission", transmissions, translateTransmission)}{select("Топливо", "fuel", fuels, translateFuel)}
       </div>
     </section>
-    <details className="group rounded-2xl border border-[#e0e5ec] bg-white" open>
-      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 text-lg font-semibold text-[#101827] sm:px-5 [&::-webkit-details-marker]:hidden">Дополнительные параметры<ChevronDown className="shrink-0 transition group-open:rotate-180" size={20} /></summary>
+    <details className="group/parameters rounded-2xl border border-[#e0e5ec] bg-white" open>
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 text-lg font-semibold text-[#101827] sm:px-5 [&::-webkit-details-marker]:hidden">Дополнительные параметры<ChevronDown className="shrink-0 transition group-open/parameters:rotate-180" size={20} /></summary>
       <div className="grid gap-4 px-4 pb-4 sm:grid-cols-2 sm:px-5 sm:pb-5 lg:grid-cols-3">
         {range("Объём двигателя, л", "engine")}{select("Привод", "drive", ["FWD", "RWD", "2WD", "4WD"], value => ({ FWD: "Передний", RWD: "Задний" })[value] ?? value)}{range("Мощность, л.с.", "power")}
         {appearanceFilters}
