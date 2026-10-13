@@ -19,7 +19,7 @@ type FieldOptions = { fuels: string[]; transmissions: string[]; bodies: string[]
 type Screen = "home" | "brand" | "model" | "generation" | "modification" | "trim" | "modification" | "trim" | "parameters" | "year" | "price" | "mileage" | "sort";
 type RangePickerState = { title: string; minKey: string; maxKey: string; single?: boolean };
 
-const PARAM_KEYS = ["fuel", "transmission", "body", "drive", "trim", "color", "yearMin", "yearMax", "priceMin", "priceMax", "mileageMin", "mileageMax", "engineMin", "engineMax", "powerMin", "powerMax", "under160", "passable", "clean", "noInsurance", "crossovers4wd", "electricOnly", "lpgOnly"];
+const PARAM_KEYS = ["fuel", "transmission", "body", "drive", "trim", "color", "colors", "options", "yearMin", "yearMax", "priceMin", "priceMax", "mileageMin", "mileageMax", "engineMin", "engineMax", "powerMin", "powerMax", "under160", "passable", "clean", "noInsurance", "crossovers4wd", "electricOnly", "lpgOnly"];
 
 export function MobileCatalogExperience({ currentQuery, options, sortOptions, totalCars }: {
   currentQuery: string;

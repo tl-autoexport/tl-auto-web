@@ -1,7 +1,9 @@
 import type { CatalogFilters } from "@/server/cars/repository";
+import { parseFilterIds } from "@/lib/catalog-appearance-filters";
 
 export function catalogFiltersFromParams(params: URLSearchParams): CatalogFilters {
   const under160 = params.get("under160") === "1" || params.get("shelf") === "under-160";
+  const colors = parseFilterIds(params.getAll("colors"));
 
   const filters: CatalogFilters = {
     source: params.get("source") === "encar" ? "encar" : undefined,
@@ -20,7 +22,9 @@ export function catalogFiltersFromParams(params: URLSearchParams): CatalogFilter
     trim: params.get("trim") || undefined,
     bodyType: params.get("body") || undefined,
     driveType: params.get("drive") || undefined,
-    color: params.get("color") || undefined,
+    color: colors.length ? undefined : params.get("color") || undefined,
+    colors,
+    options: parseFilterIds(params.getAll("options")),
     minOwners: numberParam(params.get("ownersMin")),
     maxOwners: numberParam(params.get("ownersMax")),
     minMileageKm: numberParam(params.get("mileageMin")),
@@ -33,7 +37,7 @@ export function catalogFiltersFromParams(params: URLSearchParams): CatalogFilter
     noInsurance: params.get("noInsurance") === "1",
     minInsurancePayoutKrw: numberParam(params.get("insuranceMin")),
     maxInsurancePayoutKrw: numberParam(params.get("insuranceMax")),
-    passable: params.get("passable") === "1",
+    passable: params.get("passable") === "1" || params.get("shelf") === "passable",
     crossovers4wd: params.get("crossovers4wd") === "1",
     electricOnly: params.get("electricOnly") === "1",
     lpgOnly: params.get("lpgOnly") === "1",

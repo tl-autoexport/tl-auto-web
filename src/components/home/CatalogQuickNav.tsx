@@ -47,6 +47,8 @@ type ParameterState = {
   fuel: string;
   transmission: string;
   drive: string;
+  colors: string;
+  options: string;
 };
 
 const emptyParameters: ParameterState = {
@@ -64,6 +66,8 @@ const emptyParameters: ParameterState = {
   fuel: "",
   transmission: "",
   drive: "",
+  colors: "",
+  options: "",
 };
 
 export function CatalogQuickNav({ bodies = [], transmissions = [] }: { brands?: string[]; models?: Array<{ brand: string; model: string }>; bodies?: string[]; transmissions?: string[] }) {

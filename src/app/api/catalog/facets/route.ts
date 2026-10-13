@@ -7,6 +7,7 @@ import { getCatalogCount } from "@/server/cars/repository";
 import { catalogFiltersFromParams } from "@/lib/catalog-filter-params";
 import { createReadCoalescer } from "@/server/cars/catalog-read-coalescer";
 import { generationFacetLabel } from "@/server/catalog/generation-facet-label";
+import { colorAliases, parseFilterIds } from "@/lib/catalog-appearance-filters";
 
 /**
  * Facet counters for the catalogue cascade.
@@ -89,6 +90,7 @@ function buildFilters(params: URLSearchParams): Record<string, unknown> {
     return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
   };
   const under160 = params.get("under160") === "1" || params.get("shelf") === "under-160";
+  const selectedColors = parseFilterIds(params.getAll("colors"));
 
   const filters: Record<string, unknown> = {
     brand: normalizeCatalogBrand(params.get("brand")) || undefined,
@@ -101,7 +103,9 @@ function buildFilters(params: URLSearchParams): Record<string, unknown> {
     drive: params.get("drive") || undefined,
     transmission: params.get("transmission") || undefined,
     body: params.get("body") || undefined,
-    color: params.get("color") || undefined,
+    color: selectedColors.length ? undefined : params.get("color") || undefined,
+    colorValues: colorAliases(selectedColors),
+    options: parseFilterIds(params.getAll("options")),
     source: params.get("source") || undefined,
     yearFrom: number(params.get("yearMin")),
     yearTo: number(params.get("yearMax")),

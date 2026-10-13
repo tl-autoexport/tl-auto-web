@@ -37,6 +37,7 @@ import { GenerationCascade } from "./GenerationCascade";
 import { MobileCatalogExperience } from "./MobileCatalogExperience";
 import { BrandLogo } from "@/components/catalog/BrandLogo";
 import { readCatalogPage } from "@/server/cars/catalog-read-coalescer";
+import { parseFilterIds } from "@/lib/catalog-appearance-filters";
 
 export const metadata: Metadata = {
   title: "Каталог автомобилей из Кореи",
@@ -87,6 +88,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     return <StagingCatalogPage category={category} page={positiveInteger(value("page")) ?? 1} />;
   }
   const under160 = value("under160") === "1" || shelf === "under-160";
+  const selectedColors = parseFilterIds(rawParams.colors);
   const passable = value("passable") === "1" || shelf === "passable";
   const sortValue = value("sort");
   const sort = isSort(sortValue) ? sortValue : "fresh";
@@ -107,7 +109,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     trim: value("trim") || undefined,
     bodyType: value("body") || undefined,
     driveType: driveTypeFilterValue(value("drive")) || undefined,
-    color: value("color") || undefined,
+    color: selectedColors.length ? undefined : value("color") || undefined,
+    colors: selectedColors,
+    options: parseFilterIds(rawParams.options),
     minOwners: numberParam(value("ownersMin")),
     maxOwners: numberParam(value("ownersMax")),
     minMileageKm: numberParam(value("mileageMin")),
@@ -343,7 +347,7 @@ function CatalogFilterForm({
   under160,
   value,
 }: CatalogFilterFormProps) {
-  return <Form action="/catalog" prefetch={false}><input name="sort" type="hidden" value={sort} /><CatalogParameterFields values={Object.fromEntries(["priceMin", "priceMax", "mileageMin", "mileageMax", "yearMin", "yearMax", "engineMin", "engineMax", "powerMin", "powerMax", "body", "transmission", "fuel", "drive", "under160", "passable", "clean", "noInsurance", "crossovers4wd", "electricOnly", "lpgOnly"].map(name => [name, value(name)]))} bodies={bodies} transmissions={transmissions} fuels={fuels} /><div className="mt-4 flex items-center justify-between"><Link href="/catalog" className="text-sm text-[#647084]">Сбросить</Link><LiveCatalogCount initialCount={totalCars} /></div></Form>;
+  return <Form action="/catalog" prefetch={false}><input name="sort" type="hidden" value={sort} /><CatalogParameterFields values={Object.fromEntries(["priceMin", "priceMax", "mileageMin", "mileageMax", "yearMin", "yearMax", "engineMin", "engineMax", "powerMin", "powerMax", "body", "transmission", "fuel", "drive", "colors", "options", "under160", "passable", "clean", "noInsurance", "crossovers4wd", "electricOnly", "lpgOnly"].map(name => [name, value(name)]))} bodies={bodies} transmissions={transmissions} fuels={fuels} /><div className="mt-4 flex items-center justify-between"><Link href="/catalog" className="text-sm text-[#647084]">Сбросить</Link><LiveCatalogCount initialCount={totalCars} /></div></Form>;
 }
 
 function CatalogSortMenu({ rawParams, sort }: { rawParams: Record<string, string | string[] | undefined>; sort: keyof typeof sortLabels }) {

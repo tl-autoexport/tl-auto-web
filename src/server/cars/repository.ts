@@ -4,6 +4,7 @@ import { createSupabasePublic } from "@/server/supabase/public";
 import { normalizeColor, normalizeDrive } from "@/server/normalization/vehicles";
 import { bodyTypeValues, driveTypeValues, transmissionValues } from "@/lib/catalog-filter-values";
 import { catalogBrandValues, normalizeCatalogBrand } from "@/lib/catalog-brand";
+import { colorAliases } from "@/lib/catalog-appearance-filters";
 import { homeShowcasePhotoUrl, showcasePhotoScore } from "@/lib/showcase-photo";
 import { catalogCountFilters, catalogDisplayReadView, countCatalogIdPages, createReadCoalescer } from "./catalog-read-coalescer";
 
@@ -187,6 +188,8 @@ export type CatalogFilters = {
   bodyType?: string;
   driveType?: string;
   color?: string;
+  colors?: string[];
+  options?: string[];
   minOwners?: number;
   maxOwners?: number;
   noAccidents?: boolean;
@@ -222,6 +225,8 @@ function catalogQueryContext(filters: CatalogFilters) {
     bodyType: filters.bodyType,
     driveType: filters.driveType,
     color: filters.color,
+    colors: filters.colors?.length,
+    options: filters.options?.length,
     ownersRange: filters.minOwners !== undefined || filters.maxOwners !== undefined,
     mileageRange: filters.minMileageKm !== undefined || filters.maxMileageKm !== undefined,
     priceRange: filters.minPriceRub !== undefined || filters.maxPriceRub !== undefined,
@@ -380,6 +385,8 @@ export async function getCatalogCars(filters: CatalogFilters = {}): Promise<Cata
     query = query.in("drive_type", driveTypeValues("4WD"));
   }
   if (color) query = query.eq("color", color);
+  if (filters.colors?.length) query = query.in("color", colorAliases(filters.colors));
+  if (filters.options?.length) query = query.contains("filter_option_ids", filters.options);
   if (minOwners) query = query.gte("owners_count", minOwners);
   if (maxOwners) query = query.lte("owners_count", maxOwners);
   if (minMileageKm) query = query.gte("mileage_km", minMileageKm);
@@ -466,6 +473,8 @@ export async function getCatalogCardPage(
     query = query.in("drive_type", driveTypeValues("4WD"));
   }
   if (filters.color) query = query.eq("color", filters.color);
+  if (filters.colors?.length) query = query.in("color", colorAliases(filters.colors));
+  if (filters.options?.length) query = query.contains("filter_option_ids", filters.options);
   if (filters.minOwners) query = query.gte("owners_count", filters.minOwners);
   if (filters.maxOwners) query = query.lte("owners_count", filters.maxOwners);
   if (filters.minMileageKm) query = query.gte("mileage_km", filters.minMileageKm);
@@ -608,6 +617,8 @@ function catalogCountQuery(filters: CatalogFilters, exact: boolean) {
     query = query.in("drive_type", driveTypeValues("4WD"));
   }
   if (filters.color) query = query.eq("color", filters.color);
+  if (filters.colors?.length) query = query.in("color", colorAliases(filters.colors));
+  if (filters.options?.length) query = query.contains("filter_option_ids", filters.options);
   if (filters.minOwners) query = query.gte("owners_count", filters.minOwners);
   if (filters.maxOwners) query = query.lte("owners_count", filters.maxOwners);
   if (filters.minMileageKm) query = query.gte("mileage_km", filters.minMileageKm);
