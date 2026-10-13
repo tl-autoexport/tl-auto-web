@@ -77,15 +77,14 @@ export function CatalogParameterFields({ values, onChange, bodies, transmissions
       <h3 className="mb-4 text-lg font-semibold text-[#101827]">Основные параметры</h3>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {range("Цена, ₽", "price")}{range("Пробег, км", "mileage")}{range("Год выпуска", "year")}
-        {select("Кузов", "body", [...new Set(bodies.map(value => bodyTypeFilterValue(value) ?? value))])}{select("Коробка", "transmission", transmissions, translateTransmission)}
+        {select("Кузов", "body", [...new Set(bodies.map(value => bodyTypeFilterValue(value) ?? value))])}{select("Коробка", "transmission", transmissions, translateTransmission)}{select("Топливо", "fuel", fuels, translateFuel)}
       </div>
     </section>
     <details className="group rounded-2xl border border-[#e0e5ec] bg-white" open>
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 text-lg font-semibold text-[#101827] sm:px-5 [&::-webkit-details-marker]:hidden">Дополнительные параметры<ChevronDown className="shrink-0 transition group-open:rotate-180" size={20} /></summary>
       <div className="grid gap-4 px-4 pb-4 sm:grid-cols-2 sm:px-5 sm:pb-5 lg:grid-cols-3">
-        {range("Объём двигателя, л", "engine")}{range("Мощность, л.с.", "power")}
+        {range("Объём двигателя, л", "engine")}{select("Привод", "drive", ["FWD", "RWD", "2WD", "4WD"], value => ({ FWD: "Передний", RWD: "Задний" })[value] ?? value)}{range("Мощность, л.с.", "power")}
         {appearanceFilters}
-        {select("Топливо", "fuel", fuels, translateFuel)}{select("Привод", "drive", ["FWD", "RWD", "2WD", "4WD"], value => ({ FWD: "Передний", RWD: "Задний" })[value] ?? value)}
       </div>
     </details>
     <section className="rounded-2xl border border-[#e0e5ec] bg-white p-4 sm:p-5"><h3 className="mb-3 text-lg font-semibold text-[#101827]">Популярные настройки</h3><div className="flex flex-wrap gap-2">{[["under160", "До 160 л.с."], ["crossovers4wd", "Кроссоверы 4WD"], ["electricOnly", "Электромобили"], ["lpgOnly", "Авто на газу"], ["clean", "Без ДТП"], ["noInsurance", "Без страховых"]].map(([name, label]) => <label key={name} className={`inline-flex min-h-11 cursor-pointer items-center rounded-full px-4 py-2 text-sm font-medium transition ${values[name] === "1" ? "bg-[#101827] text-white" : "bg-[#f1f3f6] text-[#273246] hover:bg-[#e7e9ed]"}`}><input aria-label={label} className="sr-only" name={name} type="checkbox" value="1" {...(onChange ? { checked: values[name] === "1", onChange: (event: React.ChangeEvent<HTMLInputElement>) => onChange(name, event.target.checked ? "1" : "") } : { defaultChecked: values[name] === "1" })} />{label}</label>)}</div></section>
