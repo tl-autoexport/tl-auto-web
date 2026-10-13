@@ -10,6 +10,7 @@ import { evaluatePublication, resolveCalculationMonth, storedPowerFinality } fro
 import { normalizeColor, normalizePlate } from "../src/server/normalization/vehicles";
 import { fetchStandardOptionCatalog } from "../src/server/imports/encar";
 import { mapEncarOptions } from "../src/server/imports/encar-options";
+import { mapEncarOpenHistory } from "../src/server/imports/encar-history";
 import type { EncarOptionRow } from "../src/server/imports/encar-options";
 
 config({ path: ".env.local", override: true, quiet: true });
@@ -47,6 +48,7 @@ type Prepared = {
   id: string; stage: Stage; car: Obj; calculation: ReturnType<typeof calculateRuVladivostok>;
   reviewedPriceRub: number;
   photos: Array<{ category: string; url: string }>; options: EncarOptionRow[];
+  history: ReturnType<typeof mapEncarOpenHistory>;
 };
 
 const obj = (value: unknown): Obj => value && typeof value === "object" && !Array.isArray(value) ? value as Obj : {};
@@ -165,6 +167,7 @@ async function main() {
       const registeredAt = str(manage.registDateTime);
       const month = resolveCalculationMonth({ registrationDate: registeredAt });
       const photos = photosFrom(payload), options = optionsFrom(payload, optionCatalog);
+      const history = mapEncarOpenHistory(obj(payload.openHistory));
       if (ad.status !== "ADVERTISE" || manage.dummy === true || ad.salesStatus === "CONTRACT")
         throw new Error(`Saved Encar snapshot is not publishable for ${id}`);
       if (!year || !engineCc || !priceKrw || !photos.some((photo) => photo.category === "outer"))
@@ -233,6 +236,9 @@ async function main() {
         fuel_type: powerEntry.fuelType, transmission: str(spec.transmissionName), drive_type: str(configRow.driveType),
         color: normalizeColor(str(spec.colorName)), body_type: str(spec.bodyName),
         vehicle_no_masked: vehicleNo, vin_masked: str(detail.vin), media_count: photos.length,
+        accident_count: history?.summary.accident_count ?? null,
+        insurance_payout_count: history?.summary.insurance_payout_count ?? null,
+        insurance_payout_total_krw: history?.summary.insurance_payout_total_krw ?? null,
         vehicle_specs: { source: "encar", enrichment_run_id: RUN_ID, power_confidence: "automatic",
           power_basis: powerEntry.powerBasis, electrified_power_evidence: powerMeta,
           seats: positive(spec.seatCount), encar_full_gallery_count: photos.length,
@@ -244,7 +250,7 @@ async function main() {
         hybrid_dvs_power_hp: hybridDvsPowerHp, hybrid_electric_power_kw: hybridElectricPowerKw,
         hybrid_dvs_above_electric_30min: hybridDvsAbove, hybrid_sequential: hybridSequential,
       };
-      prepared.push({ id, stage, car, calculation, reviewedPriceRub: audit.priceRub, photos, options });
+      prepared.push({ id, stage, car, calculation, reviewedPriceRub: audit.priceRub, photos, options, history });
     }
 
     const idsWithPlate = prepared.flatMap((item) => item.car.vehicle_no_masked ?
@@ -281,6 +287,7 @@ async function main() {
       preliminaryPrices: prepared.filter((item) => item.car.power_finality === "provisional").length,
       sourcePhotos: prepared.reduce((sum, item) => sum + item.photos.length, 0),
       optionRows: prepared.reduce((sum, item) => sum + item.options.length, 0),
+      insuranceHistoryReports: prepared.filter((item) => item.history !== null).length,
       priceRubTotal: prepared.reduce((sum, item) => sum + Number(item.car.price_rub), 0),
       pricesDifferentFromPriorRateSnapshot: prepared.filter((item) => Number(item.car.price_rub) !== item.reviewedPriceRub).length,
       totalDeltaFromPriorRateSnapshotRub: prepared.reduce((sum, item) => sum + Number(item.car.price_rub) - item.reviewedPriceRub, 0),
@@ -326,6 +333,9 @@ async function main() {
             select $1,'encar',o.category,o.source_code,o.name_original,o.name_ru,o.value_original,o.value_ru,o.price_krw,o.description_original,o.description_ru,true,o.sort_order
             from jsonb_to_recordset($2::jsonb) as o(category text,source_code text,name_original text,name_ru text,value_original text,value_ru text,price_krw bigint,description_original text,description_ru text,sort_order integer)`,
           [carId, JSON.stringify(item.options.map((option, index) => ({ ...option, sort_order: 1000 + index })))]);
+          if (item.history) await db.query(`insert into public.car_condition_reports(car_id,source,report_type,summary,items,raw_payload)
+            values ($1,'encar','encar_carhistory',$2,$3,$4)`,
+          [carId, JSON.stringify(item.history.summary), JSON.stringify(item.history.items), JSON.stringify(item.history.raw_payload)]);
           await db.query(`insert into public.calc_snapshots(car_id,country_code,destination_city,importer_type,calc_version,inputs,rates,result,
               car_price_rub,duty_rub,fees_rub,util_rub,freight_rub,broker_rub,total_rub)
             values ($1,'RU','Владивосток','individual',$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,

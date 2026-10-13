@@ -13,6 +13,7 @@ import { normalizeColor, normalizePlate } from "../src/server/normalization/vehi
 import { translateInspectionLabel, translateInspectionStatus } from "../src/server/normalization/display";
 import { fetchStandardOptionCatalog } from "../src/server/imports/encar";
 import { mapEncarOptions } from "../src/server/imports/encar-options";
+import { mapEncarOpenHistory } from "../src/server/imports/encar-history";
 
 config({ path: ".env.local", override: true, quiet: true });
 config({ path: ".env", quiet: true });
@@ -161,7 +162,7 @@ async function main() {
     const rates = await getCbrCalcRates();
     const specIds = [...new Set(prepared.filter((p) => p.class === "approved").map((p) => str(obj(p.plan.power).specId)!))];
     const specs = new Map((await db.query<Spec>(`select id,version,status,calculation_power_kw,power_basis,evidence_id from public.vehicle_power_specs where id=any($1::uuid[])`, [specIds])).rows.map((row) => [row.id, row]));
-    const planned: Array<{ item: typeof prepared[number]; car: Obj; calc: ReturnType<typeof calculateRuVladivostok>; photos: ReturnType<typeof gallery>; options: ReturnType<typeof choiceOptions>; inspection: ReturnType<typeof inspectionReport> }> = [];
+    const planned: Array<{ item: typeof prepared[number]; car: Obj; calc: ReturnType<typeof calculateRuVladivostok>; photos: ReturnType<typeof gallery>; options: ReturnType<typeof choiceOptions>; inspection: ReturnType<typeof inspectionReport>; history: ReturnType<typeof mapEncarOpenHistory> }> = [];
     for (const item of prepared) {
       const { id, row, plan, reference } = item;
       const payload = obj(row.raw_payload), detail = obj(payload.detail), ad = obj(detail.advertisement), spec = obj(detail.spec), manage = obj(detail.manage), category = obj(detail.category);
@@ -170,6 +171,7 @@ async function main() {
       const year = positive(c.year), engineCc = positive(c.engineCc ?? spec.displacement), priceUnits = positive(ad.price);
       const fuel = str(c.fuelType), brand = str(c.brand), model = str(c.model);
       const photos = gallery(payload), options = choiceOptions(payload, optionCatalog), inspection = inspectionReport(payload);
+      const history = mapEncarOpenHistory(obj(payload.openHistory));
       if (!year || !engineCc || !priceUnits || !fuel || !brand || !model || !row.source_url || !photos.some((p) => p.category === "outer"))
         throw new Error(`Core source data incomplete: ${id}`);
       const month = resolveCalculationMonth({ registrationDate: str(manage.registDateTime) });
@@ -211,6 +213,9 @@ async function main() {
         fuel_type: fuel, transmission: normalizeTransmissionType(spec.transmissionName), drive_type: catalogDriveType(c.driveType), color: normalizeColor(spec.colorName), body_type: str(spec.bodyName),
         grade: str(category.gradeEnglishName), trim: str(category.gradeDetailEnglishName), badge: str(c.badge), badge_detail: str(c.trim),
         vehicle_no_masked: vehicleNo, vin_masked: str(detail.vin), media_count: photos.length,
+        accident_count: history?.summary.accident_count ?? null,
+        insurance_payout_count: history?.summary.insurance_payout_count ?? null,
+        insurance_payout_total_krw: history?.summary.insurance_payout_total_krw ?? null,
         vehicle_specs: { source: "encar", seats: num(spec.seatCount), power_confidence: powerConfidence,
           encar_options_count: Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).length : 0,
           encar_standard_option_codes: obj(detail.options).standard ?? [], encar_full_gallery_count: photos.length,
@@ -219,7 +224,7 @@ async function main() {
         calculation_power_spec_id: approvedSpec?.id ?? null, calculation_power_spec_version: approvedSpec?.version ?? null,
         calculation_power_kw: Number(powerKw.toFixed(4)), power_basis: basis, power_resolution_source: source,
         calculation_month: month.month, calculation_month_source: month.source };
-      planned.push({ item, car, calc, photos, options, inspection });
+      planned.push({ item, car, calc, photos, options, inspection, history });
     }
     const vehicleNumbers = planned.map((p) => str(p.car.vehicle_no_masked)).filter((p): p is string => Boolean(p));
     const hashes = vehicleNumbers.map(vehicleNoHash);
@@ -236,6 +241,7 @@ async function main() {
       excluded: exclusions, photos: toPublish.reduce((n, p) => n + p.photos.length, 0),
       choiceOptions: toPublish.reduce((n, p) => n + p.options.length, 0),
       inspectionReports: toPublish.filter((p) => p.inspection).length,
+      insuranceHistoryReports: toPublish.filter((p) => p.history).length,
       priceRubSum: toPublish.reduce((n, p) => n + Number(p.car.price_rub), 0) };
     if (!write) { console.log(JSON.stringify(report, null, 2)); await db.query("rollback"); return; }
     const toInsert = probe ? toPublish.slice(0, 1) : toPublish;
@@ -258,6 +264,8 @@ async function main() {
         [carId, JSON.stringify(p.options.map((option, i) => ({ ...option, sort_order: 1000 + i })))]);
       if (p.inspection) await db.query(`insert into public.car_condition_reports(car_id,source,report_type,summary,items,raw_payload) values ($1,'encar','encar_inspection',$2,$3,$4)`,
         [carId, JSON.stringify(p.inspection.summary), JSON.stringify(p.inspection.items), JSON.stringify(p.inspection.raw_payload)]);
+      if (p.history) await db.query(`insert into public.car_condition_reports(car_id,source,report_type,summary,items,raw_payload) values ($1,'encar','encar_carhistory',$2,$3,$4)`,
+        [carId, JSON.stringify(p.history.summary), JSON.stringify(p.history.items), JSON.stringify(p.history.raw_payload)]);
       await db.query(`insert into public.calc_snapshots(car_id,country_code,destination_city,importer_type,calc_version,inputs,rates,result,car_price_rub,duty_rub,fees_rub,util_rub,freight_rub,broker_rub,total_rub)
         values ($1,'RU','Владивосток','individual',$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
         [carId, p.calc.calcVersion, JSON.stringify(p.car), JSON.stringify({ ...p.calc.rates, details: p.calc.rateDetails }), JSON.stringify(p.calc),

@@ -27,4 +27,11 @@ assert.equal(history?.summary.loan_count,1);
 assert.equal(history?.summary.insurance_payout_total_krw,3320642);
 assert.equal(history?.raw_payload.ownerHistoryResponse.length,3);
 assert.equal(mapEncarOpenHistory({openData:false}),null);
+const noInsuranceClaims = mapEncarOpenHistory({openData:true,accidentCnt:0,myAccidentCnt:0,
+  otherAccidentCnt:0,myAccidentCost:0,otherAccidentCost:0,ownerChangeCnt:1,accidents:[]});
+assert.equal(noInsuranceClaims?.summary.available,true);
+assert.equal(noInsuranceClaims?.summary.accident_count,0);
+assert.equal(noInsuranceClaims?.summary.insurance_payout_count,0);
+assert.equal(noInsuranceClaims?.summary.my_car_accident_cost,0);
+assert.deepEqual(noInsuranceClaims?.items,[]);
 console.log('Encar card data tests passed');

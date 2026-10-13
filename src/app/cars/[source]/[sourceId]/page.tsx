@@ -386,7 +386,9 @@ function ConditionOverview({
   const payoutTotal =
     asNumber(carHistory?.my_car_accident_cost) ??
     car.insurance_payout_total_krw;
-  const payoutCount = insuranceEvents.length || car.insurance_payout_count;
+  const payoutCount =
+    asNumber(carHistory?.insurance_payout_count) ??
+    (carHistory ? insuranceEvents.length : car.insurance_payout_count);
   const nonInsurancePeriods = Array.isArray(
     carHistory?.nonInsurancePeriodResponse,
   )

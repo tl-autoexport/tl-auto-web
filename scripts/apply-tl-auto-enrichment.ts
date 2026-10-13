@@ -25,6 +25,7 @@ import { translateInspectionLabel, translateInspectionStatus } from "../src/serv
 import { fetchStandardOptionCatalog } from "../src/server/imports/encar";
 import { resolveEncarVehicleId } from "../src/server/imports/encar-identity";
 import { mapEncarOptions, type EncarOptionCatalog } from "../src/server/imports/encar-options";
+import { mapEncarOpenHistory } from "../src/server/imports/encar-history";
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 
@@ -87,7 +88,8 @@ function inspectionReport(carId: string, payload: Obj) {
 }
 
 /** Only options the card can actually render are written. */
-function options(carId: string, payload: Obj, catalog: EncarOptionCatalog) {
+function options(carId: string, payload: Obj, catalog: EncarOptionCatalog | null) {
+  if (!catalog) return [];
   const detail = obj(payload.detail);
   const codes = Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).map(String) : [];
   const selected = obj(detail.options).choice;
@@ -111,7 +113,6 @@ type CardResult = {
 };
 
 async function main() {
-  const optionCatalog = await fetchStandardOptionCatalog();
   const [queue, staging, cars] = await Promise.all([
     pages<Queue>("encar_enrichment_queue", "source_listing_id,status,task,result", (q) => q.eq("run_id", runId)),
     pages<Stage>("encar_enrichment_staging", "source_listing_id,raw_payload", (q) => q.eq("run_id", runId)),
@@ -121,6 +122,13 @@ async function main() {
   const carBySource = new Map(cars.map((row) => [row.source_id, row]));
   const work = queue.filter((q) => q.status === "succeeded" && (!approvedIds || approvedIds.includes(q.source_listing_id))
     && stageBySource.get(q.source_listing_id)?.raw_payload && carBySource.has(q.source_listing_id));
+  // History is already included in staging. Fetch Encar's option catalog only
+  // when this transfer actually has option work to map.
+  const needsOptionCatalog = work.some((q) => {
+    const payload = stageBySource.get(q.source_listing_id)!.raw_payload!;
+    return ready(q, "options") || optionsAvailable(payload);
+  });
+  const optionCatalog = needsOptionCatalog ? await fetchStandardOptionCatalog() : null;
 
   const report = {
     runId, primarySource, write, allowlistApplied: Boolean(approvedIds), allowlistedIds: approvedIds?.length ?? null,
@@ -171,6 +179,7 @@ async function main() {
         continue;
       }
       const inspection = ready(q, "insurance") ? inspectionReport(car.id, payload) : null;
+      const history = mapEncarOpenHistory(obj(payload.openHistory));
       const optionRows = (ready(q, "options") || optionsAvailable(payload)) ? options(car.id, payload, optionCatalog) : [];
       const galleryRows = ready(q, "gallery") ? gallery(car.id, payload) : [];
 
@@ -179,14 +188,15 @@ async function main() {
       if (ready(q, "gallery") && !galleryRows.length) report.plans.skippedEmptyGallery++;
 
       const writeInspection = Boolean(inspection && inspection.items.length);
+      const writeHistory = Boolean(history);
       const writeOptions = optionRows.length > 0;
       const writeGallery = galleryRows.length > 0;
-      report.plans.reports += writeInspection ? 1 : 0;
+      report.plans.reports += Number(writeInspection) + Number(writeHistory);
       report.plans.options += optionRows.length;
       report.plans.galleryImages += galleryRows.length;
 
       const detail: CardResult = { sourceListingId: q.source_listing_id, carId: car.id, status: "skipped", skipped: [], inserted: { reports: [], options: [], media: [] }, error: null };
-      if (!writeInspection && !writeOptions && !writeGallery) { report.details.push(detail); appendManifest(detail); }
+      if (!writeInspection && !writeHistory && !writeOptions && !writeGallery) { report.details.push(detail); appendManifest(detail); }
       else if (!pg) {
         detail.skipped.push("dry_run");
         report.details.push(detail);
@@ -204,6 +214,23 @@ async function main() {
             report.details.push(detail);
             appendManifest(detail);
             continue;
+          }
+          if (writeHistory) {
+            const inserted = await pg.query<{ id: string }>(`
+              insert into public.car_condition_reports(car_id, source, report_type, summary, items, raw_payload)
+              select $1, 'encar', 'encar_carhistory', $2::jsonb, $3::jsonb, $4::jsonb
+              where not exists (select 1 from public.car_condition_reports
+                                where car_id = $1 and source = 'encar' and report_type = 'encar_carhistory')
+              returning id`,
+              [car.id, JSON.stringify(history!.summary), JSON.stringify(history!.items), JSON.stringify(history!.raw_payload)]);
+            if (inserted.rowCount) detail.inserted.reports.push(...inserted.rows.map((row) => row.id));
+            else detail.skipped.push("history_already_present");
+            await pg.query(`update public.cars set
+                accident_count = coalesce(accident_count, $2),
+                insurance_payout_count = coalesce(insurance_payout_count, $3),
+                insurance_payout_total_krw = coalesce(insurance_payout_total_krw, $4)
+              where id = $1`, [car.id, history!.summary.accident_count,
+              history!.summary.insurance_payout_count, history!.summary.insurance_payout_total_krw]);
           }
           if (writeInspection) {
             const inserted = await pg.query<{ id: string }>(`
