@@ -84,7 +84,9 @@ export function GenerationCascade({ currentQuery, brand, model, generation, modi
     return () => { active = false; };
   }, [open, level, generationsQuery, identity.model, identity.generation, retry]);
 
-  const options = (level === "generation" ? generationOptions : data?.axes[level] ?? []).filter((option) => option.label.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
+  const facetOptions = level === "generation" ? generationOptions : data?.axes[level] ?? [];
+  const options = (level === "brand" ? [...facetOptions].sort((left, right) => left.label.localeCompare(right.label, "ru")) : facetOptions)
+    .filter((option) => option.label.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
   const generationLabel = generationOptions.find((item) => item.value === identity.generation)?.label ?? (identity.generation?.startsWith("ordinal:") ? identity.generation.split(":").slice(3).join(":") : identity.generation?.toUpperCase());
 
   function show(nextLevel: Level) {

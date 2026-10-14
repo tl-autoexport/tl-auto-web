@@ -154,12 +154,12 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const trims = unique(optionCars.map((car) => car.trim));
   const bodies = unique(optionCars.map((car) => bodyTypeFilterValue(car.body_type)));
   const colors = unique(optionCars.map((car) => car.color));
-  const popularBrands = brands.slice(0, 12);
   const searchableModels = Object.entries(modelsByBrand).flatMap(([brand, modelNames]) => modelNames.map((model) => ({ brand, model })));
   const brandCounts = optionCars.reduce<Record<string, number>>((counts, car) => {
     if (car.brand) counts[car.brand] = (counts[car.brand] ?? 0) + 1;
     return counts;
   }, {});
+  const popularBrands = [...brands].sort((left, right) => (brandCounts[right] ?? 0) - (brandCounts[left] ?? 0) || left.localeCompare(right, "ru"));
   const currentQuery = catalogQueryString(rawParams);
   const feedQuery = catalogFeedQueryString(rawParams);
   const filterFormProps = {
@@ -218,7 +218,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                   >
                     <BrandLogo brand={brand} size={26} />
                     {brand}
-                    <span className="text-[#757b84]">{brandCounts[brand] ?? 0}</span>
                     {selected ? <span aria-hidden="true" className="text-[#a98239]">×</span> : null}
                   </Link>
                 );
@@ -244,7 +243,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         <div className="sticky top-[68px] z-[60] -mx-3 bg-[#f5f6f8] shadow-[0_5px_14px_rgba(15,31,49,0.1)] sm:-mx-5 md:hidden">
           {popularBrands.length ? <div className="scrollbar-none flex gap-4 overflow-x-auto border-y border-[#dce2eb] bg-white px-3 py-2.5 sm:px-5">{popularBrands.map((brand) => {
             const selected = filters.brand === brand;
-            return <Link aria-current={selected ? "page" : undefined} className={`inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold ${selected ? "text-[#956f2c]" : "text-[#273246]"}`} href={selected ? catalogFilterHref(rawParams, { brand: null, model: null, generation: null, modification:null,trim:null, page: null }) : catalogFilterHref(rawParams, { brand, model: null, generation: null, modification:null,trim:null, page: null })} key={brand} prefetch={false}><BrandLogo brand={brand} size={20} />{brand}<span className="text-[#7a8798]">{brandCounts[brand] ?? 0}</span>{selected ? <span aria-hidden="true">×</span> : null}</Link>;
+            return <Link aria-current={selected ? "page" : undefined} className={`inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold ${selected ? "text-[#956f2c]" : "text-[#273246]"}`} href={selected ? catalogFilterHref(rawParams, { brand: null, model: null, generation: null, modification:null,trim:null, page: null }) : catalogFilterHref(rawParams, { brand, model: null, generation: null, modification:null,trim:null, page: null })} key={brand} prefetch={false}><BrandLogo brand={brand} size={20} />{brand}{selected ? <span aria-hidden="true">×</span> : null}</Link>;
           })}</div> : null}
           <MobileCatalogExperience
             currentQuery={currentQuery}
