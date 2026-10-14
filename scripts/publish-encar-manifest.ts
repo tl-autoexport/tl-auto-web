@@ -26,6 +26,8 @@ const prepare = process.env.TL_AUTO_PUBLICATION_PREPARE === "true";
 const write = process.env.TL_AUTO_PUBLICATION_WRITE === "true";
 const probe = process.env.TL_AUTO_PUBLICATION_PROBE === "true";
 const batchSize = Number(process.env.TL_AUTO_PUBLICATION_BATCH_SIZE ?? 100);
+const excludedDuplicateIds = new Set((process.env.TL_AUTO_PUBLICATION_EXCLUDE_DUPLICATE_IDS ?? "")
+  .split(",").map((id) => id.trim()).filter(Boolean));
 const dbUrl = process.env.SUPABASE_DB_URL;
 if (!dbUrl) throw new Error("SUPABASE_DB_URL is required");
 
@@ -35,6 +37,7 @@ type Plan = { runId: string; candidates: PlanRow[] };
 type Stage = { source_listing_id: string; source_url: string | null; queue_status: string; staging_status: string; fetched_at: string | null; raw_payload: Obj | null };
 type Spec = { id: string; version: number; status: string; calculation_power_kw: string; power_basis: string; evidence_id: string };
 type Manifest = { runId: string; expected: number; reportHash: string; planHash: string; preliminaryHash: string;
+  exclusions: Array<{ id: string; reason: "active_vehicle_number_duplicate"; existingSourceId: string }>;
   entries: Array<{ id: string; powerClass: "approved" | "preliminary"; fetchedAt: string; payloadHash: string }> };
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
 
@@ -126,6 +129,9 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
         !preliminaryIds.has(car.sourceListingId) || !planById.has(car.sourceListingId))) {
     throw new Error("Readiness allowlist contains duplicates or lacks power evidence");
   }
+  if ([...excludedDuplicateIds].some((id) => !reportIds.has(id))) {
+    throw new Error("Duplicate exclusion contains an ID outside the ready publication allowlist");
+  }
   const db = new Client({ connectionString: dbUrl, ssl: { rejectUnauthorized: false } });
   await db.connect();
   try {
@@ -135,10 +141,30 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
       where q.run_id=$1 and q.source_listing_id=any($2::text[])`, [plan.runId, ids])).rows;
     const stages = new Map(stageRows.map((row) => [row.source_listing_id, row]));
     if (stageRows.length !== ids.length) throw new Error(`Staging missing: ${stageRows.length}/${ids.length}`);
+    const excludedRows = [...excludedDuplicateIds].map((id) => {
+      const row = stages.get(id);
+      const plate = row?.raw_payload ? normalizePlate(obj(obj(row.raw_payload).detail).vehicleNo) : null;
+      if (!plate) throw new Error(`Cannot verify duplicate exclusion without source plate for ${id}`);
+      return { id, hash: vehicleNoHash(plate) };
+    });
+    const duplicateCars = excludedRows.length
+      ? (await db.query<{ source_id: string; vehicle_no_hash: string }>(
+        `select source_id,vehicle_no_hash from public.cars where is_available=true and vehicle_no_hash=any($1::text[])`,
+        [[...new Set(excludedRows.map((row) => row.hash))]],
+      )).rows
+      : [];
+    const exclusions = excludedRows.map((row) => {
+      const existingCar = duplicateCars.find((car) => car.vehicle_no_hash === row.hash && car.source_id !== row.id);
+      if (!existingCar) throw new Error(`Exclusion ${row.id} is not backed by another active catalog car`);
+      return { id: row.id, reason: "active_vehicle_number_duplicate" as const, existingSourceId: existingCar.source_id };
+    });
+    const excludedIds = new Set(exclusions.map((row) => row.id));
+    const selectedCars = report.cars.filter((car) => !excludedIds.has(car.sourceListingId));
+    const selectedIds = selectedCars.map((car) => car.sourceListingId);
     const manifest: Manifest = {
-      runId: plan.runId, expected: ids.length,
+      runId: plan.runId, expected: selectedIds.length, exclusions,
       reportHash: hash(reportText), planHash: hash(planText), preliminaryHash: hash(preliminaryText),
-      entries: report.cars.map((car) => {
+      entries: selectedCars.map((car) => {
         const row = stages.get(car.sourceListingId);
         if (!row?.raw_payload || !row.fetched_at || row.queue_status !== "succeeded" || row.staging_status !== "succeeded")
           throw new Error(`Staging is incomplete for ${car.sourceListingId}`);
@@ -169,6 +195,7 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
     if (JSON.stringify(saved) !== JSON.stringify(manifest)) throw new Error("Manifest or source reports changed after preparation");
     const refs = (await db.query<AutomaticPowerReferenceRow>(`select configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,year_from,year_to,power_hp,power_kw,source,status
       from public.vehicle_power_automatic_reference where status='automatic'`)).rows;
+    const manifestIds = saved.entries.map((entry) => entry.id);
     const prepared: Array<{ id: string; row: Stage; plan: PlanRow; class: "approved" | "preliminary"; reference: AutomaticPowerReferenceRow | null }> = [];
     for (const entry of saved.entries) {
       const id = entry.id;
@@ -182,7 +209,7 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
       prepared.push({ id, row, plan: planned, class: entry.powerClass, reference });
     }
     if (prepared.length !== saved.expected) throw new Error("Manifest cardinality changed");
-    const existing = await db.query<{ source_id: string }>(`select source_id from public.cars where primary_source='encar' and source_id=any($1::text[])`, [ids]);
+    const existing = await db.query<{ source_id: string }>(`select source_id from public.cars where primary_source='encar' and source_id=any($1::text[])`, [manifestIds]);
     const existingIds = new Set(existing.rows.map((row) => row.source_id));
     const rates = report.rateSnapshot;
     if (!rates?.asOf || !rates.rates || !rates.customsRates || !rates.rateDetails ||
@@ -268,6 +295,7 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
     }
     if (planned.length !== saved.expected) throw new Error("Prepared row count changed");
     const publicationReport = { dryRun: !write, runId: saved.runId, selected: planned.length, alreadyPublished: existingIds.size,
+      excludedActiveVehicleDuplicates: saved.exclusions,
       approved: planned.filter((p) => p.item.class === "approved").length,
       preliminary: planned.filter((p) => p.item.class === "preliminary").length,
       photos: planned.reduce((n, p) => n + p.photos.length, 0),
