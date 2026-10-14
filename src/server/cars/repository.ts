@@ -908,6 +908,9 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
   const presentableCars = (page: CatalogPageResult, limit: number) => page.cars
     .flatMap((car) => {
       if (rejectedHomepageCars.has(car.id)) return [];
+      // Confirmed removed at the source by the site owner; replace its
+      // showcase slot without changing catalogue records or publication state.
+      if (car.primary_source === "encar" && car.source_id === "42898581") return [];
       const url = covers.get(car.id);
       return url ? [{ ...car, primary_image_url: url, primary_thumbnail_url: url }] : [];
     })
@@ -923,7 +926,7 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
 
 const getCachedHomeCatalogData = unstable_cache(
   fetchHomeCatalogData,
-  ["home-catalog-showcases-v8-reviewed-listings", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  ["home-catalog-showcases-v9-gallery-cover", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
   { revalidate: 60 },
 );
 

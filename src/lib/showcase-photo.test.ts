@@ -11,8 +11,8 @@ assert.equal(
     { url: rearThreeQuarter, category: "outer", media_type: "image" },
     { url: front, category: "outer", media_type: "image" },
   ]),
-  front,
-  "homepage cover should prefer the frontal frame over three-quarter and rear frames",
+  frontThreeQuarter,
+  "homepage cover should match the gallery cover even when 003 is labelled exterior",
 );
 
 assert.equal(

@@ -9,10 +9,10 @@ type ShowcaseMedia = {
 /** Strict homepage selection: prefer frontal and front three-quarter Encar frames. */
 export function homeShowcasePhotoUrl(media: ShowcaseMedia[] | null | undefined) {
   const exteriorCategories = ["outer", "outside", "outside_image", "exterior"];
-  // Encar's 003 is a front-facing shot and 001 is the front three-quarter
-  // view. Rear-facing 002/004 frames are intentionally excluded from homepage
-  // showcases, where a clean, presentation-quality cover matters most.
-  const preference = [3, 1];
+  // Match the detail gallery's full-car cover. The 003 slot is not reliably
+  // frontal: some sellers put an interior or rear view there. Keep it only
+  // as a fallback when the standard 001 cover is unavailable.
+  const preference = [1, 3];
   const candidates = (media ?? []).flatMap((item) => {
     if (item.media_type !== "image" || !exteriorCategories.includes(item.category?.toLowerCase() ?? "")) return [];
     // An unknown sequence or a detail frame is not enough evidence for a
