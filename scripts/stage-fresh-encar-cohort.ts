@@ -9,6 +9,7 @@ config({ path: ".env", quiet: true });
 const inputPath = process.env.ENCAR_FRESH_OUTPUT ?? "output/encar-fresh-candidates.json";
 const target = Number(process.env.ENCAR_FRESH_TARGET ?? 500);
 const maxListingAgeDays = Number(process.env.ENCAR_FRESH_MAX_AGE_DAYS ?? 30);
+const minVehicleYear = Number(process.env.ENCAR_FRESH_MIN_VEHICLE_YEAR ?? 2020);
 const runId = randomUUID();
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
@@ -26,20 +27,29 @@ type Candidate = {
   fuelType: "gasoline" | "diesel" | "lpg";
   firstAdvertisedAt: string;
   listedAt: string | null;
+  priorityModel?: string | null;
+  priorityModelRank?: number | null;
 };
-type Report = { mode: string; target: number; selectedCount: number; maxListingAgeDays: number; candidates: Candidate[] };
+type Report = { mode: string; target: number; selectedCount: number; maxListingAgeDays: number; minVehicleYear?: number; sourceTimestampTimezone?: string; candidates: Candidate[] };
+const parseEncarTimestamp = (value: string) => Date.parse(
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?$/.test(value) ? `${value}+09:00` : value,
+);
 
 async function main() {
   const report = JSON.parse(await readFile(inputPath, "utf8")) as Report;
   if (report.mode !== "read_only_discovery" || report.target !== target || report.selectedCount !== target || report.candidates?.length !== target)
     throw new Error(`Discovery report must contain exactly ${target} selected candidates`);
   if (report.maxListingAgeDays !== maxListingAgeDays) throw new Error("Discovery report age window does not match staging settings");
+  if (report.minVehicleYear !== minVehicleYear) throw new Error("Discovery report minimum vehicle year does not match staging settings");
+  if (report.sourceTimestampTimezone !== "Asia/Seoul for timezone-naive values") throw new Error("Discovery report timestamp timezone policy is missing or mismatched");
   const now = Date.now();
   const ids = report.candidates.map((row) => String(row.sourceListingId));
   if (ids.some((id) => !/^\d{5,}$/.test(id)) || new Set(ids).size !== target) throw new Error("Report contains invalid or duplicate Encar IDs");
   if (report.candidates.some((row) => !["gasoline", "diesel", "lpg"].includes(row.fuelType) ||
-      !Number.isFinite(Date.parse(row.firstAdvertisedAt)) || now - Date.parse(row.firstAdvertisedAt) > maxListingAgeDays * 86_400_000))
-    throw new Error("Report contains unsupported fuel or listing outside the freshness window");
+      !Number.isFinite(parseEncarTimestamp(row.firstAdvertisedAt)) || parseEncarTimestamp(row.firstAdvertisedAt) > now ||
+      now - parseEncarTimestamp(row.firstAdvertisedAt) > maxListingAgeDays * 86_400_000 ||
+      !Number.isInteger(row.year) || Number(row.year) < minVehicleYear))
+    throw new Error("Report contains unsupported fuel, vehicle year, or listing outside the freshness window");
   const fuelCounts = report.candidates.reduce<Record<string, number>>((counts, row) => {
     counts[row.fuelType] = (counts[row.fuelType] ?? 0) + 1;
     return counts;
@@ -64,10 +74,17 @@ async function main() {
   const run = await db.from("encar_enrichment_runs").insert({
     id: runId, project: "tl-auto", purpose: "full", priority: 40,
     status: "awaiting_approval", requested_limit: target, candidate_count: target,
-    rules_version: "fresh-first-advertised-30d-v1",
+    rules_version: `fresh-first-advertised-${maxListingAgeDays}d-${minVehicleYear}plus-priority-models-v2`,
     summary: {
       source: "encar", discoveryReport: inputPath, freshnessField: "manage.firstAdvertisedDateTime",
-      maxListingAgeDays, selectedFuelCounts: fuelCounts, stagedFromSavedDiscovery: true,
+      maxListingAgeDays, minVehicleYear, prioritySource: "project required-model audit ranked by sourceCount; max 50 per model before freshness fallback",
+      selectedFuelCounts: fuelCounts,
+      selectedPriorityListings: report.candidates.filter((row) => row.priorityModelRank != null).length,
+      selectedPriorityModels: report.candidates.reduce<Record<string, number>>((counts, row) => {
+        if (row.priorityModel) counts[row.priorityModel] = (counts[row.priorityModel] ?? 0) + 1;
+        return counts;
+      }, {}),
+      stagedFromSavedDiscovery: true,
       noCarsInserted: true, noPublication: true,
     },
   }).select("id,status,candidate_count").single();
@@ -77,7 +94,7 @@ async function main() {
     run_id: runId, source: "encar", source_listing_id: candidate.sourceListingId,
     source_url: candidate.sourceUrl,
     task: { insurance: true, options: true, gallery: true, diagnosis: true, sellingpoint: true, contents: true, history: true, category: false },
-    candidate_snapshot: { ...candidate, cohort: "fresh-first-advertised-30d" },
+    candidate_snapshot: { ...candidate, cohort: `fresh-first-advertised-${maxListingAgeDays}d-${minVehicleYear}plus-priority-models-v2` },
   }));
   const queued = await db.from("encar_enrichment_queue").insert(queueRows);
   if (queued.error) throw new Error(`Queue insert failed for run ${runId}; run remains awaiting_approval: ${queued.error.message}`);
@@ -86,7 +103,7 @@ async function main() {
   const rows = verify.data ?? [];
   if (rows.length !== target || rows.some((row) => row.status !== "queued"))
     throw new Error(`Queue verification mismatch for run ${runId}: ${rows.length} rows`);
-  console.log(JSON.stringify({ run: run.data, staged: rows.length, sourceFreshness: `first advertised within ${maxListingAgeDays} days`, fuelCounts, status: "awaiting_approval", publicCatalogChanged: false }, null, 2));
+  console.log(JSON.stringify({ run: run.data, staged: rows.length, sourceFreshness: `first advertised within ${maxListingAgeDays} days`, minimumVehicleYear: minVehicleYear, priorityListings: report.candidates.filter((row) => row.priorityModelRank != null).length, fuelCounts, status: "awaiting_approval", publicCatalogChanged: false }, null, 2));
 }
 
 main().catch((error) => { console.error(error instanceof Error ? error.message : error); process.exitCode = 1; });
