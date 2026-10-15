@@ -9,6 +9,7 @@ import { evaluatePublication, storedPowerFinality } from "../src/server/cars/cal
 import { tierFromStored, type EvidenceTier } from "../src/server/power-resolution/evidence-tiers";
 import { decidePublication } from "../src/server/power-resolution/publication-gate";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
+import { assessPriceAgainstAnalogs, type PriceVehicle } from "../src/server/catalog/price-anomaly";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -302,6 +303,30 @@ async function main() {
       tierBreakdown[tier] = (tierBreakdown[tier] ?? 0) + 1;
     }
 
+    const analogRows = await client.query<{ source_id: string; brand: string | null; model: string | null; year: number | null; engine_cc: number | null; fuel_type: string | null; mileage_km: number | null; price_krw: number | null }>(
+      `select source_id,brand,model,year,engine_cc,fuel_type,mileage_km,price_krw from public.cars
+       where is_available=true and price_krw>0 and year is not null and engine_cc>0
+         and (vehicle_specs->>'advertisement_type' is null or vehicle_specs->>'advertisement_type'='NORMAL')`);
+    const priceInventory: PriceVehicle[] = analogRows.rows.map((row) => ({ sourceId: row.source_id, brand: row.brand,
+      model: row.model, year: row.year, engineCc: row.engine_cc, fuelType: row.fuel_type,
+      mileageKm: row.mileage_km, priceKrw: Number(row.price_krw) }));
+    priceInventory.push(...eligible.map(({ row }) => ({ sourceId: row.source_listing_id, brand: row.manufacturer,
+      model: displayModel(row.model), year: row.model_year, engineCc: row.engine_cc, fuelType: row.fuel_type,
+      mileageKm: row.mileage_km, priceKrw: row.price_krw })));
+    const priceReviews: Array<{ id: string; verdict: ReturnType<typeof assessPriceAgainstAnalogs> }> = [];
+    const priceCleared: PreparedItem[] = [];
+    for (const item of eligible) {
+      const verdict = assessPriceAgainstAnalogs({ sourceId: item.row.source_listing_id, brand: item.row.manufacturer,
+        model: displayModel(item.row.model), year: item.row.model_year, engineCc: item.row.engine_cc, fuelType: item.fuel,
+        mileageKm: item.row.mileage_km, priceKrw: item.row.price_krw }, priceInventory);
+      priceReviews.push({ id: item.row.source_listing_id, verdict });
+      if (verdict.status !== "price_outlier") priceCleared.push(item);
+      else exclude(item.row.source_listing_id, "price_outlier_vs_analogs");
+    }
+    eligible.splice(0, eligible.length, ...priceCleared);
+    for (const tier of Object.keys(tierBreakdown)) tierBreakdown[tier] = 0;
+    for (const item of eligible) tierBreakdown[item.tier] = (tierBreakdown[item.tier] ?? 0) + 1;
+
     if (!dryRun && eligible.length) {
       await client.query("begin");
       try {
@@ -404,6 +429,10 @@ async function main() {
       excludedByReason,
       tierBreakdown,
       sampleExclusions,
+      priceAnalogReview: { clear: priceReviews.filter((row) => row.verdict.status === "comparable").length,
+        outlier: priceReviews.filter((row) => row.verdict.status === "price_outlier").length,
+        insufficientComparables: priceReviews.filter((row) => row.verdict.status === "insufficient_comparables").length,
+        sample: priceReviews.filter((row) => row.verdict.status !== "comparable").slice(0, 20) },
       mediaRows: eligible.reduce((sum, item) => sum + item.images.length, 0),
       powerResolution: "approved_evidence_confirmation",
       legacyManifestUsed: false,

@@ -11,6 +11,7 @@ import { normalizeColor, normalizePlate } from "../src/server/normalization/vehi
 import { fetchStandardOptionCatalog } from "../src/server/imports/encar";
 import { mapEncarOptions } from "../src/server/imports/encar-options";
 import { mapEncarOpenHistory } from "../src/server/imports/encar-history";
+import { assessPriceAgainstAnalogs, isEncarSaleAdvertisement, type PriceVehicle } from "../src/server/catalog/price-anomaly";
 import type { EncarOptionRow } from "../src/server/imports/encar-options";
 
 config({ path: ".env.local", override: true, quiet: true });
@@ -170,6 +171,8 @@ async function main() {
       const history = mapEncarOpenHistory(obj(payload.openHistory));
       if (ad.status !== "ADVERTISE" || manage.dummy === true || ad.salesStatus === "CONTRACT")
         throw new Error(`Saved Encar snapshot is not publishable for ${id}`);
+      if (!isEncarSaleAdvertisement(ad.advertisementType))
+        throw new Error(`Not a vehicle sale advertisement (${String(ad.advertisementType ?? "missing")}): ${id}`);
       if (!year || !engineCc || !priceKrw || !photos.some((photo) => photo.category === "outer"))
         throw new Error(`Core fields/photo are missing for ${id}`);
       if (powerEntry.fuelType !== configRow.fuelType ||
@@ -239,7 +242,7 @@ async function main() {
         accident_count: history?.summary.accident_count ?? null,
         insurance_payout_count: history?.summary.insurance_payout_count ?? null,
         insurance_payout_total_krw: history?.summary.insurance_payout_total_krw ?? null,
-        vehicle_specs: { source: "encar", enrichment_run_id: RUN_ID, power_confidence: "automatic",
+        vehicle_specs: { source: "encar", enrichment_run_id: RUN_ID, advertisement_type: ad.advertisementType, power_confidence: "automatic",
           power_basis: powerEntry.powerBasis, electrified_power_evidence: powerMeta,
           seats: positive(spec.seatCount), encar_full_gallery_count: photos.length,
           encar_options_count: options.length },
@@ -252,6 +255,22 @@ async function main() {
       };
       prepared.push({ id, stage, car, calculation, reviewedPriceRub: audit.priceRub, photos, options, history });
     }
+
+    const analogRows = await db.query<PriceVehicle>(`select source_id as "sourceId",brand,model,year,engine_cc as "engineCc",fuel_type as "fuelType",mileage_km as "mileageKm",price_krw as "priceKrw"
+      from public.cars where is_available=true and price_krw>0 and year is not null and engine_cc>0
+        and (vehicle_specs->>'advertisement_type' is null or vehicle_specs->>'advertisement_type'='NORMAL')`);
+    const priceInventory: PriceVehicle[] = [...analogRows.rows, ...prepared.map((item) => ({ sourceId: item.id,
+      brand: String(item.car.brand ?? ""), model: String(item.car.model ?? ""), year: Number(item.car.year),
+      engineCc: Number(item.car.engine_cc), fuelType: String(item.car.fuel_type ?? ""),
+      mileageKm: item.car.mileage_km == null ? null : Number(item.car.mileage_km), priceKrw: Number(item.car.price_krw) }))];
+    const priceFlags = prepared.flatMap((item) => {
+      const verdict = assessPriceAgainstAnalogs({ sourceId: item.id, brand: String(item.car.brand ?? ""),
+        model: String(item.car.model ?? ""), year: Number(item.car.year), engineCc: Number(item.car.engine_cc),
+        fuelType: String(item.car.fuel_type ?? ""), mileageKm: item.car.mileage_km == null ? null : Number(item.car.mileage_km),
+        priceKrw: Number(item.car.price_krw) }, priceInventory);
+      return verdict.status === "price_outlier" ? [{ id: item.id, ...verdict }] : [];
+    });
+    if (priceFlags.length) throw new Error(`Price analog review blocks publication (${priceFlags.length}): ${JSON.stringify(priceFlags.slice(0, 20))}`);
 
     const idsWithPlate = prepared.flatMap((item) => item.car.vehicle_no_masked ?
       [{ id: item.id, hash: vehicleHash(String(item.car.vehicle_no_masked)) }] : []);

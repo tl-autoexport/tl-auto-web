@@ -14,6 +14,7 @@ import { translateInspectionLabel, translateInspectionStatus } from "../src/serv
 import { fetchStandardOptionCatalog } from "../src/server/imports/encar";
 import { mapEncarOptions } from "../src/server/imports/encar-options";
 import { mapEncarOpenHistory } from "../src/server/imports/encar-history";
+import { isEncarSaleAdvertisement } from "../src/server/catalog/price-anomaly";
 
 config({ path: ".env.local", override: true, quiet: true });
 config({ path: ".env", quiet: true });
@@ -223,6 +224,7 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
       const { id, row, plan, reference } = item;
       const payload = obj(row.raw_payload), detail = obj(payload.detail), ad = obj(detail.advertisement), spec = obj(detail.spec), manage = obj(detail.manage), category = obj(detail.category);
       if (row.queue_status !== "succeeded" || row.staging_status !== "succeeded" || ad.status !== "ADVERTISE") throw new Error(`Source no longer staged as active: ${id}`);
+      if (!isEncarSaleAdvertisement(ad.advertisementType)) throw new Error(`Not a vehicle sale advertisement (${String(ad.advertisementType ?? "missing")}): ${id}`);
       const c = plan.configuration;
       const year = positive(c.year), engineCc = positive(c.engineCc ?? spec.displacement), priceUnits = positive(ad.price);
       const fuel = str(c.fuelType), brand = str(c.brand), model = str(c.model);
@@ -274,7 +276,7 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
         accident_count: history?.summary.accident_count ?? null,
         insurance_payout_count: history?.summary.insurance_payout_count ?? null,
         insurance_payout_total_krw: history?.summary.insurance_payout_total_krw ?? null,
-        vehicle_specs: { source: "encar", seats: num(spec.seatCount), power_confidence: powerConfidence,
+        vehicle_specs: { source: "encar", seats: num(spec.seatCount), advertisement_type: ad.advertisementType, power_confidence: powerConfidence,
           encar_options_count: Array.isArray(obj(detail.options).standard) ? (obj(detail.options).standard as unknown[]).length : 0,
           encar_standard_option_codes: obj(detail.options).standard ?? [], encar_full_gallery_count: photos.length,
           enrichment_run_id: saved.runId },

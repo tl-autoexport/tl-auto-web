@@ -27,6 +27,7 @@ import { encarClient } from "@/server/imports/encar-client";
 import { normalizeEncarTimestamp } from "@/server/imports/encar-date";
 import { resolveEncarVehicleId } from "./encar-identity";
 import { mapEncarOpenHistory } from "@/server/imports/encar-history";
+import { assessPriceAgainstAnalogs, isEncarSaleAdvertisement, type PriceVehicle } from "@/server/catalog/price-anomaly";
 import { mapChoiceOptions, mapStandardOptions, type EncarOptionCatalog, type EncarOptionRow } from "@/server/imports/encar-options";
 
 export { mapStandardOptions } from "@/server/imports/encar-options";
@@ -102,6 +103,7 @@ type EncarDetail = {
   vehicleNo: string | null;
   vin: string | null;
   transmission: string | null;
+  advertisementType: string | null;
   standardOptionCodes: string[];
   inspectionFormats: string[];
   photos: EncarPhoto[];
@@ -116,6 +118,7 @@ type EncarPhoto = {
 type EncarDetailPayload = {
   vehicleNo?: string;
   vin?: string;
+  advertisement?: { advertisementType?: string; price?: number };
   spec?: {
     displacement?: number;
     fuelName?: string;
@@ -620,6 +623,7 @@ export async function fetchDetail(vehicleId: string): Promise<EncarDetail> {
     vehicleNo: data.vehicleNo ?? null,
     vin: spec.vin ?? data.vin ?? null,
     transmission: spec.transmissionName ?? null,
+    advertisementType: data.advertisement?.advertisementType ?? null,
     standardOptionCodes: data.options?.standard ?? [],
     inspectionFormats: data.condition?.inspection?.formats ?? [],
     photos: normalizeEncarPhotos(data.photos ?? []),
@@ -936,6 +940,10 @@ async function mapCar(
     onReject?.(`detail_unavailable:${sourceId}`);
     return null;
   }
+  if (!isEncarSaleAdvertisement(detail.advertisementType)) {
+    onReject?.(`non_sale_advertisement_type:${detail.advertisementType ?? "missing"}`);
+    return null;
+  }
   const photoDetail = detail;
   await sleep(120);
   const photos = photoDetail?.photos.length ? photoDetail.photos : buildPhotos(listCar);
@@ -1091,6 +1099,7 @@ async function mapCar(
       vehicle_type: "car",
       vehicle_specs: {
         seats: detail?.seats ?? null,
+        advertisement_type: detail?.advertisementType ?? null,
         ...(listedEngineCc == null && engineCc
           ? { engine_cc_source: "verified_model_fallback" }
           : {}),
@@ -1704,6 +1713,26 @@ export async function importEncar(options: ImportOptions = {}) {
 
   const rateSnapshot = await getCbrCalcRates();
   const optionCatalog = await fetchStandardOptionCatalog();
+  const priceInventory: PriceVehicle[] = [];
+  if (!dryRun) {
+    const priceSupabase = createSupabaseAdmin();
+    for (let offset = 0; ; offset += 1000) {
+      const { data, error } = await priceSupabase.from("cars")
+        .select("source_id,brand,model,year,engine_cc,fuel_type,mileage_km,price_krw,vehicle_specs")
+        .eq("is_available", true).gt("price_krw", 0).not("year", "is", null).gt("engine_cc", 0)
+        .order("source_id", { ascending: true })
+        .range(offset, offset + 999);
+      if (error) throw error;
+      for (const row of data ?? []) {
+        const advertisementType = (row.vehicle_specs as Record<string, unknown> | null)?.advertisement_type;
+        if (advertisementType != null && String(advertisementType).toUpperCase() !== "NORMAL") continue;
+        priceInventory.push({ sourceId: String(row.source_id), brand: row.brand,
+          model: row.model, year: row.year, engineCc: row.engine_cc, fuelType: row.fuel_type,
+          mileageKm: row.mileage_km, priceKrw: Number(row.price_krw) });
+      }
+      if ((data?.length ?? 0) < 1000) break;
+    }
+  }
 
   const attemptedSourceIds = new Set<string>();
   const mappedBrandCounts: Record<string, number> = {};
@@ -1734,6 +1763,22 @@ export async function importEncar(options: ImportOptions = {}) {
       },
     );
     if (mappedCar) {
+      if (!dryRun) {
+        const car = mappedCar.car;
+        const verdict = assessPriceAgainstAnalogs({ sourceId, brand: car.brand, model: car.model,
+          year: Number(car.year), engineCc: car.engine_cc == null ? null : Number(car.engine_cc),
+          fuelType: car.fuel_type, mileageKm: car.mileage_km == null ? null : Number(car.mileage_km),
+          priceKrw: car.price_krw == null ? null : Number(car.price_krw) }, priceInventory);
+        if (verdict.status === "price_outlier") {
+          quotaRejections.push({ sourceId, brand: candidateBrand ?? "unknown",
+            reason: `price_outlier_vs_analogs:count=${verdict.analogCount}:median=${verdict.medianPriceKrw}:ratio=${verdict.ratioToMedian}` });
+          return;
+        }
+        priceInventory.push({ sourceId, brand: car.brand, model: car.model, year: Number(car.year),
+          engineCc: car.engine_cc == null ? null : Number(car.engine_cc), fuelType: car.fuel_type,
+          mileageKm: car.mileage_km == null ? null : Number(car.mileage_km),
+          priceKrw: car.price_krw == null ? null : Number(car.price_krw) });
+      }
       const identity =
         mappedCar.car.vin_masked ||
         mappedCar.car.vehicle_no_masked ||
@@ -1854,6 +1899,7 @@ export async function importEncar(options: ImportOptions = {}) {
       modelCounts: mappedModelCounts,
       modelMinimumsSatisfied,
       quotaRejectionCount: quotaRejections.length,
+      priceReviewRejections: quotaRejections.filter((row) => row.reason.startsWith("price_")).length,
       quotaRejectionCounts,
       quotaRejections: quotaRejections.slice(0, 10),
       sample: mapped.slice(0, 3).map((item) => ({
@@ -2149,6 +2195,7 @@ export async function importEncar(options: ImportOptions = {}) {
     modelCounts: mappedModelCounts,
     modelMinimumsSatisfied,
     quotaRejectionCount: quotaRejections.length,
+    priceReviewRejections: quotaRejections.filter((row) => row.reason.startsWith("price_")).length,
     quotaRejectionCounts,
     quotaRejections: quotaRejections.slice(0, 10),
   };

@@ -7,6 +7,7 @@ import { getCbrCalcRates } from "../src/server/calc/rates";
 import { normalizeColor, normalizeDrive } from "../src/server/normalization/vehicles";
 import { displayModelName } from "../src/server/catalog/display-model";
 import { evaluatePublication, powerBasisForFuel, resolveCalculationMonth, storedPowerFinality } from "../src/server/cars/calculation-contract";
+import { assessPriceAgainstAnalogs, type PriceVehicle } from "../src/server/catalog/price-anomaly";
 
 config({ path: ".env.local", quiet: true });
 config({ path: ".env", quiet: true });
@@ -167,6 +168,25 @@ async function main() {
       });
     }
 
+    const analogRows = await c.query<PriceVehicle>(`select source_id as "sourceId",brand,model,year,engine_cc as "engineCc",fuel_type as "fuelType",mileage_km as "mileageKm",price_krw as "priceKrw"
+      from public.cars where is_available=true and price_krw>0 and year is not null and engine_cc>0
+        and (vehicle_specs->>'advertisement_type' is null or vehicle_specs->>'advertisement_type'='NORMAL')`);
+    const priceInventory: PriceVehicle[] = [...analogRows.rows, ...payload.map((car) => ({ sourceId: String(car.source_id),
+      brand: String(car.brand ?? ""), model: String(car.model ?? ""), year: Number(car.year), engineCc: Number(car.engine_cc),
+      fuelType: String(car.fuel_type ?? ""), mileageKm: car.mileage_km == null ? null : Number(car.mileage_km), priceKrw: Number(car.price_krw) }))];
+    const priceReviewed: Array<Record<string, unknown>> = [];
+    const priceCleared = payload.filter((car) => {
+      const verdict = assessPriceAgainstAnalogs({ sourceId: String(car.source_id), brand: String(car.brand ?? ""),
+        model: String(car.model ?? ""), year: Number(car.year), engineCc: Number(car.engine_cc),
+        fuelType: String(car.fuel_type ?? ""), mileageKm: car.mileage_km == null ? null : Number(car.mileage_km),
+        priceKrw: Number(car.price_krw) }, priceInventory);
+      if (verdict.status !== "price_outlier") return true;
+      priceReviewed.push({ sourceListingId: car.source_id, ...verdict });
+      bump(skipReasons, "price_outlier_vs_analogs");
+      return false;
+    });
+    payload.splice(0, payload.length, ...priceCleared);
+
     if (!dryRun) {
       for (let i = 0; i < payload.length; i += 250) {
         const part = payload.slice(i, i + 250);
@@ -194,6 +214,7 @@ async function main() {
       prepared: payload.length,
       skippedByReason: skipReasons,
       unsupportedFuelValues,
+      priceAnalogReview: { cleared: payload.length, heldForReview: priceReviewed.length, sample: priceReviewed.slice(0, 20) },
       imported: dryRun ? 0 : payload.length,
       note: "Only verified queue rows; no images copied.",
     }, null, 2));

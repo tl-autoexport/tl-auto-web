@@ -6,6 +6,7 @@ import { calculateRuVladivostok } from "../src/server/calc/ru";
 import { getCbrCalcRates } from "../src/server/calc/rates";
 import { evaluatePublication, resolveCalculationMonth } from "../src/server/cars/calculation-contract";
 import { resolveAutomaticPowerReference, type AutomaticPowerReferenceRow } from "../src/server/catalog/automatic-power-reference";
+import { assessPriceAgainstAnalogs, isEncarSaleAdvertisement, type PriceVehicle } from "../src/server/catalog/price-anomaly";
 
 config({ path: ".env.local", override: true, quiet: true });
 config({ path: ".env", quiet: true });
@@ -22,6 +23,7 @@ type PowerCandidate = { sourceListingId: string; status: string; configuration: 
 type PreliminaryCandidate = { sourceListingId: string; preliminaryPowerHp: number; powerReferenceSource: string; estimatedTotalRub: number };
 type StagingRow = { source_listing_id: string; source_url: string | null; queue_status: string; candidate_snapshot: Json | null; result: Json | null; staging_status: string; raw_payload: Json | null; fetched_at: string | null; existing_car_id: string | null };
 type Ref = AutomaticPowerReferenceRow;
+type CatalogPriceRow = { source_id: string; brand: string | null; model: string | null; year: number | null; engine_cc: number | null; fuel_type: string | null; mileage_km: number | null; price_krw: number | null };
 
 const obj = (value: unknown): Json => value && typeof value === "object" && !Array.isArray(value) ? value as Json : {};
 const positive = (value: unknown): number | null => {
@@ -45,7 +47,7 @@ async function main() {
   await db.connect();
   try {
     await db.query("begin read only");
-    const [stagingResult, referencesResult] = await Promise.all([
+    const [stagingResult, referencesResult, catalogPricesResult] = await Promise.all([
       db.query<StagingRow>(`select q.source_listing_id,q.source_url,q.status queue_status,q.candidate_snapshot,q.result,
           s.status staging_status,s.raw_payload,s.fetched_at,c.id existing_car_id
         from public.encar_enrichment_queue q
@@ -55,9 +57,28 @@ async function main() {
       db.query<Ref>(`select configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,
           year_from,year_to,power_hp,power_kw,source,status
         from public.vehicle_power_automatic_reference where status='automatic'`),
+      db.query<CatalogPriceRow>(`select source_id,brand,model,year,engine_cc,fuel_type,mileage_km,price_krw
+        from public.cars where is_available=true and price_krw>0 and year is not null and engine_cc>0
+          and (vehicle_specs->>'advertisement_type' is null or vehicle_specs->>'advertisement_type'='NORMAL')`),
     ]);
     const stagedById = new Map(stagingResult.rows.map((row) => [row.source_listing_id, row]));
     const refs = referencesResult.rows;
+    const priceInventory: PriceVehicle[] = catalogPricesResult.rows.map((row) => ({ sourceId: row.source_id,
+      brand: row.brand, model: row.model, year: row.year, engineCc: row.engine_cc, fuelType: row.fuel_type,
+      mileageKm: row.mileage_km, priceKrw: Number(row.price_krw) }));
+    for (const id of ids) {
+      const row = stagedById.get(id);
+      const candidate = approvedById.get(id) ?? (powerPlan.candidates ?? []).find((item) => item.sourceListingId === id);
+      const payload = obj(row?.raw_payload), detail = obj(payload.detail), spec = obj(detail.spec), ad = obj(detail.advertisement);
+      const config = candidate?.configuration ?? obj(row?.candidate_snapshot);
+      const year = positive(config.year ?? obj(row?.candidate_snapshot).year);
+      const engineCc = positive(config.engineCc ?? spec.displacement);
+      const priceUnits = positive(ad.price);
+      if (row && year && engineCc && priceUnits) priceInventory.push({ sourceId: id,
+        brand: String(config.brand ?? ""), model: String(config.model ?? ""), year, engineCc,
+        fuelType: String(config.fuelType ?? spec.fuelName ?? ""), mileageKm: Number(spec.mileage),
+        priceKrw: Math.round(priceUnits * 10_000) });
+    }
     const rates = await getCbrCalcRates();
     const cars: Array<Record<string, unknown>> = [];
     const enrichment = new Map<string, Record<string, number>>();
@@ -92,6 +113,10 @@ async function main() {
       if (row.queue_status !== "succeeded" || row.staging_status !== "succeeded") issues.push("enrichment_not_succeeded");
       if (!row.source_url) issues.push("source_url_missing");
       if (String(advertisement.status ?? advertisement.salesStatus ?? "") !== "ADVERTISE") issues.push("source_not_confirmed_active_in_saved_snapshot");
+      if (!isEncarSaleAdvertisement(advertisement.advertisementType)) issues.push("non_sale_advertisement_type");
+      const priceAnalogs = assessPriceAgainstAnalogs({ sourceId: id, brand: String(config.brand ?? ""),
+        model: String(config.model ?? ""), year, engineCc, fuelType, mileageKm: Number(mileage), priceKrw }, priceInventory);
+      if (priceAnalogs.status === "price_outlier") issues.push("price_review_outlier_vs_analogs");
       if (priceKrw == null) issues.push("price_missing");
       if (year == null) issues.push("model_year_missing");
       if (mileage == null || !Number.isFinite(Number(mileage)) || Number(mileage) < 0) issues.push("mileage_missing_or_invalid");
@@ -185,6 +210,7 @@ async function main() {
         powerKw: powerKw == null ? null : Number(powerKw.toFixed(4)), estimatedTotalRub: calcRub,
         calculationMonth: month.month, calculationMonthSource: month.source,
         mileageKm: mileage == null ? null : Number(mileage), photoCount: photos.length,
+        sourceAdvertisementType: advertisement.advertisementType ?? null, priceAnalogs,
         hasExteriorPhoto: hasExterior, snapshotAgeHours: ageHours == null ? null : Number(ageHours.toFixed(1)),
         finality: contract?.ok ? contract.finality : null,
         ready: issues.length === 0, blockers: [...new Set(issues)],
