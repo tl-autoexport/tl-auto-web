@@ -39,8 +39,8 @@ async function main() {
       select c.id,c.source_id,s.raw_payload
       from public.cars c
       join public.encar_enrichment_staging s
-        on s.run_id=$1 and s.source_listing_id=c.source_id and s.source='encar'
-      where c.primary_source='encar' and c.vehicle_specs->>'enrichment_run_id'=$1
+        on s.run_id=$1::uuid and s.source_listing_id=c.source_id and s.source='encar'
+      where c.primary_source='encar' and c.vehicle_specs->>'enrichment_run_id'=$1::text
       order by c.source_id`, [runId])).rows;
     if (!cars.length) throw new Error(`No published Encar cards found for run ${runId}`);
 
