@@ -67,6 +67,7 @@
     "refresh:encar:history:write": "ENCAR_HISTORY_DRY_RUN=false tsx scripts/refresh-encar-history.ts",
     "backfill:encar:inspection": "tsx scripts/backfill-encar-inspection.ts",
     "backfill:encar:card-data": "tsx scripts/backfill-encar-card-data.ts",
+    "repair:encar:option-presence": "tsx scripts/repair-encar-option-presence.ts",
     "backfill:encar:insurance-history": "tsx scripts/backfill-encar-insurance-history.ts",
     "backfill:encar:insurance-history:write": "tsx scripts/backfill-encar-insurance-history.ts --write",
     "backfill:chestny:card-data": "tsx scripts/backfill-chestny-card-data.ts",

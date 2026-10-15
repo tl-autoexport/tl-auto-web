@@ -330,8 +330,8 @@ async function main() {
             from jsonb_to_recordset($2::jsonb) as p(category text,url text,sort_order integer,is_primary boolean)`,
           [carId, JSON.stringify(item.photos.map((photo, index) => ({ ...photo, sort_order: index, is_primary: index === 0 })))]);
           if (item.options.length) await db.query(`insert into public.car_options(car_id,source,category,source_code,name_original,name_ru,value_original,value_ru,price_krw,description_original,description_ru,is_present,sort_order)
-            select $1,'encar',o.category,o.source_code,o.name_original,o.name_ru,o.value_original,o.value_ru,o.price_krw,o.description_original,o.description_ru,true,o.sort_order
-            from jsonb_to_recordset($2::jsonb) as o(category text,source_code text,name_original text,name_ru text,value_original text,value_ru text,price_krw bigint,description_original text,description_ru text,sort_order integer)`,
+            select $1,'encar',o.category,o.source_code,o.name_original,o.name_ru,o.value_original,o.value_ru,o.price_krw,o.description_original,o.description_ru,o.is_present,o.sort_order
+            from jsonb_to_recordset($2::jsonb) as o(category text,source_code text,name_original text,name_ru text,value_original text,value_ru text,price_krw bigint,description_original text,description_ru text,is_present boolean,sort_order integer)`,
           [carId, JSON.stringify(item.options.map((option, index) => ({ ...option, sort_order: 1000 + index })))]);
           if (item.history) await db.query(`insert into public.car_condition_reports(car_id,source,report_type,summary,items,raw_payload)
             values ($1,'encar','encar_carhistory',$2,$3,$4)`,
