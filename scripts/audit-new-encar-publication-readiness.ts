@@ -16,6 +16,8 @@ const dbUrl = process.env.SUPABASE_DB_URL;
 const powerPlanPath = process.env.TL_AUTO_POWER_PLAN ?? "output/tl-auto-new-encar-power-plan.json";
 const preliminaryPath = process.env.TL_AUTO_PRELIMINARY_CALCULATION ?? "output/tl-auto-new-encar-preliminary-calculation-dry-run.json";
 const outputPath = process.env.TL_AUTO_PUBLICATION_READINESS_OUTPUT ?? "output/tl-auto-new-encar-publication-readiness.json";
+const reviewedPriceOutlierIds = new Set((process.env.TL_AUTO_REVIEWED_PRICE_OUTLIER_IDS ?? "")
+  .split(",").map((id) => id.trim()).filter(Boolean));
 if (!runId || !dbUrl) throw new Error("TL_AUTO_ENRICHMENT_RUN_ID and SUPABASE_DB_URL are required");
 
 type Json = Record<string, unknown>;
@@ -81,6 +83,7 @@ async function main() {
     }
     const rates = await getCbrCalcRates();
     const cars: Array<Record<string, unknown>> = [];
+    const manuallyReviewedPriceOutliers: Array<Record<string, unknown>> = [];
     const enrichment = new Map<string, Record<string, number>>();
     const freshnessHours: number[] = [];
 
@@ -116,7 +119,15 @@ async function main() {
       if (!isEncarSaleAdvertisement(advertisement.advertisementType)) issues.push("non_sale_advertisement_type");
       const priceAnalogs = assessPriceAgainstAnalogs({ sourceId: id, brand: String(config.brand ?? ""),
         model: String(config.model ?? ""), year, engineCc, fuelType, mileageKm: Number(mileage), priceKrw }, priceInventory);
-      if (priceAnalogs.status === "price_outlier") issues.push("price_review_outlier_vs_analogs");
+      if (priceAnalogs.status === "price_outlier") {
+        if (reviewedPriceOutlierIds.has(id)) {
+          manuallyReviewedPriceOutliers.push({ sourceListingId: id, decision: "publish_after_user_review",
+            basis: "User supplied Encar screenshot confirming the source asking price; source price is preserved unchanged",
+            sourcePriceKrw: priceKrw, analogs: priceAnalogs });
+        } else {
+          issues.push("price_review_outlier_vs_analogs");
+        }
+      }
       if (priceKrw == null) issues.push("price_missing");
       if (year == null) issues.push("model_year_missing");
       if (mileage == null || !Number.isFinite(Number(mileage)) || Number(mileage) < 0) issues.push("mileage_missing_or_invalid");
@@ -217,6 +228,10 @@ async function main() {
       });
     }
 
+    const observedReviewedIds = new Set(manuallyReviewedPriceOutliers.map((row) => String(row.sourceListingId)));
+    const unverifiedReviewIds = [...reviewedPriceOutlierIds].filter((id) => !observedReviewedIds.has(id));
+    if (unverifiedReviewIds.length) throw new Error(`Reviewed price-outlier allowlist does not match current outliers: ${unverifiedReviewIds.join(",")}`);
+
     const readyRows = cars.filter((row) => row.ready);
     const blockers: Record<string, number> = {};
     for (const row of cars) for (const blocker of row.blockers as string[]) blockers[blocker] = (blockers[blocker] ?? 0) + 1;
@@ -224,6 +239,7 @@ async function main() {
       generatedAt: new Date().toISOString(), runId, readOnly: true,
       databaseWrites: 0, encarRequests: 0, publicCatalogChanged: false,
       policy: "Pre-publication readiness only; approved power remains final, automatic references remain preliminary; no cars inserted or published",
+      manuallyReviewedPriceOutliers,
       // Persist exact inputs so the publisher can reproduce these estimates;
       // the live USDT/KRW quote can change while the CBR date stays constant.
       rateSnapshot: { asOf: rates.asOf, source: rates.source, rates: rates.rates,

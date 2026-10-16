@@ -38,7 +38,7 @@ type Plan = { runId: string; candidates: PlanRow[] };
 type Stage = { source_listing_id: string; source_url: string | null; queue_status: string; staging_status: string; fetched_at: string | null; raw_payload: Obj | null };
 type Spec = { id: string; version: number; status: string; calculation_power_kw: string; power_basis: string; evidence_id: string };
 type Manifest = { runId: string; expected: number; reportHash: string; planHash: string; preliminaryHash: string;
-  exclusions: Array<{ id: string; reason: "active_vehicle_number_duplicate"; existingSourceId: string }>;
+  exclusions: Array<{ id: string; reason: "active_vehicle_number_duplicate" | "duplicate_within_publication_cohort"; existingSourceId: string }>;
   entries: Array<{ id: string; powerClass: "approved" | "preliminary"; fetchedAt: string; payloadHash: string }> };
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
 
@@ -149,15 +149,24 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
       return { id, hash: vehicleNoHash(plate) };
     });
     const duplicateCars = excludedRows.length
-      ? (await db.query<{ source_id: string; vehicle_no_hash: string }>(
-        `select source_id,vehicle_no_hash from public.cars where is_available=true and vehicle_no_hash=any($1::text[])`,
+      ? (await db.query<{ source_id: string; primary_source: string; vehicle_no_hash: string }>(
+        `select source_id,primary_source,vehicle_no_hash from public.cars where is_available=true and vehicle_no_hash=any($1::text[])`,
         [[...new Set(excludedRows.map((row) => row.hash))]],
       )).rows
       : [];
+    const requestedExcludedIds = new Set(excludedDuplicateIds);
+    const cohortPlateById = new Map(ids.map((id) => {
+      const row = stages.get(id);
+      const plate = row?.raw_payload ? normalizePlate(obj(obj(row.raw_payload).detail).vehicleNo) : null;
+      return [id, plate ? vehicleNoHash(plate) : null] as const;
+    }));
     const exclusions = excludedRows.map((row) => {
-      const existingCar = duplicateCars.find((car) => car.vehicle_no_hash === row.hash && car.source_id !== row.id);
-      if (!existingCar) throw new Error(`Exclusion ${row.id} is not backed by another active catalog car`);
-      return { id: row.id, reason: "active_vehicle_number_duplicate" as const, existingSourceId: existingCar.source_id };
+      const existingCar = duplicateCars.find((car) => car.vehicle_no_hash === row.hash &&
+        (car.source_id !== row.id || car.primary_source !== "encar"));
+      if (existingCar) return { id: row.id, reason: "active_vehicle_number_duplicate" as const, existingSourceId: existingCar.source_id };
+      const cohortDuplicate = ids.find((id) => id !== row.id && !requestedExcludedIds.has(id) && cohortPlateById.get(id) === row.hash);
+      if (!cohortDuplicate) throw new Error(`Exclusion ${row.id} is not backed by an active catalog car or selected cohort duplicate`);
+      return { id: row.id, reason: "duplicate_within_publication_cohort" as const, existingSourceId: cohortDuplicate };
     });
     const excludedIds = new Set(exclusions.map((row) => row.id));
     const selectedCars = report.cars.filter((car) => !excludedIds.has(car.sourceListingId));
@@ -297,7 +306,7 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
     }
     if (planned.length !== saved.expected) throw new Error("Prepared row count changed");
     const publicationReport = { dryRun: !write, runId: saved.runId, selected: planned.length, alreadyPublished: existingIds.size,
-      excludedActiveVehicleDuplicates: saved.exclusions,
+      duplicateExclusions: saved.exclusions,
       approved: planned.filter((p) => p.item.class === "approved").length,
       preliminary: planned.filter((p) => p.item.class === "preliminary").length,
       photos: planned.reduce((n, p) => n + p.photos.length, 0),
