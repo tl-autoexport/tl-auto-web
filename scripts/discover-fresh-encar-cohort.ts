@@ -31,7 +31,7 @@ const parseEncarTimestamp = (value: string) => Date.parse(
 );
 
 type Listing = { Id: number | string; Manufacturer?: string; Model?: string; Year?: number | string; FuelType?: string };
-type Candidate = { source: "encar"; sourceListingId: string; sourceUrl: string; brand: string | null; model: string | null; year: number | null; fuelType: string; firstAdvertisedAt: string; listedAt: string | null; priorityModel: string | null; priorityModelRank: number | null };
+type Candidate = { source: "encar"; sourceListingId: string; sourceUrl: string; brand: string | null; model: string | null; year: number | null; fuelType: string; firstAdvertisedAt: string; listedAt: string | null; advertisementType: "NORMAL"; priorityModel: string | null; priorityModelRank: number | null };
 type Checkpoint = { version: 1; policy: string; listings: Listing[]; listPage: number; checkedIds: string[]; results: Candidate[]; errors: number };
 type PriorityDocument = { groups?: Array<{ manufacturer?: string; requestedModel?: string; sourceCount?: number }> };
 
@@ -133,7 +133,7 @@ async function main() {
           const listingFuel = normalizeFuel(listing.FuelType);
           const detailFuel = normalizeFuel(obj(detail.spec).fuelName ?? listing.FuelType);
           const year = vehicleYear(listing.Year);
-          if (firstAdvertisedAt && Number.isFinite(advertised) && advertised <= Date.now() && Date.now() - advertised <= maxListingAgeDays * 86_400_000 &&
+          if (advert.advertisementType === "NORMAL" && firstAdvertisedAt && Number.isFinite(advertised) && advertised <= Date.now() && Date.now() - advertised <= maxListingAgeDays * 86_400_000 &&
               year !== null && year >= minVehicleYear &&
               fuels.has(detailFuel ?? "") && detailFuel === listingFuel && manage.dummy !== true && advert.salesStatus !== "CONTRACT") {
             const brand = normalizeBrand(listing.Manufacturer);
@@ -143,6 +143,7 @@ async function main() {
               source: "encar", sourceListingId: id, sourceUrl: `https://fem.encar.com/cars/detail/${id}`,
               brand, model, year,
               fuelType: detailFuel!, firstAdvertisedAt, listedAt: String(manage.registDateTime ?? "") || null,
+              advertisementType: "NORMAL",
               priorityModel: rank === null ? null : `${brand} ${model}`,
               priorityModelRank: rank,
             });

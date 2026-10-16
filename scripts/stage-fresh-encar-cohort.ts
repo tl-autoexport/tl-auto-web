@@ -27,6 +27,7 @@ type Candidate = {
   fuelType: "gasoline" | "diesel" | "lpg";
   firstAdvertisedAt: string;
   listedAt: string | null;
+  advertisementType?: string;
   priorityModel?: string | null;
   priorityModelRank?: number | null;
 };
@@ -46,6 +47,7 @@ async function main() {
   const ids = report.candidates.map((row) => String(row.sourceListingId));
   if (ids.some((id) => !/^\d{5,}$/.test(id)) || new Set(ids).size !== target) throw new Error("Report contains invalid or duplicate Encar IDs");
   if (report.candidates.some((row) => !["gasoline", "diesel", "lpg"].includes(row.fuelType) ||
+      row.advertisementType !== "NORMAL" ||
       !Number.isFinite(parseEncarTimestamp(row.firstAdvertisedAt)) || parseEncarTimestamp(row.firstAdvertisedAt) > now ||
       now - parseEncarTimestamp(row.firstAdvertisedAt) > maxListingAgeDays * 86_400_000 ||
       !Number.isInteger(row.year) || Number(row.year) < minVehicleYear))
