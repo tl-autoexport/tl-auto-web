@@ -1,0 +1,2410 @@
+{
+  "runId": "c012d314-d718-48b0-97d9-857f7a96af1e",
+  "generatedAt": "2026-10-17T08:21:37.416Z",
+  "status": "preliminary_research_complete",
+  "readOnly": true,
+  "databaseWrites": 0,
+  "target": {
+    "hybridListings": 50,
+    "uniqueListings": 50,
+    "distinctConfigurations": 19
+  },
+  "encarrusSource": {
+    "publicHybrid30MinPage": "https://encarrus.ru/hybrids/",
+    "pageHasSeparate30MinField": true,
+    "pageCoverageNote": "Its published rows list specific Chinese PHEV/EREV models and selected Toyota/Honda/VW/Land Rover models. It does not list the Korean-market Hyundai Tucson, Hyundai Staria, Hyundai Kona, or Kia Sportage configurations in this run.",
+    "matchedRunConfigurations": 18,
+    "runConfigurationsWithExplicit30MinValue": 0,
+    "productDetailRequests": 1,
+    "productDetailParsed": 0,
+    "productDetailErrors": 1,
+    "initialScanResult": "No exact Hyundai/Kia target hybrid models were present in the EncarRus hybrid table.",
+    "followUpRegistrySource": "RDW open vehicle registry (accessed through public registry mirrors); field: nominal continuous maximum electric power.",
+    "followUpRegistryMatches": {
+      "sportage_1_6_hev_44_2_peak_kw": {
+        "listings": 17,
+        "motor30MinKw": 14.7,
+        "registryUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp"
+      },
+      "tucson_nx4_1_6_hev_44_2_peak_kw": {
+        "listings": 7,
+        "motor30MinKw": 14.7,
+        "registryUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p732vx"
+      },
+      "kona_1_6_gdi_hev_32_peak_kw": {
+        "listings": 3,
+        "motor30MinKw": 10.1,
+        "registryUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p571xk"
+      },
+      "staria_1_6t_hev_54_peak_kw": {
+        "listings": 9,
+        "motor30MinKw": 18,
+        "registryUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=v72kgj"
+      }
+    }
+  },
+  "policy": "Use engine rated power plus matched nominal continuous / 30-minute electric motor rating. Never substitute peak motor output. Registry cross-market motor-family matches are preliminary and remain unapplied until approved.",
+  "accounting": {
+    "originalHybridListings": 50,
+    "withPreliminaryMotor30MinMatch": 50,
+    "remainingWithoutMatchingMotor30MinSource": 0,
+    "preliminaryByModel": {
+      "Sportage": 23,
+      "Tucson": 15,
+      "Kona": 3,
+      "Staria": 9
+    },
+    "unresolvedByModel": {
+      "Sportage": 0,
+      "Tucson": 0,
+      "Staria": 0
+    },
+    "note": "All 50 hybrid listings have local preliminary power proposals. The 14 facelift Sportage/Tucson entries use 15.9 kW nominal continuous / 30-minute electric power from matching open vehicle-register or type-approval records, not the 47.7 kW peak rating. No database write or publication."
+  },
+  "configurations": [
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": "더 뉴 스포티지 5세대 하이브리드",
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "41015353",
+        "42422522",
+        "42490989",
+        "42861303",
+        "42864165",
+        "42871869"
+      ],
+      "encarrusMatchedCards": 36,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 6,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        15.9
+      ],
+      "status": "preliminary_power_researched"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2022,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "41489438",
+        "42855184",
+        "42872771",
+        "42901623"
+      ],
+      "encarrusMatchedCards": 8,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 4,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        14.7
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "41812922",
+        "42800499",
+        "42834493",
+        "42933015"
+      ],
+      "encarrusMatchedCards": 37,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 4,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        15.9
+      ],
+      "status": "preliminary_power_researched"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Staria",
+      "generation": null,
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": null,
+      "listingIds": [
+        "42070741",
+        "42911214",
+        "42912266",
+        "42931512"
+      ],
+      "encarrusMatchedCards": 9,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 4,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        18
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": "스포티지 5세대 하이브리드",
+      "year": 2023,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "42434206",
+        "42760530",
+        "42863525",
+        "42915172",
+        "42915765"
+      ],
+      "encarrusMatchedCards": 16,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 5,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        14.7
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2023,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "42436136",
+        "42918066"
+      ],
+      "encarrusMatchedCards": 5,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 2,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        14.7
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": "스포티지 5세대 하이브리드",
+      "year": 2023,
+      "engineCc": 1598,
+      "driveType": "4WD",
+      "listingIds": [
+        "42443689"
+      ],
+      "encarrusMatchedCards": 0,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 1,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        14.7
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": "스포티지 5세대 하이브리드",
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "42472712",
+        "42755468",
+        "42760286",
+        "42888072"
+      ],
+      "encarrusMatchedCards": 13,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 4,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        14.7
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Staria",
+      "generation": null,
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": null,
+      "listingIds": [
+        "42498380",
+        "42759039",
+        "42872549"
+      ],
+      "encarrusMatchedCards": 3,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 3,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        18
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Kona",
+      "generation": "더 뉴 코나 하이브리드",
+      "year": 2022,
+      "engineCc": 1580,
+      "driveType": null,
+      "listingIds": [
+        "42535718",
+        "42555961"
+      ],
+      "encarrusMatchedCards": 8,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 2,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        10.1
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": "스포티지 5세대 하이브리드",
+      "year": 2022,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "42753749",
+        "42810259",
+        "42847614",
+        "42881803",
+        "42896931"
+      ],
+      "encarrusMatchedCards": 33,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 5,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        14.7
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "42753835",
+        "42892148"
+      ],
+      "encarrusMatchedCards": 22,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 2,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        15.9
+      ],
+      "status": "preliminary_power_researched"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2025,
+      "engineCc": 1598,
+      "driveType": "4WD",
+      "listingIds": [
+        "42773413",
+        "42878357"
+      ],
+      "encarrusMatchedCards": 3,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 2,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        15.9
+      ],
+      "status": "preliminary_power_researched"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Tucson",
+      "generation": "NX4",
+      "year": 2021,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "42816341"
+      ],
+      "encarrusMatchedCards": 5,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 1,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        14.7
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": "스포티지 5세대 하이브리드",
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": "4WD",
+      "listingIds": [
+        "42823869"
+      ],
+      "encarrusMatchedCards": 4,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 1,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        14.7
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": "스포티지 5세대 하이브리드",
+      "year": 2021,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "42826926"
+      ],
+      "encarrusMatchedCards": 10,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 1,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        14.7
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Kia",
+      "model": "Sportage",
+      "generation": "더 뉴 스포티지 5세대 하이브리드",
+      "year": 2024,
+      "engineCc": 1598,
+      "driveType": "2WD",
+      "listingIds": [
+        "42832841"
+      ],
+      "encarrusMatchedCards": 13,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 1,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        14.7
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Staria",
+      "generation": "더 뉴 스타리아",
+      "year": 2026,
+      "engineCc": 1598,
+      "driveType": null,
+      "listingIds": [
+        "42878412"
+      ],
+      "encarrusMatchedCards": 5,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 1,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        18
+      ],
+      "status": "preliminary_candidate"
+    },
+    {
+      "brand": "Hyundai",
+      "model": "Kona",
+      "generation": "SX2",
+      "year": 2024,
+      "engineCc": 1580,
+      "driveType": null,
+      "listingIds": [
+        "42923053"
+      ],
+      "encarrusMatchedCards": 5,
+      "encarrus30MinPowersPs": [],
+      "preliminaryListings": 1,
+      "unresolvedListings": 0,
+      "electric30MinPowerKw": [
+        10.1
+      ],
+      "status": "preliminary_candidate"
+    }
+  ],
+  "listings": [
+    {
+      "sourceListingId": "41015353",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "더 뉴 스포티지 5세대 하이브리드",
+        "trim": "noblesse",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/kr/vehicles/sportage/specification",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 36,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.kia.com/content/dam/kwcms/kme/nl/nl/assets/contents/utility/price-list/2025/Kia_Sportage_Prijslijst_MY25.pdf",
+      "sourceRationale": "Sportage 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "41489438",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration 2wd",
+        "badge": "inspiration 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2022,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-n-line-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 8,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p732vx",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "41812922",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "premium",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 37,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.hyundai.com/eu/models/tucson-hybrid.html",
+      "sourceRationale": "Tucson 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42070741",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Staria",
+        "generation": null,
+        "trim": "modern",
+        "badge": "hev 1.6 cargo 5 seater",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 54,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/staria-hybrid-catalog-eng.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 9,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 204.47,
+      "electric30MinPowerKw": 18,
+      "electric30MinPowerPs": 24.4732,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=v72kgj",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 18.00 kW nominal continuous electric power (peak 54 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42422522",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "더 뉴 스포티지 5세대 하이브리드",
+        "trim": "signature",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/kr/vehicles/sportage/specification",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 36,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.kia.com/content/dam/kwcms/kme/nl/nl/assets/contents/utility/price-list/2025/Kia_Sportage_Prijslijst_MY25.pdf",
+      "sourceRationale": "Sportage 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42434206",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature 2wd",
+        "badge": "signature 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2023,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 16,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42436136",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "modern 2wd",
+        "badge": "modern 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2023,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-n-line-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 5,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p732vx",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42443689",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature gravity 4wd",
+        "badge": "signature gravity 4wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "4WD",
+        "year": 2023,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 0,
+        "explicit30MinPowersPs": [],
+        "result": "no_matching_listing_in_scanned_pages"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42472712",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature 2wd",
+        "badge": "signature 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 13,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42490989",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "더 뉴 스포티지 5세대 하이브리드",
+        "trim": "signature",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/kr/vehicles/sportage/specification",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 36,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.kia.com/content/dam/kwcms/kme/nl/nl/assets/contents/utility/price-list/2025/Kia_Sportage_Prijslijst_MY25.pdf",
+      "sourceRationale": "Sportage 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42498380",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Staria",
+        "generation": null,
+        "trim": "modern",
+        "badge": "hev 1.6 tourer 11 seater",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 54,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/staria-hybrid-catalog-eng.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 3,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 204.47,
+      "electric30MinPowerKw": 18,
+      "electric30MinPowerPs": 24.4732,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=v72kgj",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 18.00 kW nominal continuous electric power (peak 54 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42535718",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Kona",
+        "generation": "더 뉴 코나 하이브리드",
+        "trim": "modern",
+        "badge": "modern",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2022,
+        "engineCc": 1580
+      },
+      "existingProposal": {
+        "enginePowerPs": 105,
+        "electricMotorPeakPowerKw": 32,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/kona-hybrid-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 8,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 118.73,
+      "electric30MinPowerKw": 10.1,
+      "electric30MinPowerPs": 13.7322,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p571xk",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 10.10 kW nominal continuous electric power (peak 32 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42555961",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Kona",
+        "generation": "더 뉴 코나 하이브리드",
+        "trim": "modern",
+        "badge": "modern",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2022,
+        "engineCc": 1580
+      },
+      "existingProposal": {
+        "enginePowerPs": 105,
+        "electricMotorPeakPowerKw": 32,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/kona-hybrid-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 8,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 118.73,
+      "electric30MinPowerKw": 10.1,
+      "electric30MinPowerPs": 13.7322,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p571xk",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 10.10 kW nominal continuous electric power (peak 32 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42753749",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature 2wd",
+        "badge": "signature 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2022,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 33,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42753835",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 22,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.hyundai.com/eu/models/tucson-hybrid.html",
+      "sourceRationale": "Tucson 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42755468",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature 2wd",
+        "badge": "signature 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 13,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42759039",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Staria",
+        "generation": null,
+        "trim": "modern",
+        "badge": "hev 1.6 cargo 5 seater",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 54,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/staria-hybrid-catalog-eng.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 3,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 204.47,
+      "electric30MinPowerKw": 18,
+      "electric30MinPowerPs": 24.4732,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=v72kgj",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 18.00 kW nominal continuous electric power (peak 54 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42760286",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature 2wd",
+        "badge": "signature 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 13,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42760530",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "prestige 2wd",
+        "badge": "prestige 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2023,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 16,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42773413",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration",
+        "badge": "hev 1.6 4wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "4WD",
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 3,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.hyundai.com/eu/models/tucson-hybrid.html",
+      "sourceRationale": "Tucson 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42800499",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 37,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.hyundai.com/eu/models/tucson-hybrid.html",
+      "sourceRationale": "Tucson 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42810259",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature 2wd",
+        "badge": "signature 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2022,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 33,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42816341",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration 2wd",
+        "badge": "inspiration 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2021,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-n-line-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 5,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p732vx",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42823869",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "30th edition 4wd",
+        "badge": "30th edition 4wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "4WD",
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 4,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42826926",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "nobleless 2wd",
+        "badge": "nobleless 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2021,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 10,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42832841",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "더 뉴 스포티지 5세대 하이브리드",
+        "trim": "signature",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 13,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42834493",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 37,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.hyundai.com/eu/models/tucson-hybrid.html",
+      "sourceRationale": "Tucson 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42847614",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature 2wd",
+        "badge": "signature 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2022,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 33,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42855184",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "premium 2wd",
+        "badge": "premium 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2022,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-n-line-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 8,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p732vx",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42861303",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "더 뉴 스포티지 5세대 하이브리드",
+        "trim": "noblesse",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/kr/vehicles/sportage/specification",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 36,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.kia.com/content/dam/kwcms/kme/nl/nl/assets/contents/utility/price-list/2025/Kia_Sportage_Prijslijst_MY25.pdf",
+      "sourceRationale": "Sportage 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42863525",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature gravity 2wd",
+        "badge": "signature gravity 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2023,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 16,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42864165",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "더 뉴 스포티지 5세대 하이브리드",
+        "trim": "noblesse",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/kr/vehicles/sportage/specification",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 36,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.kia.com/content/dam/kwcms/kme/nl/nl/assets/contents/utility/price-list/2025/Kia_Sportage_Prijslijst_MY25.pdf",
+      "sourceRationale": "Sportage 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42871869",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "더 뉴 스포티지 5세대 하이브리드",
+        "trim": "signature",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/kr/vehicles/sportage/specification",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 36,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.kia.com/content/dam/kwcms/kme/nl/nl/assets/contents/utility/price-list/2025/Kia_Sportage_Prijslijst_MY25.pdf",
+      "sourceRationale": "Sportage 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42872549",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Staria",
+        "generation": null,
+        "trim": "modern",
+        "badge": "hev 1.6 cargo 5 seater",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 54,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/staria-hybrid-catalog-eng.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 3,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 204.47,
+      "electric30MinPowerKw": 18,
+      "electric30MinPowerPs": 24.4732,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=v72kgj",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 18.00 kW nominal continuous electric power (peak 54 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42872771",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration 2wd",
+        "badge": "inspiration 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2022,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-n-line-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 8,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p732vx",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42878357",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration",
+        "badge": "hev 1.6 4wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "4WD",
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 3,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.hyundai.com/eu/models/tucson-hybrid.html",
+      "sourceRationale": "Tucson 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42878412",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Staria",
+        "generation": "더 뉴 스타리아",
+        "trim": "15 seater",
+        "badge": "hev 1.6t kinder safety car",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2026,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 54,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/staria-hybrid-catalog-eng.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 5,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 204.47,
+      "electric30MinPowerKw": 18,
+      "electric30MinPowerPs": 24.4732,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=v72kgj",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 18.00 kW nominal continuous electric power (peak 54 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42881803",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "prestige 2wd",
+        "badge": "prestige 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2022,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 33,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42888072",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "prestige 2wd",
+        "badge": "prestige 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 13,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42892148",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2025,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 22,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.hyundai.com/eu/models/tucson-hybrid.html",
+      "sourceRationale": "Tucson 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    },
+    {
+      "sourceListingId": "42896931",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature 2wd",
+        "badge": "signature 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2022,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 33,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42901623",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration 2wd",
+        "badge": "inspiration 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2022,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-n-line-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 8,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p732vx",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42911214",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Staria",
+        "generation": null,
+        "trim": "modern",
+        "badge": "hev 1.6 cargo 3 seater",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 54,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/staria-hybrid-catalog-eng.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 9,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 204.47,
+      "electric30MinPowerKw": 18,
+      "electric30MinPowerPs": 24.4732,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=v72kgj",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 18.00 kW nominal continuous electric power (peak 54 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42912266",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Staria",
+        "generation": null,
+        "trim": "modern",
+        "badge": "hev 1.6 cargo 3 seater",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 54,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/staria-hybrid-catalog-eng.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 9,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 204.47,
+      "electric30MinPowerKw": 18,
+      "electric30MinPowerPs": 24.4732,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=v72kgj",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 18.00 kW nominal continuous electric power (peak 54 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42915172",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "signature gravity 2wd",
+        "badge": "signature gravity 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2023,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 16,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42915765",
+      "configuration": {
+        "brand": "Kia",
+        "model": "Sportage",
+        "generation": "스포티지 5세대 하이브리드",
+        "trim": "prestige 2wd",
+        "badge": "prestige 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2023,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/catalog/catalog_sportageql.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 16,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p019sp",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42918066",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration",
+        "badge": "n line 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2023,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 44.2,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-n-line-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 5,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 199.99,
+      "electric30MinPowerKw": 14.7,
+      "electric30MinPowerPs": 19.9864,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p732vx",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 14.70 kW nominal continuous electric power (peak 44.2 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42923053",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Kona",
+        "generation": "SX2",
+        "trim": "premium",
+        "badge": "premium",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2024,
+        "engineCc": 1580
+      },
+      "existingProposal": {
+        "enginePowerPs": 105,
+        "electricMotorPeakPowerKw": 32,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/kona-hybrid-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 5,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 118.73,
+      "electric30MinPowerKw": 10.1,
+      "electric30MinPowerPs": 13.7322,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=p571xk",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 10.10 kW nominal continuous electric power (peak 32 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42931512",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Staria",
+        "generation": null,
+        "trim": "inspiration",
+        "badge": "hev 1.6 lounge 7 seater",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": null,
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 54,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/content/dam/hyundai/kr/ko/data/vehicles/catalog/en/staria-hybrid-catalog-eng.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 9,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_candidate_from_open_registry",
+      "preliminaryPowerPs": 204.47,
+      "electric30MinPowerKw": 18,
+      "electric30MinPowerPs": 24.4732,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "rdw_open_vehicle_registry",
+      "sourceUrl": "https://kenteken.tv/kentekeninfo.php?kenteken=v72kgj",
+      "sourceRationale": "Open vehicle-register homologation data for the matching hybrid motor family lists 18.00 kW nominal continuous electric power (peak 54 kW). Official Hyundai/Kia specifications confirm this listing's matching engine size, hybrid generation and peak motor rating. Used ICE rated power plus the continuous electric rating; did not use peak/system output. Preliminary cross-market powertrain match."
+    },
+    {
+      "sourceListingId": "42933015",
+      "configuration": {
+        "brand": "Hyundai",
+        "model": "Tucson",
+        "generation": "NX4",
+        "trim": "inspiration",
+        "badge": "hev 1.6 2wd",
+        "modelCode": null,
+        "engineCode": null,
+        "fuelType": "hybrid",
+        "driveType": "2WD",
+        "year": 2024,
+        "engineCc": 1598
+      },
+      "existingProposal": {
+        "enginePowerPs": 180,
+        "electricMotorPeakPowerKw": 47.7,
+        "electric30MinPowerPs": null,
+        "previousDerivedPowerPs": null,
+        "previousDerivedPowerKw": null,
+        "sourceKind": "official_manufacturer",
+        "sourceUrl": "https://www.hyundai.com/contents/repn-car/catalog/tucson-catalog.pdf",
+        "note": "Peak-motor sum removed; not valid for the agreed 30-minute hybrid calculation."
+      },
+      "encarrus": {
+        "matchedCards": 37,
+        "explicit30MinPowersPs": [],
+        "result": "listing_candidates_found"
+      },
+      "disposition": "preliminary_source_match",
+      "preliminaryPowerPs": 201.618,
+      "electric30MinPowerKw": 15.9,
+      "electric30MinPowerPs": 21.618,
+      "powerBasis": "hybrid_parallel_engine_plus_electric_30min",
+      "sourceKind": "official_manufacturer_plus_rdw_open_vehicle_registry",
+      "sourceUrl": "https://www.hyundai.com/eu/models/tucson-hybrid.html",
+      "sourceRationale": "Tucson 1.6 HEV facelift uses 180 PS ICE and 47.7 kW peak electric motor per manufacturer specifications. RDW open vehicle registry records for matching 47.7 kW motor family show 15.90 kW nominal continuous electric power. Used ICE rated PS + 15.9 kW converted to PS = 201.62 PS. Cross-market powertrain match; preliminary, not a peak-power sum."
+    }
+  ]
+}
