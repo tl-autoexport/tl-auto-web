@@ -90,7 +90,7 @@ async function main() {
     for (let page = Math.max(0, state.listPage - searchStart); page < pages; page += 1) {
       const fuelFilter = fuelType === "electric" ? "_.FuelType.전기."
         : fuelType === "hybrid" ? "_.FuelType.가솔린+전기." : "";
-      const bounds = `(And.Hidden.N._.${fuelFilter}_.Year.range(${minVehicleYear}01..210012)._.Mileage.range(0..999999)._.Price.range(0..100000).)`;
+      const bounds = `(And.Hidden.N.${fuelFilter}_.Year.range(${minVehicleYear}01..210012)._.Mileage.range(0..999999)._.Price.range(0..100000).)`;
       const q = encodeURIComponent(bounds);
       const sr = encodeURIComponent(`|ModifiedDate|${page * pageSize}|${pageSize}`);
       const response = await fetch(`https://api.encar.com/search/car/list/general?count=true&q=${q}&sr=${sr}`, {
