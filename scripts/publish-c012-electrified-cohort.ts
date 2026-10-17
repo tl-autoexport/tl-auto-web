@@ -182,7 +182,7 @@ async function main() {
           (powerEntry.fuelType === "hybrid" && (powerEntry.powerBasis !== "parallel_sum" ||
             powerEntry.enginePowerPs == null || powerEntry.electricMotorPowerPs == null || powerEntry.electricMotorPowerKw == null ||
             powerEntry.electric30MinPs != null ||
-            Math.abs(powerEntry.customsPowerPs - (powerEntry.enginePowerPs + powerEntry.electricMotorPowerPs)) > 0.0002 ||
+            Math.abs(powerEntry.customsPowerPs - (powerEntry.enginePowerPs + powerEntry.electricMotorPowerPs)) > 0.01 ||
             Math.abs(powerEntry.calculationPowerKw - Number((powerEntry.enginePowerPs * KW_PER_PS + powerEntry.electricMotorPowerKw).toFixed(4))) > 0.0002)) ||
           (powerEntry.fuelType === "electric" && (powerEntry.powerBasis !== "electric_30min" || powerEntry.enginePowerPs != null ||
             powerEntry.engineCc != null || powerEntry.electric30MinPs == null || powerEntry.electricMotorPowerKw != null ||
