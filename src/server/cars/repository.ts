@@ -44,7 +44,12 @@ export type CatalogCar = {
   /** Persisted finality: `provisional` must be shown to the customer as a rehearsal. */
   power_finality?: "final" | "provisional" | null;
   power_resolution_note?: string | null;
+  calculation_power_kw?: number | null;
   fuel_type: string | null;
+  hybrid_dvs_power_hp?: number | null;
+  hybrid_electric_power_kw?: number | null;
+  hybrid_dvs_above_electric_30min?: boolean | null;
+  hybrid_sequential?: boolean | null;
   transmission: string | null;
   drive_type: string | null;
   body_type: string | null;
@@ -122,7 +127,7 @@ export type CatalogPageResult = {
 };
 
 const CATALOG_CAR_SELECT =
-  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_sort_published_at, catalog_added_at, created_at, source_updated_at, brand, model, trim, generation_label, modification_label, version_line, compact_version, naming_rules_version, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(source, url, thumbnail_url, media_type, category, is_primary, sort_order)";
+  "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_sort_published_at, catalog_added_at, created_at, source_updated_at, brand, model, trim, generation_label, modification_label, version_line, compact_version, naming_rules_version, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, calculation_power_kw, fuel_type, hybrid_dvs_power_hp, hybrid_electric_power_kw, hybrid_dvs_above_electric_30min, hybrid_sequential, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, vehicle_specs, car_media(source, url, thumbnail_url, media_type, category, is_primary, sort_order)";
 
 const CATALOG_CARD_SELECT =
   "id, primary_source, source_kind, source_id, source_url, published_at, published_at_source, catalog_sort_published_at, catalog_added_at, created_at, source_updated_at, brand, model, trim, generation_label, modification_label, version_line, compact_version, naming_rules_version, badge, badge_detail, body_type, year, registration_month, mileage_km, price_krw, price_rub, engine_cc, power_hp, power_confidence, power_finality, power_resolution_note, fuel_type, transmission, drive_type, color, owners_count, accident_count, insurance_payout_count, insurance_payout_total_krw, has_360_exterior, has_360_interior, has_heydealer_eye, has_obd_scan, has_underbody_photo, has_thermal_images, data_confidence, primary_image_url, primary_thumbnail_url, media_count, seats";

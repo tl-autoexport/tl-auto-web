@@ -63,16 +63,25 @@ function getIndividualDutyRub({
 }
 
 export function calculateRuVladivostok(input: CalcInput): CalcResult {
-  const powerHp = input.hybridDvsPowerHp != null
-    ? input.hybridDvsPowerHp + (input.hybridElectricPowerKw ?? 0) * KW_TO_HP
-    : input.powerHp;
   const hybridDvsPowerKw = input.hybridDvsPowerKw
     ?? (input.hybridDvsPowerHp != null ? input.hybridDvsPowerHp / KW_TO_HP : null);
+  // Prefer the topology-specific inputs. A missing electric component must not
+  // silently become zero: use a separately sourced total-power value only as
+  // the fallback for older callers that do not yet send the component fields.
   const hybridPowerKw = input.hybridSequential
     ? (input.hybridElectricPowerKw ?? input.powerKw ?? null)
     : hybridDvsPowerKw != null && input.hybridElectricPowerKw != null
       ? hybridDvsPowerKw + input.hybridElectricPowerKw
-      : null;
+      : input.powerKw ?? null;
+  const powerHp = input.hybridSequential
+    ? (input.hybridElectricPowerKw ?? input.powerKw) != null
+      ? (input.hybridElectricPowerKw ?? input.powerKw)! * KW_TO_HP
+      : input.powerHp
+    : hybridDvsPowerKw != null && input.hybridElectricPowerKw != null
+      ? input.hybridDvsPowerHp != null
+        ? input.hybridDvsPowerHp + input.hybridElectricPowerKw * KW_TO_HP
+        : hybridPowerKw != null ? hybridPowerKw * KW_TO_HP : input.powerHp
+      : input.powerHp;
   const powerKw = hybridPowerKw ?? input.powerKw;
   if ((powerHp == null || !Number.isFinite(powerHp)) && (powerKw == null || !Number.isFinite(powerKw))) throw new Error("Engine power is required");
   const rates: CalcRates = {

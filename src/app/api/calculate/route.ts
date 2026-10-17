@@ -20,14 +20,16 @@ const calcSchema = z.object({
   month: z.coerce.number().int().min(1).max(12).default(6),
   engineCc: z.coerce.number().int().positive(),
   powerHp: z.coerce.number().int().positive().optional(),
+  powerKw: z.coerce.number().positive().optional(),
   hybridDvsPowerHp: z.coerce.number().int().positive().optional(),
+  hybridDvsPowerKw: z.coerce.number().positive().optional(),
   hybridElectricPowerKw: z.coerce.number().positive().optional(),
   hybridDvsAboveElectric30Min: z.coerce.boolean().optional(),
   hybridSequential: z.coerce.boolean().optional(),
   fuelType: z.string().optional(),
   countryCode: z.enum(["RU", "KZ", "BY", "UZ", "KG", "DE", "SE", "IT", "NL", "AE"]).default("RU"),
   destinationCity: z.string().default("Владивосток"),
-}).refine((value) => value.powerHp != null || value.hybridDvsPowerHp != null, {
+}).refine((value) => value.powerHp != null || value.hybridDvsPowerHp != null || value.hybridElectricPowerKw != null || value.powerKw != null, {
   message: "Укажите мощность автомобиля или мощность ДВС гибрида.",
 });
 

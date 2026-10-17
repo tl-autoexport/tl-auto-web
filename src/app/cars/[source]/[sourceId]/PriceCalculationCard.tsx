@@ -52,11 +52,17 @@ type PriceCalculationCardProps = {
   calc: CalculationSnapshot | undefined;
   engineCc: number | null;
   fuel: string;
+  calculationFuel?: string | null;
   mileageKm: number | null;
   powerHp: number | null;
   powerConfidence?: "official" | "high" | "medium" | "approximate" | "automatic" | null;
   /** Stored finality; when present it decides the preliminary notice. */
   powerFinality?: "final" | "provisional" | null;
+  calculationPowerKw?: number | null;
+  hybridDvsPowerHp?: number | null;
+  hybridElectricPowerKw?: number | null;
+  hybridDvsAboveElectric30Min?: boolean | null;
+  hybridSequential?: boolean | null;
   priceKrw: number | null;
   /** The canonical published catalog price; snapshot totals must agree with it. */
   priceRub: number | null;
@@ -180,10 +186,16 @@ function RuPriceCalculationCard({
   calc,
   engineCc,
   fuel,
+  calculationFuel,
   mileageKm,
   powerHp,
   powerConfidence,
   powerFinality,
+  calculationPowerKw,
+  hybridDvsPowerHp,
+  hybridElectricPowerKw,
+  hybridDvsAboveElectric30Min,
+  hybridSequential,
   priceKrw,
   priceRub,
   source,
@@ -242,7 +254,7 @@ function RuPriceCalculationCard({
     : null;
 
   async function refreshCalculation() {
-    if (!priceKrw || !year || !engineCc || !powerHp) return;
+    if (!priceKrw || !year || !engineCc || (!powerHp && !hybridDvsPowerHp && !calculationPowerKw)) return;
     setRefreshing(true);
     setRefreshError(null);
     try {
@@ -255,7 +267,12 @@ function RuPriceCalculationCard({
           month: registrationMonth ?? 6,
           engineCc,
           powerHp,
-          fuelType: fuel,
+          powerKw: calculationPowerKw ?? undefined,
+          hybridDvsPowerHp: hybridDvsPowerHp ?? undefined,
+          hybridElectricPowerKw: hybridElectricPowerKw ?? undefined,
+          hybridDvsAboveElectric30Min: hybridDvsAboveElectric30Min ?? undefined,
+          hybridSequential: hybridSequential ?? undefined,
+          fuelType: calculationFuel ?? fuel,
           countryCode: "RU",
           destinationCity: city.label,
         }),

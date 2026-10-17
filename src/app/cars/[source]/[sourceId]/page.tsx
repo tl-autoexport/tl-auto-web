@@ -231,8 +231,14 @@ export default async function CarDetailPage({
             calc={calc}
             engineCc={car.engine_cc}
             fuel={translateFuel(car.fuel_type)}
+            calculationFuel={car.fuel_type}
             mileageKm={car.mileage_km}
             powerHp={car.power_hp}
+            calculationPowerKw={car.calculation_power_kw}
+            hybridDvsPowerHp={car.hybrid_dvs_power_hp}
+            hybridElectricPowerKw={car.hybrid_electric_power_kw}
+            hybridDvsAboveElectric30Min={car.hybrid_dvs_above_electric_30min}
+            hybridSequential={car.hybrid_sequential}
             powerConfidence={car.power_confidence}
             powerFinality={car.power_finality}
             priceKrw={car.price_krw}
