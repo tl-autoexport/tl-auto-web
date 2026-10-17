@@ -336,7 +336,11 @@ async function main() {
     }
 
     let newlyPublished = 0;
-    const selected = PROBE ? pending.slice(0, 1) : pending;
+    const selected = PROBE
+      ? [pending.find((item) => item.car.fuel_type === "hybrid"), pending.find((item) => item.car.fuel_type === "electric")]
+          .filter((item): item is Prepared => item != null)
+      : pending;
+    if (PROBE && selected.length !== 2) throw new Error("Probe requires one hybrid and one electric vehicle");
     for (let offset = 0; offset < selected.length; offset += BATCH_SIZE) {
       const batch = selected.slice(offset, offset + BATCH_SIZE);
       await db.query("begin");
