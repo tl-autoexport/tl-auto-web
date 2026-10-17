@@ -278,6 +278,8 @@ async function main() {
       return verdict.status === "price_outlier" ? [{ id: item.id, ...verdict }] : [];
     });
     if (priceFlags.length) throw new Error(`Price analog review blocks publication (${priceFlags.length}): ${JSON.stringify(priceFlags.slice(0, 20))}`);
+    const allOptionsInstalled = prepared.filter((item) => item.options.length > 5 && item.options.every((option) => option.is_present === true));
+    if (allOptionsInstalled.length) throw new Error(`Option presence audit indicates every option is installed for ${allOptionsInstalled.length} cards: ${allOptionsInstalled.map((item) => item.id).join(",")}`);
 
     const idsWithPlate = prepared.flatMap((item) => item.car.vehicle_no_masked ?
       [{ id: item.id, hash: vehicleHash(String(item.car.vehicle_no_masked)) }] : []);
@@ -313,6 +315,10 @@ async function main() {
       preliminaryPrices: prepared.filter((item) => item.car.power_finality === "provisional").length,
       sourcePhotos: prepared.reduce((sum, item) => sum + item.photos.length, 0),
       optionRows: prepared.reduce((sum, item) => sum + item.options.length, 0),
+      installedOptionRows: prepared.reduce((sum, item) => sum + item.options.filter((option) => option.is_present === true).length, 0),
+      absentOptionRows: prepared.reduce((sum, item) => sum + item.options.filter((option) => option.is_present === false).length, 0),
+      unknownOptionRows: prepared.reduce((sum, item) => sum + item.options.filter((option) => option.is_present == null).length, 0),
+      cardsWithAllOptionsInstalled: allOptionsInstalled.length,
       insuranceHistoryReports: prepared.filter((item) => item.history !== null).length,
       priceRubTotal: prepared.reduce((sum, item) => sum + Number(item.car.price_rub), 0),
       pricesDifferentFromPriorRateSnapshot: prepared.filter((item) => Number(item.car.price_rub) !== item.reviewedPriceRub).length,
