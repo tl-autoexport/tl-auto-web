@@ -132,7 +132,9 @@ async function main() {
   const unseen = ids.filter((id) => !known.has(id));
   const completed = new Set(state.checkedIds);
   const pending = unseen.filter((id) => !completed.has(id));
-  const detailResults = state.results;
+  // A resumed checkpoint can contain candidates that were staged by an earlier
+  // (possibly superseded) run. Never select those IDs again.
+  const detailResults = state.results.filter((row) => !known.has(row.sourceListingId));
   let cursor = 0;
   let completedSinceSave = 0;
   async function worker() {
@@ -196,20 +198,49 @@ async function main() {
   const selected: Candidate[] = [];
   const selectedByModel: Record<string, number> = {};
   const selectedIds = new Set<string>();
-  for (const row of prioritySorted) {
-    if (row.priorityModelRank === null) continue;
-    const modelKey = row.priorityModel ?? "";
-    if ((selectedByModel[modelKey] ?? 0) >= 50) continue;
+  const addCandidate = (row: Candidate) => {
+    if (selectedIds.has(row.sourceListingId)) return false;
+    if (row.priorityModelRank !== null) {
+      const modelKey = row.priorityModel ?? "";
+      if ((selectedByModel[modelKey] ?? 0) >= 50) return false;
+      selectedByModel[modelKey] = (selectedByModel[modelKey] ?? 0) + 1;
+    }
     selected.push(row);
     selectedIds.add(row.sourceListingId);
-    selectedByModel[modelKey] = (selectedByModel[modelKey] ?? 0) + 1;
-    if (selected.length >= target) break;
+    return true;
+  };
+  const balancedFuelTypes = fuels.has("electric") && fuels.has("hybrid") ? ["electric", "hybrid"] : null;
+  if (balancedFuelTypes) {
+    const baseQuota = Math.floor(target / balancedFuelTypes.length);
+    const extraSlots = target % balancedFuelTypes.length;
+    for (const [index, fuelType] of balancedFuelTypes.entries()) {
+      const quota = baseQuota + (index < extraSlots ? 1 : 0);
+      const fuelCandidates = prioritySorted.filter((row) => row.fuelType === fuelType);
+      let added = 0;
+      for (const row of fuelCandidates.filter((candidate) => candidate.priorityModelRank !== null)) {
+        if (addCandidate(row) && ++added >= quota) break;
+      }
+      if (added < quota) {
+        for (const row of fuelCandidates.filter((candidate) => candidate.priorityModelRank === null)) {
+          if (addCandidate(row) && ++added >= quota) break;
+        }
+      }
+    }
+  } else {
+    for (const row of prioritySorted) {
+      if (row.priorityModelRank === null) continue;
+      addCandidate(row);
+      if (selected.length >= target) break;
+    }
   }
   if (selected.length < target) {
-    const fallback = [...detailResults]
+    const fallback = prioritySorted
       .filter((row) => !selectedIds.has(row.sourceListingId))
       .sort((a, b) => parseEncarTimestamp(b.firstAdvertisedAt) - parseEncarTimestamp(a.firstAdvertisedAt));
-    selected.push(...fallback.slice(0, target - selected.length));
+    for (const row of fallback) {
+      addCandidate(row);
+      if (selected.length >= target) break;
+    }
   }
   const counts = selected.reduce<Record<string, number>>((result, row) => { result[row.fuelType] = (result[row.fuelType] ?? 0) + 1; return result; }, {});
   const selectedPriorityModels = selected.reduce<Record<string, number>>((result, row) => {
