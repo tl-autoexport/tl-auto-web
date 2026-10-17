@@ -20,7 +20,11 @@ const minVehicleYear = Math.max(1900, Math.min(2100, Number(process.env.ENCAR_FR
 const outputPath = process.env.ENCAR_FRESH_OUTPUT ?? "output/encar-fresh-candidates.json";
 const checkpointPath = process.env.ENCAR_FRESH_CHECKPOINT ?? "output/encar-fresh-checkpoint.json";
 const requestDelayMs = Math.max(0, Math.min(5_000, Number(process.env.ENCAR_FRESH_REQUEST_DELAY_MS ?? 250)));
-const fuels = new Set(["gasoline", "diesel", "lpg"]);
+const requestedFuelTypes = (process.env.ENCAR_FRESH_FUEL_TYPES ?? "gasoline,diesel,lpg")
+  .split(",").map((value) => value.trim().toLowerCase()).filter(Boolean);
+const fuels = new Set(requestedFuelTypes);
+if (!fuels.size || [...fuels].some((fuel) => !["gasoline", "diesel", "lpg", "electric", "hybrid"].includes(fuel)))
+  throw new Error("ENCAR_FRESH_FUEL_TYPES must contain gasoline, diesel, lpg, electric, or hybrid");
 const agent = new ProxyAgent(proxy);
 const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 const pageSize = 50;
@@ -32,7 +36,7 @@ const parseEncarTimestamp = (value: string) => Date.parse(
 
 type Listing = { Id: number | string; Manufacturer?: string; Model?: string; Year?: number | string; FuelType?: string };
 type Candidate = { source: "encar"; sourceListingId: string; sourceUrl: string; brand: string | null; model: string | null; year: number | null; fuelType: string; firstAdvertisedAt: string; listedAt: string | null; advertisementType: "NORMAL"; priorityModel: string | null; priorityModelRank: number | null };
-type Checkpoint = { version: 1; policy: string; listings: Listing[]; listPage: number; checkedIds: string[]; results: Candidate[]; errors: number };
+type Checkpoint = { version: 2; policy: string; listings: Listing[]; listPage: number; checkedIds: string[]; results: Candidate[]; errors: number };
 type PriorityDocument = { groups?: Array<{ manufacturer?: string; requestedModel?: string; sourceCount?: number }> };
 
 const canonicalKey = (value: unknown) => String(value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
@@ -48,7 +52,7 @@ async function saveCheckpoint(value: Checkpoint) {
 async function readCheckpoint(policy: string): Promise<Checkpoint | null> {
   try {
     const value = JSON.parse(await readFile(checkpointPath, "utf8")) as Checkpoint;
-    if (value.version !== 1 || value.policy !== policy)
+    if (value.version !== 2 || value.policy !== policy)
       throw new Error("Existing Encar freshness checkpoint does not match current settings; set ENCAR_FRESH_CHECKPOINT to a new path");
     return value;
   } catch (error) {
@@ -68,32 +72,49 @@ async function main() {
     .filter((group): group is { brand: string; model: string; sourceCount: number } => Boolean(group.brand && group.model))
     .sort((a, b) => b.sourceCount - a.sourceCount || a.brand.localeCompare(b.brand) || a.model.localeCompare(b.model));
   const priorityRank = new Map(priorityGroups.map((group, index) => [`${canonicalKey(group.brand)}|${canonicalKey(group.model)}`, index + 1]));
-  const policy = JSON.stringify({ target, pages, maxListingAgeDays, minVehicleYear, requestDelayMs, sourceTimestampTimezone: "Asia/Seoul", priorityModels: priorityGroups.map(({ brand, model }) => `${brand}:${model}`) });
+  const searchTypes: Array<"electric" | "hybrid" | null> = [
+    ...(requestedFuelTypes.some((fuel) => ["gasoline", "diesel", "lpg"].includes(fuel)) ? [null] : []),
+    ...(requestedFuelTypes.includes("electric") ? ["electric" as const] : []),
+    ...(requestedFuelTypes.includes("hybrid") ? ["hybrid" as const] : []),
+  ];
+  const policy = JSON.stringify({ target, pages, maxListingAgeDays, minVehicleYear, requestDelayMs, fuels: requestedFuelTypes, sourceTimestampTimezone: "Asia/Seoul", priorityModels: priorityGroups.map(({ brand, model }) => `${brand}:${model}`) });
   const checkpoint = await readCheckpoint(policy);
   const candidates = new Map<string, Listing>((checkpoint?.listings ?? []).map((row) => [String(row.Id), row]));
-  const fuelCounts: Record<string, number> = { gasoline: 0, diesel: 0, lpg: 0, other: 0 };
-  const bounds = `(And.Hidden.N._.Year.range(${minVehicleYear}01..210012)._.Mileage.range(0..999999)._.Price.range(0..100000).)`;
-  const state: Checkpoint = checkpoint ?? { version: 1, policy, listings: [], listPage: 0, checkedIds: [], results: [], errors: 0 };
-  for (let page = state.listPage; page < pages; page += 1) {
-    const q = encodeURIComponent(bounds);
-    const sr = encodeURIComponent(`|ModifiedDate|${page * pageSize}|${pageSize}`);
-    const response = await fetch(`https://api.encar.com/search/car/list/general?count=true&q=${q}&sr=${sr}`, {
-      headers: ENCAR_HEADERS, dispatcher: agent, signal: AbortSignal.timeout(20_000),
-    });
-    if (!response.ok) throw new Error(`Encar list HTTP ${response.status} at page ${page + 1}`);
-    const body = await response.json() as { SearchResults?: Listing[] };
-    const rows = body.SearchResults ?? [];
-    for (const row of rows) {
-      const fuel = normalizeFuel(row.FuelType) ?? "other";
-      fuelCounts[fuel in fuelCounts ? fuel : "other"] += 1;
-      if (fuels.has(fuel) && (vehicleYear(row.Year) ?? 0) >= minVehicleYear) candidates.set(String(row.Id), row);
+  const fuelCounts: Record<string, number> = { gasoline: 0, diesel: 0, lpg: 0, electric: 0, hybrid: 0, other: 0 };
+  const state: Checkpoint = checkpoint ?? { version: 2, policy, listings: [], listPage: 0, checkedIds: [], results: [], errors: 0 };
+  for (let searchIndex = 0; searchIndex < searchTypes.length; searchIndex += 1) {
+    const fuelType = searchTypes[searchIndex];
+    const searchStart = searchIndex * pages;
+    const searchEnd = searchStart + pages;
+    if (state.listPage >= searchEnd) continue;
+    for (let page = Math.max(0, state.listPage - searchStart); page < pages; page += 1) {
+      const fuelFilter = fuelType === "electric" ? "_.FuelType.전기."
+        : fuelType === "hybrid" ? "_.FuelType.가솔린+전기." : "";
+      const bounds = `(And.Hidden.N._.${fuelFilter}_.Year.range(${minVehicleYear}01..210012)._.Mileage.range(0..999999)._.Price.range(0..100000).)`;
+      const q = encodeURIComponent(bounds);
+      const sr = encodeURIComponent(`|ModifiedDate|${page * pageSize}|${pageSize}`);
+      const response = await fetch(`https://api.encar.com/search/car/list/general?count=true&q=${q}&sr=${sr}`, {
+        headers: ENCAR_HEADERS, dispatcher: agent, signal: AbortSignal.timeout(20_000),
+      });
+      if (!response.ok) throw new Error(`Encar ${fuelType ?? "all-requested-fuels"} list HTTP ${response.status} at page ${page + 1}`);
+      const body = await response.json() as { SearchResults?: Listing[] };
+      const rows = body.SearchResults ?? [];
+      for (const row of rows) {
+        const fuel = normalizeFuel(row.FuelType) ?? "other";
+        fuelCounts[fuel in fuelCounts ? fuel : "other"] += 1;
+        if (fuels.has(fuel) && (vehicleYear(row.Year) ?? 0) >= minVehicleYear) candidates.set(String(row.Id), row);
+      }
+      state.listings = [...candidates.values()];
+      state.listPage = searchStart + page + 1;
+      await saveCheckpoint(state);
+      console.log(JSON.stringify({ event: "list_progress", fuelType: fuelType ?? "all-requested-fuels", page: page + 1, pages, rows: rows.length, uniqueEligible: candidates.size, fuelCounts }));
+      if (rows.length < pageSize) {
+        state.listPage = searchEnd;
+        await saveCheckpoint(state);
+        break;
+      }
+      await delay(250);
     }
-    console.log(JSON.stringify({ event: "list_progress", page: page + 1, pages, rows: rows.length, uniqueEligible: candidates.size, fuelCounts }));
-    state.listings = [...candidates.values()];
-    state.listPage = page + 1;
-    await saveCheckpoint(state);
-    if (rows.length < pageSize) break;
-    await delay(250);
   }
 
   const ids = [...candidates.keys()];
@@ -203,7 +224,7 @@ async function main() {
     selectedPriorityListings: selected.filter((row) => row.priorityModelRank !== null).length,
     selectedFallbackListings: selected.length - selected.filter((row) => row.priorityModelRank !== null).length, selectedPriorityModels,
     listSort: "ModifiedDate", sourcePublicationDate: "detail.manage.firstAdvertisedDateTime", sourceTimestampTimezone: "Asia/Seoul for timezone-naive values",
-    listPagesRequested: pages, listCandidateIds: ids.length, alreadyInCatalogOrQueue: known.size,
+    fuelTypes: requestedFuelTypes, listPagesPerFuelSearch: pages, listPagesRequested: pages * searchTypes.length, listCandidateIds: ids.length, alreadyInCatalogOrQueue: known.size,
     unseenChecked: state.checkedIds.length, recentActiveCandidateCount: detailResults.length, detailErrors: state.errors,
     selectedFuelCounts: counts, candidates: selected,
     limitation: selected.length < target ? "More list pages may be required; no staging run was created." : null,
