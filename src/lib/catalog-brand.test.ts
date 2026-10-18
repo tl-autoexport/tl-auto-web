@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { catalogBrandValues, normalizeCatalogBrand } from "./catalog-brand";
+import { catalogBrandLogos } from "./catalog-brand-logos";
 
 assert.equal(normalizeCatalogBrand("KG_Mobility_Ssangyong"), "KGM");
 assert.equal(normalizeCatalogBrand("Kg__mobility_ssangyong"), "KGM");
@@ -28,5 +29,9 @@ assert.deepEqual(catalogBrandValues("KGM"), [
 assert.deepEqual(catalogBrandValues("Mini"), ["MINI", "Mini"]);
 assert.deepEqual(catalogBrandValues("Kia"), ["Kia"]);
 assert.deepEqual(catalogBrandValues("DS"), ["DS", "DS Automobiles", "Citroen-DS", "Citroen-ds", "Citroen DS"]);
+
+for (const brand of ["Tesla", "Nissan", "Lamborghini", "Rolls-royce", "Fiat", "BYD", "Byd", "McLaren"]) {
+  assert.ok(catalogBrandLogos[brand], `missing catalog logo mapping for ${brand}`);
+}
 
 console.log("catalog brand normalization tests passed");
