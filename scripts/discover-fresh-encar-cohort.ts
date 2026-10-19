@@ -36,7 +36,7 @@ const parseEncarTimestamp = (value: string) => Date.parse(
 );
 
 type Listing = { Id: number | string; Manufacturer?: string; Model?: string; Year?: number | string; FuelType?: string };
-type Candidate = { source: "encar"; sourceListingId: string; sourceUrl: string; brand: string | null; model: string | null; year: number | null; fuelType: string; firstAdvertisedAt: string; listedAt: string | null; advertisementType: "NORMAL"; priorityModel: string | null; priorityModelRank: number | null };
+type Candidate = { source: "encar"; sourceListingId: string; sourceUrl: string; brand: string | null; model: string | null; year: number | null; fuelType: string; firstAdvertisedAt: string; listedAt: string | null; advertisementType: "NORMAL"; priorityModel: string | null; priorityModelRank: number | null; priorityBrandRank: number | null };
 type Checkpoint = { version: 2; policy: string; listings: Listing[]; listPage: number; checkedIds: string[]; results: Candidate[]; errors: number };
 type PriorityDocument = { groups?: Array<{ manufacturer?: string; requestedModel?: string; sourceCount?: number }> };
 
@@ -80,6 +80,15 @@ async function main() {
     .filter((group): group is { brand: string; model: string; sourceCount: number } => Boolean(group.brand && group.model))
     .sort((a, b) => b.sourceCount - a.sourceCount || a.brand.localeCompare(b.brand) || a.model.localeCompare(b.model));
   const priorityRank = new Map(priorityGroups.map((group, index) => [`${canonicalKey(group.brand)}|${canonicalKey(group.model)}`, index + 1]));
+  const priorityBrandRank = new Map<string, number>();
+  const priorityBrandNames = new Map<string, string>();
+  for (const group of priorityGroups) {
+    const key = canonicalKey(group.brand);
+    if (!priorityBrandRank.has(key)) {
+      priorityBrandRank.set(key, priorityBrandRank.size + 1);
+      priorityBrandNames.set(key, group.brand);
+    }
+  }
   const searchTypes: Array<"electric" | "hybrid" | null> = [
     ...(requestedFuelTypes.some((fuel) => ["gasoline", "diesel", "lpg"].includes(fuel)) ? [null] : []),
     ...(requestedFuelTypes.includes("electric") ? ["electric" as const] : []),
@@ -144,7 +153,10 @@ async function main() {
   const pending = unseen.filter((id) => !completed.has(id));
   // A resumed checkpoint can contain candidates that were staged by an earlier
   // (possibly superseded) run. Never select those IDs again.
-  const detailResults = state.results.filter((row) => !known.has(row.sourceListingId));
+  const detailResults = state.results.filter((row) => !known.has(row.sourceListingId)).map((row) => ({
+    ...row,
+    priorityBrandRank: priorityBrandRank.get(canonicalKey(row.brand)) ?? null,
+  }));
   let cursor = 0;
   let completedSinceSave = 0;
   async function worker() {
@@ -172,6 +184,7 @@ async function main() {
             const brand = normalizeBrand(listing.Manufacturer);
             const model = normalizeModel(listing.Model);
             const rank = priorityRank.get(`${canonicalKey(brand)}|${canonicalKey(model)}`) ?? null;
+            const brandRank = priorityBrandRank.get(canonicalKey(brand)) ?? null;
             detailResults.push({
               source: "encar", sourceListingId: id, sourceUrl: `https://fem.encar.com/cars/detail/${id}`,
               brand, model, year,
@@ -179,6 +192,7 @@ async function main() {
               advertisementType: "NORMAL",
               priorityModel: rank === null ? null : `${brand} ${model}`,
               priorityModelRank: rank,
+              priorityBrandRank: brandRank,
             });
           }
         }
@@ -202,16 +216,18 @@ async function main() {
   state.results = detailResults;
   await saveCheckpoint(state);
   const prioritySorted = [...detailResults].sort((a, b) =>
-    (a.priorityModelRank ?? Number.MAX_SAFE_INTEGER) - (b.priorityModelRank ?? Number.MAX_SAFE_INTEGER) ||
+    (a.priorityModelRank ?? (priorityOnly && a.priorityBrandRank !== null ? 1_000 + a.priorityBrandRank : Number.MAX_SAFE_INTEGER)) -
+      (b.priorityModelRank ?? (priorityOnly && b.priorityBrandRank !== null ? 1_000 + b.priorityBrandRank : Number.MAX_SAFE_INTEGER)) ||
     parseEncarTimestamp(b.firstAdvertisedAt) - parseEncarTimestamp(a.firstAdvertisedAt),
   );
   const selected: Candidate[] = [];
   const selectedByModel: Record<string, number> = {};
   const selectedIds = new Set<string>();
+  const isPriority = (row: Candidate) => row.priorityModelRank !== null || (priorityOnly && row.priorityBrandRank !== null);
   const addCandidate = (row: Candidate) => {
     if (selectedIds.has(row.sourceListingId)) return false;
-    if (row.priorityModelRank !== null) {
-      const modelKey = row.priorityModel ?? "";
+    const modelKey = row.priorityModel ?? (priorityOnly && row.priorityBrandRank !== null ? `${row.brand ?? ""}|${row.model ?? ""}` : null);
+    if (modelKey) {
       if ((selectedByModel[modelKey] ?? 0) >= 50) return false;
       selectedByModel[modelKey] = (selectedByModel[modelKey] ?? 0) + 1;
     }
@@ -227,18 +243,18 @@ async function main() {
       const quota = baseQuota + (index < extraSlots ? 1 : 0);
       const fuelCandidates = prioritySorted.filter((row) => row.fuelType === fuelType);
       let added = 0;
-      for (const row of fuelCandidates.filter((candidate) => candidate.priorityModelRank !== null)) {
+      for (const row of fuelCandidates.filter(isPriority)) {
         if (addCandidate(row) && ++added >= quota) break;
       }
       if (added < quota) {
-        for (const row of fuelCandidates.filter((candidate) => candidate.priorityModelRank === null)) {
+        for (const row of fuelCandidates.filter((candidate) => !isPriority(candidate))) {
           if (addCandidate(row) && ++added >= quota) break;
         }
       }
     }
   } else {
     for (const row of prioritySorted) {
-      if (row.priorityModelRank === null) continue;
+      if (!isPriority(row)) continue;
       addCandidate(row);
       if (selected.length >= target) break;
     }
@@ -254,16 +270,17 @@ async function main() {
   }
   const counts = selected.reduce<Record<string, number>>((result, row) => { result[row.fuelType] = (result[row.fuelType] ?? 0) + 1; return result; }, {});
   const selectedPriorityModels = selected.reduce<Record<string, number>>((result, row) => {
-    const key = row.priorityModel ?? "other";
+    const key = row.priorityModel ?? (row.priorityBrandRank !== null ? `${row.brand} ${row.model}` : "other");
     result[key] = (result[key] ?? 0) + 1;
     return result;
   }, {});
   const report = {
     generatedAt: new Date().toISOString(), mode: "read_only_discovery", target, selectedCount: selected.length,
-    maxListingAgeDays, minVehicleYear, priorityOnly, prioritySource: "docs/chestny-required-models-audit.json, ranked by sourceCount",
+    maxListingAgeDays, minVehicleYear, priorityOnly, priorityScope: "required models and any model from their represented priority brands",
+    priorityBrands: [...priorityBrandNames.values()], prioritySource: "docs/chestny-required-models-audit.json, ranked by sourceCount",
     priorityModelCount: priorityGroups.length, priorityModelPerModelCap: 50,
-    selectedPriorityListings: selected.filter((row) => row.priorityModelRank !== null).length,
-    selectedFallbackListings: selected.length - selected.filter((row) => row.priorityModelRank !== null).length, selectedPriorityModels,
+    selectedPriorityListings: selected.filter(isPriority).length,
+    selectedFallbackListings: selected.length - selected.filter(isPriority).length, selectedPriorityModels,
     listSort: "ModifiedDate", sourcePublicationDate: "detail.manage.firstAdvertisedDateTime", sourceTimestampTimezone: "Asia/Seoul for timezone-naive values",
     fuelTypes: requestedFuelTypes, listPagesPerFuelSearch: pages, listPagesRequested: pages * searchTypes.length, listCandidateIds: ids.length, alreadyInCatalogOrQueue: known.size,
     unseenChecked: state.checkedIds.length, recentActiveCandidateCount: detailResults.length, detailErrors: state.errors,
