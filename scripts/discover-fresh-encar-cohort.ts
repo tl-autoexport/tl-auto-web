@@ -16,6 +16,7 @@ if (!proxy || !supabaseUrl || !serviceKey) throw new Error("ENCAR_PROXY_URL and 
 const target = Math.max(1, Math.min(500, Number(process.env.ENCAR_FRESH_TARGET ?? 500)));
 const pages = Math.max(1, Math.min(400, Number(process.env.ENCAR_FRESH_PAGES ?? 120)));
 const maxListingAgeDays = Math.max(1, Math.min(365, Number(process.env.ENCAR_FRESH_MAX_AGE_DAYS ?? 30)));
+const freshnessSafetyHours = 2;
 const minVehicleYear = Math.max(1900, Math.min(2100, Number(process.env.ENCAR_FRESH_MIN_VEHICLE_YEAR ?? 2020)));
 const priorityOnly = process.env.ENCAR_FRESH_PRIORITY_ONLY === "true";
 const outputPath = process.env.ENCAR_FRESH_OUTPUT ?? "output/encar-fresh-candidates.json";
@@ -156,7 +157,11 @@ async function main() {
   const detailResults = state.results.filter((row) => !known.has(row.sourceListingId)).map((row) => ({
     ...row,
     priorityBrandRank: priorityBrandRank.get(canonicalKey(row.brand)) ?? null,
-  }));
+  })).filter((row) => {
+    const advertised = parseEncarTimestamp(row.firstAdvertisedAt);
+    return Number.isFinite(advertised) && advertised <= Date.now() &&
+      Date.now() - advertised <= maxListingAgeDays * 86_400_000 - freshnessSafetyHours * 3_600_000;
+  });
   let cursor = 0;
   let completedSinceSave = 0;
   async function worker() {
@@ -276,7 +281,7 @@ async function main() {
   }, {});
   const report = {
     generatedAt: new Date().toISOString(), mode: "read_only_discovery", target, selectedCount: selected.length,
-    maxListingAgeDays, minVehicleYear, priorityOnly, priorityScope: "required models and any model from their represented priority brands",
+    maxListingAgeDays, freshnessSafetyHours, minVehicleYear, priorityOnly, priorityScope: "required models and any model from their represented priority brands",
     priorityBrands: [...priorityBrandNames.values()], prioritySource: "docs/chestny-required-models-audit.json, ranked by sourceCount",
     priorityModelCount: priorityGroups.length, priorityModelPerModelCap: 50,
     selectedPriorityListings: selected.filter(isPriority).length,

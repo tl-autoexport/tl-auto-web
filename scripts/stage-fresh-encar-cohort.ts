@@ -35,7 +35,7 @@ type Candidate = {
   priorityModelRank?: number | null;
   priorityBrandRank?: number | null;
 };
-type Report = { mode: string; target: number; selectedCount: number; maxListingAgeDays: number; minVehicleYear?: number; priorityOnly?: boolean; priorityBrands?: string[]; sourceTimestampTimezone?: string; fuelTypes?: string[]; candidates: Candidate[] };
+type Report = { mode: string; target: number; selectedCount: number; maxListingAgeDays: number; freshnessSafetyHours?: number; minVehicleYear?: number; priorityOnly?: boolean; priorityBrands?: string[]; sourceTimestampTimezone?: string; fuelTypes?: string[]; candidates: Candidate[] };
 const canonicalKey = (value: unknown) => String(value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
 const parseEncarTimestamp = (value: string) => Date.parse(
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?$/.test(value) ? `${value}+09:00` : value,
@@ -47,6 +47,8 @@ async function main() {
     throw new Error(`Discovery report must contain exactly ${target} selected candidates`);
   if (report.maxListingAgeDays !== maxListingAgeDays) throw new Error("Discovery report age window does not match staging settings");
   if (report.minVehicleYear !== minVehicleYear) throw new Error("Discovery report minimum vehicle year does not match staging settings");
+  if (priorityOnly && Number(report.freshnessSafetyHours ?? 0) < 2)
+    throw new Error("Priority-only staging requires a freshness safety margin of at least two hours");
   const priorityBrands = new Set((report.priorityBrands ?? []).map(canonicalKey));
   if (report.priorityOnly !== priorityOnly || (priorityOnly && (!priorityBrands.size || report.candidates.some((row) =>
     row.priorityBrandRank == null || !priorityBrands.has(canonicalKey(row.brand))))))
