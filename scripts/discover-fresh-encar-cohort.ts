@@ -53,8 +53,15 @@ async function saveCheckpoint(value: Checkpoint) {
 async function readCheckpoint(policy: string): Promise<Checkpoint | null> {
   try {
     const value = JSON.parse(await readFile(checkpointPath, "utf8")) as Checkpoint;
-    if (value.version !== 2 || value.policy !== policy)
-      throw new Error("Existing Encar freshness checkpoint does not match current settings; set ENCAR_FRESH_CHECKPOINT to a new path");
+    const previousPolicy = JSON.parse(value.policy) as Record<string, unknown>;
+    const requestedPolicy = JSON.parse(policy) as Record<string, unknown>;
+    const previousPages = Number(previousPolicy.pages);
+    const requestedPages = Number(requestedPolicy.pages);
+    delete previousPolicy.pages;
+    delete requestedPolicy.pages;
+    if (value.version !== 2 || JSON.stringify(previousPolicy) !== JSON.stringify(requestedPolicy) ||
+        !Number.isFinite(previousPages) || !Number.isFinite(requestedPages) || requestedPages < previousPages)
+      throw new Error("Existing Encar freshness checkpoint only supports resuming the same policy with an equal or larger page limit; set ENCAR_FRESH_CHECKPOINT to a new path");
     return value;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
@@ -82,7 +89,9 @@ async function main() {
   const checkpoint = await readCheckpoint(policy);
   const candidates = new Map<string, Listing>((checkpoint?.listings ?? []).map((row) => [String(row.Id), row]));
   const fuelCounts: Record<string, number> = { gasoline: 0, diesel: 0, lpg: 0, electric: 0, hybrid: 0, other: 0 };
-  const state: Checkpoint = checkpoint ?? { version: 2, policy, listings: [], listPage: 0, checkedIds: [], results: [], errors: 0 };
+  const state: Checkpoint = checkpoint
+    ? { ...checkpoint, policy }
+    : { version: 2, policy, listings: [], listPage: 0, checkedIds: [], results: [], errors: 0 };
   for (let searchIndex = 0; searchIndex < searchTypes.length; searchIndex += 1) {
     const fuelType = searchTypes[searchIndex];
     const searchStart = searchIndex * pages;
