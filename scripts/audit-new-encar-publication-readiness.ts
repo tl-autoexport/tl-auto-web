@@ -1,4 +1,4 @@
-/** Read-only readiness audit for the 305 approved + preliminary Encar cohort. */
+/** Read-only readiness audit for an approved + preliminary Encar cohort. */
 import { Client } from "pg";
 import { config } from "dotenv";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -17,6 +17,8 @@ const powerPlanPath = process.env.TL_AUTO_POWER_PLAN ?? "output/tl-auto-new-enca
 const preliminaryPath = process.env.TL_AUTO_PRELIMINARY_CALCULATION ?? "output/tl-auto-new-encar-preliminary-calculation-dry-run.json";
 const outputPath = process.env.TL_AUTO_PUBLICATION_READINESS_OUTPUT ?? "output/tl-auto-new-encar-publication-readiness.json";
 const reviewedPriceOutlierIds = new Set((process.env.TL_AUTO_REVIEWED_PRICE_OUTLIER_IDS ?? "")
+  .split(",").map((id) => id.trim()).filter(Boolean));
+const authorizedPriceOutlierIds = new Set((process.env.TL_AUTO_AUTHORIZED_PRICE_OUTLIER_IDS ?? "")
   .split(",").map((id) => id.trim()).filter(Boolean));
 if (!runId || !dbUrl) throw new Error("TL_AUTO_ENRICHMENT_RUN_ID and SUPABASE_DB_URL are required");
 
@@ -84,6 +86,7 @@ async function main() {
     const rates = await getCbrCalcRates();
     const cars: Array<Record<string, unknown>> = [];
     const manuallyReviewedPriceOutliers: Array<Record<string, unknown>> = [];
+    const authorizedPriceOutliers: Array<Record<string, unknown>> = [];
     const enrichment = new Map<string, Record<string, number>>();
     const freshnessHours: number[] = [];
 
@@ -123,6 +126,10 @@ async function main() {
         if (reviewedPriceOutlierIds.has(id)) {
           manuallyReviewedPriceOutliers.push({ sourceListingId: id, decision: "publish_after_user_review",
             basis: "User supplied Encar screenshot confirming the source asking price; source price is preserved unchanged",
+            sourcePriceKrw: priceKrw, analogs: priceAnalogs });
+        } else if (authorizedPriceOutlierIds.has(id)) {
+          authorizedPriceOutliers.push({ sourceListingId: id, decision: "publish_under_run_level_user_authorization",
+            basis: "User explicitly authorized publication of this run; saved Encar asking price is retained unchanged and the analog outlier is disclosed",
             sourcePriceKrw: priceKrw, analogs: priceAnalogs });
         } else {
           issues.push("price_review_outlier_vs_analogs");
@@ -231,6 +238,9 @@ async function main() {
     const observedReviewedIds = new Set(manuallyReviewedPriceOutliers.map((row) => String(row.sourceListingId)));
     const unverifiedReviewIds = [...reviewedPriceOutlierIds].filter((id) => !observedReviewedIds.has(id));
     if (unverifiedReviewIds.length) throw new Error(`Reviewed price-outlier allowlist does not match current outliers: ${unverifiedReviewIds.join(",")}`);
+    const observedAuthorizedIds = new Set(authorizedPriceOutliers.map((row) => String(row.sourceListingId)));
+    const unverifiedAuthorizedIds = [...authorizedPriceOutlierIds].filter((id) => !observedAuthorizedIds.has(id));
+    if (unverifiedAuthorizedIds.length) throw new Error(`Authorized price-outlier allowlist does not match current outliers: ${unverifiedAuthorizedIds.join(",")}`);
 
     const readyRows = cars.filter((row) => row.ready);
     const blockers: Record<string, number> = {};
@@ -240,6 +250,7 @@ async function main() {
       databaseWrites: 0, encarRequests: 0, publicCatalogChanged: false,
       policy: "Pre-publication readiness only; approved power remains final, automatic references remain preliminary; no cars inserted or published",
       manuallyReviewedPriceOutliers,
+      authorizedPriceOutliers,
       // Persist exact inputs so the publisher can reproduce these estimates;
       // the live USDT/KRW quote can change while the CBR date stays constant.
       rateSnapshot: { asOf: rates.asOf, source: rates.source, rates: rates.rates,
