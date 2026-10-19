@@ -17,6 +17,7 @@ const target = Math.max(1, Math.min(500, Number(process.env.ENCAR_FRESH_TARGET ?
 const pages = Math.max(1, Math.min(400, Number(process.env.ENCAR_FRESH_PAGES ?? 120)));
 const maxListingAgeDays = Math.max(1, Math.min(365, Number(process.env.ENCAR_FRESH_MAX_AGE_DAYS ?? 30)));
 const minVehicleYear = Math.max(1900, Math.min(2100, Number(process.env.ENCAR_FRESH_MIN_VEHICLE_YEAR ?? 2020)));
+const priorityOnly = process.env.ENCAR_FRESH_PRIORITY_ONLY === "true";
 const outputPath = process.env.ENCAR_FRESH_OUTPUT ?? "output/encar-fresh-candidates.json";
 const checkpointPath = process.env.ENCAR_FRESH_CHECKPOINT ?? "output/encar-fresh-checkpoint.json";
 const requestDelayMs = Math.max(0, Math.min(5_000, Number(process.env.ENCAR_FRESH_REQUEST_DELAY_MS ?? 250)));
@@ -77,7 +78,7 @@ async function main() {
     ...(requestedFuelTypes.includes("electric") ? ["electric" as const] : []),
     ...(requestedFuelTypes.includes("hybrid") ? ["hybrid" as const] : []),
   ];
-  const policy = JSON.stringify({ target, pages, maxListingAgeDays, minVehicleYear, requestDelayMs, fuels: requestedFuelTypes, sourceTimestampTimezone: "Asia/Seoul", priorityModels: priorityGroups.map(({ brand, model }) => `${brand}:${model}`) });
+  const policy = JSON.stringify({ target, pages, maxListingAgeDays, minVehicleYear, priorityOnly, requestDelayMs, fuels: requestedFuelTypes, sourceTimestampTimezone: "Asia/Seoul", priorityModels: priorityGroups.map(({ brand, model }) => `${brand}:${model}`) });
   const checkpoint = await readCheckpoint(policy);
   const candidates = new Map<string, Listing>((checkpoint?.listings ?? []).map((row) => [String(row.Id), row]));
   const fuelCounts: Record<string, number> = { gasoline: 0, diesel: 0, lpg: 0, electric: 0, hybrid: 0, other: 0 };
@@ -233,7 +234,7 @@ async function main() {
       if (selected.length >= target) break;
     }
   }
-  if (selected.length < target) {
+  if (selected.length < target && !priorityOnly) {
     const fallback = prioritySorted
       .filter((row) => !selectedIds.has(row.sourceListingId))
       .sort((a, b) => parseEncarTimestamp(b.firstAdvertisedAt) - parseEncarTimestamp(a.firstAdvertisedAt));
@@ -250,7 +251,7 @@ async function main() {
   }, {});
   const report = {
     generatedAt: new Date().toISOString(), mode: "read_only_discovery", target, selectedCount: selected.length,
-    maxListingAgeDays, minVehicleYear, prioritySource: "docs/chestny-required-models-audit.json, ranked by sourceCount",
+    maxListingAgeDays, minVehicleYear, priorityOnly, prioritySource: "docs/chestny-required-models-audit.json, ranked by sourceCount",
     priorityModelCount: priorityGroups.length, priorityModelPerModelCap: 50,
     selectedPriorityListings: selected.filter((row) => row.priorityModelRank !== null).length,
     selectedFallbackListings: selected.length - selected.filter((row) => row.priorityModelRank !== null).length, selectedPriorityModels,

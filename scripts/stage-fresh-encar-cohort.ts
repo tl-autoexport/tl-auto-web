@@ -10,6 +10,7 @@ const inputPath = process.env.ENCAR_FRESH_OUTPUT ?? "output/encar-fresh-candidat
 const target = Number(process.env.ENCAR_FRESH_TARGET ?? 500);
 const maxListingAgeDays = Number(process.env.ENCAR_FRESH_MAX_AGE_DAYS ?? 30);
 const minVehicleYear = Number(process.env.ENCAR_FRESH_MIN_VEHICLE_YEAR ?? 2020);
+const priorityOnly = process.env.ENCAR_FRESH_PRIORITY_ONLY === "true";
 const requestedFuelTypes = (process.env.ENCAR_FRESH_FUEL_TYPES ?? "gasoline,diesel,lpg")
   .split(",").map((value) => value.trim().toLowerCase()).filter(Boolean);
 const runId = randomUUID();
@@ -33,7 +34,7 @@ type Candidate = {
   priorityModel?: string | null;
   priorityModelRank?: number | null;
 };
-type Report = { mode: string; target: number; selectedCount: number; maxListingAgeDays: number; minVehicleYear?: number; sourceTimestampTimezone?: string; fuelTypes?: string[]; candidates: Candidate[] };
+type Report = { mode: string; target: number; selectedCount: number; maxListingAgeDays: number; minVehicleYear?: number; priorityOnly?: boolean; sourceTimestampTimezone?: string; fuelTypes?: string[]; candidates: Candidate[] };
 const parseEncarTimestamp = (value: string) => Date.parse(
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?$/.test(value) ? `${value}+09:00` : value,
 );
@@ -44,6 +45,8 @@ async function main() {
     throw new Error(`Discovery report must contain exactly ${target} selected candidates`);
   if (report.maxListingAgeDays !== maxListingAgeDays) throw new Error("Discovery report age window does not match staging settings");
   if (report.minVehicleYear !== minVehicleYear) throw new Error("Discovery report minimum vehicle year does not match staging settings");
+  if (report.priorityOnly !== priorityOnly || (priorityOnly && report.candidates.some((row) => row.priorityModelRank == null)))
+    throw new Error("Discovery priority-only setting does not match staging settings, or includes a non-priority model");
   if ((report.fuelTypes && JSON.stringify(report.fuelTypes) !== JSON.stringify(requestedFuelTypes)) ||
       (!report.fuelTypes && requestedFuelTypes.some((fuel) => fuel === "electric" || fuel === "hybrid")))
     throw new Error("Discovery report fuel types do not match staging settings");
@@ -81,10 +84,12 @@ async function main() {
   const run = await db.from("encar_enrichment_runs").insert({
     id: runId, project: "tl-auto", purpose: "full", priority: 40,
     status: "awaiting_approval", requested_limit: target, candidate_count: target,
-    rules_version: `fresh-first-advertised-${maxListingAgeDays}d-${minVehicleYear}plus-priority-models-electrified-v1`,
+    rules_version: `fresh-first-advertised-${maxListingAgeDays}d-${minVehicleYear}plus-${priorityOnly ? "priority-models-only" : "priority-models"}-v1`,
     summary: {
       source: "encar", discoveryReport: inputPath, freshnessField: "manage.firstAdvertisedDateTime",
-      maxListingAgeDays, minVehicleYear, prioritySource: "project required-model audit ranked by sourceCount; max 50 per model before freshness fallback",
+      maxListingAgeDays, minVehicleYear, priorityOnly, prioritySource: priorityOnly
+        ? "project required-model audit ranked by sourceCount; max 50 per model; no non-priority fallback"
+        : "project required-model audit ranked by sourceCount; max 50 per model before freshness fallback",
       selectedFuelCounts: fuelCounts,
       selectedPriorityListings: report.candidates.filter((row) => row.priorityModelRank != null).length,
       selectedPriorityModels: report.candidates.reduce<Record<string, number>>((counts, row) => {
@@ -101,7 +106,7 @@ async function main() {
     run_id: runId, source: "encar", source_listing_id: candidate.sourceListingId,
     source_url: candidate.sourceUrl,
     task: { insurance: true, options: true, gallery: true, diagnosis: true, sellingpoint: true, contents: true, history: true, category: false },
-    candidate_snapshot: { ...candidate, cohort: `fresh-first-advertised-${maxListingAgeDays}d-${minVehicleYear}plus-priority-models-electrified-v1` },
+    candidate_snapshot: { ...candidate, cohort: `fresh-first-advertised-${maxListingAgeDays}d-${minVehicleYear}plus-${priorityOnly ? "priority-models-only" : "priority-models"}-v1` },
   }));
   const queued = await db.from("encar_enrichment_queue").insert(queueRows);
   if (queued.error) throw new Error(`Queue insert failed for run ${runId}; run remains awaiting_approval: ${queued.error.message}`);
