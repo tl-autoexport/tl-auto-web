@@ -155,7 +155,7 @@ export default async function CarDetailPage({
               badges={[
                 ...(car.accident_count === 0 ? ["Без ДТП"] : []),
                 ...(car.insurance_payout_count != null && car.insurance_payout_count > 0
-                  ? [`Страховые выплаты: ${car.insurance_payout_count}`]
+                  ? [`Страховые случаи: ${car.insurance_payout_count}`]
                   : []),
               ]}
               images={displayGalleryMedia.length ? displayGalleryMedia : imageMedia}
@@ -389,9 +389,8 @@ function ConditionOverview({
     asNumber(carHistory?.owner_changed_count);
   const accidentCount =
     asNumber(carHistory?.my_car_accident_count) ?? car.accident_count;
-  const payoutTotal =
-    asNumber(carHistory?.my_car_accident_cost) ??
-    car.insurance_payout_total_krw;
+  const repairTotal =
+    asNumber(carHistory?.my_car_accident_cost);
   const payoutCount =
     asNumber(carHistory?.insurance_payout_count) ??
     (carHistory ? insuranceEvents.length : car.insurance_payout_count);
@@ -421,15 +420,21 @@ function ConditionOverview({
             }
           />
           <Spec
-            label="Страховые выплаты"
+            label="Стоимость ремонта по страховым случаям"
             value={
-              payoutTotal !== null
-                ? won(payoutTotal)
+              repairTotal !== null
+                ? won(repairTotal)
                 : "Нет данных"
             }
           />
+          {car.insurance_payout_total_krw !== null && car.insurance_payout_total_krw > 0 && (
+            <Spec
+              label="Выплаты по данным Encar"
+              value={won(car.insurance_payout_total_krw)}
+            />
+          )}
           <Spec
-            label="Кол-во выплат"
+            label="Количество случаев"
             value={payoutCount !== null ? String(payoutCount) : "Нет данных"}
           />
           {nonInsurancePeriods !== null && (
@@ -559,17 +564,26 @@ function BodyConditionMap({
 }
 
 function InsuranceDetails({ events }: { events: InsuranceEvent[] }) {
-  const total = events.reduce((sum, event) => sum + event.amount, 0);
+  const totalRepairCost = events.reduce((sum, event) => sum + (event.amount ?? 0), 0);
+  const totalInsuranceBenefit = events.reduce(
+    (sum, event) => sum + (event.insuranceBenefit ?? 0),
+    0,
+  );
   return (
     <details className="group p-2.5 sm:p-3">
       <summary className="grid min-h-10 cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 text-[13px] font-semibold sm:gap-3 sm:text-sm">
-        <span className="leading-4">Детализация страховых выплат</span>
+        <span className="leading-4">История страховых случаев и стоимость ремонта</span>
         <span className="whitespace-nowrap text-right text-[12px] text-[#647084] tabular-nums sm:text-sm">
-          {won(total)}
+          {won(totalRepairCost)}
         </span>
         <ChevronDown className="size-4 shrink-0 text-[#647084] transition group-open:rotate-180" />
       </summary>
       <div className="mt-2.5 grid gap-2.5 sm:mt-3 sm:gap-3">
+        {totalInsuranceBenefit > 0 && (
+          <p className="text-xs text-[#647084]">
+            Выплаты по данным Encar: <span className="font-semibold tabular-nums">{won(totalInsuranceBenefit)}</span>
+          </p>
+        )}
         {events.map((event, index) => (
           <div
             className="rounded bg-white p-3 ring-1 ring-[#edf0f5]"
@@ -580,23 +594,34 @@ function InsuranceDetails({ events }: { events: InsuranceEvent[] }) {
                 <p className="text-sm font-semibold tabular-nums">{event.date}</p>
                 <p className="mt-1 text-xs text-[#647084]">{event.kind}</p>
               </div>
-              <p className="shrink-0 whitespace-nowrap text-sm font-semibold tabular-nums">{won(event.amount)}</p>
+              <div className="shrink-0 text-right">
+                <p className="text-[10px] text-[#647084]">Стоимость ремонта</p>
+                <p className="whitespace-nowrap text-sm font-semibold tabular-nums">
+                  {event.amount === null ? "Не указана" : won(event.amount)}
+                </p>
+              </div>
             </div>
             <div className="mt-2.5 grid gap-1.5 text-xs text-[#647084]">
               <Spec
                 label="Запчасти"
                 value={
-                  event.component ? won(event.component) : "-"
+                  event.component !== null ? won(event.component) : "-"
                 }
               />
               <Spec
                 label="Окрас"
-                value={event.painting ? won(event.painting) : "-"}
+                value={event.painting !== null ? won(event.painting) : "-"}
               />
               <Spec
                 label="Работы"
-                value={event.wage ? won(event.wage) : "-"}
+                value={event.wage !== null ? won(event.wage) : "-"}
               />
+              {event.insuranceBenefit !== null && event.insuranceBenefit > 0 && (
+                <Spec
+                  label="Выплата по данным Encar"
+                  value={won(event.insuranceBenefit)}
+                />
+              )}
             </div>
             {event.operations.length > 0 && (
               <details className="mt-3 rounded bg-[#fbfcfe] p-3 text-xs leading-5 text-[#3a4353] ring-1 ring-[#edf0f5]">
@@ -978,22 +1003,23 @@ function buildInsuranceEvents(carHistory: Record<string, unknown> | null) {
     ...otherEvents.map((event) =>
       buildInsuranceEvent(event, "Выплата другому участнику"),
     ),
-    ...encarEvents.map((event) => buildInsuranceEvent(event, null)),
+    ...encarEvents.map((event) => buildInsuranceEvent(event, null, true)),
     ...chestnyEvents.map((event) => buildInsuranceEvent(event, null)),
   ].filter((event): event is InsuranceEvent => Boolean(event));
   const unique = new Map<string, InsuranceEvent>();
   for (const event of events) {
-    const key = [event.date, event.amount, event.wage ?? "", event.component ?? "", event.painting ?? ""].join("|");
+    const key = [event.date, event.amount, event.insuranceBenefit ?? "", event.wage ?? "", event.component ?? "", event.painting ?? ""].join("|");
     if (!unique.has(key)) unique.set(key, event);
   }
   return [...unique.values()].sort((a, b) => b.date.localeCompare(a.date));
 }
 
 type InsuranceEvent = {
-  amount: number;
+  amount: number | null;
   component: number | null;
   date: string;
   kind: string;
+  insuranceBenefit: number | null;
   operations: string[];
   painting: number | null;
   wage: number | null;
@@ -1002,6 +1028,7 @@ type InsuranceEvent = {
 function buildInsuranceEvent(
   value: unknown,
   kind: string | null,
+  isEncarEvent = false,
 ): InsuranceEvent | null {
   const record = getObject(value);
   if (!record) return null;
@@ -1011,13 +1038,27 @@ function buildInsuranceEvent(
       : typeof record.accidentDate === "string"
         ? record.accidentDate
         : null;
+  const component = asNumber(record.component) ?? asNumber(record.partCost);
+  const wage = asNumber(record.wage) ?? asNumber(record.laborCost);
+  const painting = asNumber(record.painting) ?? asNumber(record.paintingCost);
+  const hasRepairBreakdown = component !== null && wage !== null && painting !== null;
+  const legacyRepairCost = asNumber(record.repairCost);
+  const insuranceBenefit =
+    asNumber(record.insuranceBenefit) ??
+    (isEncarEvent && hasRepairBreakdown && legacyRepairCost !== null
+      ? legacyRepairCost
+      : null);
   const amount =
     asNumber(record.amount) ??
-    asNumber(record.insurance_money) ??
+    (!isEncarEvent ? asNumber(record.insurance_money) : null) ??
     asNumber(record.repair_estimate_amount) ??
-    asNumber(record.insurance_amount) ??
-    asNumber(record.repairCost);
-  if (!date || amount === null) return null;
+    (!isEncarEvent ? asNumber(record.insurance_amount) : null) ??
+    (isEncarEvent
+      ? hasRepairBreakdown
+        ? component + wage + painting
+        : null
+      : legacyRepairCost);
+  if (!date || (amount === null && insuranceBenefit === null)) return null;
   const eventKind =
     kind ??
     (typeof record.kind === "string" ? record.kind : null) ??
@@ -1026,7 +1067,7 @@ function buildInsuranceEvent(
     );
   return {
     amount,
-    component: asNumber(record.component) ?? asNumber(record.partCost),
+    component,
     date,
     kind: Boolean(record.is_severe_accident)
       ? `${eventKind} · серьёзный случай`
@@ -1039,7 +1080,8 @@ function buildInsuranceEvent(
         : null,
     ),
     painting: asNumber(record.painting) ?? asNumber(record.paintingCost),
-    wage: asNumber(record.wage) ?? asNumber(record.laborCost),
+    insuranceBenefit,
+    wage,
   };
 }
 

@@ -2,10 +2,23 @@
 export function mapEncarOpenHistory(value: Record<string, unknown>) {
   if (value.openData !== true) return null;
   const list = (v: unknown): Record<string, unknown>[] => Array.isArray(v) ? v as Record<string, unknown>[] : [];
-  const events = list(value.accidents).map(event => ({
-    accidentDate: event.date, accidentType: event.type, repairCost: event.insuranceBenefit,
-    partCost: event.partCost, laborCost: event.laborCost, paintingCost: event.paintingCost,
-  }));
+  const events = list(value.accidents).map(event => {
+    const partCost = numberOrNull(event.partCost);
+    const laborCost = numberOrNull(event.laborCost);
+    const paintingCost = numberOrNull(event.paintingCost);
+    return {
+      accidentDate: event.date,
+      accidentType: event.type,
+      repairCost:
+        partCost !== null && laborCost !== null && paintingCost !== null
+          ? partCost + laborCost + paintingCost
+          : null,
+      insuranceBenefit: numberOrNull(event.insuranceBenefit),
+      partCost,
+      laborCost,
+      paintingCost,
+    };
+  });
   const summary = {
     available: true,
     accident_count: value.accidentCnt ?? events.length,
@@ -14,7 +27,7 @@ export function mapEncarOpenHistory(value: Record<string, unknown>) {
     my_car_accident_cost: value.myAccidentCost ?? null,
     other_car_accident_cost: value.otherAccidentCost ?? null,
     insurance_payout_count: events.length,
-    insurance_payout_total_krw: events.reduce((sum, e) => sum + Number(e.repairCost ?? 0), 0),
+    insurance_payout_total_krw: events.reduce((sum, e) => sum + Number(e.insuranceBenefit ?? 0), 0),
     owner_changed_count: value.ownerChangeCnt ?? null,
     loan_count: value.loan ?? null,
     total_loss_count: value.totalLossCnt ?? null,
@@ -32,4 +45,9 @@ export function mapEncarOpenHistory(value: Record<string, unknown>) {
       return [{ startDate, endDate }];
     }),
   } };
+}
+
+function numberOrNull(value: unknown): number | null {
+  const parsed = Number(value);
+  return value == null || value === "" || !Number.isFinite(parsed) ? null : parsed;
 }

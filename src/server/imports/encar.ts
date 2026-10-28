@@ -201,6 +201,7 @@ type EncarHistoryAccident = {
   accidentDate?: string | null;
   accidentType?: string | null;
   repairCost?: number | null;
+  insuranceBenefit?: number | null;
   partCost?: number | null;
   laborCost?: number | null;
   paintingCost?: number | null;
@@ -534,7 +535,11 @@ function normalizeRecordOpenPayload(
   const accidents = (payload.accidents ?? []).map((event) => ({
     accidentDate: event.date ?? null,
     accidentType: event.type ?? null,
-    repairCost: event.insuranceBenefit ?? 0,
+    repairCost:
+      event.partCost != null && event.laborCost != null && event.paintingCost != null
+        ? event.partCost + event.laborCost + event.paintingCost
+        : null,
+    insuranceBenefit: event.insuranceBenefit ?? null,
     partCost: event.partCost ?? 0,
     laborCost: event.laborCost ?? 0,
     paintingCost: event.paintingCost ?? 0,
@@ -771,6 +776,7 @@ function sanitizeHistoryAccident(event: EncarHistoryAccident) {
     accidentDate: nullableText(event.accidentDate),
     accidentType: nullableText(event.accidentType),
     repairCost: nullableNumber(event.repairCost) ?? 0,
+    insuranceBenefit: nullableNumber(event.insuranceBenefit),
     partCost: nullableNumber(event.partCost) ?? 0,
     laborCost: nullableNumber(event.laborCost) ?? 0,
     paintingCost: nullableNumber(event.paintingCost) ?? 0,
@@ -814,7 +820,7 @@ export function buildEncarHistoryReport(
     sanitizeOwnerHistory,
   );
   const payoutTotalKrw = accidents.reduce(
-    (sum, event) => sum + event.repairCost,
+    (sum, event) => sum + (event.insuranceBenefit ?? event.repairCost),
     0,
   );
   return {
