@@ -18,6 +18,7 @@ import { bodyTypeFilterValue, transmissionFilterValue } from "@/lib/catalog-filt
 import { PrototypeVehicleCard } from "@/components/home/PrototypeVehicleCard";
 import { StoryCarousel } from "@/components/home/StoryCarousel";
 import { ContactLocations } from "@/components/home/ContactLocations";
+import { FinanceInquiryCard } from "@/components/home/FinanceInquiryCard";
 
 export const revalidate = 60;
 
@@ -68,16 +69,11 @@ export default async function Home() {
             />
             <DodoStoryCard
               title="Стань партнёром"
-              href="/#contacts"
+              href="/partners"
               image="/assets/stories/partner.webp"
               position="object-center"
             />
-            <DodoStoryCard
-              title="Кредитование"
-              image="/assets/stories/financing.webp"
-              position="object-center"
-              status="Скоро"
-            />
+            <FinanceInquiryCard />
           </StoryCarousel>
         </div>
       </section>
