@@ -909,13 +909,17 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
     "3ff62b8f-ce4b-40f3-b10a-05536c96f414", // Renault Korea Master, Encar 42839503
     "7d85beaa-9402-4100-81a5-3a2f561a87ed", // MINI Countryman, Encar 42820256
   ]);
+  const removedAtSourceHomepageListings = new Set([
+    "42898581", // Confirmed removed at source by the site owner.
+    "43044002", // Hyundai Sonata: detail URL returns 404.
+  ]);
 
   const presentableCars = (page: CatalogPageResult, limit: number) => page.cars
     .flatMap((car) => {
       if (rejectedHomepageCars.has(car.id)) return [];
       // Confirmed removed at the source by the site owner; replace its
       // showcase slot without changing catalogue records or publication state.
-      if (car.primary_source === "encar" && car.source_id === "42898581") return [];
+      if (car.primary_source === "encar" && removedAtSourceHomepageListings.has(car.source_id)) return [];
       const url = covers.get(car.id);
       return url ? [{ ...car, primary_image_url: url, primary_thumbnail_url: url }] : [];
     })
@@ -931,7 +935,7 @@ async function fetchHomeCatalogData(): Promise<HomeCatalogData> {
 
 const getCachedHomeCatalogData = unstable_cache(
   fetchHomeCatalogData,
-  ["home-catalog-showcases-v9-gallery-cover", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
+  ["home-catalog-showcases-v10-removed-listings", process.env.NEXT_PUBLIC_SUPABASE_URL ?? "unknown"],
   { revalidate: 60 },
 );
 
