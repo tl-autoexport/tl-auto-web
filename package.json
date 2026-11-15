@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "npm run test:calc && npm run test:kz && npm run test:powersports && npm run test:catalog-sync && npm run test:calculation-contract && npm run test:recalculation-power && npm run test:encar-deduplication && npm run test:new-encar-preflight-deduplication && npm run test:encar-filter && npm run test:encar-ev-battery && npm run test:encar:date && npm run test:encar:card-data && npm run test:normalization && npm run test:catalog-brand && npm run test:power-resolution && npm run test:automatic-power-reference && npm run test:contact && npm run test:site-url && npm run test:request-guard && npm run test:encarrus-power",
+    "test": "npm run test:calc && npm run test:kz && npm run test:powersports && npm run test:catalog-sync && npm run test:calculation-contract && npm run test:recalculation-power && npm run test:encar-deduplication && npm run test:new-encar-preflight-deduplication && npm run test:encar-filter && npm run test:encar-ev-battery && npm run test:encar:date && npm run test:encar:card-data && npm run test:normalization && npm run test:catalog-brand && npm run test:power-resolution && npm run test:automatic-power-reference && npm run test:contact && npm run test:site-url && npm run test:request-guard && npm run test:encarrus-power && npm run test:power-sync",
     "check": "npm run lint && npm run typecheck && npm test && npm run test:catalog-reads",
     "test:catalog-reads": "tsx src/server/cars/catalog-read-coalescer.test.ts && tsx src/lib/catalog-client-read.test.ts",
     "audit:catalog-reads": "tsx scripts/verify-catalog-read-performance.ts",
@@ -152,7 +152,10 @@
     "enrich:chestny:encar": "tsx scripts/enrich-chestny-from-encar.ts",
     "enrich:chestny:history": "tsx scripts/enrich-chestny-insurance-history.ts",
     "archive:catalog": "tsx scripts/archive-current-catalog.ts",
-    "restore:catalog": "tsx scripts/restore-catalog-archive.ts"
+    "restore:catalog": "tsx scripts/restore-catalog-archive.ts",
+    "power:sync": "tsx scripts/power-sync.ts",
+    "test:power-sync": "tsx --test src/server/power-sync/sync/*.test.ts",
+    "test:power-sync:postgres": "bash scripts/test-power-sync-postgres.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.0",
