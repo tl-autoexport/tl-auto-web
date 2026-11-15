@@ -5,7 +5,10 @@ async function main(){const d=new Client({connectionString:process.env.SUPABASE_
 const rows=(await d.query(`with latest as (select distinct on (source_id) source_id,
  jsonb_build_object('detail',jsonb_build_object('spec',payload->'detail'->'spec','category',payload->'detail'->'category'),
  'list',jsonb_build_object('Badge',payload->'list'->'Badge','BadgeDetail',payload->'list'->'BadgeDetail','FormYear',payload->'list'->'FormYear','Transmission',payload->'list'->'Transmission')) source_payload
- from public.source_snapshots where source='encar' order by source_id,fetched_at desc)
+ from (select source_id,payload,0 priority,fetched_at,fetched_at tie_breaker from public.source_snapshots where source='encar'
+       union all select source_listing_id source_id,raw_payload payload,1 priority,fetched_at,created_at tie_breaker
+       from public.encar_enrichment_staging where source='encar' and raw_payload is not null) saved
+ order by source_id,priority,fetched_at desc nulls last,tie_breaker desc)
  select c.id,c.primary_source,c.source_id,c.brand,c.model,c.year,c.fuel_type,c.engine_cc,c.badge,c.badge_detail,c.grade,c.trim,c.transmission,c.drive_type,c.vehicle_specs,
  st.transmission staging_transmission,st.drive_type staging_drive,l.source_payload
  from public.cars c left join public.chestny_catalog_staging st on c.primary_source='chestny_prigon' and st.source_listing_id=c.source_id

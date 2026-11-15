@@ -296,7 +296,12 @@ async function main() {
     }
     const existing = await db.query<{ source_id: string; run_id: string | null; snapshots: number; media: number; calculations: number }>(`
       select c.source_id,c.vehicle_specs->>'enrichment_run_id' run_id,
-        (select count(*)::int from public.source_snapshots s where s.source='encar' and s.source_id=c.source_id) snapshots,
+        (select count(*)::int from (
+          select s.source_id from public.source_snapshots s where s.source='encar' and s.source_id=c.source_id
+          union all
+          select e.source_listing_id from public.encar_enrichment_staging e
+          where e.source='encar' and e.source_listing_id=c.source_id and e.raw_payload is not null
+        ) saved) snapshots,
         (select count(*)::int from public.car_media m where m.car_id=c.id) media,
         (select count(*)::int from public.calc_snapshots x where x.car_id=c.id) calculations
       from public.cars c where c.primary_source='encar' and c.source_id=any($1::text[])`, [ids]);
@@ -385,7 +390,12 @@ async function main() {
         }
         const verify = await db.query<{ cars: number; snapshots: number; media: number; calculations: number }>(`
           select (select count(*)::int from public.cars where primary_source='encar' and source_id=any($1::text[]) and is_available) cars,
-            (select count(distinct s.source_id)::int from public.source_snapshots s where s.source='encar' and s.source_id=any($1::text[])) snapshots,
+            (select count(distinct saved.source_id)::int from (
+              select s.source_id from public.source_snapshots s where s.source='encar' and s.source_id=any($1::text[])
+              union all
+              select e.source_listing_id source_id from public.encar_enrichment_staging e
+              where e.source='encar' and e.source_listing_id=any($1::text[]) and e.raw_payload is not null
+            ) saved) snapshots,
             (select count(distinct m.car_id)::int from public.car_media m join public.cars c on c.id=m.car_id
               where c.primary_source='encar' and c.source_id=any($1::text[])) media,
             (select count(distinct x.car_id)::int from public.calc_snapshots x join public.cars c on c.id=x.car_id

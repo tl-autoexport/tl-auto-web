@@ -45,10 +45,17 @@ async function loadTl() {
     const cars = (await db.query<Car>(`
       with visible as (select * from public.cars c where public.catalog_match(c,'{}'::jsonb)),
       latest as (
-        select distinct on(s.source_id) s.source_id,s.payload
-        from public.source_snapshots s
-        where s.source='encar' and s.source_id in (select source_id from visible)
-        order by s.source_id,s.fetched_at desc
+        select distinct on(saved.source_id) saved.source_id,saved.payload
+        from (
+          select s.source_id,s.payload,0 priority,s.fetched_at,s.fetched_at tie_breaker
+          from public.source_snapshots s where s.source='encar'
+          union all
+          select e.source_listing_id source_id,e.raw_payload payload,1 priority,e.fetched_at,e.created_at tie_breaker
+          from public.encar_enrichment_staging e
+          where e.source='encar' and e.raw_payload is not null
+        ) saved
+        where saved.source_id in (select source_id from visible)
+        order by saved.source_id,saved.priority,saved.fetched_at desc nulls last,saved.tie_breaker desc
       )
       select c.id,c.primary_source,c.source_id,c.brand,c.model,c.generation,c.generation_code,
         c.trim,c.grade,c.badge,c.badge_detail,c.year,

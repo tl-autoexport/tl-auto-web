@@ -29,8 +29,13 @@ async function main() {
       select c.id,c.source_id,s.payload->'detail' detail,s.payload->'openHistory' history,
         s.payload->'inspection' inspection,s.payload->'choiceOptions' choices
       from cars c left join lateral (
-        select payload from source_snapshots where source='encar' and source_id=c.source_id
-        order by fetched_at desc limit 1
+        select payload from (
+          select payload,0 priority,fetched_at,fetched_at tie_breaker from source_snapshots
+          where source='encar' and source_id=c.source_id
+          union all
+          select raw_payload payload,1 priority,fetched_at,created_at tie_breaker from encar_enrichment_staging
+          where source='encar' and source_listing_id=c.source_id and raw_payload is not null
+        ) saved order by priority,fetched_at desc nulls last,tie_breaker desc limit 1
       ) s on true
       where c.primary_source='encar' and c.is_available=true and c.price_rub is not null
         and c.power_hp is not null and ($1::text is null or c.source_id=$1)

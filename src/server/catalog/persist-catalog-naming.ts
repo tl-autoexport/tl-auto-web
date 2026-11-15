@@ -22,7 +22,15 @@ export async function persistCatalogNamingPg(db:Client,carId:string){
  const r=await db.query<Car & {category:Record<string,unknown>|null;list:Record<string,unknown>|null}>(`select c.id,c.primary_source,c.source_id,c.brand,c.model,c.generation,c.generation_code,c.trim,c.grade,c.badge,c.badge_detail,c.year,
  st.generation staging_generation,st.trim staging_trim,s.payload#>'{detail,category}' category,s.payload->'list' list
  from public.cars c left join public.chestny_catalog_staging st on c.primary_source='chestny_prigon' and st.source_listing_id=c.source_id
- left join lateral(select payload from public.source_snapshots where source='encar' and source_id=c.source_id order by fetched_at desc limit 1)s on true where c.id=$1`,[carId]);
+ left join lateral(
+   select payload from (
+     select payload,0 as priority,fetched_at,fetched_at as tie_breaker from public.source_snapshots
+     where source='encar' and source_id=c.source_id
+     union all
+     select raw_payload as payload,1 as priority,fetched_at,created_at as tie_breaker from public.encar_enrichment_staging
+     where source='encar' and source_listing_id=c.source_id and raw_payload is not null
+   ) saved order by priority,fetched_at desc nulls last,tie_breaker desc limit 1
+ )s on c.primary_source='encar' where c.id=$1`,[carId]);
  if(!r.rows[0])throw new Error(`Car not found for naming: ${carId}`);
  const car=r.rows[0];car.source_names=sourceNames(car.category??{},car.list??{});
  const payload=resolveName(car);const keys=Object.keys(payload);const values=keys.map(k=>payload[k as keyof typeof payload]);
@@ -31,12 +39,17 @@ export async function persistCatalogNamingPg(db:Client,carId:string){
 export async function persistCatalogNamingSupabase(db:SupabaseClient,carId:string){
  const result=await db.from('cars').select(carFields).eq('id',carId).single();if(result.error)throw result.error;
  const car=result.data as unknown as Car;
- const [snapshot,staging]=await Promise.all([
- db.from('source_snapshots').select('category:payload->detail->category,list:payload->list').eq('source','encar').eq('source_id',car.source_id).order('fetched_at',{ascending:false}).limit(1).maybeSingle(),
+ const [snapshot,sourceStaging,staging]=await Promise.all([
+ car.primary_source==='encar'?db.from('source_snapshots').select('category:payload->detail->category,list:payload->list').eq('source','encar').eq('source_id',car.source_id).order('fetched_at',{ascending:false}).limit(1).maybeSingle():Promise.resolve({data:null,error:null}),
+ car.primary_source==='encar'?db.from('encar_enrichment_staging').select('raw_payload').eq('source','encar').eq('source_listing_id',car.source_id).not('raw_payload','is',null).order('fetched_at',{ascending:false,nullsFirst:false}).order('created_at',{ascending:false}).limit(1).maybeSingle():Promise.resolve({data:null,error:null}),
  car.primary_source==='chestny_prigon'?db.from('chestny_catalog_staging').select('generation,trim').eq('source_listing_id',car.source_id).maybeSingle():Promise.resolve({data:null,error:null}),
  ]);
- if(snapshot.error)throw snapshot.error;if(staging.error)throw staging.error;
+ if(snapshot.error)throw snapshot.error;if(sourceStaging.error)throw sourceStaging.error;if(staging.error)throw staging.error;
  car.staging_generation=staging.data?.generation??null;car.staging_trim=staging.data?.trim??null;
- car.source_names=sourceNames(snapshot.data?.category as Record<string,unknown>??{},snapshot.data?.list as Record<string,unknown>??{});
+ const payload=(sourceStaging.data?.raw_payload??null) as Record<string,unknown>|null;
+ const detail=(payload?.detail??{}) as Record<string,unknown>;
+ const sourceCategory=(snapshot.data?.category??detail.category??{}) as Record<string,unknown>;
+ const sourceList=(snapshot.data?.list??payload?.list??{}) as Record<string,unknown>;
+ car.source_names=sourceNames(sourceCategory,sourceList);
  const saved=await db.from('catalog_vehicle_names').upsert(resolveName(car),{onConflict:'car_id'});if(saved.error)throw saved.error;
 }

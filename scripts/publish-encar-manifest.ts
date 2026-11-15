@@ -328,7 +328,12 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
           select c.source_id,c.id,c.vehicle_specs->>'enrichment_run_id' run_id,
             (select count(*)::text from public.calc_snapshots s where s.car_id=c.id) snapshots,
             (select count(*)::text from public.car_media m where m.car_id=c.id) media,
-            (select count(*)::text from public.source_snapshots s where s.source='encar' and s.source_id=c.source_id) source_snapshots
+            (select count(*)::text from (
+              select s.source_id from public.source_snapshots s where s.source='encar' and s.source_id=c.source_id
+              union all
+              select e.source_listing_id from public.encar_enrichment_staging e
+              where e.source='encar' and e.source_listing_id=c.source_id and e.raw_payload is not null
+            ) saved) source_snapshots
           from public.cars c where c.primary_source='encar' and c.source_id=any($1::text[]) for update of c`, [batchIds]);
         const completed = new Set<string>();
         for (const car of present.rows) {
@@ -368,7 +373,12 @@ const report = JSON.parse(reportText) as { runId: string; rateSnapshot: CalcRate
       (select count(*) from public.cars where primary_source='encar' and source_id=any($1::text[]) and is_available=true)::text cars,
       (select count(distinct s.car_id) from public.calc_snapshots s join public.cars c on c.id=s.car_id where c.primary_source='encar' and c.source_id=any($1::text[]))::text snapshots,
       (select count(distinct m.car_id) from public.car_media m join public.cars c on c.id=m.car_id where c.primary_source='encar' and c.source_id=any($1::text[]))::text media,
-      (select count(distinct s.source_id) from public.source_snapshots s where s.source='encar' and s.source_id=any($1::text[]))::text source_snapshots`, [batchIds]);
+      (select count(distinct saved.source_id) from (
+        select s.source_id from public.source_snapshots s where s.source='encar' and s.source_id=any($1::text[])
+        union all
+        select e.source_listing_id source_id from public.encar_enrichment_staging e
+        where e.source='encar' and e.source_listing_id=any($1::text[]) and e.raw_payload is not null
+      ) saved)::text source_snapshots`, [batchIds]);
         const v = verify.rows[0];
         if (Number(v.cars) !== batch.length || Number(v.snapshots) !== batch.length || Number(v.media) !== batch.length || Number(v.source_snapshots) !== batch.length)
           throw new Error(`Batch verification failed: ${JSON.stringify(v)}`);
