@@ -68,6 +68,9 @@ export function resolveAutomaticPowerReference(
   const configurationMatches = matches.filter((row) => matchSpecificity(row) === mostSpecific);
   const narrowestWidth = Math.min(...configurationMatches.map(yearRangeWidth));
   const best = configurationMatches.filter((row) => yearRangeWidth(row) === narrowestWidth);
-  const powers = new Set(best.map((row) => `${row.power_hp}:${row.power_kw ?? ""}`));
+  // Calculations consume power_hp. Minor kW differences can come from conversion
+  // precision across sources and must not make an otherwise identical PS match
+  // ambiguous. Different horsepower values at the same match specificity still fail closed.
+  const powers = new Set(best.map((row) => String(row.power_hp)));
   return powers.size === 1 ? best[0] : null;
 }

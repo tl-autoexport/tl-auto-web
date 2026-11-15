@@ -11,6 +11,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { canonicalCandidates, canonicalEngineCc, canonicalGeneration, canonicalInput, configurationKey } from "../src/server/power-resolution/canonical";
 import { normalizeDrive } from "../src/server/normalization/vehicles";
 import { resolveApprovedPower, type ApprovedPowerCandidate } from "../src/server/power-resolution/resolver";
+import { resolveAutomaticPowerReference, type AutomaticPowerReferenceRow } from "../src/server/catalog/automatic-power-reference";
 
 config({ path: ".env.local", override: true, quiet: true });
 config({ path: ".env", quiet: true });
@@ -194,7 +195,7 @@ async function main() {
   await db.connect();
   try {
     await db.query("begin read only");
-    const [refs, rows] = await Promise.all([
+    const [refs, automaticRefs, rows] = await Promise.all([
       db.query(`select spec.id spec_id,spec.version spec_version,spec.calculation_power_kw,spec.power_basis,spec.source_priority,
           evidence.id evidence_id,evidence.source_kind evidence_kind,evidence.verification_status,evidence.reliability,evidence.evidence_tier,evidence.source_uri,
           matcher.id match_id,matcher.priority match_priority,matcher.brand,matcher.model,matcher.generation,matcher.trim,matcher.badge_normalized,matcher.model_code,matcher.engine_code,matcher.fuel_type,matcher.drive_type,matcher.production_year_from,matcher.production_year_to,matcher.engine_cc_from,matcher.engine_cc_to
@@ -202,6 +203,9 @@ async function main() {
         join public.vehicle_power_evidence evidence on evidence.id=spec.evidence_id
         join public.vehicle_power_spec_matches matcher on matcher.spec_id=spec.id
         where spec.status='approved' and evidence.verification_status='approved'`),
+      db.query<AutomaticPowerReferenceRow & { note: string }>(`select configuration_key,brand,model,fuel_type,engine_cc,drive_type,badge,badge_detail,
+          year_from,year_to,power_hp,power_kw,source,status,note
+        from public.vehicle_power_automatic_reference where status='automatic'`),
       db.query<CandidateRow>(`select q.source_listing_id,q.candidate_snapshot,q.result,s.raw_payload,s.normalized
         from public.encar_enrichment_queue q
         join public.encar_enrichment_staging s on s.run_id=q.run_id and s.source_listing_id=q.source_listing_id
@@ -219,6 +223,16 @@ async function main() {
       const resolution = resolveApprovedPower(input, approved);
       if (resolution.status !== "matched") {
         const potential = potentialMatches(input, approved);
+        const automatic = resolveAutomaticPowerReference({
+          brand: input.brand, model: input.model, fuel_type: input.fuelType, engine_cc: input.engineCc,
+          drive_type: input.driveType, badge: input.badge, badge_detail: input.trim,
+          year: input.year, source_listing_id: row.source_listing_id,
+        }, automaticRefs.rows) as (AutomaticPowerReferenceRow & { note: string }) | null;
+        const automaticPowerMatch = automatic?.power_hp == null ? undefined : {
+          powerHp: Number(automatic.power_hp), powerKw: automatic.power_kw == null ? null : Number(automatic.power_kw),
+          source: automatic.source, sourceUrl: automatic.note.match(/https?:\/\/[^\s|]+/)?.[0] ?? null,
+          status: "preliminary_automatic_reference" as const,
+        };
         const status = resolution.candidates.length
           ? "ambiguous"
           : potential.specIds.length
@@ -228,6 +242,7 @@ async function main() {
           sourceListingId: row.source_listing_id, status,
           reason: resolution.reason, configuration: input, configurationKey: configurationKey(input),
           candidateSpecIds: resolution.candidates.map((candidate) => candidate.specId),
+          ...(automaticPowerMatch ? { automaticPowerMatch } : {}),
           ...(potential.specIds.length ? { potentialMatch: potential } : {}),
         };
       }
@@ -238,16 +253,17 @@ async function main() {
         power: { specId: resolution.candidate.specId, evidenceId: resolution.candidate.evidenceId, evidenceTier: evidence?.evidenceTier ?? "unknown", sourceUrl: evidence?.sourceUrl ?? null, confidence: resolution.confidence, calculationPowerKw: resolution.candidate.calculationPowerKw, powerBasis: resolution.candidate.powerBasis },
       };
     });
-    const counts = Object.fromEntries([
+    const counts: Record<string, number> = Object.fromEntries([
       "approved_match", "ambiguous", "potential_match_needs_configuration", "potential_ambiguous_needs_configuration", "unmatched", "needs_source_retry",
     ].map((status) => [status, reportRows.filter((row) => row.status === status).length]));
+    counts.automatic_preliminary_match = reportRows.filter((row) => Boolean((row as { automaticPowerMatch?: unknown }).automaticPowerMatch)).length;
     const searchGroups = new Map<string, {
       brand: string | null; model: string | null; generation: string | null; year: number | null;
       engineCc: number | null; fuelType: string | null; driveType: string | null;
       listingIds: string[]; badgeExamples: string[]; sourceExamples: ReturnType<typeof sourceIdentity>[];
     }>();
     for (const row of reportRows) {
-      if (row.status !== "unmatched") continue;
+      if (row.status !== "unmatched" || (row as { automaticPowerMatch?: unknown }).automaticPowerMatch) continue;
       const vehicle = row.configuration;
       const key = [vehicle.brand, vehicle.model, vehicle.generation, vehicle.year, vehicle.engineCc, vehicle.fuelType, vehicle.driveType]
         .map((value) => value ?? "?").join("|");
@@ -272,10 +288,10 @@ async function main() {
       .map((row) => ({ sourceListingId: row.sourceListingId, configuration: row.configuration, power: row.power ?? null }));
     const report = {
       generatedAt: new Date().toISOString(), runId, readOnly: true, encarRequests: 0, databaseWrites: 0, publicCatalogChanged: false,
-      policy: "approved TL Auto power evidence only; automatic reference, AI, price calculation and publication are excluded",
-      input: { succeededEnrichmentRows: rows.rowCount ?? 0, approvedReferenceRules: refs.rowCount ?? 0 },
+      policy: "Approved TL Auto power evidence is matched first; a unique automatic reference is attached as a preliminary calculation match and excluded from external-search work",
+      input: { succeededEnrichmentRows: rows.rowCount ?? 0, approvedReferenceRules: refs.rowCount ?? 0, automaticPowerReferences: automaticRefs.rowCount ?? 0 },
       counts,
-      externalSearch: { unmatchedListings: counts.unmatched, distinctConfigurations: externalSearchWorklist.length, worklist: externalSearchWorklist },
+      externalSearch: { unmatchedListings: reportRows.filter((row) => row.status === "unmatched" && !(row as { automaticPowerMatch?: unknown }).automaticPowerMatch).length, distinctConfigurations: externalSearchWorklist.length, worklist: externalSearchWorklist },
       t3Review,
       candidates: reportRows,
     };
